@@ -154,7 +154,7 @@ function switchPage(n){navItems.forEach(function(i){i.classList.toggle('active',
 navItems.forEach(function(i){i.addEventListener('click',function(){switchPage(i.dataset.page)})});
 var audio=document.getElementById('audioEl'),miniP=document.getElementById('miniPlayer'),pIcon=document.getElementById('playIcon'),pFill=document.getElementById('pbarFill'),ptN=document.getElementById('ptName'),ptA=document.getElementById('ptArtist'),pCov=document.getElementById('pCover'),curEl=document.getElementById('curTime'),totEl=document.getElementById('totTime'),volS=document.getElementById('volSlider'),volI=document.getElementById('volIcon');
 var curIdx=-1,playing=false;
-var tracks=[{name:'诛仙团歌2026版本',artist:'诛仙世界',url:'%E7%8C%9F%E4%BB%99%E5%9B%A2%E6%AD%8C2026%E7%89%88%E6%9C%AC.mp3'},{name:'閨靈尊11语版本',artist:'诛仙世界',url:'%E9%96%93%E9%9C%8A%E5%B0%8A11%E8%AF%AD%E7%89%88%E6%9C%AC.mp3'}];
+var tracks=[{name:'诛仙团歌2026版本',artist:'诛仙世界',url:'诛仙团歌2026版本.mp3'},{name:'閨靈尊11语版本',artist:'诛仙世界',url:'閨靈尊11语版本.mp3'}];
 audio.volume=.75;
 function playTrack(i){if(i<0||i>=tracks.length)return;var t=tracks[i];curIdx=i;ptN.textContent=t.name;ptA.textContent=t.artist;miniP.classList.add('show');hlPlay(i);audio.src=t.url;audio.load();audio.play().then(function(){playing=true;updBtn();pCov.classList.add('spn')}).catch(function(e){console.log(e)})}
 function togglePlay(){if(curIdx===-1){playTrack(0);return}if(playing){audio.pause();playing=false;pCov.classList.remove('spn')}else{audio.play();playing=true;pCov.classList.add('spn')}updBtn()}
