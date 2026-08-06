@@ -110,6 +110,21 @@ html{scroll-behavior:smooth}body{font-family:'Nunito',-apple-system,sans-serif;b
 .fl{display:flex;gap:16px;justify-content:center;margin-top:12px}.fl a{color:var(--txl);text-decoration:none;font-size:.82rem;transition:color .3s}.fl a:hover{color:var(--b400)}
 @media(max-width:768px){.pg{padding:90px 18px 40px}.nav{gap:2px;padding:4px}.nl{padding:6px 10px;font-size:.8rem}.nd{display:none}.ni{padding:6px 9px;font-size:.72rem}.ht{font-size:2.2rem}.ht .cn{font-size:2.5rem}.ai{flex-direction:column}.aac{flex:unset}.ag{grid-template-columns:1fr}.sg{grid-template-columns:1fr}.rl{grid-template-columns:1fr}.lg{grid-template-columns:repeat(2,1fr)}.lm{flex-direction:column;text-align:center}.bg{grid-template-columns:repeat(2,1fr)}.pvl{display:none}.pti{display:none}}
 @media(max-width:480px){.ni{padding:5px 7px;font-size:.68rem}.ht{font-size:1.8rem}.ht .cn{font-size:2rem}.lg{grid-template-columns:1fr}}
+.gallery-card{background:var(--white);border-radius:var(--r);box-shadow:var(--sd);border:1px solid var(--bd);padding:36px;margin-bottom:36px;overflow:hidden}
+.gallery-card h3{font-size:1.15rem;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.gallery-wrap{position:relative;width:100%;border-radius:var(--rs);overflow:hidden;background:#000;aspect-ratio:16/9}
+.gallery-slide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease-in-out}
+.gallery-slide.active{opacity:1}
+.gallery-slide img{width:100%;height:100%;object-fit:contain;display:block}
+.gallery-nav{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.7);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--text);transition:all .3s;z-index:2;backdrop-filter:blur(4px)}
+.gallery-nav:hover{background:var(--b400);color:#fff;transform:translateY(-50%) scale(1.1)}
+.gallery-nav.prev{left:12px}.gallery-nav.next{right:12px}
+.gallery-dots{display:flex;justify-content:center;gap:8px;margin-top:16px}
+.gallery-dot{width:10px;height:10px;border-radius:50%;background:var(--b100);cursor:pointer;transition:all .3s var(--sp)}
+.gallery-dot.active{background:var(--b500);transform:scale(1.3)}
+.gallery-caption{text-align:center;margin-top:12px;color:var(--txm);font-size:.88rem;font-weight:600}
+.gallery-wrap:hover .gallery-nav{opacity:1}
+.gallery-wrap:not(:hover) .gallery-nav{opacity:.5}
 </style>
 </head>
 <body>
@@ -140,7 +155,7 @@ html{scroll-behavior:smooth}body{font-family:'Nunito',-apple-system,sans-serif;b
 <div class="rs rz st"><div class="rsh"><div class="ri">🎵</div><h3>诛仙世界音乐</h3><span class="dc"></span></div><div class="plc"><div class="plh"><h3>🎧 我的歌单</h3></div><div class="pll" id="plList"><div class="pli" onclick="playTrack(0)"><div class="pln"><span>01</span><div class="pb"><span></span><span></span><span></span><span></span></div></div><div class="plf"><div class="pn">诛仙团歌2026版本</div><div class="pa">诛仙世界</div></div><div class="pld">--:--</div></div><div class="pli" onclick="playTrack(1)"><div class="pln"><span>02</span><div class="pb"><span></span><span></span><span></span><span></span></div></div><div class="plf"><div class="pn">閨靈尊11语版本</div><div class="pa">诛仙世界</div></div><div class="pld">--:--</div></div></div></div>
 
 </div></section>
-
+<div class="gallery-card st"><h3>📸 我们的毕业照</h3><div class="gallery-wrap" id="galleryWrap"><div class="gallery-slide active"><img src="1.png"></div><div class="gallery-slide"><img src="2.png"></div><div class="gallery-slide"><img src="3.png"></div><div class="gallery-slide"><img src="4.png"></div><div class="gallery-slide"><img src="5.png"></div><button class="gallery-nav prev" onclick="galleryMove(-1)">‹</button><button class="gallery-nav next" onclick="galleryMove(1)">›</button></div><div class="gallery-dots" id="galleryDots"><span class="gallery-dot active" onclick="galleryGo(0)"></span><span class="gallery-dot" onclick="galleryGo(1)"></span><span class="gallery-dot" onclick="galleryGo(2)"></span><span class="gallery-dot" onclick="galleryGo(3)"></span><span class="gallery-dot" onclick="galleryGo(4)"></span></div><div class="gallery-caption">诛仙世界S3团员合照</div></div>
 <!-- LIFE -->
 <section class="pg" id="page-life"><div class="pi"><div class="sh st"><span class="ico">🌈</span><h2>我的生活</h2><p>代码之外，还有很多值得热爱的事</p><span class="ln"></span></div><div class="lm st"><div class="me">🌤️</div><div class="mtx"><h3>林深的今日心情</h3><p>今天是一个适合写代码的好天气。窗外有阳光透过树叶洒在桌上，手边是一杯刚做好的拿铁。下午打算在诛仙世界里探索新地图~</p><span class="ms"><i></i>正在输入新的生活日志...</span></div></div><div class="lsh st"><h3>🎯 兴趣爱好</h3><span class="dc"></span></div><div class="lg"><div class="lc st"><span class="le">🎮</span><h4>诛仙世界</h4><p>穿越山水之间的修仙之旅，最喜欢在青云山上看日出</p></div><div class="lc st"><span class="le">🎨</span><h4>手绘</h4><p>Procreate 是我的快乐源泉，画一些小动物和风景</p></div><div class="lc st"><span class="le">☕</span><h4>咖啡</h4><p>正在学习手冲，从选豆到萃取，每一杯都是仪式感</p></div><div class="lc st"><span class="le">📚</span><h4>阅读</h4><p>最近在读设计心理学和一些温暖的散文集</p></div><div class="lc st"><span class="le">🎵</span><h4>音乐</h4><p>独立民谣和日系轻音乐，是深夜编码的最佳搭档</p></div><div class="lc st"><span class="le">🐱</span><h4>猫咪</h4><p>家里有一只叫布丁的英短，它是我最好的听众</p></div></div><div class="lsh st"><h3>📖 最近在读</h3><span class="dc"></span></div><div class="bg st"><div class="bk"><div class="bcv">📘</div><h4>设计心理学</h4><p class="ba">唐纳德·诺曼</p></div><div class="bk"><div class="bcv">📕</div><h4>我与地坛</h4><p class="ba">史铁生</p></div><div class="bk"><div class="bcv">📗</div><h4>小王子</h4><p class="ba">圣埃克苏佩里</p></div><div class="bk"><div class="bcv">📙</div><h4>写给大家看的设计书</h4><p class="ba">Robin Williams</p></div></div></div></section>
 
