@@ -366,21 +366,23 @@ function submitWinner(){var name=document.getElementById('winnerInput').value.tr
   document.getElementById('mxMask').classList.remove('show');document.getElementById('mxPopup').classList.remove('show');
   saveToDB();showWinnerBanner(name);}
 document.getElementById('mxMask').addEventListener('click',function(){document.getElementById('mxMask').classList.remove('show');document.getElementById('mxPopup').classList.remove('show')});
-var _nxT=0,_nxH=0,_nxC=false;
+var _nxT=parseInt(localStorage.getItem('nxWhips')||'0'),_nxH=0,_nxC=false;
 var _nxF=['🐻','🤕','😭','😿','🥺','💦','😰','😫','😢','🫠'];
 var _nxD=['别打了！我错了！','哥哥放过我~','啊啊我要回家！','呜呜我再也不摸鱼了...才怪！','林深饶命~我是萌新！','再打我就哭了！','已经哭了好吗！','功德-1！功德-1！','我投降！举白旗了！','你打我...轻点？','我记仇的！','呜呜布丁救我~','别打了~我唱歌给你听！','再打我就躺地上！','我的屁股着火了！','你这是积怨吧！','你打了我20下了！','我浑身都疼...心更疼...','饶了我吧~我帮你肝诛仙！','你是林深暴龙吗？','妈妈有人欺负小孩！','不如给我+1杯奶茶！','我要发朋友圈曝光你！','你是不是没朋友才打我？','我给你磕头了！咚咚咚~','功德条清零了！','林深最好了~饶我吧~','我保证每天来访问！','别...别打脸！','我错了×3！','布丁说不想救我...','再打我就进化了！','救命啊~有没有人管管~','呜呜眼泪止不住了...','功德-999！','我变了！别再打了！'];
 document.getElementById('mxNT').textContent='萌新';
+document.getElementById('nxG').textContent=_nxT;
 (async function(){
   try{
     var r=await _sb.from('leaderboard').select('exp').eq('id','_whips').limit(1);
-    if(r.data&&r.data.length>0){_nxT=r.data[0].exp||0;}
-    document.getElementById('nxG').textContent=_nxT;
+    if(r.data&&r.data.length>0){var dbVal=r.data[0].exp||0;if(dbVal>_nxT){_nxT=dbVal;localStorage.setItem('nxWhips',_nxT);document.getElementById('nxG').textContent=_nxT;}}
   }catch(e){}
 })();
 function _nxSnd(){try{var c=new(window.AudioContext||window.webkitAudioContext)(),d=.12,b=c.createBuffer(1,c.sampleRate*d,c.sampleRate),a=b.getChannelData(0);for(var i=0;i<a.length;i++){var t=i/c.sampleRate;a[i]=(Math.random()*2-1)*Math.exp(-t*55)*.5;}var s=c.createBufferSource();s.buffer=b;var f=c.createBiquadFilter();f.type='bandpass';f.frequency.setValueAtTime(3500,c.currentTime);f.frequency.exponentialRampToValueAtTime(400,c.currentTime+d);f.Q.value=2;s.connect(f);f.connect(c.destination);s.start();s.stop(c.currentTime+d);var b2=c.createBuffer(1,c.sampleRate*.06,c.sampleRate),a2=b2.getChannelData(0);for(var j=0;j<a2.length;j++)a2[j]=Math.sin(j/c.sampleRate*500)*Math.exp(-j/c.sampleRate*80)*.35;var s2=c.createBufferSource();s2.buffer=b2;s2.connect(c.destination);s2.start();s2.stop(c.currentTime+.06);}catch(e){}}
+function _nxSnd(){try{var c=new(window.AudioContext||window.webkitAudioContext)(),d=.12,b=c.createBuffer(1,c.sampleRate*d,c.sampleRate),a=b.getChannelData(0);for(var i=0;i<a.length;i++){var t=i/c.sampleRate;a[i]=(Math.random()*2-1)*Math.exp(-t*55)*.5;}var s=c.createBufferSource();s.buffer=b;var f=c.createBiquadFilter();f.type='bandpass';f.frequency.setValueAtTime(3500,c.currentTime);f.frequency.exponentialRampToValueAtTime(400,c.currentTime+d);f.Q.value=2;s.connect(f);f.connect(c.destination);s.start();s.stop(c.currentTime+d);var b2=c.createBuffer(1,c.sampleRate*.06,c.sampleRate),a2=b2.getChannelData(0);for(var j=0;j<a2.length;j++)a2[j]=Math.sin(j/c.sampleRate*500)*Math.exp(-j/c.sampleRate*80)*.35;var s2=c.createBufferSource();s2.buffer=b2;s2.connect(c.destination);s2.start();s2.stop(c.currentTime+.06);}catch(e){}}
 function nxWhip(){
-  if(_nxC)return;_nxC=true;_nxH++;
-  setTimeout(function(){_nxC=false},500);
+  if(_nxC)return;
+  _nxC=true;_nxH++;
+  var _unlock=function(){setTimeout(function(){_nxC=false},500);};
   try{
     var sw=document.getElementById('mxSw'),bear=document.getElementById('mxBear'),emo=document.getElementById('mxEmo'),bub=document.getElementById('mxBub'),dmg=document.getElementById('mxDmg'),glb=document.getElementById('nxG');
     _nxSnd();
@@ -396,8 +398,9 @@ function nxWhip(){
     if(_nxH===15){bear.textContent='👻';bub.textContent='我死了...鬼魂复仇！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻'},3000);}
     if(_nxH===20){bear.textContent='😈';bub.textContent='我不装了！恶魔萌新！该我打你了！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻';_nxH=0},3000);}
     _nxT++;glb.textContent=_nxT;
-    _sb.from('leaderboard').upsert({id:'_whips',name:'global_whips',exp:_nxT,week_id:'global',device_id:'global',level:0,is_winner:false,updated_at:Date.now()}).catch(function(){});
-  }catch(e){}
+    localStorage.setItem('nxWhips',_nxT);
+    _sb.from('leaderboard').upsert({id:'_whips',name:'global_whips',exp:_nxT,week_id:'global',device_id:'global',level:0,is_winner:false,updated_at:Date.now()}).then(_unlock).catch(_unlock);
+  }catch(e){_unlock();}
 }
 </script>
 </body>
