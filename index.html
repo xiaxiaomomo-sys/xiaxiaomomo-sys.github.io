@@ -157,7 +157,7 @@ html{scroll-behavior:smooth}body{font-family:'Nunito',-apple-system,sans-serif;b
 <audio id="audioEl" preload="metadata"></audio>
 <script>
 var SB_URL='https://wmnyhzfwffotycaqitvm.supabase.co';
-var SB_KEY='sb_publishable_Uhqs2pFVF6Htmu1XPHKJLw_p-6CWiy9';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtbnloemZ3ZmZvdHljYXFpdHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwNjIyNTMsImV4cCI6MjEwMTYzODI1M30.s0kwvk3uMsshgOsZQOCDErCMr3UN3VXUIhj3yo2pk9c';
 function sbUp(d){return fetch(SB_URL+'/rest/v1/leaderboard',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},body:JSON.stringify(d)}).then(function(r){return r.json()})}
 function sbQ(q){return fetch(SB_URL+'/rest/v1/leaderboard?'+q,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}).then(function(r){return r.json()})}
 var myDevice=localStorage.getItem('fishDevice');
