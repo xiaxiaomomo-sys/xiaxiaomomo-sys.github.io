@@ -146,7 +146,7 @@ html{scroll-behavior:smooth}body{font-family:'Nunito',-apple-system,sans-serif;b
 @keyframes rSw{0%{transform:rotate(0)}18%{transform:rotate(25deg)}38%{transform:rotate(-18deg)}55%{transform:rotate(12deg)}72%{transform:rotate(-6deg)}88%{transform:rotate(2deg)}100%{transform:rotate(0)}}
 .mx-srope{width:2.5px;height:55px;background:repeating-linear-gradient(180deg,#a07828,#c9a23a 2px,#a07828 4px);border-radius:2px;margin:0 auto}
 .mx-ntag{position:relative;margin-top:-4px;background:#fff;border:2px solid var(--b200);border-radius:var(--rf);padding:2px 10px;font-family:'Nunito',sans-serif;font-size:.68rem;font-weight:800;color:var(--b500);white-space:nowrap;box-shadow:var(--ss);cursor:pointer;z-index:5;transition:all .2s;text-align:center}.mx-ntag:hover{border-color:var(--b400);transform:scale(1.05)}
-.mx-bear{position:relative;font-size:3rem;cursor:pointer;line-height:1;text-align:center;margin-top:-4px}
+.mx-bear{position:relative;font-size:3rem;cursor:default;line-height:1;text-align:center;margin-top:-4px}
 .mx-bear:hover{filter:brightness(1.1)}
 .mx-bear.hurt{animation:bH .35s ease}
 @keyframes bH{0%{transform:scale(1)}25%{transform:scale(1.25) rotate(12deg)}50%{transform:scale(.88) rotate(-8deg)}75%{transform:scale(1.05) rotate(3deg)}100%{transform:scale(1)}}
@@ -380,22 +380,24 @@ document.getElementById('mxNT').textContent='萌新';
 function _nxSnd(){try{var c=new(window.AudioContext||window.webkitAudioContext)(),d=.12,b=c.createBuffer(1,c.sampleRate*d,c.sampleRate),a=b.getChannelData(0);for(var i=0;i<a.length;i++){var t=i/c.sampleRate;a[i]=(Math.random()*2-1)*Math.exp(-t*55)*.5;}var s=c.createBufferSource();s.buffer=b;var f=c.createBiquadFilter();f.type='bandpass';f.frequency.setValueAtTime(3500,c.currentTime);f.frequency.exponentialRampToValueAtTime(400,c.currentTime+d);f.Q.value=2;s.connect(f);f.connect(c.destination);s.start();s.stop(c.currentTime+d);var b2=c.createBuffer(1,c.sampleRate*.06,c.sampleRate),a2=b2.getChannelData(0);for(var j=0;j<a2.length;j++)a2[j]=Math.sin(j/c.sampleRate*500)*Math.exp(-j/c.sampleRate*80)*.35;var s2=c.createBufferSource();s2.buffer=b2;s2.connect(c.destination);s2.start();s2.stop(c.currentTime+.06);}catch(e){}}
 function nxWhip(){
   if(_nxC)return;_nxC=true;_nxH++;
-  var sw=document.getElementById('mxSw'),bear=document.getElementById('mxBear'),emo=document.getElementById('mxEmo'),bub=document.getElementById('mxBub'),dmg=document.getElementById('mxDmg'),glb=document.getElementById('nxG');
-  _nxSnd();
-  sw.classList.remove('sw');sw.offsetHeight;sw.classList.add('sw');
-  bear.classList.remove('hurt');bear.offsetHeight;bear.classList.add('hurt');bear.textContent=_nxF[Math.floor(Math.random()*_nxF.length)];
-  setTimeout(function(){bear.classList.remove('hurt');sw.classList.remove('sw')},600);
-  emo.textContent=['😭','💦','😢','😫'][Math.floor(Math.random()*4)];emo.classList.add('show');setTimeout(function(){emo.classList.remove('show')},2000);
-  dmg.textContent='-'+(Math.floor(Math.random()*99)+1);dmg.classList.remove('show');dmg.offsetHeight;dmg.classList.add('show');setTimeout(function(){dmg.classList.remove('show')},800);
-  bub.textContent=_nxD[Math.floor(Math.random()*_nxD.length)];bub.classList.add('show');setTimeout(function(){bub.classList.remove('show')},3500);
-  for(var i=0;i<2;i++){setTimeout(function(){var l=document.createElement('div');l.className='mx-lf';l.textContent=['🍃','🍂','🌿'][Math.floor(Math.random()*3)];l.style.right=(15+Math.random()*35)+'px';l.style.bottom=(180+Math.random()*25)+'px';document.body.appendChild(l);l.classList.add('fall');setTimeout(function(){l.remove()},1600);},i*50);}
-  if(_nxH===5){bub.textContent='救命...布丁快跑！';bub.classList.add('show');}
-  if(_nxH===10){bear.textContent='💀';bub.textContent='我裂开了...功德条清零！！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻'},3000);}
-  if(_nxH===15){bear.textContent='👻';bub.textContent='我死了...鬼魂复仇！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻'},3000);}
-  if(_nxH===20){bear.textContent='😈';bub.textContent='我不装了！恶魔萌新！该我打你了！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻';_nxH=0},3000);}
-  _nxT++;glb.textContent=_nxT;
-  _sb.from('leaderboard').upsert({id:'_whips',name:'global_whips',exp:_nxT,week_id:'global',device_id:'global',level:0,is_winner:false,updated_at:Date.now()}).catch(function(){});
   setTimeout(function(){_nxC=false},500);
+  try{
+    var sw=document.getElementById('mxSw'),bear=document.getElementById('mxBear'),emo=document.getElementById('mxEmo'),bub=document.getElementById('mxBub'),dmg=document.getElementById('mxDmg'),glb=document.getElementById('nxG');
+    _nxSnd();
+    sw.classList.remove('sw');sw.offsetHeight;sw.classList.add('sw');
+    bear.classList.remove('hurt');bear.offsetHeight;bear.classList.add('hurt');bear.textContent=_nxF[Math.floor(Math.random()*_nxF.length)];
+    setTimeout(function(){bear.classList.remove('hurt');sw.classList.remove('sw')},600);
+    emo.textContent=['😭','💦','😢','😫'][Math.floor(Math.random()*4)];emo.classList.add('show');setTimeout(function(){emo.classList.remove('show')},2000);
+    dmg.textContent='-'+(Math.floor(Math.random()*99)+1);dmg.classList.remove('show');dmg.offsetHeight;dmg.classList.add('show');setTimeout(function(){dmg.classList.remove('show')},800);
+    bub.textContent=_nxD[Math.floor(Math.random()*_nxD.length)];bub.classList.add('show');setTimeout(function(){bub.classList.remove('show')},3500);
+    for(var i=0;i<2;i++){setTimeout(function(){var l=document.createElement('div');l.className='mx-lf';l.textContent=['🍃','🍂','🌿'][Math.floor(Math.random()*3)];l.style.right=(15+Math.random()*35)+'px';l.style.bottom=(180+Math.random()*25)+'px';document.body.appendChild(l);l.classList.add('fall');setTimeout(function(){l.remove()},1600);},i*50);}
+    if(_nxH===5){bub.textContent='救命...布丁快跑！';bub.classList.add('show');}
+    if(_nxH===10){bear.textContent='💀';bub.textContent='我裂开了...功德条清零！！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻'},3000);}
+    if(_nxH===15){bear.textContent='👻';bub.textContent='我死了...鬼魂复仇！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻'},3000);}
+    if(_nxH===20){bear.textContent='😈';bub.textContent='我不装了！恶魔萌新！该我打你了！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻';_nxH=0},3000);}
+    _nxT++;glb.textContent=_nxT;
+    _sb.from('leaderboard').upsert({id:'_whips',name:'global_whips',exp:_nxT,week_id:'global',device_id:'global',level:0,is_winner:false,updated_at:Date.now()}).catch(function(){});
+  }catch(e){}
 }
 </script>
 </body>
