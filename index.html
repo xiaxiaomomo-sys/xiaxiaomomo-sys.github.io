@@ -268,16 +268,19 @@ function getLevelTitle(lv){if(lv>=100)return'👑 摸鱼之王';if(lv>=91)return
 function getLevelIcon(lv){if(lv>=100)return'👑';if(lv>=91)return'🐉';if(lv>=71)return'🐋';if(lv>=51)return'🐙';if(lv>=31)return'🦐';if(lv>=21)return'🦑';if(lv>=11)return'🐡';return'🐟';}
 function saveFishState(){localStorage.setItem('fishExp',mxExp);}
 
+var _winnerShown=false;
 async function saveToDB(){
   if(!dbReady)return;
   var curLv=Math.min(Math.floor(mxExp/EXP_PER_LV),MAX_LV);
   var record={id:myDevice,exp:Math.floor(mxExp),level:curLv,name:myName||'匿名摸鱼客',week_id:curWeek,device_id:myDevice,is_winner:false,updated_at:Date.now()};
+  var wasWinner=false;
   if(curLv>=MAX_LV){
     var existing=await _sb.from('leaderboard').select('is_winner').eq('id',myDevice).maybeSingle();
-    if(existing.data&&existing.data.is_winner){record.is_winner=true;}
+    if(existing.data&&existing.data.is_winner){record.is_winner=true;wasWinner=true;}
     else{var w=await _sb.from('leaderboard').select('id').eq('is_winner',true).eq('week_id',curWeek).limit(1);record.is_winner=!w.data||w.data.length===0;}
   }
   await _sb.from('leaderboard').upsert(record);
+  if(record.is_winner&&!wasWinner&&!_winnerShown){_winnerShown=true;setTimeout(function(){document.getElementById('mxMask').classList.add('show');document.getElementById('mxPopup').classList.add('show');},800);}
 }
 
 async function loadFromDB(){
