@@ -403,28 +403,23 @@ function _nxInitAud(){
       var click=t<0.003?(Math.random()*2-1)*Math.exp(-t*1200)*0.3:0;
       var env=Math.exp(-t*13);
       var wob=1+0.04*Math.sin(t*2*Math.PI*9);
-      var body=env*wob*(
-        Math.sin(ph1)*0.48+
-        Math.sin(ph2)*0.11*Math.exp(-t*22)+
-        Math.sin(ph3)*0.04*Math.exp(-t*38)
-      );
+      var body=env*wob*(Math.sin(ph1)*0.48+Math.sin(ph2)*0.11*Math.exp(-t*22)+Math.sin(ph3)*0.04*Math.exp(-t*38));
       var warm=Math.exp(-t*11)*Math.sin(t*2*Math.PI*185)*0.1;
       ch[i]=Math.max(-1,Math.min(1,click+body+warm));
     }
     _nxBuf=buf;
   }catch(e){}
 }
+function _nxSnd(){try{if(!_nxAud)_nxInitAud();if(!_nxAud||!_nxBuf)return;if(_nxAud.state==='suspended')_nxAud.resume();var s=_nxAud.createBufferSource();s.buffer=_nxBuf;var g=_nxAud.createGain();g.gain.setValueAtTime(.8,_nxAud.currentTime);s.connect(g);g.connect(_nxAud.destination);s.start();}catch(e){}}
 _nxInitAud();
 
 function nxWhip(){
   _nxSnd();
-  var sw = document.getElementById('mxSw');
-  var bear = document.getElementById('mxBear');
-  var emo = document.getElementById('mxEmo');
-  var dmg = document.getElementById('mxDmg');
-  var bub = document.getElementById('mxBub');
-  var glb = document.getElementById('nxG');
-
+  var sw=document.getElementById('mxSw');
+  var bear=document.getElementById('mxBear');
+  var emo=document.getElementById('mxEmo');
+  var bub=document.getElementById('mxBub');
+  var glb=document.getElementById('nxG');
   sw.classList.remove('sw');sw.offsetHeight;sw.classList.add('sw');
   setTimeout(function(){sw.classList.remove('sw')},550);
   bear.classList.remove('hurt');bear.offsetHeight;bear.classList.add('hurt');
@@ -438,9 +433,9 @@ function nxWhip(){
   if(_nxH===5){bub.textContent='功德+5！布丁跑过来凑热闹了~';bub.classList.add('show');}
   if(_nxH===10){bear.textContent='💀';bub.textContent='功德+10！功德条已溢出！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻'},3000);}
   if(_nxH===15){bear.textContent='👻';bub.textContent='功德+15！已成佛！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻'},3000);}
- if(_nxH===20){bear.textContent='😈';bub.textContent='功德+20！走火入魔！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻';_nxH=0},3000);}
-_nxH++;   // ← 加上这行
-_nxT++;glb.textContent=_nxT;
+  if(_nxH===20){bear.textContent='😈';bub.textContent='功德+20！走火入魔！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻';_nxH=0},3000);}
+  _nxH++;
+  _nxT++;glb.textContent=_nxT;
   localStorage.setItem('nxWhips',_nxT);
   _sb.from('leaderboard').upsert({id:'_whips',name:'global_whips',exp:_nxT,week_id:'global',device_id:'global',level:0,is_winner:false,updated_at:Date.now()}).catch(function(){});
 }
