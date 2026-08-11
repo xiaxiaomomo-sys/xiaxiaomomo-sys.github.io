@@ -226,7 +226,9 @@ else if(t==='heal'){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.c
 else if(t==='taunt'){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';o.frequency.setValueAtTime(400,c.currentTime);o.frequency.setValueAtTime(300,c.currentTime+.08);o.frequency.setValueAtTime(450,c.currentTime+.16);g.gain.setValueAtTime(.08,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.25);o.start(c.currentTime);o.stop(c.currentTime+.25)}
 }catch(e){}}
 
-var _bgmTimer=null,_bgmBeat=0,_bgmOn=false;
+var _bgmTimer=null,_bgmBeat=0,_bgmOn=false,_muted=false;
+function toggleAllSound(){_muted=!_muted;if(_muted){stopBGM();if(_actx){try{_actx.suspend()}catch(e){}}}else{if(_actx){try{_actx.resume()}catch(e){}}if(G.scr==='battle')startBGM()}updMuteBtn()}
+function updMuteBtn(){var btn=document.getElementById('xxMuteBtn');if(!btn)return;btn.textContent=_muted?'🔇 开启声音':'🔊 关闭声音'}
 function startBGM(){if(_bgmOn)return;_bgmOn=true;_bgmBeat=0;var c=getCtx();if(c.state==='suspended')c.resume();
 var bpm=125,beatMs=60000/bpm/2;
 var bass=[0,0,0,0,7,7,7,7,8,8,8,8,5,5,7,7];
@@ -323,7 +325,7 @@ if(p.pSkl.length===0)h+='<div style="color:var(--txm);font-size:.85rem">尚未�
 for(var i=0;i<p.pSkl.length;i++){var sk=PSKILLS.find(function(s){return s.id===p.pSkl[i]});if(!sk)continue;h+='<div class="xg-item"><span class="it-icon">🔮</span><div class="it-info"><div class="it-name">'+sk.n+'</div><div class="it-desc">'+sk.d+'</div></div></div>';}
 h+='</div>';
 
-h+='<div class="xg-actions">';
+h+='<div style="margin-bottom:8px"><button class="xg-btn" id="xxMuteBtn" onclick="toggleAllSound()">'+(_muted?'🔇 开启声音':'🔊 关闭声音')+'</button></div>';h+='<div class="xg-actions">';
 h+='<button class="xg-btn primary" onclick="xxFloor('+pr.curFloor+')">⚔️ 挑战第'+pr.curFloor+'层</button>';
 h+='<button class="xg-btn" onclick="xxGoto(\'floors\')">📍 选择楼层</button>';
 h+='<button class="xg-btn" onclick="xxGoto(\'shop\')">🛒 商店</button>';
