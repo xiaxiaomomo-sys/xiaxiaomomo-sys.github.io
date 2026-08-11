@@ -133,33 +133,7 @@ html{scroll-behavior:smooth}body{font-family:'Nunito',-apple-system,sans-serif;b
 .ft{text-align:center;padding:48px 20px 32px;color:var(--txm);font-size:.85rem;z-index:1;position:relative}.ftb{font-weight:800;color:var(--b400);margin-bottom:6px;font-size:.95rem}.ft .ht2{color:var(--pk);display:inline-block;animation:hb 1.5s ease-in-out infinite}
 @keyframes hb{0%,100%{transform:scale(1)}15%{transform:scale(1.25)}30%{transform:scale(1)}45%{transform:scale(1.18)}}
 .fl{display:flex;gap:16px;justify-content:center;margin-top:12px}.fl a{color:var(--txl);text-decoration:none;font-size:.82rem;transition:color .3s}.fl a:hover{color:var(--b400)}
-.mx-tree{position:fixed;right:10px;bottom:88px;z-index:997;width:150px;height:240px;user-select:none}.mx-tree *{user-select:none}
-.mx-ground{position:absolute;bottom:0;left:-10px;right:-10px;height:22px;background:radial-gradient(ellipse at 50% 0%,#5ca87a 0%,#3d8c5c 60%,transparent 100%)}
-.mx-trunk{position:absolute;bottom:18px;left:18px;width:20px;height:130px;background:linear-gradient(90deg,#5a3e10,#8B6914,#6B4F12);border-radius:6px 6px 0 0}
-.mx-canopy{position:absolute;bottom:115px;left:-20px;width:110px;height:80px}
-.mx-canopy .cl{position:absolute;border-radius:50%}.mx-canopy .cl:nth-child(1){width:65px;height:60px;background:radial-gradient(circle at 40% 35%,#66bb6a,#2e7d32);top:0;left:8px}.mx-canopy .cl:nth-child(2){width:55px;height:52px;background:radial-gradient(circle at 45% 40%,#4caf50,#1b5e20);top:8px;left:38px}.mx-canopy .cl:nth-child(3){width:45px;height:44px;background:radial-gradient(circle at 50% 45%,#81c784,#388e3c);top:-5px;left:50px}
-.mx-branch{position:absolute;bottom:152px;left:28px;width:68px;height:10px;background:linear-gradient(90deg,#8B6914,#a07828,#8B6914);border-radius:5px 5px 0 0}
-.mx-lf1{position:absolute;bottom:158px;left:88px;font-size:.8rem}.mx-lf2{position:absolute;bottom:168px;left:70px;font-size:.65rem}
-.mx-swing{position:absolute;bottom:80px;left:86px;transform-origin:top center;animation:iSw 2.8s ease-in-out infinite}
-.mx-swing.sw{animation:rSw .55s ease-in-out}
-@keyframes iSw{0%,100%{transform:rotate(0)}25%{transform:rotate(12deg)}75%{transform:rotate(-12deg)}}
-@keyframes rSw{0%{transform:rotate(0)}18%{transform:rotate(25deg)}38%{transform:rotate(-18deg)}55%{transform:rotate(12deg)}72%{transform:rotate(-6deg)}88%{transform:rotate(2deg)}100%{transform:rotate(0)}}
-.mx-srope{width:2.5px;height:55px;background:repeating-linear-gradient(180deg,#a07828,#c9a23a 2px,#a07828 4px);border-radius:2px;margin:0 auto}
-.mx-ntag{position:relative;margin-top:-4px;background:#fff;border:2px solid var(--b200);border-radius:var(--rf);padding:2px 10px;font-family:'Nunito',sans-serif;font-size:.68rem;font-weight:800;color:var(--b500);white-space:nowrap;box-shadow:var(--ss);cursor:pointer;z-index:5;transition:all .2s;text-align:center}.mx-ntag:hover{border-color:var(--b400);transform:scale(1.05)}
-.mx-bear{position:relative;font-size:3rem;cursor:default;line-height:1;text-align:center;margin-top:-4px}
-.mx-bear:hover{filter:brightness(1.1)}
-.mx-bear.hurt{animation:bH .35s ease}
-@keyframes bH{0%{transform:scale(1)}25%{transform:scale(1.25) rotate(12deg)}50%{transform:scale(.88) rotate(-8deg)}75%{transform:scale(1.05) rotate(3deg)}100%{transform:scale(1)}}
-.mx-emo{position:absolute;top:-5px;left:20px;font-size:1.1rem;opacity:0;pointer-events:none;z-index:7;transition:opacity .2s}.mx-emo.show{opacity:1;animation:eP .3s var(--sp)}
-@keyframes eP{0%{transform:scale(0) rotate(-15deg)}60%{transform:scale(1.3) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
-.mx-dmg{position:absolute;top:0;left:20px;font-size:.85rem;font-weight:900;color:#ff6b6b;opacity:0;pointer-events:none;z-index:9;text-shadow:0 1px 4px rgba(255,0,0,.25)}.mx-dmg.show{opacity:1;animation:dF .7s ease forwards}
-@keyframes dF{0%{opacity:1;transform:translateY(0) scale(.6)}25%{opacity:1;transform:translateY(-18px) scale(1.2)}100%{opacity:0;transform:translateY(-45px) scale(.8)}}
-.mx-bub{position:absolute;top:-15px;right:30px;background:#fff;border:2px solid var(--b200);border-radius:14px;padding:7px 12px;font-family:'Nunito',sans-serif;font-size:.7rem;font-weight:700;color:var(--tx);box-shadow:var(--sd);opacity:0;transform:scale(.85) translateY(6px);transition:all .25s var(--sp);pointer-events:none;max-width:165px;line-height:1.45;z-index:8}.mx-bub::after{content:'';position:absolute;bottom:-7px;right:18px;border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid var(--b200)}.mx-bub.show{opacity:1;transform:scale(1) translateY(0)}
-.mx-cnt{text-align:center;font-size:.6rem;font-weight:700;color:var(--txm);margin-top:4px;white-space:nowrap}.mx-cnt b{color:var(--b500);font-weight:900}
-.mx-chint{position:absolute;bottom:30px;left:70px;font-size:.58rem;font-weight:700;color:var(--txl);white-space:nowrap;animation:hB 1.8s ease-in-out infinite;pointer-events:none}
-@keyframes hB{0%,100%{opacity:.5}50%{opacity:1}}
-.mx-lf{position:fixed;pointer-events:none;font-size:.65rem;z-index:998}.mx-lf.fall{animation:lF 1.5s ease-in forwards}
-@keyframes lF{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(55px) rotate(260deg)}}@media(max-width:768px){.pg{padding:90px 18px 40px}.nav{gap:2px;padding:4px}.nl{padding:6px 10px;font-size:.8rem}.nd{display:none}.ni{padding:6px 9px;font-size:.72rem}.dtb{padding:6px 10px;font-size:.72rem}.ht{font-size:2.2rem}.ht .cn{font-size:2.5rem}.ai{flex-direction:column}.aac{flex:unset}.ag{grid-template-columns:1fr}.sg{grid-template-columns:1fr}.rl{grid-template-columns:1fr}.lg{grid-template-columns:repeat(2,1fr)}.lm{flex-direction:column;text-align:center}.bg{grid-template-columns:repeat(2,1fr)}.pvl{display:none}.pti{display:none}.mx-time{display:none}.lb-card{padding:20px}}
+@media(max-width:768px){.pg{padding:90px 18px 40px}.nav{gap:2px;padding:4px}.nl{padding:6px 10px;font-size:.8rem}.nd{display:none}.ni{padding:6px 9px;font-size:.72rem}.dtb{padding:6px 10px;font-size:.72rem}.ht{font-size:2.2rem}.ht .cn{font-size:2.5rem}.ai{flex-direction:column}.aac{flex:unset}.ag{grid-template-columns:1fr}.sg{grid-template-columns:1fr}.rl{grid-template-columns:1fr}.lg{grid-template-columns:repeat(2,1fr)}.lm{flex-direction:column;text-align:center}.bg{grid-template-columns:repeat(2,1fr)}.pvl{display:none}.pti{display:none}.mx-time{display:none}.lb-card{padding:20px}}
 @media(max-width:480px){.ni{padding:5px 7px;font-size:.68rem}.dtb{padding:5px 8px;font-size:.68rem}.ht{font-size:1.8rem}.ht .cn{font-size:2rem}.lg{grid-template-columns:1fr}}
 </style>
 </head>
@@ -167,27 +141,7 @@ html{scroll-behavior:smooth}body{font-family:'Nunito',-apple-system,sans-serif;b
 <div class="atmo"></div>
 <div class="cld"><div class="c1"></div><div class="c2"></div><div class="c3"></div></div>
 <div class="spk"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-<div class="mx-tree">
-<div class="mx-ground"></div>
-<div class="mx-trunk"></div>
-<div class="mx-canopy"><div class="cl"></div><div class="cl"></div><div class="cl"></div></div>
-<div class="mx-branch"></div>
-<div class="mx-lf1">🍃</div>
-<div class="mx-lf2">🌿</div>
-<div class="mx-swing" id="mxSw">
-<div class="mx-srope"></div>
-<div class="mx-ntag" id="mxNT">萌新</div>
-<div style="position:relative">
-<div class="mx-bear" id="mxBear" onclick="nxWhip()">🐻</div>
-<div class="mx-emo" id="mxEmo"></div>
-<div class="mx-dmg" id="mxDmg"></div>
-</div>
-<div class="mx-bub" id="mxBub"></div>
-</div>
-<div class="mx-chint">👆 点击小熊敲木鱼</div>
-<div class="mx-cnt">🙏 全网功德 <b id="nxG">0</b></div>
-</div>
-</div><nav class="nav"><div class="nl"><i></i> 林深</div><div class="nd"></div><button class="ni active" data-page="home">首页</button><button class="ni" data-page="about">关于</button><button class="ni" data-page="works">推荐</button><button class="ni" data-page="zxsj">诛仙世界</button><button class="ni" data-page="life">生活</button><div class="nd"></div><button class="dtb" id="dtBtn"><span id="dtIcon">🌙</span> <span id="dtText">关灯</span></button></nav>
+<nav class="nav"><div class="nl"><i></i> 林深</div><div class="nd"></div><button class="ni active" data-page="home">首页</button><button class="ni" data-page="about">关于</button><button class="ni" data-page="works">推荐</button><button class="ni" data-page="zxsj">诛仙世界</button><button class="ni" data-page="life">生活</button><div class="nd"></div><button class="dtb" id="dtBtn"><span id="dtIcon">🌙</span> <span id="dtText">关灯</span></button></nav>
 <div class="pw">
 <section class="pg active" id="page-home"><div class="hh"><div class="aa st"><div class="ar2"></div><div class="ar"></div><div class="am">🌿</div><div class="ab">✨</div></div><div class="hg st">— HELLO THERE —</div><h1 class="ht st">欢迎来到 <span class="cn">林深的小天地</span> <span class="wv">👋</span></h1><p class="hs st" id="twText">这里是一片属于林深的数字花园，<br>记录着关于代码、设计和生活的小美好。</p><div class="mx-winner" id="mxWinner"></div><div class="lb-card st" id="lbCard"><div class="lb-title"><span class="trophy">🏆</span> 本周摸鱼排行榜<span class="count" id="lbCount">0 人参与</span></div><div class="lb-name-row"><input type="text" id="lbNameInput" class="lb-name-input" placeholder="输入你的名字..." maxlength="10"><button class="lb-name-btn" id="lbNameBtn" onclick="setMyName()">设置名字</button></div><div id="lbList"><div class="lb-empty">暂无数据，开始摸鱼吧~</div></div></div><div class="hq st">保持热爱，奔赴山海</div><div class="htg st"><span style="cursor:pointer" onclick="switchPage('zxsj')">🎮 诛仙世界</span><span>💻 前端开发</span><span>☕ 咖啡续命</span><span>📖 深夜阅读</span></div><div class="sbtn st" onclick="switchPage('about')"><span>向下探索</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div></div></section>
 <section class="pg" id="page-about"><div class="pi"><div class="sh st"><span class="ico">🌸</span><h2>关于林深</h2><p>一个喜欢把想法变成现实的人</p><span class="ln"></span></div><div class="ai st"><div class="aac"><div class="ma">🌿</div><h3>林深</h3><span class="tg">前端开发者 / 设计师</span><p class="bm">喜欢森林、海浪和深夜的安静。相信好的设计和好的代码，都可以让人感到温暖。</p></div><div class="atc"><h3>📖 我的故事</h3><p>你好呀！我是林深，一个喜欢用代码和像素讲故事的前端开发者。三年前第一次用 HTML 写出一个「Hello World」的时候，就觉得这件事特别酷。</p><p>平时喜欢研究有趣的交互效果，也爱折腾好看的界面。对我来说，技术和设计就像咖啡和拿铁拉花——一个提供功能，一个带来美感，缺一不可。</p><p>工作之余，我喜欢拍照记录城市角落的光影变化，偶尔画几幅小插画，或者窝在沙发里读一本纸质书。</p></div></div><div class="ag"><div class="af st"><span class="fi">🎯</span><h4>追求极致</h4><p>每一个像素的位置、每一行代码的命名，都值得被认真对待。</p></div><div class="af st"><span class="fi">🌱</span><h4>持续成长</h4><p>保持对新技术的好奇心，每天比昨天进步一点点。</p></div><div class="af st"><span class="fi">🤝</span><h4>温暖协作</h4><p>好的作品来自好的团队，沟通和理解比技术更重要。</p></div></div><div class="sc st"><h3>⚡ 林深属性面板</h3><div class="sg"><div class="si"><div class="sl"><span>🐟 摸鱼摸虾</span><span>100%</span></div><div class="sb"><div class="sf sfb" style="--f:100%"></div></div></div><div class="si"><div class="sl"><span>🐴 牛马程度</span><span>99%</span></div><div class="sb"><div class="sf sfp" style="--f:99%"></div></div></div><div class="si"><div class="sl"><span>🎮 诛仙世界探索度</span><span>100%</span></div><div class="sb"><div class="sf sfb" style="--f:100%"></div></div></div><div class="si"><div class="sl"><span>😴 诛仙世界摆烂程度</span><span>98%</span></div><div class="sb"><div class="sf sfl" style="--f:98%"></div></div></div><div class="si"><div class="sl"><span>💸 穷鬼程度</span><span>100%</span></div><div class="sb"><div class="sf sfp" style="--f:100%"></div></div></div><div class="si"><div class="sl"><span>🌙 熬夜冠军</span><span>97%</span></div><div class="sb"><div class="sf sfm" style="--f:97%"></div></div></div><div class="si"><div class="sl"><span>🧋 奶茶依赖症</span><span>95%</span></div><div class="sb"><div class="sf sfb" style="--f:95%"></div></div></div><div class="si"><div class="sl"><span>👀 发呆冠军</span><span>96%</span></div><div class="sb"><div class="sf sfl" style="--f:96%"></div></div></div></div></div></div></section>
@@ -268,19 +222,16 @@ function getLevelTitle(lv){if(lv>=100)return'👑 摸鱼之王';if(lv>=91)return
 function getLevelIcon(lv){if(lv>=100)return'👑';if(lv>=91)return'🐉';if(lv>=71)return'🐋';if(lv>=51)return'🐙';if(lv>=31)return'🦐';if(lv>=21)return'🦑';if(lv>=11)return'🐡';return'🐟';}
 function saveFishState(){localStorage.setItem('fishExp',mxExp);}
 
-var _winnerShown=false;
 async function saveToDB(){
   if(!dbReady)return;
   var curLv=Math.min(Math.floor(mxExp/EXP_PER_LV),MAX_LV);
   var record={id:myDevice,exp:Math.floor(mxExp),level:curLv,name:myName||'匿名摸鱼客',week_id:curWeek,device_id:myDevice,is_winner:false,updated_at:Date.now()};
-  var wasWinner=false;
   if(curLv>=MAX_LV){
     var existing=await _sb.from('leaderboard').select('is_winner').eq('id',myDevice).maybeSingle();
-    if(existing.data&&existing.data.is_winner){record.is_winner=true;wasWinner=true;}
+    if(existing.data&&existing.data.is_winner){record.is_winner=true;}
     else{var w=await _sb.from('leaderboard').select('id').eq('is_winner',true).eq('week_id',curWeek).limit(1);record.is_winner=!w.data||w.data.length===0;}
   }
   await _sb.from('leaderboard').upsert(record);
-  if(record.is_winner&&!wasWinner&&!_winnerShown){_winnerShown=true;setTimeout(function(){document.getElementById('mxMask').classList.add('show');document.getElementById('mxPopup').classList.add('show');},800);}
 }
 
 async function loadFromDB(){
@@ -289,21 +240,12 @@ async function loadFromDB(){
   lbData={};var count=0;
   if(r.data){r.data.forEach(function(row){lbData[row.id]=row;count++})}
   renderLeaderboard(count);
-}setInterval(function(){
-  _sb.from('leaderboard').select('exp').eq('id','_whips').limit(1)
-    .then(function(r){
-      if(r.data&&r.data.length>0){
-        var dbVal=r.data[0].exp||0;
-        if(dbVal>_nxT){_nxT=dbVal;}
-        document.getElementById('nxG').textContent=_nxT;
-      }
-    }).catch(function(){});
-},15000);
+}
 
 function renderLeaderboard(count){
   document.getElementById('lbCount').textContent=count+' 人参与';
   var list=document.getElementById('lbList');
- 297: var sorted=Object.keys(lbData).map(function(k){return lbData[k]}).filter(function(p){return p.id!=='_whips'&&p.id!=='_ping'}).sort(function(a,b){return b.exp-a.exp});
+  var sorted=Object.keys(lbData).map(function(k){return lbData[k]}).sort(function(a,b){return b.exp-a.exp});
   if(sorted.length===0){list.innerHTML='<div class="lb-empty">暂无数据，开始摸鱼吧~</div>';return;}
   var html='';
   sorted.forEach(function(p,i){
@@ -335,16 +277,11 @@ function showWinnerBanner(name){
   el.classList.add('show');
 }
 
-async function checkWinner(){
-  try{
-    var r=await _sb.from('leaderboard').select('name').eq('week_id',curWeek).eq('is_winner',true).limit(1);
-    if(r.data&&r.data.length>0&&r.data[0].name){showWinnerBanner(r.data[0].name);}
-  }catch(e){}
-}// 初始化连接
+// 初始化连接
 (async function(){
   try{
     var r=await _sb.from('leaderboard').upsert({id:'_ping',week_id:curWeek,updated_at:Date.now()});
-   if(!r.error){dbReady=true;loadFromDB();saveToDB();checkWinner();}
+    if(!r.error){dbReady=true;console.log('Supabase连接成功');loadFromDB();saveToDB();}
     else{console.log('连接失败:',r.error)}
   }catch(e){console.log('连接错误:',e)}
 })();
@@ -373,16 +310,6 @@ setInterval(updateTimer,500);
 setInterval(saveFishState,10000);
 setInterval(saveToDB,30000);
 setInterval(loadFromDB,30000);
-  setInterval(function(){
-  _sb.from('leaderboard').select('exp').eq('id','_whips').limit(1)
-    .then(function(r){
-      if(r.data&&r.data.length>0){
-        var dbVal=r.data[0].exp||0;
-        if(dbVal>_nxT){_nxT=dbVal;}
-        document.getElementById('nxG').textContent=_nxT;
-      }
-    }).catch(function(){});
-},15000);
 window.addEventListener('beforeunload',function(){saveFishState();saveToDB()});
 document.addEventListener('visibilitychange',function(){if(!document.hidden){saveToDB();loadFromDB()}});
 
@@ -393,51 +320,6 @@ function submitWinner(){var name=document.getElementById('winnerInput').value.tr
   document.getElementById('mxMask').classList.remove('show');document.getElementById('mxPopup').classList.remove('show');
   saveToDB();showWinnerBanner(name);}
 document.getElementById('mxMask').addEventListener('click',function(){document.getElementById('mxMask').classList.remove('show');document.getElementById('mxPopup').classList.remove('show')});
-var _nxT=parseInt(localStorage.getItem('nxWhips')||'0'),_nxH=0,_nxC=false;
-var _nxF=['🐻','🤕','😫','😭','🥺','💦','😰','🫠','😵‍💫','🤯'];
-document.getElementById('mxNT').textContent='萌新';
-document.getElementById('nxG').textContent=_nxT;
-(async function(){
-  try{
-    var r=await _sb.from('leaderboard').select('exp').eq('id','_whips').limit(1);
-    if(r.data&&r.data.length>0){var dbVal=r.data[0].exp||0;if(dbVal>_nxT){_nxT=dbVal;localStorage.setItem('nxWhips',_nxT);document.getElementById('nxG').textContent=_nxT;}}
-  }catch(e){}
-})();
-var _nxAud=null,_nxBuf=null;
-function _nxInitAud(){try{_nxAud=new(window.AudioContext||window.webkitAudioContext)();var sr=_nxAud.sampleRate;var buf=_nxAud.createBuffer(1,Math.floor(sr*0.18),sr);var ch=buf.getChannelData(0);for(var i=0;i<ch.length;i++){var t=i/sr;var n=Math.random()*2-1;var crack=Math.exp(-t*180)*n*0.7;var body=Math.exp(-t*55)*(Math.sin(t*2*Math.PI*250)*0.15+Math.sin(t*2*Math.PI*500)*0.08+Math.sin(t*2*Math.PI*750)*0.04);var thud=Math.exp(-t*35)*Math.sin(t*2*Math.PI*100)*0.18;var contact=t<0.008?n*Math.exp(-t*300)*0.6:0;ch[i]=Math.max(-1,Math.min(1,crack+body+thud+contact));}_nxBuf=buf;}catch(e){}}
-function _nxSnd(){try{if(!_nxAud)_nxInitAud();if(!_nxAud||!_nxBuf)return;if(_nxAud.state==='suspended')_nxAud.resume();var s=_nxAud.createBufferSource();s.buffer=_nxBuf;var g=_nxAud.createGain();g.gain.setValueAtTime(.8,_nxAud.currentTime);s.connect(g);g.connect(_nxAud.destination);s.start();}catch(e){}}
-_nxInitAud();
-function nxWhip(){
-  _nxSnd();
-  var sw=document.getElementById('mxSw');
-  var bear=document.getElementById('mxBear');
-  var emo=document.getElementById('mxEmo');
-  var dmg=document.getElementById('mxDmg');
-  var bub=document.getElementById('mxBub');
-  var glb=document.getElementById('nxG');
-  sw.classList.remove('sw');sw.offsetHeight;sw.classList.add('sw');
-  setTimeout(function(){sw.classList.remove('sw')},550);
-  bear.classList.remove('hurt');bear.offsetHeight;bear.classList.add('hurt');
-  bear.textContent=_nxF[Math.floor(Math.random()*_nxF.length)];
-  setTimeout(function(){bear.classList.remove('hurt')},350);
-  emo.textContent=['👋','💥','🔥'][Math.floor(Math.random()*3)];
-  emo.classList.add('show');setTimeout(function(){emo.classList.remove('show')},1500);
-  dmg.textContent=['啪!','嗷!','痛!','啊!'][Math.floor(Math.random()*4)];
-  dmg.style.color='#ff4444';
-  dmg.classList.add('show');setTimeout(function(){dmg.classList.remove('show')},700);
-  var slapTexts=['啪！','好疼！','轻点打~','呜呜呜','我做错了什么','别打了！','啪叽~'];
-  bub.textContent=slapTexts[Math.floor(Math.random()*slapTexts.length)];
-  bub.classList.add('show');setTimeout(function(){bub.classList.remove('show')},2000);
-  for(var i=0;i<3;i++){setTimeout(function(){var l=document.createElement('div');l.className='mx-lf';l.textContent=['👋','💥','✋','🖐️'][Math.floor(Math.random()*4)];l.style.right=(15+Math.random()*35)+'px';l.style.bottom=(180+Math.random()*25)+'px';document.body.appendChild(l);l.classList.add('fall');setTimeout(function(){l.remove()},1600);},i*60);}
-  if(_nxH===5){bub.textContent='连打5下！小熊已经眼冒金星了~';bub.classList.add('show');}
-  if(_nxH===10){bear.textContent='💀';bub.textContent='连打10下！小熊已经不省人事！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻'},3000);}
-  if(_nxH===15){bear.textContent='👻';bub.textContent='连打15下！小熊灵魂出窍了！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻'},3000);}
-  if(_nxH===20){bear.textContent='😈';bub.textContent='连打20下！小熊变身了！';bub.classList.add('show');setTimeout(function(){bear.textContent='🐻';_nxH=0},3000);}
-  _nxH++;
-  _nxT++;glb.textContent=_nxT;
-  localStorage.setItem('nxWhips',_nxT);
-  _sb.from('leaderboard').upsert({id:'_whips',name:'global_whips',exp:_nxT,week_id:'global',device_id:'global',level:0,is_winner:false,updated_at:Date.now()}).catch(function(){});
-}
 </script>
 </body>
 </html>
