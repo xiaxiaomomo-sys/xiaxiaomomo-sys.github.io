@@ -386,7 +386,7 @@ document.getElementById('nxG').textContent=_nxT;
   }catch(e){}
 })();
 var _nxAud=null,_nxBuf=null;
-function _nxInitAud(){
+function _nxInitAud(){try{_nxAud=new(window.AudioContext||window.webkitAudioContext)();var sr=_nxAud.sampleRate;var buf=_nxAud.createBuffer(1,Math.floor(sr*0.18),sr);var ch=buf.getChannelData(0);for(var i=0;i<ch.length;i++){var t=i/sr;var n=Math.random()*2-1;var crack=Math.exp(-t*180)*n*0.7;var body=Math.exp(-t*55)*(Math.sin(t*2*Math.PI*250)*0.15+Math.sin(t*2*Math.PI*500)*0.08+Math.sin(t*2*Math.PI*750)*0.04);var thud=Math.exp(-t*35)*Math.sin(t*2*Math.PI*100)*0.18;var contact=t<0.008?n*Math.exp(-t*300)*0.6:0;ch[i]=Math.max(-1,Math.min(1,crack+body+thud+contact));}_nxBuf=buf;}catch(e){}}
   try{
     _nxAud=new(window.AudioContext||window.webkitAudioContext)();
     var sr=_nxAud.sampleRate,dur=0.3;
