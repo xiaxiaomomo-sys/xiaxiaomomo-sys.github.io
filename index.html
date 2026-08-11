@@ -289,12 +289,21 @@ async function loadFromDB(){
   lbData={};var count=0;
   if(r.data){r.data.forEach(function(row){lbData[row.id]=row;count++})}
   renderLeaderboard(count);
-}
+}setInterval(function(){
+  _sb.from('leaderboard').select('exp').eq('id','_whips').limit(1)
+    .then(function(r){
+      if(r.data&&r.data.length>0){
+        var dbVal=r.data[0].exp||0;
+        if(dbVal>_nxT){_nxT=dbVal;}
+        document.getElementById('nxG').textContent=_nxT;
+      }
+    }).catch(function(){});
+},15000);
 
 function renderLeaderboard(count){
   document.getElementById('lbCount').textContent=count+' 人参与';
   var list=document.getElementById('lbList');
-  var sorted=Object.keys(lbData).map(function(k){return lbData[k]}).sort(function(a,b){return b.exp-a.exp});
+ 297: var sorted=Object.keys(lbData).map(function(k){return lbData[k]}).filter(function(p){return p.id!=='_whips'&&p.id!=='_ping'}).sort(function(a,b){return b.exp-a.exp});
   if(sorted.length===0){list.innerHTML='<div class="lb-empty">暂无数据，开始摸鱼吧~</div>';return;}
   var html='';
   sorted.forEach(function(p,i){
@@ -364,6 +373,16 @@ setInterval(updateTimer,500);
 setInterval(saveFishState,10000);
 setInterval(saveToDB,30000);
 setInterval(loadFromDB,30000);
+  setInterval(function(){
+  _sb.from('leaderboard').select('exp').eq('id','_whips').limit(1)
+    .then(function(r){
+      if(r.data&&r.data.length>0){
+        var dbVal=r.data[0].exp||0;
+        if(dbVal>_nxT){_nxT=dbVal;}
+        document.getElementById('nxG').textContent=_nxT;
+      }
+    }).catch(function(){});
+},15000);
 window.addEventListener('beforeunload',function(){saveFishState();saveToDB()});
 document.addEventListener('visibilitychange',function(){if(!document.hidden){saveToDB();loadFromDB()}});
 
