@@ -386,8 +386,34 @@ document.getElementById('nxG').textContent=_nxT;
   }catch(e){}
 })();
 var _nxAud=null,_nxBuf=null;
-function _nxInitAud(){try{_nxAud=new(window.AudioContext||window.webkitAudioContext)();var sr=_nxAud.sampleRate,dur=.12;var buf=_nxAud.createBuffer(1,Math.floor(sr*dur),sr);var ch=buf.getChannelData(0);for(var i=0;i<ch.length;i++){var t=i/sr;var atk=i<sr*.002?(Math.random()*2-1)*Math.exp(-t*1500):0;var body=Math.exp(-t*38)*(Math.sin(t*2*Math.PI*920)*.45+Math.sin(t*2*Math.PI*1180)*.3+Math.sin(t*2*Math.PI*1650)*.15+Math.sin(t*2*Math.PI*560)*.15);var creak=Math.exp(-t*60)*Math.sin(t*2*Math.PI*3200)*.08;ch[i]=atk*.4+body+creak;}_nxBuf=buf;}catch(e){}}
-function _nxSnd(){try{if(!_nxAud)_nxInitAud();if(!_nxAud||!_nxBuf)return;if(_nxAud.state==='suspended')_nxAud.resume();var s=_nxAud.createBufferSource();s.buffer=_nxBuf;var g=_nxAud.createGain();g.gain.setValueAtTime(.8,_nxAud.currentTime);s.connect(g);g.connect(_nxAud.destination);s.start();}catch(e){}}
+function _nxInitAud(){
+  try{
+    _nxAud=new(window.AudioContext||window.webkitAudioContext)();
+    var sr=_nxAud.sampleRate,dur=0.3;
+    var buf=_nxAud.createBuffer(1,Math.floor(sr*dur),sr);
+    var ch=buf.getChannelData(0);
+    var ph1=0,ph2=0,ph3=0;
+    for(var i=0;i<ch.length;i++){
+      var t=i/sr;
+      var f1=360*Math.exp(-t*7)+180;
+      var f2=f1*1.99,f3=f1*3.01;
+      ph1+=2*Math.PI*f1/sr;
+      ph2+=2*Math.PI*f2/sr;
+      ph3+=2*Math.PI*f3/sr;
+      var click=t<0.003?(Math.random()*2-1)*Math.exp(-t*1200)*0.3:0;
+      var env=Math.exp(-t*13);
+      var wob=1+0.04*Math.sin(t*2*Math.PI*9);
+      var body=env*wob*(
+        Math.sin(ph1)*0.48+
+        Math.sin(ph2)*0.11*Math.exp(-t*22)+
+        Math.sin(ph3)*0.04*Math.exp(-t*38)
+      );
+      var warm=Math.exp(-t*11)*Math.sin(t*2*Math.PI*185)*0.1;
+      ch[i]=Math.max(-1,Math.min(1,click+body+warm));
+    }
+    _nxBuf=buf;
+  }catch(e){}
+}
 _nxInitAud();
 
 function nxWhip(){
