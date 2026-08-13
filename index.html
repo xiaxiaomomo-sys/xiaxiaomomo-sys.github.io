@@ -307,6 +307,278 @@ body.dark::after{opacity:.06}
 
 /* ===== 响应式 ===== */
 @media(max-width:768px){.xg-hub-grid{grid-template-columns:1fr}.xg-action-col{order:-1}}
+/* ===== 修仙游戏样式 ===== */
+.xg-title {
+  text-align: center;
+  padding: 40px 20px 60px;
+}
+.xg-title .big-emoji {
+  font-size: 4rem;
+  margin-bottom: 12px;
+  animation: fu .6s var(--ss2) both;
+}
+.xg-title h3 {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.xg-title p {
+  color: var(--txm);
+  margin-bottom: 20px;
+}
+.xg-card {
+  background: var(--card);
+  border: 1px solid var(--b100);
+  border-radius: var(--r);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.04);
+}
+.xg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border: 1px solid var(--b200);
+  border-radius: var(--r);
+  background: var(--card);
+  color: var(--ink);
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: inherit;
+}
+.xg-btn:hover { background: var(--b100); transform: translateY(-1px); }
+.xg-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.xg-btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+.xg-btn.primary:hover { background: var(--ink); filter: brightness(1.1); }
+.xg-btn.gold { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+.xg-btn.gold:hover { filter: brightness(1.08); }
+.xg-btn.danger { background: var(--cinnabar); color: #fff; border-color: var(--cinnabar); }
+.xg-btn.danger:hover { filter: brightness(1.1); }
+.xg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+.xg-hdr {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.xg-hdr h2 {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 1.8rem;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+.xg-hdr p { color: var(--txm); font-size: .9rem; }
+.xg-hub-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+@media(max-width:640px) { .xg-hub-grid { grid-template-columns: 1fr; } }
+.xg-action-col { display: flex; flex-direction: column; gap: 12px; }
+.xg-action-group {
+  background: var(--card);
+  border: 1px solid var(--b100);
+  border-radius: var(--r);
+  padding: 16px;
+}
+.xg-action-group h4 {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+.xg-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--b50);
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+.xg-item .it-icon { font-size: 1.4rem; flex-shrink: 0; }
+.xg-item .it-info { flex: 1; min-width: 0; }
+.xg-item .it-name { font-weight: 800; font-size: .88rem; }
+.xg-item .it-desc { font-size: .75rem; color: var(--txm); margin-top: 2px; }
+.xg-chbtn {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: var(--b50);
+  border: 1px solid var(--b100);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.xg-chbtn:hover { background: var(--b100); border-color: var(--gold); }
+.xg-chbtn.boss { border-color: var(--cinnabar); background: rgba(196,30,58,.05); }
+.xg-battle {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.xg-battle.shake { animation: shakeX .3s ease; }
+@keyframes shakeX { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+.xg-bp {
+  background: var(--card);
+  border: 1px solid var(--b100);
+  border-radius: var(--r);
+  padding: 16px;
+  position: relative;
+}
+.xg-bp.monster { border-color: rgba(196,30,58,.2); }
+.xg-bp .emoji { font-size: 2.8rem; }
+.xg-bp.atk-fwd { animation: atkForward .3s ease; }
+.xg-bp.hit { animation: hitShake .3s ease; }
+.xg-bp.die { animation: dieAnim .6s ease forwards; }
+.xg-bp.heal-flash { animation: healFlash .4s ease; }
+.xg-bp.skill-glow { animation: skillGlow .5s ease; }
+.xg-bp.berserk-active { box-shadow: 0 0 20px rgba(196,30,58,.3); }
+.xg-bp.clone-active { box-shadow: 0 0 20px rgba(150,80,255,.3); }
+@keyframes atkForward { 0%{transform:translateX(0)} 40%{transform:translateX(20px)} 100%{transform:translateX(0)} }
+@keyframes hitShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+@keyframes dieAnim { 0%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.1)} 100%{opacity:0;transform:scale(.8) rotate(10deg)} }
+@keyframes healFlash { 0%{box-shadow:0 0 0 rgba(76,175,80,0)} 50%{box-shadow:0 0 30px rgba(76,175,80,.5)} 100%{box-shadow:0 0 0 rgba(76,175,80,0)} }
+@keyframes skillGlow { 0%{box-shadow:0 0 0 rgba(201,169,110,0)} 50%{box-shadow:0 0 30px rgba(201,169,110,.5)} 100%{box-shadow:0 0 0 rgba(201,169,110,0)} }
+.xg-vs {
+  text-align: center;
+  font-size: 2rem;
+  padding: 8px 0;
+  color: var(--gold);
+}
+.bname { font-weight: 900; font-size: 1.05rem; }
+.blv { font-size: .78rem; color: var(--txm); }
+.xg-hp-bar {
+  height: 10px;
+  background: var(--b100);
+  border-radius: 99px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+.xg-hp-fill {
+  height: 100%;
+  background: var(--jade);
+  border-radius: 99px;
+  transition: width .4s ease;
+}
+.xg-hp-fill.mid { background: var(--gold); }
+.xg-hp-fill.low { background: var(--cinnabar); animation: lowPulse 1s infinite; }
+@keyframes lowPulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+.xg-exp-bar {
+  height: 8px;
+  background: var(--b100);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.xg-exp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--b400), var(--gold));
+  border-radius: 99px;
+  transition: width .4s ease;
+}
+.xg-info-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.xg-info-tag {
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  background: var(--b50);
+  border-radius: 6px;
+}
+.buff-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.xg-buff-tag {
+  font-size: .65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(201,169,110,.15);
+  color: var(--gold);
+}
+.xg-buff-tag.berserk { background: rgba(196,30,58,.12); color: var(--cinnabar); }
+.xg-buff-tag.clone { background: rgba(150,80,255,.12); color: #9650ff; }
+.xg-buff-tag.inv { background: rgba(76,175,80,.12); color: var(--jade); }
+.xg-buff-tag.stun { background: rgba(255,193,7,.12); color: #e6a817; }
+.xg-log {
+  background: var(--b50);
+  border-radius: var(--r);
+  padding: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: .8rem;
+  line-height: 1.6;
+  margin-top: 12px;
+}
+.xg-log .dmg { color: var(--cinnabar); font-weight: 800; }
+.xg-log .heal { color: var(--jade); font-weight: 800; }
+.xg-log .info { color: var(--b400); font-weight: 700; }
+.xg-taunt {
+  text-align: center;
+  padding: 10px;
+  margin-top: 8px;
+  background: linear-gradient(135deg, rgba(196,30,58,.06), rgba(196,30,58,.12));
+  border: 1px solid rgba(196,30,58,.2);
+  border-radius: var(--r);
+  font-weight: 800;
+  font-size: .9rem;
+  color: var(--cinnabar);
+  animation: tauntPop .4s var(--ss2);
+}
+@keyframes tauntPop { 0%{transform:scale(.9);opacity:0} 100%{transform:scale(1);opacity:1} }
+.xg-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.xg-skill-card {
+  background: var(--card);
+  border: 2px solid var(--b200);
+  border-radius: var(--r);
+  padding: 16px;
+  cursor: pointer;
+  transition: all .25s;
+  animation: fu .5s var(--ss2) both;
+}
+.xg-skill-card:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+.xg-skill-card.rarity-epic { border-color: #9650ff; }
+.xg-skill-card.rarity-legendary { border-color: var(--gold); box-shadow: 0 0 16px rgba(201,169,110,.15); }
+.xg-skill-card.rarity-curse { border-color: var(--cinnabar); background: rgba(196,30,58,.03); }
+.sk-type {
+  font-size: .65rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 99px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.sk-type.active { background: rgba(196,30,58,.1); color: var(--cinnabar); }
+.sk-type.passive { background: rgba(150,80,255,.1); color: #9650ff; }
+.sk-name { font-weight: 900; font-size: .95rem; margin-bottom: 4px; }
+.sk-desc { font-size: .78rem; color: var(--txm); line-height: 1.4; }
+@keyframes dmgPop { 0%{opacity:1;transform:translate(-50%,-50%) scale(1)} 100%{opacity:0;transform:translate(-50%,-120%) scale(1.2)} }
+@keyframes dmgPopCrit { 0%{opacity:1;transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-60%) scale(1.5)} 100%{opacity:0;transform:translate(-50%,-140%) scale(1.2)} }
+@keyframes fu { 0%{opacity:0;transform:translateY(16px)} 100%{opacity:1;transform:translateY(0)} }
 </style>
 </head>
 <body>
