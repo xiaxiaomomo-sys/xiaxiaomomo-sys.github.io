@@ -146,8 +146,7 @@ html{scroll-behavior:smooth}body{font-family:'Nunito',-apple-system,sans-serif;b
 .xg{max-width:720px;width:100%;margin:0 auto}
 .xg-hdr{text-align:center;margin-bottom:28px;position:relative}.xg-hdr h2{font-size:2rem;font-weight:900;margin-bottom:6px}.xg-hdr p{color:var(--txm);font-size:.95rem}
 
-.xg-card{background:var(--white);border-radius:var(--r);box-shadow:var(--sd);border:1px solid var(--bd);padding:24px;margin-bottom:20px;transition:background .4s}
-
+.xg-card{background:var(--white);border-radius:var(--r);box-shadow:var(--sd);border:1px solid var(--bd);padding:24px;margin-bottom:20px;transition:background .4s;position:relative}
 .xg-stat-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--b100);font-size:.88rem;font-weight:700}.xg-stat-row:last-child{border:none}
 
 .xg-hp-bar{height:14px;background:var(--b50);border-radius:10px;overflow:hidden;margin:8px 0;position:relative}.xg-hp-fill{height:100%;border-radius:10px;transition:width .4s ease;background:linear-gradient(90deg,#4caf50,#81c784)}.xg-hp-fill.low{background:linear-gradient(90deg,#ff6b6b,#ff9800)}.xg-hp-fill.mid{background:linear-gradient(90deg,#ff9800,#ffc107)}
@@ -302,7 +301,7 @@ body.dark::after{opacity:.06}
 
 /* ===== 商店 ===== */
 .xg-item{background:var(--b50);border:1px solid var(--b100);border-radius:var(--rs)}
-.xg-item:hover{border-color:varv{color:var(--cinnabar)}
+.xg-item:hover{border-color:var(--gold)}
 
 /* ===== 响应式 ===== */
 @media(max-width:768px){.xg-hub-grid{grid-template-columns:1fr}.xg-action-col{order:-1}}
@@ -540,8 +539,7 @@ function rHub(c){
   h+='<div><div style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.4rem;font-weight:800">'+p.name+'</div>';
   h+='<div style="font-size:.82rem;color:var(--txm)">Lv.'+p.lv+' · '+lvTitle+'</div></div></div>';
   h+='<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:700;margin-bottom:4px"><span>❤️ 生命</span><span>'+Math.floor(p.hp)+'/'+mxhp+'</span></div>';
-  h+='<div class="xg-hp-bar" style="height:12px"><div class="xg-hp-fill'+(--gold)}
-.xg-bp.monster .bl(p.hp/mxhp<.3?' low':p.hp/mxhp<.6?' mid':'')+'" style="width:'+Math.floor(p.hp/mxhp*100)+'%"></div></div></div>';
+ h+='<div class="xg-hp-bar" style="height:12px"><div class="xg-hp-fill'+(p.hp/mxhp<.3?' low':p.hp/mxhp<.6?' mid':'')+'" style="width:'+Math.floor(p.hp/mxhp*100)+'%"></div></div></div>';
   h+='<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:700;margin-bottom:4px"><span>⭐ 经验</span><span>'+p.exp+'/'+need+'</span></div>';
   h+='<div class="xg-exp-bar"><div class="xg-exp-fill" style="width:'+Math.floor(p.exp/need*100)+'%"></div></div></div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.82rem">';
