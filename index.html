@@ -490,7 +490,7 @@ function calcLifeSteal(p){var s=p.pLife||0;if(p.pSkl.indexOf('P5')>=0)s+=3;retur
 /* 动画辅助 */
 function animAfterRender(elId,cls,delay){setTimeout(function(){var e=$(elId);if(!e)return;e.classList.remove('atk-fwd','hit','die','heal-flash','skill-glow');void e.offsetWidth;e.classList.add(cls);setTimeout(function(){if(e)e.classList.remove(cls)},600)},delay||0);}
 function shakeBattle(){var el=document.querySelector('.xg-battle');if(!el)return;el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');setTimeout(function(){el.classList.remove('shake')},300);}
-function floatDmg/* 攻击残影 */
+/* 攻击残影 */
 function atkTrail(){
     var pe=document.getElementById('xgPE');
     if(!pe)return;
@@ -548,7 +548,9 @@ function critLine(){
         r.style.opacity=String(1-t);
         if(t<1)requestAnimationFrame(b);else if(r.parentNode)r.remove()
     })();
-}(targetId,text,color){setTimeout(function(){var tEl=$(targetId);if(!tEl)return;var isCrit=text.indexOf('\u66B4\u51FB')>=0;var f=document.createElement('div');f.textContent=text;var sz=isCrit?'2rem':'1.4rem';var anim=isCrit?'dmgPopCrit 1s ease forwards':'dmgPop .8s ease forwards';f.style.cssText='position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);font-size:'+sz+';font-weight:900;color:'+color+';z-index:99;pointer-events:none;text-shadow:0 2px 12px rgba(0,0,0,.3),0 0 20px '+color+';animation:'+anim+';white-space:nowrap;font-style:italic';tEl.style.position='relative';tEl.appendChild(f);setTimeout(function(){if(f.parentNode)f.remove()},1000);},50);}
+}
+
+function floatDmg(targetId,text,color){setTimeout(function(){var tEl=$(targetId);if(!tEl)return;var isCrit=text.indexOf('\u66B4\u51FB')>=0;var f=document.createElement('div');f.textContent=text;var sz=isCrit?'2rem':'1.4rem';var anim=isCrit?'dmgPopCrit 1s ease forwards':'dmgPop .8s ease forwards';f.style.cssText='position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);font-size:'+sz+';font-weight:900;color:'+color+';z-index:99;pointer-events:none;text-shadow:0 2px 12px rgba(0,0,0,.3),0 0 20px '+color+';animation:'+anim+';white-space:nowrap;font-style:italic';tEl.style.position='relative';tEl.appendChild(f);setTimeout(function(){if(f.parentNode)f.remove()},1000);},50);}
 function renderBuffTags(c,p){var tags='';if(c.berserkTurns>0)tags+='<span class="xg-buff-tag berserk">⚔️狂暴'+c.berserkTurns+'回合</span>';if(c.cloneTurns>0)tags+='<span class="xg-buff-tag clone">🎭分身'+c.cloneTurns+'回合</span>';if(c.invTurns>0)tags+='<span class="xg-buff-tag inv">🛡️无敌</span>';if(c.godOfWarReady)tags+='<span class="xg-buff-tag warrior">⚡战神就绪</span>';if(c.p8Active)tags+='<span class="xg-buff-tag p8buff">🔥战意+30%</span>';if(c.buffs)for(var i=0;i<c.buffs.length;i++){tags+='<span class="xg-buff-tag shield">🛡️'+c.buffs[i].t+'</span>'}if(c.stunM>0)tags+='<span class="xg-buff-tag stun">💫麻痹'+c.stunM+'</span>';return tags;}
 
 /* 战斗系统 */
