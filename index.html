@@ -518,6 +518,40 @@ function atkTrail(){
         })(i);
     }
 }
+/* 技能释放特效 */
+function skillEffect(){
+    var pe=document.getElementById('xgPE');
+    if(!pe)return;
+    var emoji=pe.querySelector('.emoji');
+    if(!emoji)return;
+    var rect=emoji.getBoundingClientRect();
+    var cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+    var ring=document.createElement('div');
+    ring.style.cssText='position:fixed;left:'+cx+'px;top:'+cy+'px;width:20px;height:20px;border-radius:50%;border:3px solid rgba(201,169,110,.8);transform:translate(-50%,-50%);z-index:51;pointer-events:none;';
+    document.body.appendChild(ring);
+    var t0=Date.now();
+    (function(){
+        var t=Math.min((Date.now()-t0)/500,1);
+        ring.style.width=(20+t*120)+'px';ring.style.height=(20+t*120)+'px';
+        ring.style.opacity=String(1-t);ring.style.borderWidth=Math.max(1,3*(1-t))+'px';
+        if(t<1)requestAnimationFrame(arguments.callee);else if(ring.parentNode)ring.remove()
+    })();
+    for(var i=0;i<6;i++){
+        (function(idx){
+            var angle=(idx/6)*Math.PI*2;var dist=60+Math.random()*30;
+            var p=document.createElement('div');
+            p.style.cssText='position:fixed;left:'+cx+'px;top:'+cy+'px;width:6px;height:6px;border-radius:50%;background:radial-gradient(circle,#ffd740,#c9a96e);transform:translate(-50%,-50%);z-index:52;pointer-events:none;box-shadow:0 0 8px #c9a96e;';
+            document.body.appendChild(p);
+            var pt0=Date.now();var dur=300+Math.random()*200;
+            (function(){
+                var t=Math.min((Date.now()-pt0)/dur,1);var ease=1-Math.pow(1-t,3);
+                p.style.left=(cx+Math.cos(angle)*dist*ease)+'px';p.style.top=(cy+Math.sin(angle)*dist*ease)+'px';
+                p.style.opacity=String(1-t);p.style.transform='translate(-50%,-50%) scale('+(1-t*.5)+')';
+                if(t<1)requestAnimationFrame(arguments.callee);else if(p.parentNode)p.remove()
+            })()
+        })(i)
+    }
+}
 
 /* 暴击闪光 */
 function critLine(){
@@ -569,6 +603,7 @@ function doMonsterAtk(){var p=G.p,c=G.cmb,m=c.m;if(c.stunM>0){c.stunM--;addLog('
 /* 自动战斗循环 */
 function autoLoop(){if(!G.cmb||G.cmb.result)return;var spd=1000;var p=G.p,c=G.cmb,m=c.m;var sk=chooseAutoSkill();if(!sk){c.basicAtkCount=(c.basicAtkCount||0)+1;if(p.pSkl.indexOf('P19')>=0&&c.basicAtkCount>=5&&!c.godOfWarReady){c.godOfWarReady=true;c.basicAtkCount=0;addLog('<span class="info">【战神附体】蓄力完成！下次攻击暴击+伤害翻倍！</span>')}}else{c.basicAtkCount=0}var _crit=false;if(sk)doSkillUse(sk);else _crit=doNormalAtk();if(c.cloneTurns>0&&m.hp>0){c.cloneTurns--;var cloneAtk=Math.floor(getPAtk(p,c)*0.3);var cloneDmg=Math.max(1,cloneAtk-m.def);m.hp=Math.max(0,m.hp-cloneDmg);addLog('🎭 分身攻击 <span class="dmg">'+cloneDmg+'</span>');floatDmg('xgME','🎭'+cloneDmg,'#9650ff');applyOnHitHeal(p,cloneDmg);if(c.cloneTurns<=0)addLog('分身术效果结束')}if(p.pSkl.indexOf('P21')>=0&&m.hp>0&&Math.random()<.05){var stormDmg=Math.max(1,getPAtk(p,c)-m.def);m.hp=Math.max(0,m.hp-stormDmg);addLog('🌪️ 风暴之心！<span class="dmg">'+stormDmg+'</span>');floatDmg('xgME','🌪'+stormDmg,'#4ba6f7');applyOnHitHeal(p,stormDmg)}sfx(sk?'skill':'atk');render();animAfterRender('xgPE','atk-fwd',10);
 if(sk)animAfterRender('xgPE','skill-glow',50);
+if(sk)skillEffect();
 atkTrail();
 if(_crit)critLine();if(m.hp<=0){m.hp=0;setTimeout(function(){animAfterRender('xgME','die',10);sfx('win');render();setTimeout(battleWin,900)},400);return}_abt=setTimeout(function(){if(!G.cmb||G.cmb.result)return;var hit=doMonsterAtk();render();animAfterRender('xgME','atk-fwd',10);if(hit){animAfterRender('xgPE','hit',100);sfx('hit')}if(p.hp<=0){var revived=false;if(p.pSkl.indexOf('P10')>=0&&!c.reviveUsed&&Math.random()<.25){c.reviveUsed=true;var rh=Math.floor(calcMaxHp(p)*.3);p.hp=rh;addLog('<span class="heal">【天道庇佑】+'+rh+'</span>');floatDmg('xgPE','+'+rh,'#4caf50');revived=true;sfx('heal');render();animAfterRender('xgPE','heal-flash',200)}if(!revived){p.hp=0;sfx('die');stopBGM();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return}}for(var i=c.buffs.length-1;i>=0;i--){c.buffs[i].dur--;if(c.buffs[i].dur<=0)c.buffs.splice(i,1)}for(var k in c.cd){if(c.cd[k]>0)c.cd[k]--}if(c.berserkTurns>0){c.berserkTurns--;if(c.berserkTurns<=0)addLog('<span class="info">狂暴化结束</span>')}if(p.pSkl.indexOf('P9')>=0){var rh=Math.floor(calcMaxHp(p)*.015);var oldH=p.hp;p.hp=Math.min(calcMaxHp(p),p.hp+rh);var act=p.hp-oldH;if(act>0){addLog('【修罗之体】回复 <span class="heal">+'+act+'</span>');floatDmg('xgPE','+'+act,'#4caf50');sfx('heal');render();animAfterRender('xgPE','heal-flash',200)}}if((m.ab===1||m.ab===6||m.ab===7)&&c.turnCount%3===0&&c.turnCount>0){m.hp=Math.min(m.mhp,m.hp+Math.floor(m.mhp*.05));addLog('<span class="info">怪物回血</span>')}c.turnCount++;c.round++;render();if(p.pSkl.indexOf('P18')>=0&&Math.random()<.1&&m.hp>0){addLog('<span class="info">【时间守护者】额外行动！</span>');setTimeout(function(){if(!G.cmb||G.cmb.result||m.hp<=0)return;var sk2=chooseAutoSkill(),_crit2=false;
 if(sk2)doSkillUse(sk2);else _crit2=doNormalAtk();
