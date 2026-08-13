@@ -25,7 +25,9 @@ html{scroll-behavior:smooth}body{font-family:'Nunito',-apple-system,sans-serif;b
 @keyframes tw{0%,100%{opacity:0;transform:scale(.3) rotate(0)}50%{opacity:1;transform:scale(1.1) rotate(180deg)}}
 .nav{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:1000;display:flex;align-items:center;gap:4px;padding:5px 8px;background:var(--gs);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:var(--rf);box-shadow:var(--sd),0 0 0 1px var(--bd);opacity:0;animation:nv .7s var(--ss2) .3s forwards;transition:background .4s,box-shadow .4s}
 @keyframes nv{from{opacity:0;transform:translateX(-50%) translateY(-24px) scale(.9)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
-.nl{padding:8px 14px;font-weight:900;font-size:.92rem;color:var(--b500);display:flex;align-items:center;gap:6px}.nl i{width:8px;height:8px;background:var(--b400);border-radius:50%;animation:lp 3s ease-in-out infinite}.nd{width:1px;height:24px;background:var(--b100);margin:0 4px}@keyframes lp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.7}}
+.nl{padding:8px 14px;font-weight:900;font-size:.92rem;color:var(--b500);display:flex;align-items:center;gap:6px}.nl i{width:8px;height:8px;background:var(--b400);border-radius:50%;animation:lp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.7}}
+.nd{width:1px;height:24px;background:var(--b100);margin:0 4px 2s ease-in-out infinite}
+@keyframes lp}
 .ni{padding:8px 14px;border-radius:var(--rf);border:none;background:0;color:var(--txm);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .35s var(--sp);white-space:nowrap}.ni:hover{color:var(--b500);background:var(--b50)}.ni.active{background:linear-gradient(135deg,var(--ink),var(--b400));color:#faf7f0;box-shadow:0 3px 14px rgba(45,34,24,.25);transform:scale(1.06)}.nl{color:var(--cinnabar)}.nl i{background:var(--cinnabar)}.ni:hover{color:var(--cinnabar);background:rgba(196,30,58,.06)}
 .dtb{display:flex;align-items:center;gap:5px;padding:8px 14px;border-radius:var(--rf);border:2px solid var(--b100);background:var(--white);color:var(--txm);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .35s var(--sp);flex-shrink:0;margin-left:4px}.dtb:hover{border-color:var(--b400);color:var(--b500);transform:scale(1.06)}
 .pw{position:relative;min-height:100vh;z-index:1}
@@ -305,278 +307,6 @@ body.dark::after{opacity:.06}
 
 /* ===== 响应式 ===== */
 @media(max-width:768px){.xg-hub-grid{grid-template-columns:1fr}.xg-action-col{order:-1}}
-/* ===== 修仙游戏样式 ===== */
-.xg-title {
-  text-align: center;
-  padding: 40px 20px 60px;
-}
-.xg-title .big-emoji {
-  font-size: 4rem;
-  margin-bottom: 12px;
-  animation: fu .6s var(--ss2) both;
-}
-.xg-title h3 {
-  font-family: 'Ma Shan Zheng', cursive;
-  font-size: 2rem;
-  font-weight: 900;
-  color: var(--ink);
-  margin-bottom: 8px;
-}
-.xg-title p {
-  color: var(--txm);
-  margin-bottom: 20px;
-}
-.xg-card {
-  background: var(--card);
-  border: 1px solid var(--b100);
-  border-radius: var(--r);
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,.04);
-}
-.xg-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 20px;
-  border: 1px solid var(--b200);
-  border-radius: var(--r);
-  background: var(--card);
-  color: var(--ink);
-  font-size: .9rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all .2s;
-  font-family: inherit;
-}
-.xg-btn:hover { background: var(--b100); transform: translateY(-1px); }
-.xg-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-.xg-btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
-.xg-btn.primary:hover { background: var(--ink); filter: brightness(1.1); }
-.xg-btn.gold { background: var(--gold); color: var(--ink); border-color: var(--gold); }
-.xg-btn.gold:hover { filter: brightness(1.08); }
-.xg-btn.danger { background: var(--cinnabar); color: #fff; border-color: var(--cinnabar); }
-.xg-btn.danger:hover { filter: brightness(1.1); }
-.xg-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 16px;
-}
-.xg-hdr {
-  text-align: center;
-  margin-bottom: 24px;
-}
-.xg-hdr h2 {
-  font-family: 'Ma Shan Zheng', cursive;
-  font-size: 1.8rem;
-  font-weight: 900;
-  margin-bottom: 4px;
-}
-.xg-hdr p { color: var(--txm); font-size: .9rem; }
-.xg-hub-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  max-width: 800px;
-  margin: 0 auto;
-}
-@media(max-width:640px) { .xg-hub-grid { grid-template-columns: 1fr; } }
-.xg-action-col { display: flex; flex-direction: column; gap: 12px; }
-.xg-action-group {
-  background: var(--card);
-  border: 1px solid var(--b100);
-  border-radius: var(--r);
-  padding: 16px;
-}
-.xg-action-group h4 {
-  font-family: 'Ma Shan Zheng', cursive;
-  font-size: 1rem;
-  margin-bottom: 10px;
-}
-.xg-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  background: var(--b50);
-  border-radius: 8px;
-  margin-bottom: 6px;
-}
-.xg-item .it-icon { font-size: 1.4rem; flex-shrink: 0; }
-.xg-item .it-info { flex: 1; min-width: 0; }
-.xg-item .it-name { font-weight: 800; font-size: .88rem; }
-.xg-item .it-desc { font-size: .75rem; color: var(--txm); margin-top: 2px; }
-.xg-chbtn {
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  background: var(--b50);
-  border: 1px solid var(--b100);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all .2s;
-}
-.xg-chbtn:hover { background: var(--b100); border-color: var(--gold); }
-.xg-chbtn.boss { border-color: var(--cinnabar); background: rgba(196,30,58,.05); }
-.xg-battle {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  max-width: 800px;
-  margin: 0 auto;
-}
-.xg-battle.shake { animation: shakeX .3s ease; }
-@keyframes shakeX { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
-.xg-bp {
-  background: var(--card);
-  border: 1px solid var(--b100);
-  border-radius: var(--r);
-  padding: 16px;
-  position: relative;
-}
-.xg-bp.monster { border-color: rgba(196,30,58,.2); }
-.xg-bp .emoji { font-size: 2.8rem; }
-.xg-bp.atk-fwd { animation: atkForward .3s ease; }
-.xg-bp.hit { animation: hitShake .3s ease; }
-.xg-bp.die { animation: dieAnim .6s ease forwards; }
-.xg-bp.heal-flash { animation: healFlash .4s ease; }
-.xg-bp.skill-glow { animation: skillGlow .5s ease; }
-.xg-bp.berserk-active { box-shadow: 0 0 20px rgba(196,30,58,.3); }
-.xg-bp.clone-active { box-shadow: 0 0 20px rgba(150,80,255,.3); }
-@keyframes atkForward { 0%{transform:translateX(0)} 40%{transform:translateX(20px)} 100%{transform:translateX(0)} }
-@keyframes hitShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
-@keyframes dieAnim { 0%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.1)} 100%{opacity:0;transform:scale(.8) rotate(10deg)} }
-@keyframes healFlash { 0%{box-shadow:0 0 0 rgba(76,175,80,0)} 50%{box-shadow:0 0 30px rgba(76,175,80,.5)} 100%{box-shadow:0 0 0 rgba(76,175,80,0)} }
-@keyframes skillGlow { 0%{box-shadow:0 0 0 rgba(201,169,110,0)} 50%{box-shadow:0 0 30px rgba(201,169,110,.5)} 100%{box-shadow:0 0 0 rgba(201,169,110,0)} }
-.xg-vs {
-  text-align: center;
-  font-size: 2rem;
-  padding: 8px 0;
-  color: var(--gold);
-}
-.bname { font-weight: 900; font-size: 1.05rem; }
-.blv { font-size: .78rem; color: var(--txm); }
-.xg-hp-bar {
-  height: 10px;
-  background: var(--b100);
-  border-radius: 99px;
-  overflow: hidden;
-  margin: 4px 0;
-}
-.xg-hp-fill {
-  height: 100%;
-  background: var(--jade);
-  border-radius: 99px;
-  transition: width .4s ease;
-}
-.xg-hp-fill.mid { background: var(--gold); }
-.xg-hp-fill.low { background: var(--cinnabar); animation: lowPulse 1s infinite; }
-@keyframes lowPulse { 0%,100%{opacity:1} 50%{opacity:.6} }
-.xg-exp-bar {
-  height: 8px;
-  background: var(--b100);
-  border-radius: 99px;
-  overflow: hidden;
-}
-.xg-exp-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--b400), var(--gold));
-  border-radius: 99px;
-  transition: width .4s ease;
-}
-.xg-info-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.xg-info-tag {
-  font-size: .72rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  background: var(--b50);
-  border-radius: 6px;
-}
-.buff-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 4px;
-}
-.xg-buff-tag {
-  font-size: .65rem;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: rgba(201,169,110,.15);
-  color: var(--gold);
-}
-.xg-buff-tag.berserk { background: rgba(196,30,58,.12); color: var(--cinnabar); }
-.xg-buff-tag.clone { background: rgba(150,80,255,.12); color: #9650ff; }
-.xg-buff-tag.inv { background: rgba(76,175,80,.12); color: var(--jade); }
-.xg-buff-tag.stun { background: rgba(255,193,7,.12); color: #e6a817; }
-.xg-log {
-  background: var(--b50);
-  border-radius: var(--r);
-  padding: 12px;
-  max-height: 200px;
-  overflow-y: auto;
-  font-size: .8rem;
-  line-height: 1.6;
-  margin-top: 12px;
-}
-.xg-log .dmg { color: var(--cinnabar); font-weight: 800; }
-.xg-log .heal { color: var(--jade); font-weight: 800; }
-.xg-log .info { color: var(--b400); font-weight: 700; }
-.xg-taunt {
-  text-align: center;
-  padding: 10px;
-  margin-top: 8px;
-  background: linear-gradient(135deg, rgba(196,30,58,.06), rgba(196,30,58,.12));
-  border: 1px solid rgba(196,30,58,.2);
-  border-radius: var(--r);
-  font-weight: 800;
-  font-size: .9rem;
-  color: var(--cinnabar);
-  animation: tauntPop .4s var(--ss2);
-}
-@keyframes tauntPop { 0%{transform:scale(.9);opacity:0} 100%{transform:scale(1);opacity:1} }
-.xg-choices {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-  margin: 20px 0;
-}
-.xg-skill-card {
-  background: var(--card);
-  border: 2px solid var(--b200);
-  border-radius: var(--r);
-  padding: 16px;
-  cursor: pointer;
-  transition: all .25s;
-  animation: fu .5s var(--ss2) both;
-}
-.xg-skill-card:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
-.xg-skill-card.rarity-epic { border-color: #9650ff; }
-.xg-skill-card.rarity-legendary { border-color: var(--gold); box-shadow: 0 0 16px rgba(201,169,110,.15); }
-.xg-skill-card.rarity-curse { border-color: var(--cinnabar); background: rgba(196,30,58,.03); }
-.sk-type {
-  font-size: .65rem;
-  font-weight: 800;
-  padding: 2px 8px;
-  border-radius: 99px;
-  display: inline-block;
-  margin-bottom: 6px;
-}
-.sk-type.active { background: rgba(196,30,58,.1); color: var(--cinnabar); }
-.sk-type.passive { background: rgba(150,80,255,.1); color: #9650ff; }
-.sk-name { font-weight: 900; font-size: .95rem; margin-bottom: 4px; }
-.sk-desc { font-size: .78rem; color: var(--txm); line-height: 1.4; }
-@keyframes dmgPop { 0%{opacity:1;transform:translate(-50%,-50%) scale(1)} 100%{opacity:0;transform:translate(-50%,-120%) scale(1.2)} }
-@keyframes dmgPopCrit { 0%{opacity:1;transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-60%) scale(1.5)} 100%{opacity:0;transform:translate(-50%,-140%) scale(1.2)} }
-@keyframes fu { 0%{opacity:0;transform:translateY(16px)} 100%{opacity:1;transform:translateY(0)} }
 </style>
 </head>
 <body>
@@ -788,40 +518,6 @@ function atkTrail(){
         })(i);
     }
 }
-/* 技能释放特效 */
-function skillEffect(){
-    var pe=document.getElementById('xgPE');
-    if(!pe)return;
-    var emoji=pe.querySelector('.emoji');
-    if(!emoji)return;
-    var rect=emoji.getBoundingClientRect();
-    var cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
-    var ring=document.createElement('div');
-    ring.style.cssText='position:fixed;left:'+cx+'px;top:'+cy+'px;width:20px;height:20px;border-radius:50%;border:3px solid rgba(201,169,110,.8);transform:translate(-50%,-50%);z-index:51;pointer-events:none;';
-    document.body.appendChild(ring);
-    var t0=Date.now();
-    (function(){
-        var t=Math.min((Date.now()-t0)/500,1);
-        ring.style.width=(20+t*120)+'px';ring.style.height=(20+t*120)+'px';
-        ring.style.opacity=String(1-t);ring.style.borderWidth=Math.max(1,3*(1-t))+'px';
-        if(t<1)requestAnimationFrame(arguments.callee);else if(ring.parentNode)ring.remove()
-    })();
-    for(var i=0;i<6;i++){
-        (function(idx){
-            var angle=(idx/6)*Math.PI*2;var dist=60+Math.random()*30;
-            var p=document.createElement('div');
-            p.style.cssText='position:fixed;left:'+cx+'px;top:'+cy+'px;width:6px;height:6px;border-radius:50%;background:radial-gradient(circle,#ffd740,#c9a96e);transform:translate(-50%,-50%);z-index:52;pointer-events:none;box-shadow:0 0 8px #c9a96e;';
-            document.body.appendChild(p);
-            var pt0=Date.now();var dur=300+Math.random()*200;
-            (function(){
-                var t=Math.min((Date.now()-pt0)/dur,1);var ease=1-Math.pow(1-t,3);
-                p.style.left=(cx+Math.cos(angle)*dist*ease)+'px';p.style.top=(cy+Math.sin(angle)*dist*ease)+'px';
-                p.style.opacity=String(1-t);p.style.transform='translate(-50%,-50%) scale('+(1-t*.5)+')';
-                if(t<1)requestAnimationFrame(arguments.callee);else if(p.parentNode)p.remove()
-            })()
-        })(i)
-    }
-}
 
 /* 暴击闪光 */
 function critLine(){
@@ -873,7 +569,6 @@ function doMonsterAtk(){var p=G.p,c=G.cmb,m=c.m;if(c.stunM>0){c.stunM--;addLog('
 /* 自动战斗循环 */
 function autoLoop(){if(!G.cmb||G.cmb.result)return;var spd=1000;var p=G.p,c=G.cmb,m=c.m;var sk=chooseAutoSkill();if(!sk){c.basicAtkCount=(c.basicAtkCount||0)+1;if(p.pSkl.indexOf('P19')>=0&&c.basicAtkCount>=5&&!c.godOfWarReady){c.godOfWarReady=true;c.basicAtkCount=0;addLog('<span class="info">【战神附体】蓄力完成！下次攻击暴击+伤害翻倍！</span>')}}else{c.basicAtkCount=0}var _crit=false;if(sk)doSkillUse(sk);else _crit=doNormalAtk();if(c.cloneTurns>0&&m.hp>0){c.cloneTurns--;var cloneAtk=Math.floor(getPAtk(p,c)*0.3);var cloneDmg=Math.max(1,cloneAtk-m.def);m.hp=Math.max(0,m.hp-cloneDmg);addLog('🎭 分身攻击 <span class="dmg">'+cloneDmg+'</span>');floatDmg('xgME','🎭'+cloneDmg,'#9650ff');applyOnHitHeal(p,cloneDmg);if(c.cloneTurns<=0)addLog('分身术效果结束')}if(p.pSkl.indexOf('P21')>=0&&m.hp>0&&Math.random()<.05){var stormDmg=Math.max(1,getPAtk(p,c)-m.def);m.hp=Math.max(0,m.hp-stormDmg);addLog('🌪️ 风暴之心！<span class="dmg">'+stormDmg+'</span>');floatDmg('xgME','🌪'+stormDmg,'#4ba6f7');applyOnHitHeal(p,stormDmg)}sfx(sk?'skill':'atk');render();animAfterRender('xgPE','atk-fwd',10);
 if(sk)animAfterRender('xgPE','skill-glow',50);
-if(sk)skillEffect();
 atkTrail();
 if(_crit)critLine();if(m.hp<=0){m.hp=0;setTimeout(function(){animAfterRender('xgME','die',10);sfx('win');render();setTimeout(battleWin,900)},400);return}_abt=setTimeout(function(){if(!G.cmb||G.cmb.result)return;var hit=doMonsterAtk();render();animAfterRender('xgME','atk-fwd',10);if(hit){animAfterRender('xgPE','hit',100);sfx('hit')}if(p.hp<=0){var revived=false;if(p.pSkl.indexOf('P10')>=0&&!c.reviveUsed&&Math.random()<.25){c.reviveUsed=true;var rh=Math.floor(calcMaxHp(p)*.3);p.hp=rh;addLog('<span class="heal">【天道庇佑】+'+rh+'</span>');floatDmg('xgPE','+'+rh,'#4caf50');revived=true;sfx('heal');render();animAfterRender('xgPE','heal-flash',200)}if(!revived){p.hp=0;sfx('die');stopBGM();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return}}for(var i=c.buffs.length-1;i>=0;i--){c.buffs[i].dur--;if(c.buffs[i].dur<=0)c.buffs.splice(i,1)}for(var k in c.cd){if(c.cd[k]>0)c.cd[k]--}if(c.berserkTurns>0){c.berserkTurns--;if(c.berserkTurns<=0)addLog('<span class="info">狂暴化结束</span>')}if(p.pSkl.indexOf('P9')>=0){var rh=Math.floor(calcMaxHp(p)*.015);var oldH=p.hp;p.hp=Math.min(calcMaxHp(p),p.hp+rh);var act=p.hp-oldH;if(act>0){addLog('【修罗之体】回复 <span class="heal">+'+act+'</span>');floatDmg('xgPE','+'+act,'#4caf50');sfx('heal');render();animAfterRender('xgPE','heal-flash',200)}}if((m.ab===1||m.ab===6||m.ab===7)&&c.turnCount%3===0&&c.turnCount>0){m.hp=Math.min(m.mhp,m.hp+Math.floor(m.mhp*.05));addLog('<span class="info">怪物回血</span>')}c.turnCount++;c.round++;render();if(p.pSkl.indexOf('P18')>=0&&Math.random()<.1&&m.hp>0){addLog('<span class="info">【时间守护者】额外行动！</span>');setTimeout(function(){if(!G.cmb||G.cmb.result||m.hp<=0)return;var sk2=chooseAutoSkill(),_crit2=false;
 if(sk2)doSkillUse(sk2);else _crit2=doNormalAtk();
@@ -882,8 +577,8 @@ render();
 animAfterRender('xgPE','atk-fwd',10);
 atkTrail();
 if(_crit2)critLine()},200)}_abt=setTimeout(autoLoop,spd)},spd)}
-function battleWin(){stopAuto();stopBGM();saveXiuxianProg();var p=G.p,c=G.cmb;if(!c)return;var rw=rwMul(c.floor,p.lv);var ge=Math.floor(c.m.exp*rw.em*(1+(p.expBonus||0)/100)),gd=Math.floor(c.m.gold*rw.gm);p.exp+=ge;p.gold+=gd;p.kills++;p.consecutiveKills=(p.consecutiveKills||0)+1;if(p.pSkl.indexOf('P14')>=0&&p.kills%100===0)p.pAtk++;if(c.floor>=G.prog.maxFloor)G.prog.maxFloor=c.floor;G.prog.cleared[c.floor]=true;if(c.isBoss)G.prog.bossCleared[c.floor]=true;G._grindFloor=c.floor;G._grindIsBoss=c.isBoss;G.prog.curFloor=Math.max(G.prog.curFloor,c.floor+1);G.cmb={result:'win',exp:ge,gold:gd};rc();autoSave()}
-function battleLose(){stopAuto();stopBGM();var p=G.p;if(!G.cmb)return;p.consecutiveKills=0;var lost=Math.floor(p.gold*.5);p.gold=Math.max(0,p.gold-lost);G.cmb={result:'lose',lost:lost};rc();autoSave()}
+function battleWin(){stopAuto();stopBGM();saveXiuxianProg();var p=G.p,c=G.cmb;if(!c)return;var rw=rwMul(c.floor,p.lv);var ge=Math.floor(c.m.exp*rw.em*(1+(p.expBonus||0)/100)),gd=Math.floor(c.m.gold*rw.gm);p.exp+=ge;p.gold+=gd;p.kills++;p.consecutiveKills=(p.consecutiveKills||0)+1;if(p.pSkl.indexOf('P14')>=0&&p.kills%100===0)p.pAtk++;if(c.floor>=G.prog.maxFloor)G.prog.maxFloor=c.floor;G.prog.cleared[c.floor]=true;if(c.isBoss)G.prog.bossCleared[c.floor]=true;G._grindFloor=c.floor;G._grindIsBoss=c.isBoss;G.prog.curFloor=Math.max(G.prog.curFloor,c.floor+1);G.cmb={result:'win',exp:ge,gold:gd};G.scr='win';rc();if(G._autoNextTimer)clearTimeout(G._autoNextTimer);G._autoNextTimer=setTimeout(function(){G._autoNextTimer=null;G._autoContinue=true;checkLvlUp()},2000);autoSave()}
+function battleLose(){stopAuto();stopBGM();var p=G.p;if(!G.cmb)return;p.consecutiveKills=0;var lost=Math.floor(p.gold*.5);p.gold=Math.max(0,p.gold-lost);G.cmb={result:'lose',lost:lost};G.scr='death';rc();autoSave()}
 
 /* 升级/选择系统 */
 function checkLvlUp(){var p=G.p;if(p.lv>=100){G._autoContinue=false;G.scr='hub';rc();return}if(p.exp>=expNeed(p.lv)){p.exp-=expNeed(p.lv);p.lv++;p.statPts+=ptsPerLv(p.lv);var rl=Math.random();if(rl<.33){p.atkPts++}else if(rl<.66){p.defPts++}else{p.conPts++}G._refreshed=false;genStatCh();G.scr='lattr';rc()}else{if(G._autoContinue){G._autoContinue=false;var gf=G._grindFloor||G.prog.curFloor;var gb=G._grindIsBoss!=null?G._grindIsBoss:(gf%10===0);G.p.hp=calcMaxHp(G.p);startBattle(gf,gb)}else{G.scr='hub';rc()}}}
@@ -1009,26 +704,10 @@ function rBattle(c){
   h+='</div></div>';
   if(cm.taunt)h+='<div class="xg-taunt">😈 林深大魔王: "'+cm.taunt+'"</div>';
   h+='<div class="xg-log" style="margin-top:12px">';
-  for(var i=0;i<cm.log.length;i++)h+='<div>'+cm.log[i]+'</div>';h+='</div>';
-if(cm.result==='win'){
-h+='<div style="background:linear-gradient(135deg,rgba(201,169,110,.08),rgba(201,169,110,.15));border:2px solid var(--gold);border-radius:var(--r);padding:28px;text-align:center;margin-top:16px;animation:fu .5s var(--ss2) both">';
-h+='<div style="font-size:2.5rem;margin-bottom:8px">🎉</div>';
-h+='<div style="font-size:1.4rem;font-weight:900;margin-bottom:12px;color:var(--b500)">战斗胜利！</div>';
-h+='<div style="font-size:1rem;margin-bottom:20px">获得 <span style="color:var(--b500);font-weight:900;font-size:1.2rem">'+cm.exp+'</span> 经验 和 <span style="color:var(--yw);font-weight:900;font-size:1.2rem">'+cm.gold+'</span> 金币</div>';
-h+='<div class="xg-actions">';
-h+='<button class="xg-btn primary" onclick="xxContinueNow()">⏩ 立即继续</button>';
-h+='<button class="xg-btn gold" onclick="xxGoNextFloor()">⏭️ 进入下一层</button>';
-h+='<button class="xg-btn danger" onclick="xxInterrupt()">🛑 停止</button>';
-h+='</div></div>';}
-if(cm.result==='lose'){
-h+='<div style="background:linear-gradient(135deg,rgba(196,30,58,.05),rgba(196,30,58,.1));border:2px solid var(--cinnabar);border-radius:var(--r);padding:28px;text-align:center;margin-top:16px;animation:fu .5s var(--ss2) both">';
-h+='<div style="font-size:2.5rem;margin-bottom:8px">💀</div>';
-h+='<div style="font-size:1.4rem;font-weight:900;margin-bottom:12px;color:var(--cinnabar)">战斗失败...</div>';
-h+='<div style="font-size:1rem;margin-bottom:20px">丢失 <span style="color:var(--cinnabar);font-weight:900">'+cm.lost+'</span> 金币</div>';
-h+='<div class="xg-actions">';
-h+='<button class="xg-btn primary" onclick="xxInterrupt()">↩️ 回到基地</button>';
-h+='</div></div>';}
-c.innerHTML=h;
+  for(var i=0;i<cm.log.length;i++)h+='<div>'+cm.log[i]+'</div>';
+  h+='</div>';
+  c.innerHTML=h;
+}
 function rWin(c){var cm=G.cmb;var h='<div class="xg-title"><div class="big-emoji">🎉</div><h3>战斗胜利！</h3><p style="font-size:1.1rem;margin-bottom:8px">获得 <span style="color:var(--b500);font-weight:900;font-size:1.3rem">'+cm.exp+'</span> 经验 和 <span style="color:var(--yw);font-weight:900;font-size:1.3rem">'+cm.gold+'</span> 金币</p><p style="color:var(--txm);font-size:.85rem;margin-bottom:16px">继续刷第'+(G._grindFloor||'?')+'层...</p><div class="xg-actions"><button class="xg-btn primary" onclick="xxContinueNow()">⏩ 立即继续</button><button class="xg-btn gold" onclick="xxGoNextFloor()">⏭️ 进入下一层</button><button class="xg-btn danger" onclick="xxInterrupt()">🛑 停止</button></div></div>';c.innerHTML=h;}
 function rDeath(c){var cm=G.cmb;var h='<div class="xg-title"><div class="big-emoji">💀</div><h3>战斗失败...</h3><p style="margin-bottom:8px">丢失 <span style="color:var(--pk);font-weight:900">'+cm.lost+'</span> 金币</p><p style="color:var(--txm);font-size:.85rem;margin-bottom:20px">不要气馁，修仙之路本就艰难</p><button class="xg-btn primary" onclick="xxGoto(\'hub\')">回到基地</button></div>';c.innerHTML=h;}
 function rLattr(c){var p=G.p;var h='<div class="xg-title"><div class="big-emoji">⬆️</div><h3>升级到 Lv.'+p.lv+'！</h3><p style="color:var(--txm)">选择一项属性提升</p><div class="xg-choices">';for(var i=0;i<G.ce.length;i++){var ch=G.ce[i];var animDelay='animation-delay:'+((i+1)*.15)+'s;';if(ch.k==='empty'){h+='<div class="xg-skill-card" style="border-color:var(--txl);opacity:.7;'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name">🫥 谢谢惠顾</div><div class="sk-desc">'+ch.ds+'</div></div>';}else if(ch.k==='fear'){h+='<div class="xg-skill-card rarity-curse" style="'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name" style="color:#ff4757">😈 '+ch.t+'</div><div class="sk-desc">'+ch.ds+'</div></div>';}else{var rarity=ch.v>=4?'rarity-legendary':ch.v>=3?'rarity-epic':'';h+='<div class="xg-skill-card '+rarity+'" style="'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name">⬆️ '+ch.t+'</div><div class="sk-desc">'+ch.ds+'</div><div class="sk-type active">+'+ch.v+'</div></div>';}}h+='</div>';h+='<button class="xg-btn gold" onclick="xxRefresh()"'+(p.gold<15?' disabled style="opacity:.5"':'')+'>🔄 刷新 (15金币)</button>';h+='</div>';c.innerHTML=h;}
