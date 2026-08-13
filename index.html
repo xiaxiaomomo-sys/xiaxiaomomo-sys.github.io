@@ -575,7 +575,26 @@ function rHub(c){
   h+='<button class="xg-btn primary" onclick="xxGmAxe(\'hp\')" style="font-size:.78rem">❤️满血</button>';
   h+='<button class="xg-btn danger" onclick="xxGmAxe(\'lv\')" style="font-size:.78rem">⬆️+1级</button>';
   h+='</div></div>';}
-  h+='</div></div>';
+   h+='</div></div>';
+
+  /* 修仙排行榜 */
+  h+='<div class="xg-card" style="margin-top:16px">';
+  h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.1rem;margin-bottom:16px">🏆 修仙排行榜</h4>';
+  if(!xiuxLB||xiuxLB.length===0)h+='<div style="text-align:center;padding:16px;color:var(--txm);font-size:.85rem">暂无数据，开始修仙吧~</div>';
+  else{h+='<div style="display:flex;flex-direction:column;gap:4px">';
+  xiuxLB.forEach(function(r,i){
+    var isMe=r.id===myDevice;
+    var badge=i===0?'🥇':i===1?'🥈':i===2?'🥉':'　';
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:'+(isMe?'rgba(201,169,110,.08)':'transparent')+';border:'+(isMe?'1px solid var(--gold)':'1px solid transparent')+'">';
+    h+='<span style="width:24px;font-size:.9rem">'+badge+'</span>';
+    h+='<span style="font-weight:800;font-size:.82rem;flex:1;'+(isMe?'color:var(--gold)':'')+'">'+(r.name||'匿名修仙者')+'</span>';
+    h+='<span style="font-size:.72rem;color:var(--txm)">'+r.title+'</span>';
+    h+='<span style="font-size:.75rem;font-weight:700;color:var(--b400)">第'+r.max_floor+'层</span>';
+    h+='<span style="font-size:.72rem;color:var(--txm)">Lv.'+r.level+'</span>';
+    h+='</div>';});
+  h+='</div>';}
+  h+='</div>';
+
   c.innerHTML=h;
 }
 function rBattle(c){
