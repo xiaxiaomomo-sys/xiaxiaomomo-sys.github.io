@@ -304,7 +304,34 @@ body.dark::after{opacity:.06}
 /* ===== 商店 ===== */
 .xg-item{background:var(--b50);border:1px solid var(--b100);border-radius:var(--rs)}
 .xg-item:hover{border-color:var(--gold)}
+/* ===== 存档管理 ===== */
+.xg-save-group{background:var(--white);border:1px solid var(--bd);border-radius:var(--r);padding:18px;box-shadow:var(--ss)}
+.xg-save-group::before{content:'';display:block;width:24px;height:3px;background:var(--cinnabar);border-radius:3px;margin-bottom:12px}
+.xg-save-group h4{font-family:'Ma Shan Zheng',cursive;font-size:1.1rem;font-weight:800;margin-bottom:10px;color:var(--tx);letter-spacing:1px}
+.xg-save-group .xg-btn{width:100%;justify-content:center;margin-bottom:6px;text-align:center}
+.xg-save-group .xg-save-tip{font-size:.72rem;color:var(--txm);line-height:1.6;margin-top:8px;padding:8px 10px;background:var(--b50);border-radius:var(--rs);border:1px dashed var(--b100)}
 
+/* 存档导入弹窗 */
+.xg-import-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;opacity:0;pointer-events:none;transition:opacity .3s}.xg-import-mask.show{opacity:1;pointer-events:all}
+.xg-import-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.85);z-index:9999;background:var(--white);border-radius:var(--rl);box-shadow:var(--sl);border:2px solid var(--b200);padding:32px;text-align:center;opacity:0;pointer-events:none;transition:all .4s var(--sp);max-width:440px;width:90%}.xg-import-popup.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:all}
+.xg-import-popup h4{font-size:1.15rem;font-weight:800;margin-bottom:8px;font-family:'Ma Shan Zheng',cursive;letter-spacing:1px}
+.xg-import-popup p{color:var(--txb);font-size:.85rem;line-height:1.6;margin-bottom:16px}
+.xg-import-popup textarea{width:100%;height:120px;padding:12px;border:2px solid var(--b100);border-radius:var(--rs);font-family:'Nunito',monospace;font-size:.78rem;font-weight:600;color:var(--tx);background:var(--b50);outline:none;resize:vertical;margin-bottom:16px;transition:border-color .3s}.xg-import-popup textarea:focus{border-color:var(--b400)}
+.xg-import-popup .xg-import-btns{display:flex;gap:10px;justify-content:center}
+.xg-import-popup .xg-import-btns .xg-btn{min-width:100px}
+
+/* 导出弹窗 */
+.xg-export-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.85);z-index:9999;background:var(--white);border-radius:var(--rl);box-shadow:var(--sl);border:2px solid var(--b200);padding:32px;text-align:center;opacity:0;pointer-events:none;transition:all .4s var(--sp);max-width:500px;width:90%}.xg-export-popup.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:all}
+.xg-export-popup h4{font-size:1.15rem;font-weight:800;margin-bottom:8px;font-family:'Ma Shan Zheng',cursive;letter-spacing:1px}
+.xg-export-popup p{color:var(--txb);font-size:.85rem;line-height:1.6;margin-bottom:16px}
+.xg-export-popup textarea{width:100%;height:100px;padding:12px;border:2px solid var(--b100);border-radius:var(--rs);font-family:monospace;font-size:.72rem;font-weight:600;color:var(--tx);background:var(--b50);outline:none;resize:none;margin-bottom:16px;word-break:break-all}
+.xg-export-popup .xg-import-btns{display:flex;gap:10px;justify-content:center}
+.xg-export-popup .xg-import-btns .xg-btn{min-width:100px}
+
+/* 存档成功/失败提示 */
+.xg-save-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);z-index:10000;background:var(--white);border-radius:var(--r);box-shadow:var(--sl);border:2px solid var(--b200);padding:20px 28px;text-align:center;opacity:0;pointer-events:none;transition:all .3s var(--sp)}.xg-save-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:all}
+.xg-save-toast .toast-icon{font-size:2.5rem;margin-bottom:8px;display:block}
+.xg-save-toast .toast-text{font-size:.9rem;font-weight:700;color:var(--tx)}
 /* ===== 响应式 ===== */
 @media(max-width:768px){.xg-hub-grid{grid-template-columns:1fr}.xg-action-col{order:-1}}
 </style>
@@ -520,7 +547,106 @@ function atkTrail(){
         })(i);
     }
 }
+/* ===== 存档导出/导入 ===== */
+function showExportModal(){
+    var raw=localStorage.getItem(SK);
+    if(!raw||raw==='null'){
+        showSaveToast('❌','当前没有存档数据，快去修炼吧！');
+        return;
+    }
+    try{
+        var encoded=btoa(unescape(encodeURIComponent(raw)));
+        // 显示导出弹窗
+        var mask=document.getElementById('xgImportMask');
+        var popup=document.getElementById('xgExportPopup');
+        var textarea=document.getElementById('xgExportCode');
+        if(mask&&popup&&textarea){
+            textarea.value=encoded;
+            mask.classList.add('show');
+            popup.classList.add('show');
+        }
+    }catch(e){
+        showSaveToast('❌','导出失败：'+e.message);
+    }
+}
 
+function closeExportModal(){
+    var mask=document.getElementById('xgImportMask');
+    var popup=document.getElementById('xgExportPopup');
+    if(mask)mask.classList.remove('show');
+    if(popup)popup.classList.remove('show');
+}
+
+function copyExportCode(){
+    var textarea=document.getElementById('xgExportCode');
+    if(!textarea||!textarea.value)return;
+    textarea.select();
+    textarea.setSelectionRange(0,99999);
+    navigator.clipboard.writeText(textarea.value).then(function(){
+        showSaveToast('✅','存档码已复制到剪贴板！');
+        closeExportModal();
+    }).catch(function(){
+        document.execCommand('copy');
+        showSaveToast('✅','存档码已复制到剪贴板！');
+        closeExportModal();
+    });
+}
+
+function showImportModal(){
+    var mask=document.getElementById('xgImportMask');
+    var popup=document.getElementById('xgImportPopup');
+    var textarea=document.getElementById('xgImportCode');
+    if(mask&&popup){
+        if(textarea)textarea.value='';
+        mask.classList.add('show');
+        popup.classList.add('show');
+    }
+}
+
+function closeImportModal(){
+    var mask=document.getElementById('xgImportMask');
+    var popup=document.getElementById('xgImportPopup');
+    if(mask)mask.classList.remove('show');
+    if(popup)popup.classList.remove('show');
+}
+
+function confirmImport(){
+    var textarea=document.getElementById('xgImportCode');
+    if(!textarea)return;
+    var code=textarea.value.trim();
+    if(!code){
+        showSaveToast('❌','请先粘贴存档码！');
+        return;
+    }
+    try{
+        var decoded=decodeURIComponent(escape(atob(code)));
+        // 验证JSON合法性
+        var parsed=JSON.parse(decoded);
+        // 覆盖存档
+        localStorage.setItem(SK,decoded);
+        closeImportModal();
+        showSaveToast('✅','存档导入成功！页面即将刷新...');
+        setTimeout(function(){location.reload();},1200);
+    }catch(e){
+        showSaveToast('❌','存档码无效或已损坏，请检查后重试！');
+    }
+}
+
+function showSaveToast(icon,text){
+    // 创建toast元素（如果不存在）
+    var toast=document.getElementById('xgSaveToast');
+    if(!toast){
+        toast=document.createElement('div');
+        toast.id='xgSaveToast';
+        toast.className='xg-save-toast';
+        toast.innerHTML='<span class="toast-icon"></span><div class="toast-text"></div>';
+        document.body.appendChild(toast);
+    }
+    toast.querySelector('.toast-icon').textContent=icon;
+    toast.querySelector('.toast-text').textContent=text;
+    toast.classList.add('show');
+    setTimeout(function(){toast.classList.remove('show');},1800);
+}
 /* 暴击闪光 */
 function critLine(){
     var pe=document.getElementById('xgPE');
