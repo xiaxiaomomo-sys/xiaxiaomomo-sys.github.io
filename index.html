@@ -517,6 +517,7 @@ function replSk(idx){var info=G.ce._rp,p=G.p;var arr=info.isP?p.pSkl:p.aSkl;arr[
 function buyItem(idx){var it=SHOP[idx],p=G.p;if(p.gold<it.p)return;p.gold-=it.p;it.f(p);p.hp=Math.min(p.hp,calcMaxHp(p));rc();autoSave()}/* 存档系统 */
 function save(){try{localStorage.setItem(SK,JSON.stringify({v:VER,p:G.p,pr:G.prog}))}catch(e){}try{_sb.from('save').upsert({id:myDevice,game_data:{v:VER,p:G.p,pr:G.prog},updated_at:Date.now()})}catch(e){}}
 function load(){try{var d=JSON.parse(localStorage.getItem(SK));if(d){if(d.v===VER){G.p=d.p;G.prog=d.pr;return true}if(d.v===6&&d.p){G.p=d.p;G.prog=d.pr;if(G.p.consecutiveKills===undefined)G.p.consecutiveKills=0;return true}}}catch(e){}return false}
+async function loadCloud(){try{var r=await _sb.from('save').select('game_data').eq('id',myDevice).single();if(r.data&&r.data.game_data&&r.data.game_data.v===VER){G.p=r.data.game_data.p;G.prog=r.data.game_data.pr;localStorage.setItem(SK,JSON.stringify({v:VER,p:G.p,pr:G.prog}));return true}if(r.data&&r.data.game_data&&r.data.game_data.v===6&&r.data.game_data.p){G.p=r.data.game_data.p;G.prog=r.data.game_data.pr;if(G.p.consecutiveKills===undefined)G.p.consecutiveKills=0;localStorage.setItem(SK,JSON.stringify({v:VER,p:G.p,pr:G.prog}));return true}}catch(e){}return false}
 function autoSave(){save()}setInterval(autoSave,30000);
 
 /* 渲染总调度 */
@@ -628,7 +629,7 @@ function rAssign(c){var p=G.p;var h='<div class="xg-hdr"><h2>📊 属性分配</
 
 /* 全局函数绑定 */
 window.xxNew=function(){var nm=document.getElementById('xxName');if(!nm||!nm.value.trim())return;G.p=mkP(nm.value.trim());G.prog={maxFloor:1,cleared:{},bossCleared:{},curFloor:1};G.scr='hub';rc();autoSave();};
-window.xxLoad=function(){if(load()){G.scr='hub';rc();}else{alert('没有找到存档！');}};
+window.xxLoad=function(){if(load()){G.scr='hub';rc();}else{loadCloud().then(function(ok){if(ok){G.scr='hub';rc();alert('从云端恢复存档成功！')}else{alert('本地和云端都没有找到存档！')}});}};
 window.xxFloor=function(f){G.p.hp=calcMaxHp(G.p);startBattle(f,f%10===0);};
 window.xxGoto=function(s){G.scr=s;rc();};
 window.xxBuy=function(i){buyItem(i);};
@@ -642,7 +643,7 @@ window.xxAssign=function(stat,delta){var p=G.p;if(delta>0&&p.statPts<=0)return;i
 window.xxContinueNow=function(){if(G._autoNextTimer){clearTimeout(G._autoNextTimer);G._autoNextTimer=null}G._autoContinue=true;checkLvlUp()};
 window.xxGoNextFloor=function(){if(G._autoNextTimer){clearTimeout(G._autoNextTimer);G._autoNextTimer=null}G._autoContinue=false;stopAuto();stopBGM();xxFloor(G.prog.curFloor)};
 window.xxInterrupt=function(){if(G._autoNextTimer){clearTimeout(G._autoNextTimer);G._autoNextTimer=null}G._autoContinue=false;stopAuto();stopBGM();G.scr='hub';rc()};
-window.xxLoadCloud=function(){_sb.from('save').select('game_data').eq('id',myDevice).single().then(function(r){if(r.data&&r.data.game_data&&r.data.game_data.v===VER){G.p=r.data.game_data.p;G.prog=r.data.game_data.pr;localStorage.setItem(SK,JSON.stringify({v:VER,p:G.p,pr:G.prog}));G.scr='hub';rc();alert('云端存档恢复成功！')}else{alert('云端没有找到存档。')}}).catch(function(){alert('云端读取失败，请检查网络。')})};
+window.xxLoadCloud=function(){loadCloud().then(function(ok){if(ok){G.scr='hub';rc();alert('云端存档恢复成功！')}else{alert('云端没有找到存档。')}}).catch(function(){alert('云端读取失败，请检查网络。')})};
 window.xxClear=function(){localStorage.removeItem(SK);G={scr:'start',p:null,prog:null,cmb:null,ce:null};rc();};
 
 /* GM系统 */
