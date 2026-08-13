@@ -10,13 +10,13 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#eaf2ff;--white:#fff;--gs:rgba(255,255,255,0.92);--b50:#f0f6ff;--b100:#daedff;--b200:#b5daff;--b300:#82c2ff;--b400:#4ba6f7;--b500:#3088e0;--b600:#1f6cbd;--pk:#ffaec5;--pks:#ffd6e5;--mt:#a8e6cf;--lv:#c9b8ff;--yw:#ffe485;--tx:#1e3456;--txb:#3d5a80;--txm:#8fa8c8;--txl:#b0c4de;--bd:rgba(59,141,232,0.08);--r:22px;--rs:14px;--rl:32px;--rf:9999px;--ss:0 2px 12px rgba(59,141,232,0.06);--sd:0 4px 24px rgba(59,141,232,0.08);--sm:0 8px 36px rgba(59,141,232,0.10);--sl:0 16px 48px rgba(59,141,232,0.14);--sp:cubic-bezier(0.34,1.56,0.64,1);--ss2:cubic-bezier(0.22,1.2,0.36,1);--sn:cubic-bezier(0.4,0,0.2,1)}
-body.dark{--bg:#0f1724;--white:#1a2332;--gs:rgba(26,35,50,.95);--b50:#1e293b;--b100:#2d3a4e;--b200:#374357;--b300:#4a6fa5;--b400:#5b9bd5;--b500:#6cb4ee;--b600:#87ceeb;--tx:#e2e8f0;--txb:#b0bdd0;--txm:#7a8ba0;--txl:#556070;--bd:rgba(100,140,200,.12);--pk:#ff8faa;--pks:#3a2535;--mt:#5ca87a;--lv:#9580d0;--yw:#d4b840}
-body.dark .atmo::before{background:radial-gradient(circle,rgba(100,140,200,.12) 0%,transparent 70%)}body.dark .atmo::after{background:radial-gradient(circle,rgba(100,80,120,.08) 0%,transparent 70%)}body.dark .cld div{background:rgba(30,41,59,.4)}body.dark .spk span::before{color:var(--b300)}body.dark .am{background:linear-gradient(135deg,#374357,#4a6fa5,#5b9bd5)}body.dark .ab{background:var(--white)}body.dark .lc::before{opacity:.5}
+:root{--bg:#f5f0e6;--white:#faf7f0;--gs:rgba(250,247,240,.95);--b50:#f0ebe0;--b100:#e0d8c8;--b200:#c9bfaa;--b300:#8b7e6a;--b400:#6b5c47;--b500:#4a3f2f;--b600:#3a2f1f;--pk:#c41e3a;--pks:#fce4ec;--mt:#5b8c5a;--lv:#7b68ae;--yw:#c9a96e;--tx:#2d2218;--txb:#5a4e3e;--txm:#8b7e6a;--txl:#b5a996;--bd:rgba(45,34,24,.1);--r:16px;--rs:10px;--rl:24px;--rf:9999px;--ss:0 2px 10px rgba(45,34,24,.06);--sd:0 4px 20px rgba(45,34,24,.08);--sm:0 8px 32px rgba(45,34,24,.10);--sl:0 16px 48px rgba(45,34,24,.14);--sp:cubic-bezier(0.34,1.56,0.64,1);--ss2:cubic-bezier(0.22,1.2,0.36,1);--sn:cubic-bezier(0.4,0,0.2,1);--ink:#2d2218;--ink-lt:rgba(45,34,24,.04);--cinnabar:#c41e3a;--jade:#5b8c5a;--gold:#c9a96e;--gold-lt:#e8d5a0}
+body.dark{--bg:#1a1714;--white:#252018;--gs:rgba(37,32,24,.95);--b50:#2e2820;--b100:#3d3628;--b200:#4d4638;--b300:#8b7e6a;--b400:#c9a96e;--b500:#e8d5a0;--b600:#f0e8d0;--tx:#e8e0d0;--txb:#b5a996;--txm:#8b7e6a;--txl:#5a4e3e;--bd:rgba(201,169,110,.15);--pk:#ff6b6b;--pks:#3a2020;--mt:#7dba7a;--lv:#a990d0;--yw:#e8d5a0;--ink:#e8e0d0;--ink-lt:rgba(232,224,208,.04);--cinnabar:#ff6b6b;--jade:#7dba7a;--gold:#e8d5a0;--gold-lt:#f0e8d0}
+body.dark .atmo::before{background:radial-gradient(circle,rgba(201,169,110,.1) 0%,transparent 70%)}body.dark .atmo::after{background:radial-gradient(circle,rgba(255,107,107,.06) 0%,transparent 70%)}body.dark .cld div{background:rgba(37,32,24,.4)}body.dark .spk span::before{color:var(--b300)}body.dark .am{background:linear-gradient(135deg,var(--ink),var(--b300),var(--b400))}body.dark .ab{background:var(--white)}body.dark .lc::before{opacity:.5}
 html{scroll-behavior:smooth}body{font-family:'Nunito',-apple-system,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;line-height:1.7;padding-bottom:90px;transition:background .4s,color .4s}
 ::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--b200);border-radius:10px}
 .scroll-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--b400),var(--pk),var(--b500));z-index:10000;width:0;transition:width .1s linear}
-.atmo{position:fixed;inset:0;pointer-events:none;z-index:0;transition:background .4s}.atmo::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(181,218,255,.35) 0%,transparent 70%);top:-100px;right:-150px;border-radius:50%;animation:ad 20s ease-in-out infinite alternate}.atmo::after{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(255,214,229,.25) 0%,transparent 70%);bottom:-100px;left:-100px;border-radius:50%;animation:ad 25s ease-in-out infinite alternate-reverse}
+.atmo{position:fixed;inset:0;pointer-events:none;z-index:0;transition:background .4s}.atmo::before{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(201,169,110,.12) 0%,transparent 70%);top:-80px;right:-100px;border-radius:50%;animation:ad 20s ease-in-out infinite alternate}.atmo::after{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(196,30,58,.06) 0%,transparent 70%);bottom:-80px;left:-80px;border-radius:50%;animation:ad 25s ease-in-out infinite alternate-reverse}
 @keyframes ad{0%{transform:translate(0,0) scale(1)}100%{transform:translate(40px,-30px) scale(1.1)}}
 .cld{position:fixed;inset:0;pointer-events:none;z-index:0}.cld div{position:absolute;background:rgba(255,255,255,.65);border-radius:60px;transition:background .4s}.cld div::before,.cld div::after{content:'';position:absolute;background:inherit;border-radius:50%}
 .c1{width:130px;height:42px;top:10%;left:-160px;animation:dr 30s linear infinite}.c1::before{width:54px;height:54px;top:-30px;left:22px}.c1::after{width:38px;height:38px;top:-18px;right:24px}.c2{width:95px;height:34px;top:24%;left:-130px;animation:dr 38s linear infinite 10s;opacity:.5}.c2::before{width:42px;height:42px;top:-24px;left:16px}.c2::after{width:30px;height:30px;top:-13px;right:17px}.c3{width:160px;height:50px;top:55%;left:-190px;animation:dr 34s linear infinite 18s;opacity:.4}.c3::before{width:64px;height:64px;top:-36px;left:30px}.c3::after{width:46px;height:46px;top:-22px;right:30px}
@@ -28,7 +28,7 @@ html{scroll-behavior:smooth}body{font-family:'Nunito',-apple-system,sans-serif;b
 .nl{padding:8px 14px;font-weight:900;font-size:.92rem;color:var(--b500);display:flex;align-items:center;gap:6px}.nl i{width:8px;height:8px;background:var(--b400);border-radius:50%;animation:lp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.7}}
 .nd{width:1px;height:24px;background:var(--b100);margin:0 4px 2s ease-in-out infinite}
 @keyframes lp}
-.ni{padding:8px 14px;border-radius:var(--rf);border:none;background:0;color:var(--txm);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .35s var(--sp);white-space:nowrap}.ni:hover{color:var(--b500);background:var(--b50)}.ni.active{background:linear-gradient(135deg,var(--b400),var(--b500));color:#fff;box-shadow:0 3px 14px rgba(75,166,247,.35);transform:scale(1.06)}
+.ni{padding:8px 14px;border-radius:var(--rf);border:none;background:0;color:var(--txm);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .35s var(--sp);white-space:nowrap}.ni:hover{color:var(--b500);background:var(--b50)}.ni.active{background:linear-gradient(135deg,var(--ink),var(--b400));color:#faf7f0;box-shadow:0 3px 14px rgba(45,34,24,.25);transform:scale(1.06)}.nl{color:var(--cinnabar)}.nl i{background:var(--cinnabar)}.ni:hover{color:var(--cinnabar);background:rgba(196,30,58,.06)}
 .dtb{display:flex;align-items:center;gap:5px;padding:8px 14px;border-radius:var(--rf);border:2px solid var(--b100);background:var(--white);color:var(--txm);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .35s var(--sp);flex-shrink:0;margin-left:4px}.dtb:hover{border-color:var(--b400);color:var(--b500);transform:scale(1.06)}
 .pw{position:relative;min-height:100vh;z-index:1}
 .pg{position:absolute;top:0;left:0;right:0;min-height:100vh;padding:100px 40px 60px;opacity:0;transform:translateY(20px);pointer-events:none;transition:opacity .55s var(--sn),transform .55s var(--sn);display:flex;flex-direction:column;align-items:center}.pg.active{opacity:1;transform:translateY(0);pointer-events:all;position:relative}
@@ -216,6 +216,96 @@ html{scroll-behavior:smooth}body{font-family:'Nunito',-apple-system,sans-serif;b
 .xg-info-tag{padding:3px 10px;border-radius:var(--rf);font-size:.7rem;font-weight:700;background:var(--b50);color:var(--txb);border:1px solid var(--b100)}
 
 @media(max-width:768px){.pg{padding:90px 18px 40px}.nav{gap:2px;padding:4px;flex-wrap:wrap;max-width:95vw;justify-content:center}.nl{padding:6px 10px;font-size:.8rem}.nd{display:none}.ni{padding:6px 9px;font-size:.72rem}.dtb{padding:6px 10px;font-size:.72rem}.ht{font-size:2.2rem}.ht .cn{font-size:2.5rem}.ai{flex-direction:column}.aac{flex:unset}.ag,.sg,.rl,.lg{grid-template-columns:1fr}.lm{flex-direction:column;text-align:center}.bg{grid-template-columns:repeat(2,1fr)}.pvl,.pti{display:none}.mx-time{display:none}.lb-card{padding:20px}.badge-grid{grid-template-columns:repeat(2,1fr)}.xg-battle{flex-direction:column}.xg-vs{padding:4px 0}.xg-choices .xg-skill-card{min-width:140px}}
+/* ===== 水墨山水背景 ===== */
+body::after{content:'';position:fixed;bottom:0;left:0;right:0;height:50vh;pointer-events:none;z-index:0;opacity:.035;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 400'%3E%3Cpath d='M0,400 L0,280 Q120,180 240,260 Q360,140 480,230 Q600,100 720,200 Q840,80 960,170 Q1080,60 1200,150 Q1320,100 1440,180 L1440,400Z' fill='%232d2218'/%3E%3Cpath d='M0,400 L0,320 Q180,240 360,300 Q540,210 720,280 Q900,180 1080,250 Q1260,200 1440,260 L1440,400Z' fill='%232d2218' opacity='.5'/%3E%3C/svg%3E") no-repeat bottom center;background-size:100% auto}
+body.dark::after{opacity:.06}
+
+/* ===== 标题仙侠字体 ===== */
+.sh h2,.xg-hdr h2,.ht,.ht .cn{font-family:'Ma Shan Zheng',cursive}
+.sh h2{font-size:2.4rem;letter-spacing:2px}
+.xg-hdr h2{font-size:1.8rem;letter-spacing:1px}
+
+/* ===== 宣纸卡片质感 ===== */
+.xg-card::before,.lb-card::before,.sc::before,.lm::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.4}
+.xg-card:hover,.lb-card:hover,.sc:hover,.lm:hover{box-shadow:var(--sm);border-color:var(--b200)}
+
+/* ===== 按钮卷轴风 ===== */
+.xg-btn.primary{background:linear-gradient(135deg,var(--ink),var(--b400));color:#faf7f0;border-color:var(--b500);box-shadow:0 3px 14px rgba(45,34,24,.25)}
+.xg-btn.primary:hover{background:linear-gradient(135deg,var(--cinnabar),var(--ink));box-shadow:0 4px 20px rgba(196,30,58,.25)}
+.xg-btn.danger{background:linear-gradient(135deg,var(--cinnabar),#a01830);color:#fff;border-color:var(--cinnabar)}
+.xg-btn.gold{background:linear-gradient(135deg,var(--gold),#b8944a);color:#fff;border-color:var(--gold)}
+
+/* ===== Hub双栏布局 ===== */
+.xg-hub-grid{display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start}
+.xg-action-col{display:flex;flex-direction:column;gap:16px}
+.xg-action-group{background:var(--white);border:1px solid var(--bd);border-radius:var(--r);padding:18px;box-shadow:var(--ss)}
+.xg-action-group::before{content:'';display:block;width:24px;height:3px;background:var(--gold);border-radius:3px;margin-bottom:12px}
+.xg-action-group h4{font-family:'Ma Shan Zheng',cursive;font-size:1.1rem;font-weight:800;margin-bottom:10px;color:var(--tx);letter-spacing:1px}
+.xg-action-group .xg-btn{width:100%;justify-content:center;margin-bottom:6px;text-align:center}
+
+/* ===== 等级称号金线下划线 ===== */
+.xg-hdr h2{position:relative;display:inline-block}
+.xg-hdr h2::after{content:'';position:absolute;bottom:-4px;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+
+/* ===== 战斗面板 ===== */
+.xg-bp.monster{border-color:var(--pk);background:linear-gradient(180deg,var(--white),rgba(196,30,58,.03))}
+.xg-bp .bname{font-family:'Ma Shan Zheng',cursive;font-size:1.1rem;letter-spacing:1px}
+.xg-buff-tag.atk-up{border-color:rgba(196,30,58,.3);color:var(--cinnabar);background:rgba(196,30,58,.08)}
+.xg-buff-tag.shield{border-color:rgba(91,140,90,.3);color:var(--jade);background:rgba(91,140,90,.08)}
+.xg-buff-tag.stun{border-color:rgba(201,169,110,.4);color:var(--gold);background:rgba(201,169,110,.1)}
+.xg-buff-tag.clone{border-color:rgba(123,104,174,.3);color:var(--lv);background:rgba(123,104,174,.08)}
+.xg-buff-tag.heal{border-color:rgba(91,140,90,.3);color:var(--jade);background:rgba(91,140,90,.08)}
+.xg-buff-tag.berserk{border-color:rgba(196,30,58,.4);color:var(--cinnabar);background:rgba(196,30,58,.1)}
+.xg-buff-tag.inv{border-color:rgba(201,169,110,.4);color:var(--gold);background:rgba(201,169,110,.12)}
+.xg-log .dmg{color:var(--cinnabar);font-weight:800}
+.xg-log .heal{color:var(--jade);font-weight:800}
+.xg-log .info{color:var(--gold);font-weight:700}
+.xg-vs{color:var(--gold);font-weight:900;text-shadow:0 2px 8px rgba(201,169,110,.3)}
+.xg-info-tag{background:var(--b50);border:1px solid var(--b100);border-radius:4px;color:var(--txb)}
+
+/* ===== 技能卡片稀有度 ===== */
+.xg-skill-card .sk-type.active{background:rgba(196,30,58,.1);color:var(--cinnabar);border:1px solid rgba(196,30,58,.2);border-radius:4px}
+.xg-skill-card .sk-type.passive{background:rgba(123,104,174,.1);color:var(--lv);border:1px solid rgba(123,104,174,.2);border-radius:4px}
+.xg-skill-card.rarity-epic{border-color:var(--lv);background:linear-gradient(135deg,rgba(123,104,174,.04),rgba(123,104,174,.08))}
+.xg-skill-card.rarity-legendary{border-color:var(--gold);background:linear-gradient(135deg,rgba(201,169,110,.06),rgba(201,169,110,.12))}
+.xg-skill-card.rarity-curse{border-color:var(--cinnabar);background:linear-gradient(135deg,rgba(196,30,58,.04),rgba(196,30,58,.1))}
+
+/* ===== 升级卡片翻转入场 ===== */
+@keyframes cardFlipIn{0%{opacity:0;transform:perspective(800px) rotateY(30deg) scale(.9)}100%{opacity:1;transform:perspective(800px) rotateY(0) scale(1)}}
+.xg-choices .xg-skill-card{animation:cardFlipIn .6s var(--ss2) both}
+.xg-choices .xg-skill-card:nth-child(1){animation-delay:.08s}
+.xg-choices .xg-skill-card:nth-child(2){animation-delay:.18s}
+.xg-choices .xg-skill-card:nth-child(3){animation-delay:.28s}
+.xg-choices .xg-skill-card:hover{transform:translateY(-8px) scale(1.03);box-shadow:0 8px 28px rgba(45,34,24,.15)}
+
+/* ===== 血条经验条 ===== */
+.xg-hp-fill:not(.low):not(.mid){background:linear-gradient(90deg,var(--jade),#7dba7a)}
+.xg-hp-fill.low{background:linear-gradient(90deg,var(--cinnabar),#e85d6a)}
+.xg-hp-fill.mid{background:linear-gradient(90deg,#d4a04a,var(--gold))}
+.xg-exp-fill{background:linear-gradient(90deg,var(--gold),#b8944a)}
+
+/* ===== 头像区 ===== */
+.am{background:linear-gradient(135deg,var(--ink),var(--b300),var(--b400));box-shadow:0 12px 40px rgba(45,34,24,.2)}
+.sh .ln{background:linear-gradient(90deg,var(--gold),var(--ink),var(--gold))}
+.ftb{color:var(--ink);font-family:'Ma Shan Zheng',cursive}
+
+/* ===== 推荐/排行 ===== */
+.rs .rsh h3{font-family:'Ma Shan Zheng',cursive;font-size:1.15rem}
+.lb-rank.is-me{border-color:var(--gold);background:rgba(201,169,110,.08)}
+.lb-rank.is-winner{border-color:var(--yw);background:rgba(201,169,110,.12)}
+.lb-rank:nth-child(1) .lb-rank-num{background:linear-gradient(135deg,var(--gold),#b8944a)}
+
+/* ===== Mini播放器 ===== */
+.pcv{background:linear-gradient(135deg,var(--ink),var(--b400))}
+.btn.pl{background:var(--ink);box-shadow:0 4px 16px rgba(45,34,24,.25)}
+.btn.pl:hover{background:var(--cinnabar)}
+
+/* ===== 商店 ===== */
+.xg-item{background:var(--b50);border:1px solid var(--b100);border-radius:var(--rs)}
+.xg-item:hover{border-color:varv{color:var(--cinnabar)}
+
+/* ===== 响应式 ===== */
+@media(max-width:768px){.xg-hub-grid{grid-template-columns:1fr}.xg-action-col{order:-1}}
 </style>
 </head>
 <body>
@@ -435,10 +525,98 @@ function render(){var c=$('xgRoot');if(!c)return;switch(G.scr){case'start':rStar
 
 function rStart(c){c.innerHTML='<div class="xg-title"><div class="big-emoji">⚔️</div><h3 onclick="xxGmClick()" style="cursor:default">修仙之路</h3><p>踏上修仙征程，击败妖魔，成为最强修仙者</p><div class="xg-card" style="max-width:400px;margin:0 auto 16px"><input id="xxName" class="lb-name-input" placeholder="输入你的道号..." maxlength="10" style="width:100%;margin-bottom:12px;text-align:center"><button class="xg-btn primary" style="width:100%" onclick="xxNew()">开始修仙</button></div><button class="xg-btn" onclick="xxLoad()">继续上次的存档</button></div>'}
 
-function rHub(c){var p=G.p,pr=G.prog,mxhp=calcMaxHp(p),atk=calcAtk(p),def=calcDef(p),need=expNeed(p.lv);var lvTitle=titleFor(p.lv);var titleColor=lvTitle==='渡劫期'?'color:#ff6b6b':lvTitle==='大乘期'?'color:#ffd740':lvTitle==='合体期'?'color:#9650ff':lvTitle==='化神期'?'color:var(--b500)':'';var h='<div class="xg-hdr"><h2 style="'+titleColor+'">⚔️ '+lvTitle+'</h2><p>'+p.name+' · Lv.'+p.lv+'</p></div>';h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">';h+='<div class="xg-card"><h3 style="font-size:.9rem;font-weight:800;margin-bottom:10px">📊 状态</h3>';h+='<div class="xg-stat-row"><span>❤️ 生命</span><span>'+Math.floor(p.hp)+'/'+mxhp+'</span></div><div class="xg-hp-bar"><div class="xg-hp-fill'+(p.hp/mxhp<.3?' low':p.hp/mxhp<.6?' mid':'')+'" style="width:'+Math.floor(p.hp/mxhp*100)+'%"></div></div>';h+='<div class="xg-stat-row"><span>⭐ 经验</span><span>'+p.exp+'/'+need+'</span></div><div class="xg-exp-bar"><div class="xg-exp-fill" style="width:'+Math.floor(p.exp/need*100)+'%"></div></div>';h+='<div class="xg-stat-row"><span>⚔️ 攻击</span><span style="color:#ff4757">'+atk+'</span></div>';h+='<div class="xg-stat-row"><span>🛡️ 防御</span><span style="color:var(--b500)">'+def+'</span></div>';h+='<div class="xg-stat-row"><span>💀 暴击</span><span>'+Math.floor(calcCritR(p)*100)+'%/'+Math.floor(calcCritD(p)*100)+'%</span></div>';h+='<div class="xg-stat-row"><span>💨 闪避</span><span>'+Math.floor(calcDodge(p)*100)+'%</span></div>';h+='<div class="xg-stat-row"><span>🩸 吸血</span><span>'+Math.floor(calcLifeSteal(p))+'%</span></div>';if(p.expBonus>0)h+='<div class="xg-stat-row"><span>✨ 经验加成</span><span style="color:var(--mt)">+'+p.expBonus+'%</span></div>';h+='<div class="xg-stat-row"><span>💰 金币</span><span style="color:var(--yw)">'+p.gold+'</span></div>';h+='<div class="xg-stat-row"><span>💀 击杀</span><span>'+p.kills+'</span></div>';if(p.consecutiveKills>0)h+='<div class="xg-stat-row"><span>🔥 连杀</span><span style="color:var(--pk)">'+p.consecutiveKills+'</span></div>';h+='</div>';h+='<div class="xg-card"><h3 style="font-size:.9rem;font-weight:800;margin-bottom:10px">⚔️ 主动 ('+p.aSkl.length+'/3)</h3>';if(p.aSkl.length===0)h+='<div style="color:var(--txm);font-size:.82rem;padding:8px 0">尚未习得</div>';for(var i=0;i<p.aSkl.length;i++){var sk=ASKILLS.find(function(s){return s.id===p.aSkl[i]});if(!sk)continue;h+='<div class="xg-item"><span class="it-icon">⚔️</span><div class="it-info"><div class="it-name">'+sk.n+'</div><div class="it-desc">'+sk.d+' · CD:'+sk.cd+'</div></div></div>';}h+='<h3 style="font-size:.9rem;font-weight:800;margin:14px 0 10px">🔮 被动 ('+p.pSkl.length+'/5)</h3>';if(p.pSkl.length===0)h+='<div style="color:var(--txm);font-size:.82rem;padding:8px 0">尚未习得</div>';for(var i=0;i<p.pSkl.length;i++){var sk=PSKILLS.find(function(s){return s.id===p.pSkl[i]});if(!sk)continue;h+='<div class="xg-item"><span class="it-icon">🔮</span><div class="it-info"><div class="it-name">'+sk.n+'</div><div class="it-desc">'+sk.d+'</div></div></div>';}h+='</div></div>';if(_gmUnlocked){h+='<div class="xg-card" style="border:2px dashed var(--pk);margin-bottom:12px"><h3 style="font-size:1rem;font-weight:800;margin-bottom:12px">🛠️ GM后台</h3><div class="xg-actions"><button class="xg-btn gold" onclick="xxGmAxe(\'gold\')">💰+300</button><button class="xg-btn gold" onclick="xxGmAxe(\'gold1w\')">💰+1万</button><button class="xg-btn primary" onclick="xxGmAxe(\'exp\')">⭐+1000</button><button class="xg-btn primary" onclick="xxGmAxe(\'hp\')">❤️满血</button><button class="xg-btn danger" onclick="xxGmAxe(\'lv\')">⬆️+1级</button><button class="xg-btn" style="background:var(--lv)" onclick="xxGmAxe(\'atk\')">⚔️+50攻</button><button class="xg-btn" style="background:var(--mt)" onclick="xxGmAxe(\'def\')">🛡️+50防</button></div></div>'}h+='<div class="xg-actions"><button class="xg-btn primary" onclick="xxFloor('+pr.curFloor+')">⚔️ 挑战第'+pr.curFloor+'层</button><button class="xg-btn" onclick="xxGoto(\'floors\')">📍 选择楼层</button><button class="xg-btn gold" onclick="xxGoto(\'shop\')>🛒 商店</button><button class="xg-btn" onclick="xxGoto(\'skills\')">📖 技能</button><button class="xg-btn" onclick="xxGoto(\'save\')">💾 存档</button></div>';c.innerHTML=h;}
+function rHub(c){
+  var p=G.p,pr=G.prog,mxhp=calcMaxHp(p),atk=calcAtk(p),def=calcDef(p),need=expNeed(p.lv);
+  var lvTitle=titleFor(p.lv);
+  var titleColor=lvTitle==='渡劫期'?'color:var(--cinnabar)':lvTitle==='大乘期'?'color:var(--gold)':lvTitle==='合体期'?'color:var(--lv)':lvTitle==='化神期'?'color:var(--b400)':'color:var(--tx)';
+  var h='<div class="xg-hdr"><h2 style="'+titleColor+'">'+lvTitle+'</h2><p>'+p.name+' · Lv.'+p.lv+'</p></div>';
+  h+='<div class="xg-hub-grid">';
 
-function rBattle(c){var p=G.p,cm=G.cmb,m=cm.m,mxhp=calcMaxHp(p);var playerBuffs=renderBuffTags(cm,p);var playerCls='xg-bp';if(cm.berserkTurns>0)playerCls+=' berserk-active';if(cm.cloneTurns>0)playerCls+=' clone-active';var hpPct=Math.floor(p.hp/mxhp*100);var mHpPct=Math.floor(m.hp/m.mhp*100);var h='<div class="xg-hdr"><h2>⚔️ 战斗中</h2><p>第'+cm.floor+'层'+(cm.isBoss?' · BOSS战':'')+'</p></div>';h+='<div class="xg-battle"><div class="'+playerCls+'" id="xgPE"><div class="emoji">🧑‍💻</div><div class="bname">'+p.name+'</div><div class="blv">Lv.'+p.lv+' '+titleFor(p.lv)+'</div>';h+='<div class="xg-hp-bar"><div class="xg-hp-fill'+(hpPct<30?' low':hpPct<60?' mid':'')+'" style="width:'+hpPct+'%"></div></div>';h+='<div style="font-size:.8rem;font-weight:700;color:var(--b400)">'+Math.floor(p.hp)+'/'+mxhp+'</div>';h+='<div class="buff-row">'+playerBuffs+'</div>';h+='<div class="xg-info-bar"><span class="xg-info-tag">⚔️'+calcAtk(p)+'</span><span class="xg-info-tag">🛡️'+calcDef(p)+'</span><span class="xg-info-tag">💥'+Math.floor(calcCritR(p)*100)+'%×'+Math.floor(calcCritD(p)*100)+'%</span><span class="xg-info-tag">💨'+Math.floor(calcDodge(p)*100)+'%</span><span class="xg-info-tag">🩸'+Math.floor(calcLifeSteal(p))+'%</span>';if(p.expBonus>0)h+='<span class="xg-info-tag" style="color:var(--mt)">✨+'+p.expBonus+'%</span>';h+='</div></div><div class="xg-vs">⚡</div><div class="xg-bp monster" id="xgME"><div class="emoji">'+m.emoji+'</div><div class="bname">'+m.name+'</div><div class="blv">Lv.'+m.floor+'</div>';h+='<div class="xg-hp-bar"><div class="xg-hp-fill'+(mHpPct<30?' low':mHpPct<60?' mid':'')+'" style="width:'+mHpPct+'%"></div></div>';h+='<div style="font-size:.8rem;font-weight:700;color:var(--pk)">'+Math.floor(m.hp)+'/'+m.mhp+' ('+mHpPct+'%)</div>';if(m.invTimer>0)h+='<div style="font-size:.72rem;color:var(--pk);font-weight:700;margin-top:4px">🛡️ 无敌 '+m.invTimer+'秒</div>';if(G.p&&G.p.scans>0)h+='<div class="xg-info-bar" style="margin-top:6px"><span class="xg-info-tag">⚔️'+m.atk+'</span><span class="xg-info-tag">🛡️'+m.def+'</span></div>';h+='</div></div>';if(cm.taunt)h+='<div class="xg-taunt">😈 林深大魔王: "'+cm.taunt+'"</div>';h+='<div class="xg-log">';for(var i=0;i<cm.log.length;i++)h+='<div>'+cm.log[i]+'</div>';h+='</div>';c.innerHTML=h;}
+  /* 左栏：角色面板 */
+  h+='<div>';
+  h+='<div class="xg-card" style="padding:24px;margin-bottom:16px">';
+  h+='<div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">';
+  h+='<div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--ink),var(--b400));display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;box-shadow:0 4px 16px rgba(45,34,24,.2)">🧑‍💻</div>';
+  h+='<div><div style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.4rem;font-weight:800">'+p.name+'</div>';
+  h+='<div style="font-size:.82rem;color:var(--txm)">Lv.'+p.lv+' · '+lvTitle+'</div></div></div>';
+  h+='<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:700;margin-bottom:4px"><span>❤️ 生命</span><span>'+Math.floor(p.hp)+'/'+mxhp+'</span></div>';
+  h+='<div class="xg-hp-bar" style="height:12px"><div class="xg-hp-fill'+(--gold)}
+.xg-bp.monster .bl(p.hp/mxhp<.3?' low':p.hp/mxhp<.6?' mid':'')+'" style="width:'+Math.floor(p.hp/mxhp*100)+'%"></div></div></div>';
+  h+='<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:700;margin-bottom:4px"><span>⭐ 经验</span><span>'+p.exp+'/'+need+'</span></div>';
+  h+='<div class="xg-exp-bar"><div class="xg-exp-fill" style="width:'+Math.floor(p.exp/need*100)+'%"></div></div></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.82rem">';
+  var stats=[['⚔️ 攻击',atk,'color:var(--cinnabar)'],['🛡️ 防御',def,'color:var(--jade)'],['💀 暴击',Math.floor(calcCritR(p)*100)+'%/'+Math.floor(calcCritD(p)*100)+'%',''],['💨 闪避',Math.floor(calcDodge(p)*100)+'%',''],['🩸 吸血',Math.floor(calcLifeSteal(p))+'%',''],['💰 金币',p.gold,'color:var(--gold)'],['💀 击杀',p.kills,''],['🔥 连杀',p.consecutiveKills||0,'color:var(--pk)']];
+  stats.forEach(function(s){h+='<div style="display:flex;justify-content:space-between;padding:4px 8px;background:var(--b50);border-radius:6px"><span style="color:var(--txm)">'+s[0]+'</span><span style="font-weight:800;'+s[2]+'">'+s[1]+'</span></div>';});
+  if(p.expBonus>0)h+='<div style="display:flex;justify-content:space-between;padding:4px 8px;background:var(--b50);border-radius:6px"><span style="color:var(--txm)">✨ 经验加成</span><span style="font-weight:800;color:var(--mt)">+'+p.expBonus+'%</span></div>';
+  h+='</div></div>';
+  h+='<div class="xg-card" style="padding:20px">';
+  h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.1rem;margin-bottom:12px">⚔️ 主动 ('+p.aSkl.length+'/3)</h4>';
+  if(p.aSkl.length===0)h+='<div style="color:var(--txm);font-size:.82rem;padding:8px 0">尚未习得</div>';
+  p.aSkl.forEach(function(id){var sk=ASKILLS.find(function(s){return s.id===id});if(!sk)return;h+='<div class="xg-item" style="margin-bottom:6px;border-left:3px solid var(--cinnabar)"><span class="it-icon">⚔️</span><div class="it-info"><div class="it-name">'+sk.n+'</div><div class="it-desc">'+sk.d+' · CD:'+sk.cd+'</div></div></div>';});
+  h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.1rem;margin:12px 0 10px">🔮 被动 ('+p.pSkl.length+'/5)</h4>';
+  if(p.pSkl.length===0)h+='<div style="color:var(--txm);font-size:.82rem;padding:8px 0">尚未习得</div>';
+  p.pSkl.forEach(function(id){var sk=PSKILLS.find(function(s){return s.id===id});if(!sk)return;h+='<div class="xg-item" style="margin-bottom:6px;border-left:3px solid var(--lv)"><span class="it-icon">🔮</span><div class="it-info"><div class="it-name">'+sk.n+'</div><div class="it-desc">'+sk.d+'</div></div></div>';});
+  h+='</div></div>';
 
+  /* 右栏：功能按钮分组 */
+  h+='<div class="xg-action-col">';
+  h+='<div class="xg-action-group"><h4>⚔️ 战斗</h4>';
+  h+='<button class="xg-btn primary" onclick="xxFloor('+pr.curFloor+')">挑战第 '+pr.curFloor+' 层</button>';
+  h+='<button class="xg-btn" onclick="xxGoto(\'floors\')">📍 选择楼层</button></div>';
+  h+='<div class="xg-action-group"><h4>📖 功能</h4>';
+  h+='<button class="xg-btn" onclick="xxGoto(\'skills\')">📋 技能列表</button>';
+  h+='<button class="xg-btn" onclick="xxGoto(\'save\')">💾 存档管理</button></div>';
+  h+='<div class="xg-action-group"><h4>🛒 商店</h4>';
+  h+='<button class="xg-btn gold" onclick="xxGoto(\'shop\')">进入商店</button>';
+  h+='<div style="text-align:center;font-size:.75rem;color:var(--txm);margin-top:4px">💰 持有 '+p.gold+' 金币</div></div>';
+  if(_gmUnlocked){h+='<div class="xg-action-group" style="border:2px dashed var(--cinnabar)"><h4>🛠️ GM后台</h4><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
+  h+='<button class="xg-btn gold" onclick="xxGmAxe(\'gold\')" style="font-size:.78rem">💰+300</button>';
+  h+='<button class="xg-btn gold" onclick="xxGmAxe(\'gold1w\')" style="font-size:.78rem">💰+1万</button>';
+  h+='<button class="xg-btn primary" onclick="xxGmAxe(\'exp\')" style="font-size:.78rem">⭐+1000</button>';
+  h+='<button class="xg-btn primary" onclick="xxGmAxe(\'hp\')" style="font-size:.78rem">❤️满血</button>';
+  h+='<button class="xg-btn danger" onclick="xxGmAxe(\'lv\')" style="font-size:.78rem">⬆️+1级</button>';
+  h+='</div></div>';}
+  h+='</div></div>';
+  c.innerHTML=h;
+}
+function rBattle(c){
+  var p=G.p,cm=G.cmb,m=cm.m,mxhp=calcMaxHp(p);
+  var playerBuffs=renderBuffTags(cm,p);
+  var playerCls='xg-bp';
+  if(cm.berserkTurns>0)playerCls+=' berserk-active';
+  if(cm.cloneTurns>0)playerCls+=' clone-active';
+  var hpPct=Math.floor(p.hp/mxhp*100);
+  var mHpPct=Math.floor(m.hp/m.mhp*100);
+  var h='<div class="xg-hdr"><h2>⚔️ 战斗中</h2><p style="color:var(--txm)">第 '+cm.floor+' 层'+(cm.isBoss?' · BOSS战':'')+'</p></div>';
+  h+='<div class="xg-battle">';
+  h+='<div class="'+playerCls+'" id="xgPE" style="flex:1">';
+  h+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px"><div class="emoji">🧑‍💻</div>';
+  h+='<div style="text-align:left"><div class="bname">'+p.name+'</div><div class="blv">Lv.'+p.lv+' '+titleFor(p.lv)+'</div></div></div>';
+  h+='<div class="xg-hp-bar" style="margin:8px 0"><div class="xg-hp-fill'+(hpPct<30?' low':hpPct<60?' mid':'')+'" style="width:'+hpPct+'%"></div></div>';
+  h+='<div style="font-size:.85rem;font-weight:800;color:var(--b400);margin-bottom:6px">'+Math.floor(p.hp)+'/'+mxhp+' <span style="font-size:.72rem;color:var(--txm)">('+hpPct+'%)</span></div>';
+  h+='<div class="buff-row">'+playerBuffs+'</div>';
+  h+='<div class="xg-info-bar" style="margin-top:8px">';
+  h+='<span class="xg-info-tag">⚔️ '+calcAtk(p)+'</span><span class="xg-info-tag">🛡️ '+calcDef(p)+'</span>';
+  h+='<span class="xg-info-tag">💥 '+Math.floor(calcCritR(p)*100)+'%×'+Math.floor(calcCritD(p)*100)+'%</span>';
+  h+='<span class="xg-info-tag">💨 '+Math.floor(calcDodge(p)*100)+'%</span>';
+  h+='<span class="xg-info-tag">🩸 '+Math.floor(calcLifeSteal(p))+'%</span>';
+  if(p.expBonus>0)h+='<span class="xg-info-tag" style="color:var(--mt)">✨+'+p.expBonus+'%</span>';
+  h+='</div></div>';
+  h+='<div class="xg-vs">⚡</div>';
+  h+='<div class="xg-bp monster" id="xgME" style="flex:1">';
+  h+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px"><div class="emoji">'+m.emoji+'</div>';
+  h+='<div style="text-align:left"><div class="bname" style="color:var(--cinnabar)">'+m.name+'</div><div class="blv">Lv.'+m.floor+(m.isBoss?' · BOSS':'')+'</div></div></div>';
+  h+='<div class="xg-hp-bar" style="margin:8px 0"><div class="xg-hp-fill'+(mHpPct<30?' low':mHpPct<60?' mid':'')+'" style="width:'+mHpPct+'%"></div></div>';
+  h+='<div style="font-size:.85rem;font-weight:800;color:var(--cinnabar);margin-bottom:6px">'+Math.floor(m.hp)+'/'+m.mhp+' <span style="font-size:.72rem;color:var(--txm)">('+mHpPct+'%)</span></div>';
+  if(m.invTimer>0)h+='<div style="font-size:.75rem;color:var(--gold);font-weight:700;padding:4px 10px;background:rgba(201,169,110,.1);border-radius:6px;border:1px solid rgba(201,169,110,.3);margin-top:4px">🛡️ 无敌 '+m.invTimer+'秒</div>';
+  if(G.p&&G.p.scans>0){h+='<div class="xg-info-bar" style="margin-top:8px"><span class="xg-info-tag">⚔️ '+m.atk+'</span><span class="xg-info-tag">🛡️ '+m.def+'</span></div>';}
+  h+='</div></div>';
+  if(cm.taunt)h+='<div class="xg-taunt">😈 林深大魔王: "'+cm.taunt+'"</div>';
+  h+='<div class="xg-log" style="margin-top:12px">';
+  for(var i=0;i<cm.log.length;i++)h+='<div>'+cm.log[i]+'</div>';
+  h+='</div>';
+  c.innerHTML=h;
+}
 function rWin(c){var cm=G.cmb;var h='<div class="xg-title"><div class="big-emoji">🎉</div><h3>战斗胜利！</h3><p style="font-size:1.1rem;margin-bottom:8px">获得 <span style="color:var(--b500);font-weight:900;font-size:1.3rem">'+cm.exp+'</span> 经验 和 <span style="color:var(--yw);font-weight:900;font-size:1.3rem">'+cm.gold+'</span> 金币</p><p style="color:var(--txm);font-size:.85rem;margin-bottom:16px">继续刷第'+(G._grindFloor||'?')+'层...</p><div class="xg-actions"><button class="xg-btn primary" onclick="xxContinueNow()">⏩ 立即继续</button><button class="xg-btn gold" onclick="xxGoNextFloor()">⏭️ 进入下一层</button><button class="xg-btn danger" onclick="xxInterrupt()">🛑 停止</button></div></div>';c.innerHTML=h;}
 function rDeath(c){var cm=G.cmb;var h='<div class="xg-title"><div class="big-emoji">💀</div><h3>战斗失败...</h3><p style="margin-bottom:8px">丢失 <span style="color:var(--pk);font-weight:900">'+cm.lost+'</span> 金币</p><p style="color:var(--txm);font-size:.85rem;margin-bottom:20px">不要气馁，修仙之路本就艰难</p><button class="xg-btn primary" onclick="xxGoto(\'hub\')">回到基地</button></div>';c.innerHTML=h;}
 function rLattr(c){var p=G.p;var h='<div class="xg-title"><div class="big-emoji">⬆️</div><h3>升级到 Lv.'+p.lv+'！</h3><p style="color:var(--txm)">选择一项属性提升</p><div class="xg-choices">';for(var i=0;i<G.ce.length;i++){var ch=G.ce[i];var animDelay='animation-delay:'+((i+1)*.15)+'s;';if(ch.k==='empty'){h+='<div class="xg-skill-card" style="border-color:var(--txl);opacity:.7;'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name">🫥 谢谢惠顾</div><div class="sk-desc">'+ch.ds+'</div></div>';}else if(ch.k==='fear'){h+='<div class="xg-skill-card rarity-curse" style="'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name" style="color:#ff4757">😈 '+ch.t+'</div><div class="sk-desc">'+ch.ds+'</div></div>';}else{var rarity=ch.v>=4?'rarity-legendary':ch.v>=3?'rarity-epic':'';h+='<div class="xg-skill-card '+rarity+'" style="'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name">⬆️ '+ch.t+'</div><div class="sk-desc">'+ch.ds+'</div><div class="sk-type active">+'+ch.v+'</div></div>';}}h+='</div>';h+='<button class="xg-btn gold" onclick="xxRefresh()"'+(p.gold<15?' disabled style="opacity:.5"':'')+'>🔄 刷新 (15金币)</button>';h+='</div>';c.innerHTML=h;}
