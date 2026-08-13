@@ -393,7 +393,7 @@ dtBtn.addEventListener('click',function(){document.body.classList.toggle('dark')
 /* 音频播放器 */
 var audio=document.getElementById('audioEl'),miniP=document.getElementById('miniPlayer'),pIcon=document.getElementById('playIcon'),pFill=document.getElementById('pbarFill'),ptN=document.getElementById('ptName'),ptA=document.getElementById('ptArtist'),pCov=document.getElementById('pCover'),curEl=document.getElementById('curTime'),totEl=document.getElementById('totTime'),volS=document.getElementById('volSlider'),volI=document.getElementById('volIcon');
 var curIdx=-1,playing=false;
-var tracks=[{name:'诛仙团歌2026版本',artist:'诛仙世界',url:'诛仙团歌2026版本.mp3'},{name:'闯灵尊11语版本',artist:'诛仙世界',url:'guiling.mp3'}]; 
+var tracks=[{name:'诛仙团歌2026版本',artist:'诛仙世界',url:'诛仙团歌2026版本.mp3'}, {name:'闯灵尊11语版本',artist:'诛仙世界',url:'闯灵尊11语版本.mp3'}]; 
 audio.volume=.75;
 function playTrack(i){if(i<0||i>=tracks.length)return;var t=tracks[i];curIdx=i;ptN.textContent=t.name;ptA.textContent=t.artist;miniP.classList.add('show');hlPlay(i);audio.src=t.url;audio.load();audio.play().then(function(){playing=true;updBtn();pCov.classList.add('spn')}).catch(function(){})}
 function togglePlay(){if(curIdx===-1){playTrack(0);return}if(playing){audio.pause();playing=false;pCov.classList.remove('spn')}else{audio.play();playing=true;pCov.classList.add('spn')}updBtn()}
