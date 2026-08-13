@@ -199,17 +199,19 @@ html{scroll-behavior:smooth}body{font-family:'Nunito',-apple-system,sans-serif;b
 .xg-choices{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:20px}.xg-choices .xg-skill-card{flex:1;min-width:180px;max-width:280px}
 
 .xg-bp.atk-fwd{animation:xgAtk .4s ease}
-@keyframes xgAtk{0%{transform:translateX(0)}35%{transform:translateX(25px) scale(1.06)}60%{transform:translateX(25px) scale(1.06)}100%{transform:translateX(0) scale(1)}}
-.xg-bp.skill-glow{animation:xgSkill .5s ease}
-@keyframes xgSkill{0%{box-shadow:inset 0 0 0 transparent}30%{box-shadow:inset 0 0 40px rgba(75,166,247,.4)}100%{box-shadow:inset 0 0 0 transparent}}
-.xg-bp.hit{animation:xgHit .4s ease}
-@keyframes xgHit{0%{transform:translateX(0);filter:brightness(1)}25%{transform:translateX(-12px);filter:brightness(1.8) saturate(2)}50%{transform:translateX(-12px);filter:brightness(1.8) saturate(2)}100%{transform:translateX(0);filter:brightness(1)}}
-.xg-bp.die{animation:xgDie .8s ease forwards}
-@keyframes xgDie{0%{opacity:1;transform:scale(1) rotate(0)}40%{opacity:.6;transform:scale(1.15) rotate(5deg)}100%{opacity:0;transform:scale(.3) rotate(25deg)}}
-.xg-bp.heal-flash{animation:xgHeal .5s ease}
-@keyframes xgHeal{0%{box-shadow:inset 0 0 0 transparent}30%{box-shadow:inset 0 0 30px rgba(76,175,80,.4)}100%{box-shadow:inset 0 0 0 transparent}}
-.xg-taunt{background:linear-gradient(135deg,var(--pks),#fff);border:2px solid var(--pk);border-radius:var(--rs);padding:10px 16px;margin:0 0 10px;font-size:.85rem;font-weight:700;color:var(--pk);text-align:center;animation:tauntPop .4s var(--sp)}
-@keyframes tauntPop{0%{opacity:0;transform:scale(.8) translateY(-8px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes xgAtk{0%{transform:translateX(0) scale(1)}15%{transform:translateX(-15px) scale(.92)}45%{transform:translateX(40px) scale(1.12) rotate(-4deg)}65%{transform:translateX(40px) scale(1.12) rotate(-4deg)}100%{transform:translateX(0) scale(1) rotate(0)}}
+@keyframes xgSkill{0%{box-shadow:inset 0 0 0 transparent}20%{box-shadow:inset 0 0 50px rgba(201,169,110,.5)}50%{box-shadow:inset 0 0 60px rgba(201,169,110,.6)}100%{box-shadow:inset 0 0 0 transparent}}
+@keyframes xgHit{0%{transform:translateX(0);filter:brightness(1)}12%{transform:translateX(18px) rotate(3deg);filter:brightness(2.5) saturate(3)}25%{transform:translateX(-10px) rotate(-2deg);filter:brightness(1.5)}40%{transform:translateX(6px);filter:brightness(1.2)}55%{transform:translateX(-3px);filter:brightness(1.05)}100%{transform:translateX(0);filter:brightness(1)}}
+@keyframes xgDie{0%{opacity:1;transform:scale(1) rotate(0);filter:brightness(1) saturate(1)}20%{opacity:.85;transform:scale(1.25) rotate(-8deg);filter:brightness(2) saturate(2)}50%{opacity:.4;transform:scale(.9) rotate(15deg);filter:brightness(.6) saturate(.5)}100%{opacity:0;transform:scale(.15) rotate(40deg);filter:brightness(.2) saturate(0)}}
+@keyframes xgHeal{0%{box-shadow:inset 0 0 0 transparent}25%{box-shadow:inset 0 0 40px rgba(91,140,90,.5)}50%{box-shadow:inset 0 0 35px rgba(91,140,90,.35)}100%{box-shadow:inset 0 0 0 transparent}}
+.xg-bp .crit-line{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:10;border-radius:var(--r);animation:xgCritFlash .4s ease forwards}
+@keyframes xgCritFlash{0%{opacity:0}15%{opacity:.6}100%{opacity:0}}
+.xg-bp .crit-line.gold{box-shadow:inset 0 0 40px rgba(201,169,110,.6)}
+.xg-bp .crit-line.red{box-shadow:inset 0 0 40px rgba(196,30,58,.5)}
+@keyframes dmgPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-10deg)}30%{opacity:1;transform:translate(-50%,-100%) scale(1.3) rotate(5deg)}60%{opacity:1;transform:translate(-50%,-120%) scale(1)}100%{opacity:0;transform:translate(-50%,-160%) scale(.8)}}
+@keyframes dmgPopCrit{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(-15deg)}25%{opacity:1;transform:translate(-50%,-90%) scale(1.6) rotate(8deg)}50%{opacity:1;transform:translate(-50%,-110%) scale(1.2) rotate(-3deg)}75%{opacity:1;transform:translate(-50%,-130%) scale(1)}100%{opacity:0;transform:translate(-50%,-180%) scale(.7)}}
+.xg-bp.atk-fwd::after{content:'';position:absolute;top:20%;left:10%;width:80%;height:60%;border-radius:var(--r);pointer-events:none;z-index:5;opacity:0;animation:atkTrail .5s ease forwards}
+@keyframes atkTrail{0%{opacity:0}20%{opacity:.4;background:linear-gradient(90deg,transparent,rgba(201,169,110,.15))}60%{opacity:.2;background:linear-gradient(90deg,transparent,rgba(201,169,110,.08))}100%{opacity:0}}
 
 .xg-info-bar{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:6px 0}
 .xg-info-tag{padding:3px 10px;border-radius:var(--rf);font-size:.7rem;font-weight:700;background:var(--b50);color:var(--txb);border:1px solid var(--b100)}
@@ -488,7 +490,7 @@ function calcLifeSteal(p){var s=p.pLife||0;if(p.pSkl.indexOf('P5')>=0)s+=3;retur
 /* 动画辅助 */
 function animAfterRender(elId,cls,delay){setTimeout(function(){var e=$(elId);if(!e)return;e.classList.remove('atk-fwd','hit','die','heal-flash','skill-glow');void e.offsetWidth;e.classList.add(cls);setTimeout(function(){if(e)e.classList.remove(cls)},600)},delay||0);}
 function shakeBattle(){var el=document.querySelector('.xg-battle');if(!el)return;el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');setTimeout(function(){el.classList.remove('shake')},300);}
-function floatDmg(targetId,text,color){setTimeout(function(){var tEl=$(targetId);if(!tEl)return;var f=document.createElement('div');f.textContent=text;f.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.4rem;font-weight:900;color:'+color+';z-index:99;pointer-events:none;text-shadow:0 2px 8px rgba(0,0,0,.15);animation:dmgFloat .8s ease forwards;white-space:nowrap';tEl.style.position='relative';tEl.appendChild(f);setTimeout(function(){if(f.parentNode)f.remove()},850);},50);}
+function floatDmg(targetId,text,color){setTimeout(function(){var tEl=$(targetId);if(!tEl)return;var isCrit=text.indexOf('\u66B4\u51FB')>=0;var f=document.createElement('div');f.textContent=text;var sz=isCrit?'2rem':'1.4rem';var anim=isCrit?'dmgPopCrit 1s ease forwards':'dmgPop .8s ease forwards';f.style.cssText='position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);font-size:'+sz+';font-weight:900;color:'+color+';z-index:99;pointer-events:none;text-shadow:0 2px 12px rgba(0,0,0,.3),0 0 20px '+color+';animation:'+anim+';white-space:nowrap;font-style:italic';tEl.style.position='relative';tEl.appendChild(f);setTimeout(function(){if(f.parentNode)f.remove()},1000);},50);}
 function renderBuffTags(c,p){var tags='';if(c.berserkTurns>0)tags+='<span class="xg-buff-tag berserk">⚔️狂暴'+c.berserkTurns+'回合</span>';if(c.cloneTurns>0)tags+='<span class="xg-buff-tag clone">🎭分身'+c.cloneTurns+'回合</span>';if(c.invTurns>0)tags+='<span class="xg-buff-tag inv">🛡️无敌</span>';if(c.godOfWarReady)tags+='<span class="xg-buff-tag warrior">⚡战神就绪</span>';if(c.p8Active)tags+='<span class="xg-buff-tag p8buff">🔥战意+30%</span>';if(c.buffs)for(var i=0;i<c.buffs.length;i++){tags+='<span class="xg-buff-tag shield">🛡️'+c.buffs[i].t+'</span>'}if(c.stunM>0)tags+='<span class="xg-buff-tag stun">💫麻痹'+c.stunM+'</span>';return tags;}
 
 /* 战斗系统 */
