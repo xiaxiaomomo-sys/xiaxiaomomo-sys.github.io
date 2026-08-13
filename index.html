@@ -901,6 +901,7 @@ var xiuxLB=[];
 async function saveXiuxianProg(){if(!G.p||!dbReady)return;if(G.p.name==='测试用小号')return;try{await _sb.from('xiuxian_leaderboard').upsert({id:myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||G.prog.curFloor||1:1,level:G.p.lv,title:titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()})}catch(e){}}
 async function loadXiuxianLB(){try{var r=await _sb.from('xiuxian_leaderboard').select('*').order('max_floor',{ascending:false}).order('level',{ascending:false}).limit(20);if(r.data)xiuxLB=r.data.filter(function(row){return row.name!=='测试用小号'});if(G.scr==='hub')rc()}catch(e){}}
 setTimeout(loadXiuxianLB,5000);
+setInterval(loadXiuxianLB,30000);
 window.xxNew=function(){var nm=document.getElementById('xxName');if(!nm||!nm.value.trim())return;G.p=mkP(nm.value.trim());G.prog={maxFloor:1,cleared:{},bossCleared:{},curFloor:1};G.scr='hub';rc();autoSave();};
 window.xxLoad=function(){if(load()){G.scr='hub';rc();}else{loadCloud().then(function(ok){if(ok){G.scr='hub';rc();alert('从云端恢复存档成功！')}else{alert('本地和云端都没有找到存档！')}});}};
 window.xxFloor=function(f){G.p.hp=calcMaxHp(G.p);startBattle(f,f%10===0);};
