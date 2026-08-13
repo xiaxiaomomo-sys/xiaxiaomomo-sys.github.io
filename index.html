@@ -538,7 +538,7 @@ function rHub(c){
   h+='<div>';
   h+='<div class="xg-card" style="padding:24px;margin-bottom:16px">';
   h+='<div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">';
-  h+='<div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--ink),var(--b400));display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;box-shadow:0 4px 16px rgba(45,34,24,.2)">🧑‍💻</div>';
+  h+='<div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--ink),var(--b400));display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;box-shadow:0 4px 16px rgba(45,34,24,.2)">🧘</div>';
   h+='<div><div style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.4rem;font-weight:800">'+p.name+'</div>';
   h+='<div style="font-size:.82rem;color:var(--txm)">Lv.'+p.lv+' · '+lvTitle+'</div></div></div>';
   h+='<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:700;margin-bottom:4px"><span>❤️ 生命</span><span>'+Math.floor(p.hp)+'/'+mxhp+'</span></div>';
@@ -610,7 +610,7 @@ function rBattle(c){
   var h='<div class="xg-hdr"><h2>⚔️ 战斗中</h2><p style="color:var(--txm)">第 '+cm.floor+' 层'+(cm.isBoss?' · BOSS战':'')+'</p></div>';
   h+='<div class="xg-battle">';
   h+='<div class="'+playerCls+'" id="xgPE" style="flex:1">';
-  h+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px"><div class="emoji">🧑‍💻</div>';
+  h+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px"><div class="emoji">🧘</div>';
   h+='<div style="text-align:left"><div class="bname">'+p.name+'</div><div class="blv">Lv.'+p.lv+' '+titleFor(p.lv)+'</div></div></div>';
   h+='<div class="xg-hp-bar" style="margin:8px 0"><div class="xg-hp-fill'+(hpPct<30?' low':hpPct<60?' mid':'')+'" style="width:'+hpPct+'%"></div></div>';
   h+='<div style="font-size:.85rem;font-weight:800;color:var(--b400);margin-bottom:6px">'+Math.floor(p.hp)+'/'+mxhp+' <span style="font-size:.72rem;color:var(--txm)">('+hpPct+'%)</span></div>';
