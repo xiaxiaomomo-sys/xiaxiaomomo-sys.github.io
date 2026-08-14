@@ -877,7 +877,7 @@ if(it.maxCount){var cc2=p[it.countKey]||0;countInfo=cc2+'/'+it.maxCount+'次';}
 var buyLabel=atLimit?'\uD83D\uDD12 \u5DF2\u6EE1':'\uD83D\uDCB0'+it.p;
 var btnCls=canBuy?'xg-btn gold':'xg-btn';
 var btnStyle='padding:6px 12px;font-size:.75rem;'+(canBuy?'':'opacity:.5;cursor:not-allowed;');
-var btnAttr=canBuy?String.fromCharCode(111,110,99,108,105,99,107,61,34)+'xxBuy('+i+')'+String.fromCharCode(34):'disabled';
+var btnAttr=canBuy?'onclick="xxBuy('+i+')"':'disabled';
 h+='<div class="xg-item">';
 h+='<span class="it-icon">'+it.ic+'</span>';
 h+='<div class="it-info">';
