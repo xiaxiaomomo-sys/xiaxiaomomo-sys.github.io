@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
+<meta name="game-version" content="v1.0.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -382,45 +383,60 @@ body.dark::after{opacity:.06}
     <button class="btt" id="bttBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <audio id="audioEl" preload="metadata"></audio>
 <script>
-/* ===== 版本检测 - 检测网站更新 ===== */
+/* ===== 自动版本检测 (单文件智能自检方案) ===== */
 ;(function(){
-  var CURRENT_VER = '1';  // ← 和 version.txt 里的数字保持一致
+  // 1. 读取当前页面写死的版本号
+  var metaTag = document.querySelector('meta[name="game-version"]');
+  var CURRENT_VER = metaTag ? metaTag.content : 'unknown';
   var CHECK_INTERVAL = 120000; // 每2分钟检查一次
 
   function checkVersion(){
-    fetch('version.txt?t=' + Date.now(), {cache:'no-store'})
+    if(CURRENT_VER === 'unknown') return;
+
+    // 2. 去服务器请求最新的 HTML 文件 (加时间戳防止浏览器缓存)
+    var url = window.location.href.split('#')[0].split('?')[0];
+    fetch(url + '?t=' + Date.now(), {cache:'no-store'})
       .then(function(r){ return r.text(); })
-      .then(function(txt){
-        var latest = txt.trim().replace(/[^0-9]/g,'');
-        var dismissed = localStorage.getItem('ver_dismissed') || '0';
-        if(latest && latest !== CURRENT_VER && latest !== dismissed){
-          showUpdateToast(latest);
+      .then(function(html){
+        // 3. 用正则提取服务器上最新的版本号
+        var match = html.match(/<meta\s+name="game-version"\s+content="([^"]+)"/i);
+        if(match && match[1]){
+          var latest = match[1];
+          var dismissed = localStorage.getItem('ver_dismissed') || '';
+          
+          // 4. 如果服务器版本和当前版本不一样，立刻弹窗强制刷新！
+          if(latest !== CURRENT_VER && latest !== dismissed){
+            showUpdateToast(latest);
+          }
         }
       })
       .catch(function(){ });
   }
- function showUpdateToast(latestVer){
+
+  function showUpdateToast(latestVer){
     if(document.getElementById('siteUpdateToast')) return;
 
     var mask = document.createElement('div');
     mask.id = 'siteUpdateToast';
-    mask.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:99999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s';
+    mask.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;backdrop-filter:blur(4px);';
     mask.innerHTML =
       '<div style="background:var(--white,#faf7f0);border-radius:20px;box-shadow:0 16px 48px rgba(45,34,24,.18);border:2px solid var(--b200,#c9bfaa);padding:36px 40px;text-align:center;max-width:380px;width:90%;transform:scale(.85);transition:transform .4s cubic-bezier(.34,1.56,.64,1)">' +
-        '<div style="font-size:3rem;margin-bottom:12px">🔄</div>' +
-        '<h4 style="font-size:1.15rem;font-weight:800;margin-bottom:8px;font-family:\'Ma Shan Zheng\',cursive;letter-spacing:1px">网站已更新</h4>' +
-        '<p style="color:var(--txb,#5a4e3e);font-size:.88rem;line-height:1.6;margin-bottom:20px">林深刚刚更新了网站内容，刷新页面获取最新版本。</p>' +
-        '<button id="updNowBtn" style="padding:12px 32px;border-radius:9999px;border:none;background:linear-gradient(135deg,var(--b400,#6b5c47),var(--b500,#4a3f2f));color:#faf7f0;font-family:Nunito,sans-serif;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .25s">立即刷新 ↻</button>' +
+        '<div style="font-size:3rem;margin-bottom:12px;animation:fs 3s ease-in-out infinite">🔄</div>' +
+        '<h4 style="font-size:1.2rem;font-weight:800;margin-bottom:8px;font-family:\'Ma Shan Zheng\',cursive;color:var(--cinnabar)">修仙界天道更新</h4>' +
+        '<p style="color:var(--txb,#5a4e3e);font-size:.88rem;line-height:1.6;margin-bottom:20px">林深刚刚优化了修仙界法则（最新版本：<span style="color:var(--pk);font-weight:700">' + latestVer + '</span>）。为防止因版本不同步导致存档损坏，请立即刷新页面。</p>' +
+        '<button id="updNowBtn" style="padding:12px 32px;border-radius:9999px;border:none;background:linear-gradient(135deg,var(--cinnabar,#ff6b6b),#a01830);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;transition:all .25s;box-shadow:0 4px 15px rgba(196,30,58,.3)">立即渡劫刷新 ↻</button>' +
       '</div>';
     document.body.appendChild(mask);
 
-    requestAnimationFrame(function(){ mask.style.opacity = '1'; });
+    requestAnimationFrame(function(){ mask.style.opacity = '1'; mask.querySelector('div').style.transform = 'scale(1)';});
 
     document.getElementById('updNowBtn').onclick = function(){
       localStorage.setItem('ver_dismissed', latestVer);
       location.reload();
     };
   }
+  
+  // 页面加载 5 秒后首次检查，之后每 2 分钟轮询一次
   setTimeout(checkVersion, 5000);
   setInterval(checkVersion, CHECK_INTERVAL);
 })();
