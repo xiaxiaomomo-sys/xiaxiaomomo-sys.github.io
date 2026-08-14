@@ -881,8 +881,21 @@ function rBattle(c){
 function rWin(c){var cm=G.cmb;var h='<div class="xg-title"><div class="big-emoji">🎉</div><h3>战斗胜利！</h3><p style="font-size:1.1rem;margin-bottom:8px">获得 <span style="color:var(--b500);font-weight:900;font-size:1.3rem">'+cm.exp+'</span> 经验 和 <span style="color:var(--yw);font-weight:900;font-size:1.3rem">'+cm.gold+'</span> 金币</p><p style="color:var(--txm);font-size:.85rem;margin-bottom:16px">继续刷第'+(G._grindFloor||'?')+'层...</p><div class="xg-actions"><button class="xg-btn primary" onclick="xxContinueNow()">⏩ 立即继续</button><button class="xg-btn gold" onclick="xxGoNextFloor()">⏭️ 进入下一层</button><button class="xg-btn danger" onclick="xxInterrupt()">🛑 停止</button></div></div>';c.innerHTML=h;}
 function rDeath(c){var cm=G.cmb;var h='<div class="xg-title"><div class="big-emoji">💀</div><h3>战斗失败...</h3><p style="margin-bottom:8px">丢失 <span style="color:var(--pk);font-weight:900">'+cm.lost+'</span> 金币</p><p style="color:var(--txm);font-size:.85rem;margin-bottom:20px">不要气馁，修仙之路本就艰难</p><button class="xg-btn primary" onclick="xxGoto(\'hub\')">回到基地</button></div>';c.innerHTML=h;}
 function rLattr(c){var p=G.p;var h='<div class="xg-title"><div class="big-emoji">⬆️</div><h3>升级到 Lv.'+p.lv+'！</h3><p style="color:var(--txm)">选择一项属性提升</p><div class="xg-choices">';for(var i=0;i<G.ce.length;i++){var ch=G.ce[i];var animDelay='animation-delay:'+((i+1)*.15)+'s;';if(ch.k==='empty'){h+='<div class="xg-skill-card" style="border-color:var(--txl);opacity:.7;'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name">🫥 谢谢惠顾</div><div class="sk-desc">'+ch.ds+'</div></div>';}else if(ch.k==='fear'){h+='<div class="xg-skill-card rarity-curse" style="'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name" style="color:#ff4757">😈 '+ch.t+'</div><div class="sk-desc">'+ch.ds+'</div></div>';}else{var rarity=ch.v>=4?'rarity-legendary':ch.v>=3?'rarity-epic':'';h+='<div class="xg-skill-card '+rarity+'" style="'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name">⬆️ '+ch.t+'</div><div class="sk-desc">'+ch.ds+'</div><div class="sk-type active">+'+ch.v+'</div></div>';}}h+='</div>';h+='<button class="xg-btn gold" onclick="xxRefresh()"'+(p.gold<15?' disabled style="opacity:.5"':'')+'>🔄 刷新 (15金币)</button>';h+='</div>';c.innerHTML=h;}
-function rLskill(c){var p=G.p;var h='<div class="xg-title"><div class="big-emoji">✨</div><h3>领悟新技能！</h3><p style="color:var(--txm)">选择一项技能</p><div class="xg-choices">';for(var i=0;i<G.ce.length;i++){if(!G.ce[i].s)continue;var ch=G.ce[i];var rarity=ch.s.lv>=40?'rarity-legendary':ch.s.lv>=25?'rarity-epic':'';h+='<div class="xg-skill-card '+rarity+'" style="animation-delay:'+((i+1)*.15)+'s" onclick="xxSkPick('+i+')"><div class="sk-type '+(ch.isP?'passive':'active')+'">'+(ch.isP?'🔮被动':'⚔️主动')+'</div><div class="sk-name">'+ch.s.n+'</div><div class="sk-desc">'+ch.s.d+'</div><div style="font-size:.65rem;color:var(--txm);margin-top:4px">Lv.'+ch.s.lv+'解锁</div></div>';}h+='</div></div>';c.innerHTML=h;}
-function rReplace(c){
+function rLskill(c){
+  var p=G.p;
+  var h='<div class="xg-title"><div class="big-emoji">✨</div><h3>领悟新技能！</h3><p style="color:var(--txm)">选择一项技能，或直接跳过放弃本轮领悟</p><div class="xg-choices">';
+  for(var i=0;i<G.ce.length;i++){
+    if(!G.ce[i].s)continue;
+    var ch=G.ce[i];
+    var rarity=ch.s.lv>=40?'rarity-legendary':ch.s.lv>=25?'rarity-epic':'';
+    h+='<div class="xg-skill-card '+rarity+'" style="animation-delay:'+((i+1)*.15)+'s" onclick="xxSkPick('+i+')"><div class="sk-type '+(ch.isP?'passive':'active')+'">'+(ch.isP?'🔮被动':'⚔️主动')+'</div><div class="sk-name">'+ch.s.n+'</div><div class="sk-desc">'+ch.s.d+'</div><div style="font-size:.65rem;color:var(--txm);margin-top:4px">Lv.'+ch.s.lv+'解锁</div></div>';
+  }
+  h+='</div><div class="xg-actions" style="margin-top:20px"><button class="xg-btn danger" onclick="xxSkSkip()">🛑 跳过 (放弃领悟技能)</button></div></div>';
+  c.innerHTML=h;
+}
+  h+='</div><div class="xg-actions" style="margin-top:20px"><button class="xg-btn danger" onclick="xxSkSkip()">🛑 跳过 (放弃领悟技能)</button></div></div>';
+  c.innerHTML=h;
+}function rReplace(c){
   var info=G.ce._rp,p=G.p;
   var arr=info.isP?p.pSkl:p.aSkl;
   var src=info.isP?PSKILLS:ASKILLS;
