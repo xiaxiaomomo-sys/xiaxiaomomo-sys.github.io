@@ -400,7 +400,6 @@ body.dark::after{opacity:.06}
   }
 
   function showUpdateToast(){
-    // 防止重复弹出
     if(document.getElementById('siteUpdateToast')) return;
 
     var mask = document.createElement('div');
@@ -411,20 +410,13 @@ body.dark::after{opacity:.06}
         '<div style="font-size:3rem;margin-bottom:12px">🔄</div>' +
         '<h4 style="font-size:1.15rem;font-weight:800;margin-bottom:8px;font-family:\'Ma Shan Zheng\',cursive;letter-spacing:1px">网站已更新</h4>' +
         '<p style="color:var(--txb,#5a4e3e);font-size:.88rem;line-height:1.6;margin-bottom:20px">林深刚刚更新了网站内容，刷新页面获取最新版本。</p>' +
-        '<div style="display:flex;gap:10px;justify-content:center">' +
-          '<button id="updLaterBtn" style="padding:10px 24px;border-radius:9999px;border:2px solid var(--b200,#c9bfaa);background:var(--white,#faf7f0);color:var(--tx,#2d2218);font-family:Nunito,sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:all .25s">稍后再说</button>' +
-          '<button id="updNowBtn" style="padding:10px 24px;border-radius:9999px;border:none;background:linear-gradient(135deg,var(--b400,#6b5c47),var(--b500,#4a3f2f));color:#faf7f0;font-family:Nunito,sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:all .25s">立即刷新 ↻</button>' +
-        '</div>' +
+        '<button id="updNowBtn" style="padding:12px 32px;border-radius:9999px;border:none;background:linear-gradient(135deg,var(--b400,#6b5c47),var(--b500,#4a3f2f));color:#faf7f0;font-family:Nunito,sans-serif;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .25s">立即刷新 ↻</button>' +
       '</div>';
     document.body.appendChild(mask);
 
     requestAnimationFrame(function(){ mask.style.opacity = '1'; });
 
     document.getElementById('updNowBtn').onclick = function(){ location.reload(); };
-    document.getElementById('updLaterBtn').onclick = function(){
-      mask.style.opacity = '0';
-      setTimeout(function(){ mask.remove(); }, 300);
-    };
   }
 
   // 页面加载后开始轮询
