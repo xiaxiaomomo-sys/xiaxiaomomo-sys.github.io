@@ -865,6 +865,24 @@ function rReplace(c){var info=G.ce._rp,p=G.p;var arr=info.isP?p.pSkl:p.aSkl;var 
 function rShop(c){
 var p=G.p;
 var h='<div class="xg-hdr"><h2>\uD83D\uDED2 \u5546\u5E97</h2><p>\u91D1\u5E01: <span style="color:var(--yw);font-weight:900">'+p.gold+'</span></p></div><div class="xg-card">';
+
+/* ==== 新增：林深大大的关爱福利 ==== */
+var giftClaimed = p.giftClaimed || false;
+var giftBtnCls = giftClaimed ? 'xg-btn' : 'xg-btn primary';
+var giftBtnStyle = 'padding:6px 12px;font-size:.75rem;'+(giftClaimed?'opacity:.5;cursor:not-allowed;':'');
+var giftBtnAttr = giftClaimed ? 'disabled' : 'onclick="xxClaimGift()"';
+var giftLabel = giftClaimed ? '已领取' : '🎁 领取1000金币';
+
+h+='<div class="xg-item" style="border-left:3px solid var(--pk); background:linear-gradient(135deg, var(--white), var(--pks)); margin-bottom:16px;">';
+h+='<span class="it-icon">💖</span>';
+h+='<div class="it-info">';
+h+='<div class="it-name" style="color:var(--pk); font-weight:900;">来自林深大大的关爱</div>';
+h+='<div class="it-desc" style="color:var(--pk);">每个名字仅限领取一次的专属启动资金~</div>';
+h+='</div>';
+h+='<button class="'+giftBtnCls+'" style="'+giftBtnStyle+'" '+giftBtnAttr+'>'+giftLabel+'</button>';
+h+='</div>';
+/* ==== 福利代码结束 ==== */
+
 for(var i=0;i<SHOP.length;i++){
 var it=SHOP[i];
 var canBuy=p.gold>=it.p;
@@ -907,6 +925,14 @@ window.xxLoad=function(){if(load()){G.scr='hub';rc();}else{loadCloud().then(func
 window.xxFloor=function(f){G.p.hp=calcMaxHp(G.p);startBattle(f,f%10===0);};
 window.xxGoto=function(s){G.scr=s;rc();};
 window.xxBuy=function(i){buyItem(i);};
+window.xxClaimGift=function(){
+    if(G.p.giftClaimed) return; // 如果已经领过，直接拦截
+    G.p.giftClaimed = true;     // 标记为已领取
+    G.p.gold += 1000;           // 金币 +1000
+    if(typeof showSaveToast === 'function') showSaveToast('🎁', '成功领取 1000 金币！'); // 弹出居中提示
+    rc();                       // 刷新界面
+    autoSave();                 // 自动存档
+};
 window.xxRefresh=function(){var p=G.p;if(p.gold<15)return;p.gold-=15;G._refreshed=true;genStatCh();rc()};
 window.xxStatPick=function(i){applyStatCh(i);};
 window.xxSkPick=function(i){applySkCh(i);};
