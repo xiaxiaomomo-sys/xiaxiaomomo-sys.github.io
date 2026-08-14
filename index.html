@@ -421,6 +421,9 @@ body.dark::after{opacity:.06}
       location.reload();
     };
   }
+  setTimeout(checkVersion, 5000);
+  setInterval(checkVersion, CHECK_INTERVAL);
+})();
 var SB_URL='https://wmnyhzfwffotycaqitvm.supabase.co';var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtbnloemZ3ZmZvdHljYXFpdHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwNjIyNTMsImV4cCI6MjEwMTYzODI1M30.s0kwvk3uMsshgOsZQOCDErCMr3UN3VXUIhj3yo2pk9c';var _sb=supabase.createClient(SB_URL,SB_KEY);var myDevice=localStorage.getItem('fishDevice');if(!myDevice){myDevice='dev_'+Math.random().toString(36).substr(2,8)+Date.now().toString(36);localStorage.setItem('fishDevice',myDevice);}
 
 window.addEventListener('scroll',function(){var h=document.documentElement;var pct=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100;document.getElementById('scrollProgress').style.width=pct+'%';document.getElementById('bttBtn').classList.toggle('show',h.scrollTop>400);});
