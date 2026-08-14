@@ -970,6 +970,14 @@ window.xxClaimCompensation=function(){
     rc();                       // 刷新界面
     autoSave();                 // 自动存档
 };
+    window.xxClaimGift=function(){
+    if(G.p.giftClaimed) return; // 如果已经领过，直接拦截
+    G.p.giftClaimed = true;     // 标记为已领取
+    G.p.gold += 1000;           // 金币 +1000
+    if(typeof showSaveToast === 'function') showSaveToast('🎁', '成功领取 1000 金币！'); 
+    rc();                       // 刷新界面
+    autoSave();                 // 自动存档
+};
 window.xxRefresh=function(){var p=G.p;if(p.gold<15)return;p.gold-=15;G._refreshed=true;genStatCh();rc()};
 window.xxStatPick=function(i){applyStatCh(i);};
 window.xxSkPick=function(i){applySkCh(i);};
