@@ -546,7 +546,7 @@ var PET_QUAL={
   god:{name:'神兽',emoji:'💛',chance:0.02,expRate:0.35,bonusPerLv:0.20,skillMul:2.0,color:'#ffd740'}
 };
 function petForm(lv){if(lv>=90)return{emoji:'🦄',name:'洪荒神兽'};if(lv>=50)return{emoji:'🦁',name:'镇派瑞狮'};if(lv>=30)return{emoji:'🦊',name:'通灵仙狐'};if(lv>=10)return{emoji:'🐰',name:'机灵小兽'};return{emoji:'🐹',name:'摸鱼幼崽'}}
-function petExpNeed(lv){return lv*50}
+function petExpNeed(lv){return Math.floor(expNeed(lv)*0.5)}
 function petBonusMul(){var p=G.p;if(!p||!p.pet||!p.pet.owned)return 0;var q=PET_QUAL[p.pet.quality];if(!q)return 0;return p.pet.level*q.bonusPerLv/100}
 function petGoldBonus(){var p=G.p;if(!p||!p.pet||!p.pet.owned)return 0;return Math.floor(p.pet.level/10)}
 function rollPetQuality(){var r=Math.random();if(r<0.02)return'god';if(r<0.07)return'fairy';if(r<0.32)return'spirit';return'common'}
