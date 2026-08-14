@@ -765,7 +765,7 @@ for(var i=0;i<SHOP.length;i++){var it=SHOP[i];var price=getShopPrice(it.p);var c
 
 /* 洗髓丹 */
 if(p.pet&&p.pet.owned){var washPrice=getShopPrice(5000);var canWash=p.gold>=washPrice;
-h+='<div class="xg-item" style="border-left:3px solid var(--cinnabar)"><span class="it-icon">💊</span><div class="it-info"><div class="it-name">洗髓丹</div><div class="it-desc">重新抽取宠物资质（等级重置为Lv.1）</div></div><button class="'+(canWash?'xg-btn gold':'xg-btn')+'" style="padding:6px 12px;font-size:.75rem;'+(canWash?'':'opacity:.5;cursor:not-allowed;')+'" '+(canWash?'onclick="xxResetPet()"':'disabled')+'>💰'+washPrice+(washPrice<5000?' <s style="font-size:.6rem;opacity:.6">5000</s>':'')+'</button></div>'}
+h+='<div class="xg-item" style="border-left:3px solid var(--cinnabar)"><span class="it-icon">💊</span><div class="it-info"><div class="it-name">洗髓丹</div><div class="it-desc">重新抽取宠物资质（等级和经验不变）</div></div><button class="'+(canWash?'xg-btn gold':'xg-btn')+'" style="padding:6px 12px;font-size:.75rem;'+(canWash?'':'opacity:.5;cursor:not-allowed;')+'" '+(canWash?'onclick="xxResetPet()"':'disabled')+'>💰'+washPrice+(washPrice<5000?' <s style="font-size:.6rem;opacity:.6">5000</s>':'')+'</button></div>'}
 
 h+='</div><div class="xg-actions"><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 返回</button></div>';
 c.innerHTML=h;}
@@ -794,7 +794,7 @@ window.xxClaimGift=function(){if(G.p.giftClaimed)return;G.p.giftClaimed=true;G.p
 
 /* 🐾 宠物系统全局函数 */
 window.xxClaimPet=function(){var p=G.p;if(!p||(p.pet&&p.pet.owned))return;var q=rollPetQuality();p.pet={owned:true,quality:q,level:1,exp:0};var info=PET_QUAL[q];showSaveToast(info.emoji,'领养成功！资质：'+info.name+' · 触发率×'+info.skillMul);rc();autoSave()};
-window.xxResetPet=function(){var p=G.p;if(!p||!p.pet||!p.pet.owned)return;var price=getShopPrice(5000);if(p.gold<price)return;p.gold-=price;var oldQ=p.pet.quality;var newQ=rollPetQuality();p.pet.quality=newQ;p.pet.level=1;p.pet.exp=0;p.hp=Math.min(p.hp,calcMaxHp(p));var info=PET_QUAL[newQ];var isUp=info.bonusPerLv>PET_QUAL[oldQ].bonusPerLv;showSaveToast(info.emoji,'洗髓成功！新资质：'+info.name+'（触发率×'+info.skillMul+'）'+(isUp?' ↑提升！':''));rc();autoSave()};
+window.xxResetPet=function(){var p=G.p;if(!p||!p.pet||!p.pet.owned)return;var price=getShopPrice(5000);if(p.gold<price)return;p.gold-=price;var oldQ=p.pet.quality;var newQ=rollPetQuality();p.pet.quality=newQ;p.;p.hp=Math.min(p.hp,calcMaxHp(p));var info=PET_QUAL[newQ];var isUp=info.bonusPerLv>PET_QUAL[oldQ].bonusPerLv;showSaveToast(info.emoji,'洗髓成功！新资质：'+info.name+'（触发率×'+info.skillMul+'）'+(isUp?' ↑提升！':''));rc();autoSave()};
 
 window.xxRefresh=function(){var p=G.p;if(p.gold<15)return;p.gold-=15;G._refreshed=true;genStatCh();rc()};
 window.xxStatPick=function(i){applyStatCh(i)};
