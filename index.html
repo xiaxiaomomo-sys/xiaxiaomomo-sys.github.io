@@ -382,6 +382,55 @@ body.dark::after{opacity:.06}
     <button class="btt" id="bttBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <audio id="audioEl" preload="metadata"></audio>
 <script>
+/* ===== 版本检测 - 检测网站更新 ===== */
+;(function(){
+  var CURRENT_VER = '1';  // ← 和 version.txt 里的数字保持一致
+  var CHECK_INTERVAL = 120000; // 每2分钟检查一次
+
+  function checkVersion(){
+    fetch('version.txt?t=' + Date.now(), {cache:'no-store'})
+      .then(function(r){ return r.text(); })
+      .then(function(txt){
+        var latest = txt.trim().replace(/[^0-9]/g,'');
+        if(latest && latest !== CURRENT_VER){
+          showUpdateToast();
+        }
+      })
+      .catch(function(){ /* 网络问题忽略 */ });
+  }
+
+  function showUpdateToast(){
+    // 防止重复弹出
+    if(document.getElementById('siteUpdateToast')) return;
+
+    var mask = document.createElement('div');
+    mask.id = 'siteUpdateToast';
+    mask.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:99999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s';
+    mask.innerHTML =
+      '<div style="background:var(--white,#faf7f0);border-radius:20px;box-shadow:0 16px 48px rgba(45,34,24,.18);border:2px solid var(--b200,#c9bfaa);padding:36px 40px;text-align:center;max-width:380px;width:90%;transform:scale(.85);transition:transform .4s cubic-bezier(.34,1.56,.64,1)">' +
+        '<div style="font-size:3rem;margin-bottom:12px">🔄</div>' +
+        '<h4 style="font-size:1.15rem;font-weight:800;margin-bottom:8px;font-family:\'Ma Shan Zheng\',cursive;letter-spacing:1px">网站已更新</h4>' +
+        '<p style="color:var(--txb,#5a4e3e);font-size:.88rem;line-height:1.6;margin-bottom:20px">林深刚刚更新了网站内容，刷新页面获取最新版本。</p>' +
+        '<div style="display:flex;gap:10px;justify-content:center">' +
+          '<button id="updLaterBtn" style="padding:10px 24px;border-radius:9999px;border:2px solid var(--b200,#c9bfaa);background:var(--white,#faf7f0);color:var(--tx,#2d2218);font-family:Nunito,sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:all .25s">稍后再说</button>' +
+          '<button id="updNowBtn" style="padding:10px 24px;border-radius:9999px;border:none;background:linear-gradient(135deg,var(--b400,#6b5c47),var(--b500,#4a3f2f));color:#faf7f0;font-family:Nunito,sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:all .25s">立即刷新 ↻</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(mask);
+
+    requestAnimationFrame(function(){ mask.style.opacity = '1'; });
+
+    document.getElementById('updNowBtn').onclick = function(){ location.reload(); };
+    document.getElementById('updLaterBtn').onclick = function(){
+      mask.style.opacity = '0';
+      setTimeout(function(){ mask.remove(); }, 300);
+    };
+  }
+
+  // 页面加载后开始轮询
+  setTimeout(checkVersion, 5000);         // 首次5秒后检查
+  setInterval(checkVersion, CHECK_INTERVAL); // 之后每2分钟检查
+})();
 var SB_URL='https://wmnyhzfwffotycaqitvm.supabase.co';var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtbnloemZ3ZmZvdHljYXFpdHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwNjIyNTMsImV4cCI6MjEwMTYzODI1M30.s0kwvk3uMsshgOsZQOCDErCMr3UN3VXUIhj3yo2pk9c';var _sb=supabase.createClient(SB_URL,SB_KEY);var myDevice=localStorage.getItem('fishDevice');if(!myDevice){myDevice='dev_'+Math.random().toString(36).substr(2,8)+Date.now().toString(36);localStorage.setItem('fishDevice',myDevice);}
 
 window.addEventListener('scroll',function(){var h=document.documentElement;var pct=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100;document.getElementById('scrollProgress').style.width=pct+'%';document.getElementById('bttBtn').classList.toggle('show',h.scrollTop>400);});
