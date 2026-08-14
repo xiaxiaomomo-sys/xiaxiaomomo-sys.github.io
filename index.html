@@ -882,8 +882,20 @@ function rWin(c){var cm=G.cmb;var h='<div class="xg-title"><div class="big-emoji
 function rDeath(c){var cm=G.cmb;var h='<div class="xg-title"><div class="big-emoji">💀</div><h3>战斗失败...</h3><p style="margin-bottom:8px">丢失 <span style="color:var(--pk);font-weight:900">'+cm.lost+'</span> 金币</p><p style="color:var(--txm);font-size:.85rem;margin-bottom:20px">不要气馁，修仙之路本就艰难</p><button class="xg-btn primary" onclick="xxGoto(\'hub\')">回到基地</button></div>';c.innerHTML=h;}
 function rLattr(c){var p=G.p;var h='<div class="xg-title"><div class="big-emoji">⬆️</div><h3>升级到 Lv.'+p.lv+'！</h3><p style="color:var(--txm)">选择一项属性提升</p><div class="xg-choices">';for(var i=0;i<G.ce.length;i++){var ch=G.ce[i];var animDelay='animation-delay:'+((i+1)*.15)+'s;';if(ch.k==='empty'){h+='<div class="xg-skill-card" style="border-color:var(--txl);opacity:.7;'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name">🫥 谢谢惠顾</div><div class="sk-desc">'+ch.ds+'</div></div>';}else if(ch.k==='fear'){h+='<div class="xg-skill-card rarity-curse" style="'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name" style="color:#ff4757">😈 '+ch.t+'</div><div class="sk-desc">'+ch.ds+'</div></div>';}else{var rarity=ch.v>=4?'rarity-legendary':ch.v>=3?'rarity-epic':'';h+='<div class="xg-skill-card '+rarity+'" style="'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name">⬆️ '+ch.t+'</div><div class="sk-desc">'+ch.ds+'</div><div class="sk-type active">+'+ch.v+'</div></div>';}}h+='</div>';h+='<button class="xg-btn gold" onclick="xxRefresh()"'+(p.gold<15?' disabled style="opacity:.5"':'')+'>🔄 刷新 (15金币)</button>';h+='</div>';c.innerHTML=h;}
 function rLskill(c){var p=G.p;var h='<div class="xg-title"><div class="big-emoji">✨</div><h3>领悟新技能！</h3><p style="color:var(--txm)">选择一项技能</p><div class="xg-choices">';for(var i=0;i<G.ce.length;i++){if(!G.ce[i].s)continue;var ch=G.ce[i];var rarity=ch.s.lv>=40?'rarity-legendary':ch.s.lv>=25?'rarity-epic':'';h+='<div class="xg-skill-card '+rarity+'" style="animation-delay:'+((i+1)*.15)+'s" onclick="xxSkPick('+i+')"><div class="sk-type '+(ch.isP?'passive':'active')+'">'+(ch.isP?'🔮被动':'⚔️主动')+'</div><div class="sk-name">'+ch.s.n+'</div><div class="sk-desc">'+ch.s.d+'</div><div style="font-size:.65rem;color:var(--txm);margin-top:4px">Lv.'+ch.s.lv+'解锁</div></div>';}h+='</div></div>';c.innerHTML=h;}
-function rReplace(c){var info=G.ce._rp,p=G.p;var arr=info.isP?p.pSkl:p.aSkl;var src=info.isP?PSKILLS:ASKILLS;var newSk=src.find(function(s){return s.id===info.id});var h='<div class="xg-title"><div class="big-emoji">🔄</div><h3>技能栏已满</h3><p style="color:var(--txm)">选择一个替换为 ['+newSk.n+']</p><div class="xg-choices">';for(var i=0;i<arr.length;i++){var oldSk=src.find(function(s){return s.id===arr[i]});if(!oldSk)continue;h+='<div class="xg-skill-card" style="animation-delay:'+((i+1)*.12)+'s" onclick="xxReplPick('+i+')"><div class="sk-name">'+oldSk.n+'</div><div class="sk-desc">'+oldSk.d+'</div></div>';}h+='</div></div>';c.innerHTML=h;}
-function rShop(c){
+function rReplace(c){
+  var info=G.ce._rp,p=G.p;
+  var arr=info.isP?p.pSkl:p.aSkl;
+  var src=info.isP?PSKILLS:ASKILLS;
+  var newSk=src.find(function(s){return s.id===info.id});
+  var h='<div class="xg-title"><div class="big-emoji">🔄</div><h3>技能栏已满</h3><p style="color:var(--txm)">选择一个替换为 ['+newSk.n+']，或直接跳过保持原样</p><div class="xg-choices">';
+  for(var i=0;i<arr.length;i++){
+    var oldSk=src.find(function(s){return s.id===arr[i]});
+    if(!oldSk)continue;
+    h+='<div class="xg-skill-card" style="animation-delay:'+((i+1)*.12)+'s" onclick="xxReplPick('+i+')"><div class="sk-name">'+oldSk.n+'</div><div class="sk-desc">'+oldSk.d+'</div></div>';
+  }
+  h+='</div><div class="xg-actions" style="margin-top:20px"><button class="xg-btn danger" onclick="xxReplSkip()">🛑 跳过 (放弃学习此技能)</button></div></div>';
+  c.innerHTML=h;
+}function rShop(c){
 var p=G.p;
 var h='<div class="xg-hdr"><h2>\uD83D\uDED2 \u5546\u5E97</h2><p>\u91D1\u5E01: <span style="color:var(--yw);font-weight:900">'+p.gold+'</span></p></div><div class="xg-card">';
 
@@ -982,6 +994,15 @@ window.xxRefresh=function(){var p=G.p;if(p.gold<15)return;p.gold-=15;G._refreshe
 window.xxStatPick=function(i){applyStatCh(i);};
 window.xxSkPick=function(i){applySkCh(i);};
 window.xxReplPick=function(i){replSk(i);};
+window.xxReplSkip=function(){
+  var p=G.p;
+  if(p.statPts>0){
+    G.scr='assign';
+    rc();
+  }else{
+    checkLvlUp();
+  }
+};
 window.xxSave=function(){save();alert('存档成功！');};
 window.xxAssignDone=function(){checkLvlUp()};
 window.xxAssign=function(stat,delta){var p=G.p;if(delta>0&&p.statPts<=0)return;if(delta<0&&p[stat]<=0)return;p[stat]+=delta;p.statPts-=delta;p.hp=Math.min(p.hp,calcMaxHp(p));autoSave();rc();};
