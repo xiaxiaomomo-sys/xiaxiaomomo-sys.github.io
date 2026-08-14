@@ -392,14 +392,14 @@ body.dark::after{opacity:.06}
       .then(function(r){ return r.text(); })
       .then(function(txt){
         var latest = txt.trim().replace(/[^0-9]/g,'');
-        if(latest && latest !== CURRENT_VER){
-          showUpdateToast();
+        var dismissed = localStorage.getItem('ver_dismissed') || '0';
+        if(latest && latest !== CURRENT_VER && latest !== dismissed){
+          showUpdateToast(latest);
         }
       })
-      .catch(function(){ /* 网络问题忽略 */ });
+      .catch(function(){ });
   }
-
-  function showUpdateToast(){
+ function showUpdateToast(latestVer){
     if(document.getElementById('siteUpdateToast')) return;
 
     var mask = document.createElement('div');
@@ -416,13 +416,11 @@ body.dark::after{opacity:.06}
 
     requestAnimationFrame(function(){ mask.style.opacity = '1'; });
 
-    document.getElementById('updNowBtn').onclick = function(){ location.reload(); };
+    document.getElementById('updNowBtn').onclick = function(){
+      localStorage.setItem('ver_dismissed', latestVer);
+      location.reload();
+    };
   }
-
-  // 页面加载后开始轮询
-  setTimeout(checkVersion, 5000);         // 首次5秒后检查
-  setInterval(checkVersion, CHECK_INTERVAL); // 之后每2分钟检查
-})();
 var SB_URL='https://wmnyhzfwffotycaqitvm.supabase.co';var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtbnloemZ3ZmZvdHljYXFpdHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwNjIyNTMsImV4cCI6MjEwMTYzODI1M30.s0kwvk3uMsshgOsZQOCDErCMr3UN3VXUIhj3yo2pk9c';var _sb=supabase.createClient(SB_URL,SB_KEY);var myDevice=localStorage.getItem('fishDevice');if(!myDevice){myDevice='dev_'+Math.random().toString(36).substr(2,8)+Date.now().toString(36);localStorage.setItem('fishDevice',myDevice);}
 
 window.addEventListener('scroll',function(){var h=document.documentElement;var pct=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100;document.getElementById('scrollProgress').style.width=pct+'%';document.getElementById('bttBtn').classList.toggle('show',h.scrollTop>400);});
