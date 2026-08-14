@@ -827,7 +827,40 @@ async function loadXiuxianLB(){try{var r=await _sb.from('xiuxian_leaderboard').s
 setTimeout(loadXiuxianLB,5000);setInterval(loadXiuxianLB,30000);
 
 window.xxNew=function(){var nm=document.getElementById('xxName');if(!nm||!nm.value.trim())return;G.p=mkP(nm.value.trim());G.prog={maxFloor:1,cleared:{},bossCleared:{},curFloor:1};G.scr='hub';rc();autoSave()};
-window.xxLoad=function(){if(load()){G.scr='hub';rc()}else{loadCloud().then(function(ok){if(ok){G.scr='hub';rc();alert('从云端恢复存档成功！')}else{alert('本地和云端都没有找到存档！')}})}};
+/* === 核心：老玩家宠物等级一键重置补丁 === */
+function checkAndResetPet() {
+    // 如果玩家存在，且没被打过"重置"标记，说明是老玩家第一次加载新版本
+    if (G.p && !G.p.petResetS4) {
+        // 如果老玩家已经领养了宠物，且等级大于1
+        if (G.p.pet && G.p.pet.owned && G.p.pet.level > 1) {
+            G.p.pet.level = 1; // 强制降回1级
+            G.p.pet.exp = 0;   // 经验清零
+            
+            // 弹出安抚公告（告知保留了原资质）
+            setTimeout(function(){ 
+                alert("【系统公告】灵兽经验系统已重制优化！\n\n为保证全服数值公平，已将您的灵兽等级回退至 Lv.1。\n不要慌！我们已为您完美保留了原有的【" + PET_QUAL[G.p.pet.quality].name + "】稀有资质！\n快带着它重新踏上修仙之路吧！"); 
+            }, 600);
+        }
+        G.p.petResetS4 = true; // 给存档打上标记，以后再读取就不会被重置了
+        save(); // 强制保存一下
+    }
+}
+
+window.xxLoad=function(){
+    if(load()){
+        checkAndResetPet(); // 读取成功后触发检测
+        G.scr='hub';rc();
+    }else{
+        loadCloud().then(function(ok){
+            if(ok){
+                checkAndResetPet(); // 云端读取成功后触发检测
+                G.scr='hub';rc();
+            }else{
+                alert('本地和云端都没有找到存档！');
+            }
+        });
+    }
+};
 window.xxFloor=function(f){G.p.hp=calcMaxHp(G.p);startBattle(f,f%10===0)};
 window.xxGoto=function(s){G.scr=s;rc()};
 window.xxBuy=function(i){buyItem(i)};
