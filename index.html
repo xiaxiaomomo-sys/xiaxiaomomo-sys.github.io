@@ -471,7 +471,6 @@ var mxFloatEl=document.createElement('div');mxFloatEl.className='mx-float';mxFlo
 function submitWinner(){var name=document.getElementById('winnerInput').value.trim();if(!name){document.getElementById('winnerInput').style.borderColor='var(--pk)';return;}myName=name;localStorage.setItem('fishName',myName);document.getElementById('mxMask').classList.remove('show');document.getElementById('mxPopup').classList.remove('show');saveToDB();showWinnerBanner(name);}
 document.getElementById('mxMask').addEventListener('click',function(){document.getElementById('mxMask').classList.remove('show');document.getElementById('mxPopup').classList.remove('show')});
 </script>
-<script>
 (function(){
 var SK='xx_save_v7',VER=7,G={scr:'start',p:null,prog:null,cmb:null,ce:null};
 function $(id){return document.getElementById(id)}
@@ -509,11 +508,11 @@ function stopBGM(){_bgmOn=false;if(_bgmTimer){clearTimeout(_bgmTimer);_bgmTimer=
 var TAUNTS=['就这？就这点本事？','你真菜！就这水平也敢来？','你怎么可能打得过我林深大魔王！','再去练练吧！弱者！','回去喝奶吧小宝贝~','这点伤害给我挠痒痒都不够！','我让你一只手都能赢你！','你是在给我按摩吗？好舒服~','修仙？你还是去修车吧！','就你这修为？笑死我了！','我林深大魔王的威名你也敢挑战？','看看你那可怜的血量...真可怜啊','别挣扎了，放弃吧！','弱者不配与我对战！','你是不是没吃饭？攻击软绵绵的！','你的攻击就像蚊子咬！','我闭着眼睛都能赢你！','等你修炼到猴年马月再来吧！','你是不是把修为都用来摸鱼了？','下次带点零食来，打你的间隙我能吃！','不自量力说的就是你！','回去再修炼100年吧！','连我一根头发都伤不到！','你的修仙之路到此为止了！','菜就多练练！','我一根手指就能碾死你！','就这？我见过的蚂蚁都比你强！','林深大魔王天下无敌！你算老几？','你的修仙资质评级：不合格！','给你一次机会，回去重新修炼！'];
 
 /* 技能数据 */
-var ASKILLS=[{id:'A1',n:'破天一剑',lv:5,cd:3,d:'攻击力×2.5伤害'},{id:'A2',n:'御风斩',lv:5,cd:2,d:'攻击力×1.5，必中'},{id:'A3',n:'天雷引',lv:10,cd:4,d:'攻击力×1.8，50%麻痹'},{id:'A4',n:'万剑归宗',lv:15,cd:5,d:'攻击力×4伤害'},{id:'A5',n:'血祭',lv:15,cd:4,d:'消耗20%HP，HP×2伤害'},{id:'A6',n:'金刚不坏',lv:20,cd:6,d:'下2回合伤害减半'},{id:'A7',n:'剑气纵横',lv:25,cd:5,d:'3次攻击每次×1.2'},{id:'A8',n:'九天神雷',lv:35,cd:7,d:'攻击力×5，50%眩晕'},{id:'A9',n:'逆天改命',lv:40,cd:8,d:'回复50%HP，无敌1回合'},{id:'A10',n:'湮灭',lv:50,cd:6,d:'当前HP×1.5伤害'},{id:'A11',n:'命运轮盘',lv:8,cd:3,d:'60%概率攻×6，40%自伤HP×0.5'},{id:'A12',n:'连斩',lv:12,cd:3,d:'连续5次攻击，每次×0.5'},{id:'A13',n:'噬魂',lv:25,cd:5,d:'吸取怪物30%当前HP(BOSS仅10%，大魔王仅回血)'},{id:'A14',n:'狂暴化',lv:30,cd:4,d:'攻+50%防-50%持续3回合'},{id:'A15',n:'时间冻结',lv:35,cd:6,d:'怪物无法行动2回合(BOSS减半)'},{id:'A16',n:'分身术',lv:30,cd:5,d:'3回合分身协助攻击(伤害-50%×基础攻击)'},{id:'A17',n:'以命换命',lv:35,cd:6,d:'消耗50%当前HP，造成2.5倍攻击+消耗血量伤害'}];
+var ASKILLS=[{id:'A1',n:'破天一剑',lv:5,cd:3,d:'攻击力×2.5伤害'},{id:'A2',n:'御风斩',lv:5,cd:2,d:'攻击力×1.5，必中'},{id:'A3',n:'天雷引',lv:10,cd:4,d:'攻击力×1.8，50%麻痹'},{id:'A4',n:'万剑归宗',lv:15,cd:5,d:'攻击力×4伤害'},{id:'A5',n:'血祭',lv:15,cd:4,d:'消耗20%HP，HP×2伤害'},{id:'A6',n:'金刚不坏',lv:20,cd:6,d:'下2回合伤害减半'},{id:'A7',n:'剑气纵横',lv:25,cd:5,d:'3次攻击每次×1.2'},{id:'A8',n:'九天神雷',lv:35,cd:7,d:'攻击力×5，50%眩晕'},{id:'A9',n:'逆天改命',lv:40,cd:8,d:'回复50%HP，无敌1回合'},{id:'A10',n:'湮灭',lv:50,cd:6,d:'当前HP×1.5伤害'},{id:'A11',n:'命运轮盘',lv:8,cd:3,d:'55%概率攻×6，45%自伤45%当前HP'},{id:'A12',n:'连斩',lv:12,cd:3,d:'连续5次攻击，每次×0.5'},{id:'A13',n:'噬魂',lv:25,cd:5,d:'吸取怪物30%当前HP(BOSS仅10%，大魔王仅回血)'},{id:'A14',n:'狂暴化',lv:30,cd:4,d:'攻+50%防-50%持续3回合'},{id:'A15',n:'时间冻结',lv:35,cd:6,d:'怪物无法行动2回合(BOSS减半)'},{id:'A16',n:'分身术',lv:30,cd:5,d:'3回合分身协助攻击(伤害-50%×基础攻击)'},{id:'A17',n:'以命换命',lv:35,cd:6,d:'消耗50%当前HP，造成2.5倍攻击+消耗血量伤害'}];
 var PSKILLS=[{id:'P1',n:'怒气爆发',lv:5,d:'HP<50%攻击力+20%'},{id:'P2',n:'铁壁',lv:10,d:'大伤害40%减伤25%'},{id:'P3',n:'乘胜追击',lv:15,d:'暴击后下一击+30%'},{id:'P4',n:'鬼魅身法',lv:20,d:'+10%闪避率(上限25%)'},{id:'P5',n:'吸血光环',lv:25,d:'攻击回复+3%伤害(上限5%)'},{id:'P6',n:'复仇之魂',lv:30,d:'被攻击攻击+2%×5层'},{id:'P7',n:'不屈意志',lv:35,d:'HP<45%防御×1.5'},{id:'P8',n:'战意昂扬',lv:40,d:'连杀5只后攻击+30%(BOSS+10%)持续3场'},{id:'P9',n:'修罗之体',lv:50,d:'每回合回复2.5%最大HP'},{id:'P10',n:'天道庇佑',lv:60,d:'致死25%恢复30%HP'},{id:'P11',n:'嗜血狂暴',lv:70,d:'根据已损失生命增加攻击力(最高+80%)'},
 {id:'P12',n:'破甲之力',lv:20,d:'攻击无视怪物10%防御'},{id:'P13',n:'荆棘之甲',lv:15,d:'受到攻击反弹15%伤害(BOSS仅5%)'},{id:'P14',n:'嗜血本能',lv:10,d:'每击杀50只永久攻击+1'},{id:'P15',n:'不灭之火',lv:30,d:'HP<20%时攻击力+80%'},{id:'P16',n:'灵魂链接',lv:25,d:'每次暴击回复2%最大HP'},{id:'P17',n:'适应进化',lv:40,d:'每受100次攻击永久防御+1'},{id:'P18',n:'时间守护者',lv:35,d:'每回合10%概率额外行动一次'},{id:'P19',n:'战神附体',lv:45,d:'连续5次普攻后下次攻击暴击+伤害翻倍'},{id:'P20',n:'死亡凝视',lv:55,d:'怪物HP<30%时伤害+50%'},{id:'P21',n:'风暴之心',lv:65,d:'每回合10%概率触发1.5倍攻击'}];
 var STAT_POOL=[{t:'攻击力',v:[2,4],k:'pAtk',ds:'永久增加攻击力'},{t:'最大生命',v:[8,15],k:'pHp',ds:'永久增加最大生命值'},{t:'防御力',v:[1,3],k:'pDef',ds:'永久增加防御力'},{t:'暴击率',v:[1,2],k:'pCritR',ds:'永久增加暴击率'},{t:'暴击伤害',v:[3,8],k:'pCritD',ds:'永久增加暴击伤害'},{t:'闪避率',v:[0,1],k:'pDodge',ds:'永久增加闪避率'},{t:'吸血率',v:[0,1],k:'pLife',ds:'永久增加吸血比例(%)'},{t:'攻击回血',v:[0,1],k:'healPct',ds:'每次攻击回复0~1%最大HP(上限3%)'},{t:'低血增攻',v:[5,10],k:'lowAtk',ds:'HP<30%时攻击力提升%'},{t:'首次暴击',v:[1,1],k:'firstCrit',ds:'首次攻击必定暴击'},{t:'濒死保命',v:[1,1],k:'survive',ds:'致死时保留1HP'}];
-var SHOP=[{n:'经验增幅石',ic:'✨',d:'永久EXP获取+1%',p:500,f:function(p){p.expBonus=Math.min((p.expBonus||0)+1,150);p.expBonusCount=(p.expBonusCount||0)+1}},{n:'攻击药水',ic:'⚔️',d:'攻击力永久+2',p:60,f:function(p){p.pAtk+=2}},{n:'防御药水',ic:'🛡️',d:'防御力永久+1',p:55,f:function(p){p.pDef+=1}},{n:'生命药水',ic:'❤️',d:'最大HP永久+10',p:50,f:function(p){p.pHp+=10}},{n:'透视卷轴',ic:'🔮',d:'永久显示怪物属性',p:600,f:function(p){p.scans++}},{n:'洗点丹',ic:'🔄',d:'重置属性分配',p:400,f:function(p){var t=p.atkPts+p.defPts+p.conPts;p.atkPts=0;p.defPts=0;p.conPts=0;p.statPts+=t;p.hp=calcMaxHp(p)}},{n:'主动技能扩充栏',ic:'⚔️',d:'增加1个主动技能格子',p:1000,maxCount:2,countKey:'activeSlotExp',f:function(p){p.activeSlotExp=Math.min((p.activeSlotExp||0)+1,2)}},{n:'被动技能扩充栏',ic:'🔮',d:'增加1个被动技能格子',p:1000,maxCount:3,countKey:'passiveSlotExp',f:function(p){p.passiveSlotExp=Math.min((p.passiveSlotExp||0)+1,3)}}];
+var SHOP=[{n:'经验增幅石',ic:'✨',d:'永久EXP获取+1%',p:500,f:function(p){p.expBonus=Math.min((p.expBonus||0)+1,150);p.expBonusCount=(p.expBonusCount||0)+1}},{n:'攻击药水',ic:'⚔️',d:'攻击力永久+2',p:60,f:function(p){p.pAtk+=2}},{n:'防御药水',ic:'🛡️',d:'防御力永久+1',p:55,f:function(p){p.pDef+=1}},{n:'生命药水',ic:'❤️',d:'最大HP永久+10',p:50,f:function(p){p.pHp+=10}},{n:'透视卷轴',ic:'🔮',d:'永久显示怪物属性',p:600,f:function(p){p.scans++}},{n:'洗点丹',ic:'🔄',d:'重置属性分配',p:400,f:function(p){var t=p.atkPts+p.defPts+p.conPts;p.atkPts=0;p.defPts=0;p.conPts=0;p.statPts+=t;p.hp=calcMaxHp(p)}},{n:'主动技能扩充栏',ic:'⚔️',d:'增加1个主动技能格子',p:1000,maxCount:2,countKey:'activeSlotExp',f:function(p){p.activeSlotExp=Math.min((p.activeSlotExp||0)+1,2)}},{n:'被动技能扩充栏',ic:'🔮',d:'增加1个被动技能格子',p:1000,maxCount:3,countKey:'passiveSlotExp',f:function(p){p.passiveSlotExp=Math.min((p.passiveSlotExp||0)+1,3)}},{n:'洗髓丹',ic:'💊',d:'重置宠物资质，等级清零',p:5000,reqPet:true,f:function(p){p.pet.q=rollPetQ();p.pet.lv=1;p.pet.exp=0;}}];
 
 var MN=['灵蛇','妖狐','石魔','鬼蛛','邪修','恶灵','魔猿','毒蝎','血蝠','骷髅兵','邪傀','怨魂','影魔','噬魂兽','狂暴熊','冰霜狼','赤炎蟒','幽冥鸦','九尾狐','修罗将'];
 var ME=['🐍','🦊','🗿','🕷️','👿','👻','🐒','🦂','🦇','💀','🤖','👁️','👤','🦁','🐻‍❄️','🐺','🐍','🦅','🦊','⚔️'];
@@ -527,9 +526,14 @@ function mkP(nm){return{name:nm,lv:1,exp:0,gold:700,hp:100,atkPts:2,defPts:1,con
 function expNeed(lv){if(lv<=10)return lv*lv*50;if(lv<=20)return lv*lv*80;if(lv<=30)return lv*lv*120;if(lv<=40)return lv*lv*180;if(lv<=50)return lv*lv*250;if(lv<=60)return lv*lv*350;if(lv<=80)return lv*lv*500;return lv*lv*700}
 function ptsPerLv(lv){return 2}
 function titleFor(lv){if(lv>=81)return'渡劫期';if(lv>=61)return'大乘期';if(lv>=51)return'合体期';if(lv>=41)return'化神期';if(lv>=31)return'元婴期';if(lv>=21)return'金丹期';if(lv>=11)return'筑基期';if(lv>=1)return'炼气期';return'凡人'}
-function calcAtk(p){return Math.floor(10+p.atkPts*1.5+p.pAtk)}
-function calcDef(p){return Math.floor(p.defPts*1.0+p.pDef)}
-function calcMaxHp(p){return Math.floor(100+p.conPts*12+p.pHp)}
+
+var PET_Q=[{n:'凡骨',c:'var(--txm)',expR:0.2,st:0.05,skM:1.0},{n:'灵兽',c:'var(--b400)',expR:0.35,st:0.10,skM:1.2},{n:'仙宠',c:'var(--lv)',expR:0.2,st:0.15,skM:1.5},{n:'神兽',c:'var(--gold)',expR:0.35,st:0.20,skM:2.0}];
+function rollPetQ(){var r=Math.random();return r<0.01?3:r<0.10?2:r<0.40?1:0;}
+function getPetEmoji(lv){return lv<10?'🐹':lv<30?'🐰':lv<50?'🦊':lv<90?'🦁':'🦄';}
+function getPetStatMul(p){if(!p.pet)return 1;return 1+(p.pet.lv*PET_Q[p.pet.q].st)/100;}
+function calcAtk(p){return Math.floor((10+p.atkPts*1.5+p.pAtk)*getPetStatMul(p))}
+function calcDef(p){return Math.floor((p.defPts*1.0+p.pDef)*getPetStatMul(p))}
+function calcMaxHp(p){return Math.floor((100+p.conPts*12+p.pHp)*getPetStatMul(p))}
 function calcCritR(p){return Math.min(Math.floor(p.kills/10)*.01+p.pCritR/100,.25)}
 function calcCritD(p){return Math.min(1.2+Math.min(Math.floor(p.kills/50)*.02,.3)+p.pCritD/100,1.5)}
 function calcDodge(p){var d=Math.min(Math.floor(p.kills/30)*.01+p.pDodge/100,.15);if(p.pSkl.indexOf('P4')>=0)d=Math.min(d+.1,.25);return d;}
@@ -540,346 +544,182 @@ function maxPassiveSlots(p){return 5+(p.passiveSlotExp||0)}
 /* 动画辅助 */
 function animAfterRender(elId,cls,delay){setTimeout(function(){var e=$(elId);if(!e)return;e.classList.remove('atk-fwd','hit','die','heal-flash','skill-glow');void e.offsetWidth;e.classList.add(cls);setTimeout(function(){if(e)e.classList.remove(cls)},600)},delay||0);}
 function shakeBattle(){var el=document.querySelector('.xg-battle');if(!el)return;el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');setTimeout(function(){el.classList.remove('shake')},300);}
-/* 攻击残影 */
 function atkTrail(){
-    var pe=document.getElementById('xgPE');
-    if(!pe)return;
-    var emoji=pe.querySelector('.emoji');
-    if(!emoji)return;
-    var rect=emoji.getBoundingClientRect();
-    for(var i=0;i<3;i++){
-        (function(idx){
-            setTimeout(function(){
-                var g=document.createElement('div');
-                g.textContent='🗡️';
-                g.style.cssText='position:fixed;left:'+rect.left+'px;top:'+rect.top+'px;width:'+rect.width+'px;height:'+rect.height+'px;display:flex;align-items:center;justify-content:center;font-size:2rem;opacity:.6;z-index:50;pointer-events:none;color:#c9a96e;text-shadow:0 0 16px #c9a96e;';
-                document.body.appendChild(g);
-                var dx=40+idx*25,steps=8,step=0;
-                var iv=setInterval(function(){
-                    step++;
-                    var t=step/steps;
-                    g.style.left=(rect.left+dx*t)+'px';
-                    g.style.top=(rect.top-10*Math.sin(t*Math.PI))+'px';
-                    g.style.opacity=String(.6*(1-t));
-                    g.style.transform='scale('+(1-t*.5)+') rotate('+(t*15)+'deg)';
-                    if(step>=steps){clearInterval(iv);if(g.parentNode)g.remove()}
-                },40);
-            },idx*50);
-        })(i);
-    }
-}
-/* ===== 存档导出/导入 ===== */
-function showExportModal(){
-    var raw=localStorage.getItem(SK);
-    if(!raw||raw==='null'){
-        showSaveToast('❌','当前没有存档数据，快去修炼吧！');
-        return;
-    }
-    try{
-        var encoded=btoa(unescape(encodeURIComponent(raw)));
-        // 显示导出弹窗
-        var mask=document.getElementById('xgImportMask');
-        var popup=document.getElementById('xgExportPopup');
-        var textarea=document.getElementById('xgExportCode');
-        if(mask&&popup&&textarea){
-            textarea.value=encoded;
-            mask.classList.add('show');
-            popup.classList.add('show');
-        }
-    }catch(e){
-        showSaveToast('❌','导出失败：'+e.message);
-    }
+    var pe=document.getElementById('xgPE');if(!pe)return;var emoji=pe.querySelector('.emoji');if(!emoji)return;var rect=emoji.getBoundingClientRect();
+    for(var i=0;i<3;i++){(function(idx){setTimeout(function(){
+        var g=document.createElement('div');g.textContent='🗡️';g.style.cssText='position:fixed;left:'+rect.left+'px;top:'+rect.top+'px;width:'+rect.width+'px;height:'+rect.height+'px;display:flex;align-items:center;justify-content:center;font-size:2rem;opacity:.6;z-index:50;pointer-events:none;color:#c9a96e;text-shadow:0 0 16px #c9a96e;';document.body.appendChild(g);
+        var dx=40+idx*25,steps=8,step=0;var iv=setInterval(function(){step++;var t=step/steps;g.style.left=(rect.left+dx*t)+'px';g.style.top=(rect.top-10*Math.sin(t*Math.PI))+'px';g.style.opacity=String(.6*(1-t));g.style.transform='scale('+(1-t*.5)+') rotate('+(t*15)+'deg)';if(step>=steps){clearInterval(iv);if(g.parentNode)g.remove()}},40);
+    },idx*50);})(i);}
 }
 
-function closeExportModal(){
-    var mask=document.getElementById('xgImportMask');
-    var popup=document.getElementById('xgExportPopup');
-    if(mask)mask.classList.remove('show');
-    if(popup)popup.classList.remove('show');
-}
-
-function copyExportCode(){
-    var textarea=document.getElementById('xgExportCode');
-    if(!textarea||!textarea.value)return;
-    textarea.select();
-    textarea.setSelectionRange(0,99999);
-    navigator.clipboard.writeText(textarea.value).then(function(){
-        showSaveToast('✅','存档码已复制到剪贴板！');
-        closeExportModal();
-    }).catch(function(){
-        document.execCommand('copy');
-        showSaveToast('✅','存档码已复制到剪贴板！');
-        closeExportModal();
-    });
-}
-
-function showImportModal(){
-    var mask=document.getElementById('xgImportMask');
-    var popup=document.getElementById('xgImportPopup');
-    var textarea=document.getElementById('xgImportCode');
-    if(mask&&popup){
-        if(textarea)textarea.value='';
-        mask.classList.add('show');
-        popup.classList.add('show');
-    }
-}
-
-function closeImportModal(){
-    var mask=document.getElementById('xgImportMask');
-    var popup=document.getElementById('xgImportPopup');
-    if(mask)mask.classList.remove('show');
-    if(popup)popup.classList.remove('show');
-}
-
-function confirmImport(){
-    var textarea=document.getElementById('xgImportCode');
-    if(!textarea)return;
-    var code=textarea.value.trim();
-    if(!code){
-        showSaveToast('❌','请先粘贴存档码！');
-        return;
-    }
-    try{
-        var decoded=decodeURIComponent(escape(atob(code)));
-        // 验证JSON合法性
-        var parsed=JSON.parse(decoded);
-        // 覆盖存档
-        localStorage.setItem(SK,decoded);
-        closeImportModal();
-        showSaveToast('✅','存档导入成功！页面即将刷新...');
-        setTimeout(function(){location.reload();},1200);
-    }catch(e){
-        showSaveToast('❌','存档码无效或已损坏，请检查后重试！');
-    }
-}
-
-function showSaveToast(icon,text){
-    // 创建toast元素（如果不存在）
-    var toast=document.getElementById('xgSaveToast');
-    if(!toast){
-        toast=document.createElement('div');
-        toast.id='xgSaveToast';
-        toast.className='xg-save-toast';
-        toast.innerHTML='<span class="toast-icon"></span><div class="toast-text"></div>';
-        document.body.appendChild(toast);
-    }
-    toast.querySelector('.toast-icon').textContent=icon;
-    toast.querySelector('.toast-text').textContent=text;
-    toast.classList.add('show');
-    setTimeout(function(){toast.classList.remove('show');},1800);
-}
-/* 暴击闪光 */
+/* 存档导入导出 */
+function showExportModal(){var raw=localStorage.getItem(SK);if(!raw||raw==='null'){showSaveToast('❌','没有存档！');return;}try{var encoded=btoa(unespc=unescape(encodeURIComponent(raw)));$('xgImportMask').classList.add('show');$('xgExportPopup').classList.add('show');$('xgExportCode').value=btoa(unescape(encodeURIComponent(raw)));}catch(e){}}
+function closeExportModal(){$('xgImportMask').classList.remove('show');$('xgExportPopup').classList.remove('show')}
+function copyExportCode(){var ta=$('xgExportCode');ta.select();navigator.clipboard.writeText(ta.value).then(function(){showSaveToast('✅','已复制！');closeExportModal()});}
+function showImportModal(){$('xgImportMask').classList.add('show');$('xgImportPopup').classList.add('show');$('xgImportCode').value='';}
+function closeImportModal(){$('xgImportMask').classList.remove('show');$('xgImportPopup').classList.remove('show')}
+function confirmImport(){var code=$('xgImportCode').value.trim();if(!code)return;try{var dec=decodeURIComponent(escape(atob(code)));JSON.parse(dec);localStorage.setItem(SK,dec);closeImportModal();showSaveToast('✅','导入成功！刷新中...');setTimeout(function(){location.reload()},1200)}catch(e){showSaveToast('❌','存档码无效！')}}
+function showSaveToast(icon,text){var t=$('xgSaveToast');if(!t){t=document.createElement('div');t.id='xgSaveToast';t.className='xg-save-toast';t.innerHTML='<span class="toast-icon"></span><div class="toast-text"></div>';document.body.appendChild(t);}t.querySelector('.toast-icon').textContent=icon;t.querySelector('.toast-text').textContent=text;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},1800);}
 function critLine(){
-    var pe=document.getElementById('xgPE');
-    if(!pe)return;
-    var emoji=pe.querySelector('.emoji');
-    if(!emoji)return;
-    var rect=emoji.getBoundingClientRect();
-    var cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
-    var f=document.createElement('div');
-    f.style.cssText='position:fixed;left:'+cx+'px;top:'+cy+'px;width:'+rect.width*1.5+'px;height:'+rect.height*1.5+'px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,64,.9),rgba(255,215,64,.3),transparent);transform:translate(-50%,-50%);z-index:51;pointer-events:none;';
-    document.body.appendChild(f);
-    var t0=Date.now();
-    (function a(){
-        var t=Math.min((Date.now()-t0)/400,1);
-        f.style.opacity=String(1-t);
-        f.style.transform='translate(-50%,-50%) scale('+(1+t*1.5)+')';
-        if(t<1)requestAnimationFrame(a);else if(f.parentNode)f.remove()
-    })();
-    var r=document.createElement('div');
-    r.style.cssText='position:fixed;left:'+cx+'px;top:'+cy+'px;width:20px;height:20px;border-radius:50%;border:3px solid rgba(255,215,64,.8);transform:translate(-50%,-50%);z-index:51;pointer-events:none;';
-    document.body.appendChild(r);
-    var t02=Date.now();
-    (function b(){
-        var t=Math.min((Date.now()-t02)/500,1);
-        var sz=20+t*100;
-        r.style.width=sz+'px';r.style.height=sz+'px';
-        r.style.opacity=String(1-t);
-        if(t<1)requestAnimationFrame(b);else if(r.parentNode)r.remove()
-    })();
+    var pe=document.getElementById('xgPE');if(!pe)return;var rect=pe.querySelector('.emoji').getBoundingClientRect();var cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+    var f=document.createElement('div');f.style.cssText='position:fixed;left:'+cx+'px;top:'+cy+'px;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,64,.9),transparent);transform:translate(-50%,-50%);z-index:51;pointer-events:none;';document.body.appendChild(f);
+    var t0=Date.now();(function a(){var t=Math.min((Date.now()-t0)/400,1);f.style.opacity=String(1-t);f.style.transform='translate(-50%,-50%) scale('+(1+t*1.5)+')';if(t<1)requestAnimationFrame(a);else f.remove()})();
 }
+function floatDmg(id,txt,col){setTimeout(function(){var el=$(id);if(!el)return;var isC=txt.indexOf('暴击')>=0;var f=document.createElement('div');f.textContent=txt;f.style.cssText='position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);font-size:'+(isC?'2rem':'1.4rem')+';font-weight:900;color:'+col+';z-index:99;pointer-events:none;text-shadow:0 2px 12px rgba(0,0,0,.3);animation:'+(isC?'dmgPopCrit 1s ease forwards':'dmgPop .8s ease forwards')+';white-space:nowrap;';el.style.position='relative';el.appendChild(f);setTimeout(function(){f.remove()},1000)},50);}
+function renderBuffTags(c,p){var tags='';if(c.berserkTurns>0)tags+='<span class="xg-buff-tag berserk">⚔️狂暴'+c.berserkTurns+'</span>';if(c.cloneTurns>0)tags+='<span class="xg-buff-tag clone">🎭分身'+c.cloneTurns+'</span>';if(c.invTurns>0)tags+='<span class="xg-buff-tag inv">🛡️无敌</span>';if(c.godOfWarReady)tags+='<span class="xg-buff-tag warrior">⚡战神</span>';if(c.p8Active)tags+='<span class="xg-buff-tag p8buff">🔥战意</span>';if(c.buffs)for(var i=0;i<c.buffs.length;i++)tags+='<span class="xg-buff-tag shield">🛡️'+c.buffs[i].t+'</span>';if(c.stunM>0)tags+='<span class="xg-buff-tag stun">💫麻痹</span>';return tags;}
 
-function floatDmg(targetId,text,color){setTimeout(function(){var tEl=$(targetId);if(!tEl)return;var isCrit=text.indexOf('\u66B4\u51FB')>=0;var f=document.createElement('div');f.textContent=text;var sz=isCrit?'2rem':'1.4rem';var anim=isCrit?'dmgPopCrit 1s ease forwards':'dmgPop .8s ease forwards';f.style.cssText='position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);font-size:'+sz+';font-weight:900;color:'+color+';z-index:99;pointer-events:none;text-shadow:0 2px 12px rgba(0,0,0,.3),0 0 20px '+color+';animation:'+anim+';white-space:nowrap;font-style:italic';tEl.style.position='relative';tEl.appendChild(f);setTimeout(function(){if(f.parentNode)f.remove()},1000);},50);}
-function renderBuffTags(c,p){var tags='';if(c.berserkTurns>0)tags+='<span class="xg-buff-tag berserk">⚔️狂暴'+c.berserkTurns+'回合</span>';if(c.cloneTurns>0)tags+='<span class="xg-buff-tag clone">🎭分身'+c.cloneTurns+'回合</span>';if(c.invTurns>0)tags+='<span class="xg-buff-tag inv">🛡️无敌</span>';if(c.godOfWarReady)tags+='<span class="xg-buff-tag warrior">⚡战神就绪</span>';if(c.p8Active)tags+='<span class="xg-buff-tag p8buff">🔥战意+30% ('+(G.p.p8RemainingBattles||'')+'场)</span>';if(c.buffs)for(var i=0;i<c.buffs.length;i++){tags+='<span class="xg-buff-tag shield">🛡️'+c.buffs[i].t+'</span>'}if(c.stunM>0)tags+='<span class="xg-buff-tag stun">💫麻痹'+c.stunM+'</span>';return tags;}
-
-/* 战斗系统 */
+/* 战斗系统引擎 */
 var _abt=null;function stopAuto(){if(_abt){clearTimeout(_abt);_abt=null}}
-function startBattle(floor,isBoss){stopAuto();var m=genMon(floor,isBoss);G.p.hp=calcMaxHp(G.p);var p8Active=false,p8IsBoss=false;if(G.p.pSkl.indexOf('P8')>=0){if((G.p.consecutiveKills||0)>=5){p8Active=true;p8IsBoss=isBoss;G.p.consecutiveKills=0;G.p.p8RemainingBattles=3}else if((G.p.p8RemainingBattles||0)>0){p8Active=true;p8IsBoss=isBoss}}G.cmb={m:m,floor:floor,isBoss:isBoss,round:0,log:[],locked:true,cd:{},buffs:[],defending:false,stunM:0,invTurns:0,firstCritUsed:false,prevCrit:false,kPow:0,turnCount:0,reviveUsed:false,surviveUsed:false,result:null,taunt:'',berserkTurns:0,cloneTurns:0,basicAtkCount:0,godOfWarReady:false,p8Active:p8Active,p8IsBoss:p8IsBoss};G.scr='battle';rc();startBGM();if(G.p.pSkl.indexOf('P12')>=0){m.def=Math.floor(m.def*.9);addLog('<span class="info">【破甲之力】怪物防御-10%！</span>')}if(p8Active)addLog('<span class="info">【战意昂扬】连杀加成！攻击'+(isBoss?'+10%':'+30%')+'！</span>');setTimeout(function(){G.cmb.locked=false;rc();autoLoop()},1000)}
-function addLog(msg){if(!G.cmb)return;G.cmb.log.unshift(msg);if(G.cmb.log.length>30)G.cmb.log.pop()}
-function getPAtk(p,c){var a=calcAtk(p),hp=p.hp,mhp=calcMaxHp(p);if(p.pSkl.indexOf('P1')>=0&&hp/mhp<.5){a*=1.2;if(c.turnCount===0||Math.random()<.3)addLog('<span class="info">【怒气爆发】攻击力+20%！</span>')}if(p.pSkl.indexOf('P11')>=0){var old=a;a*=(1+(1-hp/mhp)*.8);if(Math.floor(a-old)>2)addLog('<span class="info">【嗜血狂暴】HP越低攻击越高！</span>')}if(p.pSkl.indexOf('P6')>=0&&c.kPow>0)a*=(1+c.kPow*.02);if(p.pSkl.indexOf('P3')>=0&&p.prevCrit){a*=1.3;addLog('<span class="info">【乘胜追击】暴击后攻击+30%！</span>')}if(p.pSkl.indexOf('P8')>=0&&c.p8Active){a*=c.p8IsBoss?1.1:1.3}if(p.lowAtk>0&&hp/mhp<.3)a*=(1+p.lowAtk/100);if(p.pSkl.indexOf('P15')>=0&&hp/mhp<.2){a*=1.8;if(Math.random()<.3)addLog('<span class="info">【不灭之火】HP<20%攻击+80%！</span>')}if(c.berserkTurns>0)a*=1.5;if(p.pSkl.indexOf('P19')>=0&&c.godOfWarReady){a*=2}if(p.pSkl.indexOf('P20')>=0&&c.m.hp/c.m.mhp<.3){a*=1.5;if(Math.random()<.3)addLog('<span class="info">【死亡凝视】伤害+50%！</span>')}a=Math.min(a,calcAtk(p)*15);return Math.floor(a)}
-function applyOnHitHeal(p,dmg){var ls=calcLifeSteal(p);if(ls>0&&dmg>0){var steal=Math.floor(dmg*ls/100);if(steal>0){var oldHp=p.hp;p.hp=Math.min(calcMaxHp(p),p.hp+steal);var actual=p.hp-oldHp;if(actual>0)addLog('🩸吸血 <span class="heal">+'+actual+'</span>')}}if(p.healPct>0){var h2=Math.floor(calcMaxHp(p)*Math.min(p.healPct,3)/100);var oldHp2=p.hp;p.hp=Math.min(calcMaxHp(p),p.hp+h2);var actual2=p.hp-oldHp2;if(actual2>0)addLog('💚回血 <span class="heal">+'+actual2+'</span>')}}
-function doNormalAtk(){var p=G.p,c=G.cmb,m=c.m;p.prevCrit=false;var atk=getPAtk(p,c);if(m.ab===5||m.ab===6){if(Math.random()<.15){addLog('怪物闪避！');return false}atk=Math.floor(atk*.8)}var isCrit=Math.random()<calcCritR(p);if(p.firstCrit&&!c.firstCritUsed){isCrit=true;c.firstCritUsed=true;addLog('<span class="info">首次暴击触发！</span>')}if(p.pSkl.indexOf('P19')>=0&&c.godOfWarReady)isCrit=true;if(isCrit)atk=Math.floor(atk*calcCritD(p));p.prevCrit=isCrit;if(p.pSkl.indexOf('P19')>=0&&c.godOfWarReady)c.godOfWarReady=false;var dmg=Math.max(1,atk-m.def);m.hp=Math.max(0,m.hp-dmg);addLog('造成 <span class="dmg">'+dmg+'</span> 伤害'+(isCrit?' <span class="info">(暴击!)</span>':''));floatDmg('xgME',(isCrit?'暴击! ':'')+dmg,isCrit?'#ffd740':'#ff6b6b');if(isCrit&&p.pSkl.indexOf('P16')>=0){var crh=Math.floor(calcMaxHp(p)*.02);p.hp=Math.min(calcMaxHp(p),p.hp+crh);addLog('【灵魂链接】<span class="heal">+'+crh+'</span>')}applyOnHitHeal(p,dmg)
-return isCrit
-}
-function doSkillUse(sid){var p=G.p,c=G.cmb,m=c.m;p.prevCrit=false;var sk=null;for(var i=0;i<ASKILLS.length;i++)if(ASKILLS[i].id===sid){sk=ASKILLS[i];break}if(!sk)return;var dmg=0;var totalDmg=0;switch(sid){case'A1':dmg=Math.floor(getPAtk(p,c)*2.5);break;case'A2':dmg=Math.floor(getPAtk(p,c)*1.5);addLog('<span class="info">御风斩必中！</span>');break;case'A3':dmg=Math.floor(getPAtk(p,c)*1.8);if(Math.random()<.5){c.stunM=1;addLog('<span class="info">麻痹1回合！</span>')}break;case'A4':dmg=Math.floor(getPAtk(p,c)*4);break;case'A5':var sd=Math.floor(p.hp*.2);p.hp=Math.max(1,p.hp-sd);dmg=Math.floor(p.hp*2);addLog('消耗 <span class="dmg">'+sd+'</span> HP');break;case'A6':c.buffs.push({t:'减伤50%',v:.5,dur:2});addLog('减伤50%（2回合）');c.cd[sid]=sk.cd;return;case'A7':var ba=getPAtk(p,c);totalDmg=0;for(var h=0;h<3;h++){var hd=Math.max(1,Math.floor(ba*1.2)-m.def);m.hp=Math.max(0,m.hp-hd);totalDmg+=hd;addLog('第'+(h+1)+'击: <span class="dmg">'+hd+'</span>')}applyOnHitHeal(p,totalDmg);c.cd[sid]=sk.cd;return;case'A8':dmg=Math.floor(getPAtk(p,c)*4.5);if(Math.random()<.5){c.stunM=1;addLog('<span class="info">眩晕1回合！</span>')}break;case'A9':var heal=Math.floor(calcMaxHp(p)*.5);p.hp=Math.min(calcMaxHp(p),p.hp+heal);c.invTurns=1;addLog('回复 <span class="heal">'+heal+'</span> HP，无敌1回合');floatDmg('xgPE','+'+heal,'#4caf50');c.cd[sid]=sk.cd;return;case'A10':dmg=Math.floor(p.hp*1.5);break;case'A11':if(Math.random()<.6){dmg=Math.floor(getPAtk(p,c)*6);addLog('<span class="info">命运眷顾！攻击×6！</span>')}else{var sd=Math.floor(p.hp*.5);p.hp=Math.max(1,p.hp-sd);addLog('命运反噬！<span class="dmg">自伤'+sd+'</span>HP')}break;case'A12':var ba=getPAtk(p,c);totalDmg=0;for(var h=0;h<5;h++){var hd=Math.max(1,Math.floor(ba*.5)-m.def);m.hp=Math.max(0,m.hp-hd);totalDmg+=hd;addLog('连斩第'+(h+1)+'击: <span class="dmg">'+hd+'</span>')}applyOnHitHeal(p,totalDmg);c.cd[sid]=sk.cd;return;case'A13':if(m.is魔王){var ha=Math.min(Math.floor(m.hp*.3),calcMaxHp(p)-p.hp);p.hp+=ha;addLog('噬魂 <span class="heal">+'+ha+'</span>回复(终BOSS仅回血)');floatDmg('xgPE','+'+ha,'#4caf50');sfx('heal')}else{var drainRate=m.isBoss?0.1:0.3;var drain=Math.floor(m.hp*drainRate);m.hp=Math.max(0,m.hp-drain);var ha=Math.min(drain,calcMaxHp(p)-p.hp);p.hp+=ha;addLog('噬魂 <span class="dmg">'+drain+'</span>伤害 <span class="heal">+'+ha+'</span>回复');floatDmg('xgME','-'+drain,'#ff6b6b');floatDmg('xgPE','+'+ha,'#4caf50')}c.cd[sid]=sk.cd;return;case'A14':c.berserkTurns=3;addLog('<span class="info">狂暴化！攻+50%防-50%（3回合）</span>');c.cd[sid]=sk.cd;return;case'A15':if(m.isBoss){c.stunM+=1;addLog('<span class="info">时间冻结！Boss减半，1回合</span>')}else{c.stunM+=2;addLog('<span class="info">时间冻结！无法行动2回合</span>')}c.cd[sid]=sk.cd;return;case'A16':c.cloneTurns=3;addLog('<span class="info">🎭 分身术！持续3回合，分身协助攻击(伤害-50%)</span>');c.cd[sid]=sk.cd;return;case'A17':var hpCost=Math.floor(p.hp*.5);p.hp=Math.max(1,p.hp-hpCost);dmg=Math.floor(getPAtk(p,c)*2.5+hpCost);addLog('消耗 <span class="dmg">'+hpCost+'</span> HP');break;}if(dmg>0){dmg=Math.max(1,dmg-m.def);m.hp=Math.max(0,m.hp-dmg);addLog(sk.n+' → <span class="dmg">'+dmg+'</span>');floatDmg('xgME',sk.n+' '+dmg,'#ff6b6b');applyOnHitHeal(p,dmg)}c.cd[sid]=sk.cd}
-function chooseAutoSkill(){var p=G.p,c=G.cmb;if(!p.aSkl.length)return null;var hp=p.hp/calcMaxHp(p),available=[];for(var i=0;i<p.aSkl.length;i++){var sid=p.aSkl[i];if((c.cd[sid]||0)>0)continue;if(sid==='A5'&&hp<=.5)continue;if(sid==='A9'&&hp>.45)continue;if(sid==='A10'&&hp<=.3)continue;if(sid==='A11'&&hp<=.5)continue;if(sid==='A14'&&hp<=.6)continue;if(sid==='A17'&&hp<=.5)continue;available.push(sid)}if(!available.length)return null;if(Math.random()<.6)return available[Math.floor(Math.random()*available.length)];return null}
-function doMonsterAtk(){var p=G.p,c=G.cmb,m=c.m;if(c.stunM>0){c.stunM--;addLog('<span class="info">怪物被眩晕，跳过</span>');return false}if(m.is魔王&&c.turnCount>0){var taunt=TAUNTS[Math.floor(Math.random()*TAUNTS.length)];addLog('<span style="color:var(--pk);font-weight:800">林深大魔王: "'+taunt+'"</span>');G.cmb.taunt=taunt;sfx('taunt')}var atk=m.atk;if(m.ab===7&&m.hp/m.mhp<.3)atk=Math.floor(atk*2);if((m.ab===4||m.ab===6||m.ab===7)&&c.turnCount%5===0&&c.turnCount>0){atk=Math.floor(atk*2);addLog('<span class="info">AOE攻击！</span>')}if((m.ab===2||m.ab===6||m.ab===7)&&Math.random()<.3){atk=Math.floor(atk*1.8);addLog('<span class="info">怪物暴击！</span>')}if(Math.random()<calcDodge(p)){addLog('你闪避了攻击！<span class="info">（闪避成功）</span>');return false}if((m.ab===5||m.ab===6||m.ab===7)&&Math.random()<.15){addLog('攻击未命中！');return false}if(p.pSkl.indexOf('P2')>=0&&atk>calcMaxHp(p)*.2&&Math.random()<.4){atk=Math.floor(atk*.75);addLog('<span class="info">【铁壁】减伤25%！</span>')}var pDef=calcDef(p);if(c.berserkTurns>0)pDef=Math.floor(pDef*.5);
-for(var bi=0;bi<c.buffs.length;bi++){if(c.buffs[bi].t==='减伤50%'){atk=Math.floor(atk*c.buffs[bi].v)}}if(p.pSkl.indexOf('P7')>=0&&p.hp/calcMaxHp(p)<.45){pDef=Math.floor(pDef*1.5);if(c.turnCount===0||Math.random()<.3)addLog('<span class="info">【不屈意志】防御×1.5！</span>')}if(c.invTurns>0){c.invTurns--;addLog('<span class="info">无敌！</span>');return false}var dmg=Math.max(1,atk-pDef);if(m.invTimer>0){dmg=1;var pts=['就这？给本魔王挠痒痒呢~','哈哈哈，你在给林深大魔王按摩吗？','用力点！我都不疼~','你这攻击也太弱了吧！','林深大魔王：感觉到了一丝微风~','这就是你的全部实力？太失望了...','我闭着眼睛都能赢你！','你的攻击就像蚊子咬！','建议你回新手村练练再来！','不自量力说的就是你！'];addLog('<span style="color:var(--pk);font-weight:800">林深大魔王: "'+pts[Math.floor(Math.random()*pts.length)]+'"</span>');m.invTimer--;addLog('🛡️ 魔王无敌！只受 <span class="dmg">1</span> 伤害 <span class="info">(剩余'+m.invTimer+'秒)</span>');if(m.invTimer<=0)addLog('<span style="color:var(--b500);font-weight:800">💥 林深大魔王无敌结束！全力进攻！</span>')}p.hp=Math.max(0,p.hp-dmg);floatDmg('xgPE','-'+dmg,'#ff6b6b');shakeBattle();if(m.ab===3||m.ab===6||m.ab===7)m.hp=Math.min(m.mhp,m.hp+Math.floor(dmg*.1));if(p.pSkl.indexOf('P6')>=0){c.kPow=Math.min((c.kPow||0)+1,5);addLog('<span class="info">【复仇之魂】层数+'+(c.kPow)+'(攻击+'+c.kPow*2+'%)</span>')}addLog('怪物造成 <span class="dmg">'+dmg+'</span> 伤害');if(p.pSkl.indexOf('P13')>=0&&dmg>0){var thRate=m.isBoss?0.05:0.15;var th=Math.floor(dmg*thRate);m.hp=Math.max(0,m.hp-th);if(th>0){addLog('【荆棘】反弹 <span class="dmg">'+th+'</span>');floatDmg('xgME','-'+th,'#ff4081')}}if(p.pSkl.indexOf('P17')>=0){p.hitsTaken=(p.hitsTaken||0)+1;if(p.hitsTaken>=100){p.hitsTaken=0;p.pDef++;addLog('<span class="info">【适应进化】永久防御+1！</span>')}}return true}
-
-/* 自动战斗循环 */
-function autoLoop(){if(!G.cmb||G.cmb.result)return;var spd=1000;var p=G.p,c=G.cmb,m=c.m;var sk=chooseAutoSkill();if(!sk){c.basicAtkCount=(c.basicAtkCount||0)+1;if(p.pSkl.indexOf('P19')>=0&&c.basicAtkCount>=5&&!c.godOfWarReady){c.godOfWarReady=true;c.basicAtkCount=0;addLog('<span class="info">【战神附体】蓄力完成！下次攻击暴击+伤害翻倍！</span>')}}else{c.basicAtkCount=0}var _crit=false;if(sk)doSkillUse(sk);else _crit=doNormalAtk();if(c.cloneTurns>0&&m.hp>0){c.cloneTurns--;var cloneAtk=Math.floor(getPAtk(p,c)*0.5);var cloneDmg=Math.max(1,cloneAtk-m.def);m.hp=Math.max(0,m.hp-cloneDmg);addLog('🎭 分身攻击 <span class="dmg">'+cloneDmg+'</span>');floatDmg('xgME','🎭'+cloneDmg,'#9650ff');applyOnHitHeal(p,cloneDmg);if(c.cloneTurns<=0)addLog('分身术效果结束')}if(p.pSkl.indexOf('P21')>=0&&m.hp>0&&Math.random()<.10){var stormDmg=Math.max(1,Math.floor(getPAtk(p,c)*1.5)-m.def);m.hp=Math.max(0,m.hp-stormDmg);addLog('🌪️ 风暴之心！<span class="dmg">'+stormDmg+'</span>');floatDmg('xgME','🌪'+stormDmg,'#4ba6f7');applyOnHitHeal(p,stormDmg)}sfx(sk?'skill':'atk');render();animAfterRender('xgPE','atk-fwd',10);
-if(sk)animAfterRender('xgPE','skill-glow',50);
-atkTrail();
-if(_crit)critLine();if(m.is魔王&&m.hp>0){var t=TAUNTS[Math.floor(Math.random()*TAUNTS.length)];addLog('<span style="color:var(--pk);font-weight:800">林深大魔王: "'+t+'"</span>');G.cmb.taunt=t;sfx('taunt');render()}if(m.hp<=0){m.hp=0;setTimeout(function(){animAfterRender('xgME','die',10);sfx('win');render();setTimeout(battleWin,900)},400);return}_abt=setTimeout(function(){if(!G.cmb||G.cmb.result)return;var hit=doMonsterAtk();render();animAfterRender('xgME','atk-fwd',10);if(hit){animAfterRender('xgPE','hit',100);sfx('hit')}if(p.hp<=0){var revived=false;if(p.pSkl.indexOf('P10')>=0&&!c.reviveUsed&&Math.random()<.25){c.reviveUsed=true;var rh=Math.floor(calcMaxHp(p)*.3);p.hp=rh;addLog('<span class="heal">【天道庇佑】+'+rh+'</span>');floatDmg('xgPE','+'+rh,'#4caf50');revived=true;sfx('heal');render();animAfterRender('xgPE','heal-flash',200)}if(!revived){p.hp=0;sfx('die');stopBGM();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return}}for(var i=c.buffs.length-1;i>=0;i--){c.buffs[i].dur--;if(c.buffs[i].dur<=0)c.buffs.splice(i,1)}for(var k in c.cd){if(c.cd[k]>0)c.cd[k]--}if(c.berserkTurns>0){c.berserkTurns--;if(c.berserkTurns<=0)addLog('<span class="info">狂暴化结束</span>')}if(p.pSkl.indexOf('P9')>=0){var rh=Math.floor(calcMaxHp(p)*.025);var oldH=p.hp;p.hp=Math.min(calcMaxHp(p),p.hp+rh);var act=p.hp-oldH;if(act>0){addLog('【修罗之体】回复 <span class="heal">+'+act+'</span>');floatDmg('xgPE','+'+act,'#4caf50');sfx('heal');render();animAfterRender('xgPE','heal-flash',200)}}if((m.ab===1||m.ab===6||m.ab===7)&&c.turnCount%3===0&&c.turnCount>0){m.hp=Math.min(m.mhp,m.hp+Math.floor(m.mhp*.05));addLog('<span class="info">怪物回血</span>')}c.turnCount++;c.round++;render();if(p.pSkl.indexOf('P18')>=0&&Math.random()<.1&&m.hp>0){addLog('<span class="info">【时间守护者】额外行动！</span>');setTimeout(function(){if(!G.cmb||G.cmb.result||m.hp<=0)return;var sk2=chooseAutoSkill(),_crit2=false;
-if(sk2)doSkillUse(sk2);else _crit2=doNormalAtk();
-sfx(sk2?'skill':'atk');
-render();
-animAfterRender('xgPE','atk-fwd',10);
-atkTrail();
-if(_crit2)critLine()},200)}_abt=setTimeout(autoLoop,spd)},spd)}
-function battleWin(){stopAuto();stopBGM();saveXiuxianProg();var p=G.p,c=G.cmb;if(!c)return;var rw=rwMul(c.floor,p.lv);var ge=Math.floor(c.m.exp*rw.em*(1+(p.expBonus||0)/100)),gd=Math.floor(c.m.gold*rw.gm);p.exp+=ge;p.gold+=gd;p.kills++;p.consecutiveKills=(p.consecutiveKills||0)+1;if(p.p8RemainingBattles>0){p.p8RemainingBattles--;if(p.p8RemainingBattles<=0){p.consecutiveKills=0}}if(p.pSkl.indexOf('P14')>=0&&p.kills%50===0)p.pAtk+=1;if(c.floor>=G.prog.maxFloor)G.prog.maxFloor=c.floor;G.prog.cleared[c.floor]=true;if(c.isBoss)G.prog.bossCleared[c.floor]=true;G._grindFloor=c.floor;G._grindIsBoss=c.isBoss;G.prog.curFloor=Math.max(G.prog.curFloor,c.floor+1);G.cmb={result:'win',exp:ge,gold:gd};G.scr='win';rc();if(G._autoNextTimer)clearTimeout(G._autoNextTimer);G._autoNextTimer=setTimeout(function(){G._autoNextTimer=null;G._autoContinue=true;checkLvlUp()},2000);autoSave()}
-function battleLose(){stopAuto();stopBGM();var p=G.p;if(!G.cmb)return;p.consecutiveKills=0;p.p8RemainingBattles=0;var lost=Math.floor(p.gold*.5);p.gold=Math.max(0,p.gold-lost);G.cmb={result:'lose',lost:lost};G.scr='death';rc();autoSave()}
-
-/* 升级/选择系统 */
-function checkLvlUp(){var p=G.p;if(p.lv>=100){G._autoContinue=false;G.scr='hub';rc();return}if(p.exp>=expNeed(p.lv)){p.exp-=expNeed(p.lv);p.lv++;p.statPts+=ptsPerLv(p.lv);var rl=Math.random();if(rl<.33){p.atkPts++}else if(rl<.66){p.defPts++}else{p.conPts++}G._refreshed=false;genStatCh();G.scr='lattr';rc()}else{if(G._autoContinue){G._autoContinue=false;var gf=G._grindFloor||G.prog.curFloor;var gb=G._grindIsBoss!=null?G._grindIsBoss:(gf%10===0);G.p.hp=calcMaxHp(G.p);startBattle(gf,gb)}else{G.scr='hub';rc()}}}
-function genStatCh(){var pool=[],cnt=0,p=G.p,sp=0,kills=p.kills||0;var totalCritR=Math.floor(kills/10)+p.pCritR;var totalCritD=Math.min(Math.floor(kills/50)*2,30)+p.pCritD;var dodgeMax=p.pSkl.indexOf('P4')>=0?25:15;var totalDodge=Math.floor(kills/30)+p.pDodge;var totalLife=p.pLife+(p.pSkl.indexOf('P5')>=0?3:0);while(pool.length<3&&cnt<50){cnt++;var roll=Math.random();var maxBad=G._refreshed?1:2;if(sp<maxBad&&roll<0.25){pool.push({t:'谢谢惠顾',v:0,k:'empty',ds:'什么都没有~下次好运！',isSpecial:true});sp++;continue}else if(sp<maxBad&&roll<0.55){var effs=[{t:'攻击',k:'atkPts',amt:-1},{t:'防御',k:'defPts',amt:-1},{t:'体力',k:'conPts',amt:-2},{t:'金币',k:'gold',amt:-5}];var fe=effs[Math.floor(Math.random()*effs.length)];pool.push({t:'来自林深大魔王的恐惧',v:0,k:'fear',ds:'永久'+fe.t+fe.amt,fe:fe,isSpecial:true});sp++;continue}var pick=STAT_POOL[Math.floor(Math.random()*STAT_POOL.length)];if(pick.k==='lowAtk'&&(p.lowAtk||0)>=100)continue;if(pick.k==='firstCrit'&&p.firstCrit)continue;if(pick.k==='survive'&&p.survive)continue;if(pick.k==='pCritR'&&totalCritR>=25)continue;if(pick.k==='pCritD'&&totalCritD>=30)continue;if(pick.k==='pDodge'&&totalDodge>=dodgeMax)continue;if(pick.k==='pLife'&&totalLife>=5)continue;var dup=false;for(var i=0;i<pool.length;i++)if(pool[i].k===pick.k)dup=true;if(!dup)pool.push({t:pick.t,v:pick.v[0]+Math.floor(Math.random()*(pick.v[1]-pick.v[0]+1)),k:pick.k,ds:pick.ds})}while(pool.length<3){pool.push({t:'谢谢惠顾',v:0,k:'empty',ds:'什么都没有~下次好运！',isSpecial:true})}G.ce=pool}function genSkCh(){
-  var pool=[],cnt=0;
-  while(pool.length<3&&cnt<100){
-    cnt++;
-    var isP=Math.random()<.5;
-    var src=isP?PSKILLS:ASKILLS;
-    var cands=[];
-    for(var i=0;i<src.length;i++){
-      var owned=isP?G.p.pSkl:G.p.aSkl;
-      if(owned.indexOf(src[i].id)<0){
-        // 限制 P14 和 P17 每次只有 5% 的概率能进入抽奖候选池
-        if(isP && (src[i].id==='P14' || src[i].id==='P17') && Math.random() > 0.05) continue;
-        cands.push({s:src[i],isP:isP});
-      }
+function startBattle(floor,isBoss){
+stopAuto();var m=genMon(floor,isBoss);G.p.hp=calcMaxHp(G.p);var p8Active=false,p8IsBoss=false;
+if(G.p.pSkl.indexOf('P8')>=0){if((G.p.consecutiveKills||0)>=5){p8Active=true;p8IsBoss=isBoss;G.p.consecutiveKills=0;G.p.p8RemainingBattles=3}else if((G.p.p8RemainingBattles||0)>0){p8Active=true;p8IsBoss=isBoss}}
+G.cmb={m:m,floor:floor,isBoss:isBoss,round:0,log:[],locked:true,cd:{},buffs:[],defending:false,stunM:0,invTurns:0,firstCritUsed:false,prevCrit:false,kPow:0,turnCount:0,reviveUsed:false,surviveUsed:false,petSaveUsed:false,petSkipped:false,result:null,taunt:'',berserkTurns:0,cloneTurns:0,basicAtkCount:0,godOfWarReady:false,p8Active:p8Active,p8IsBoss:p8IsBoss};
+G.scr='battle';rc();startBGM();
+if(G.p.pSkl.indexOf('P12')>=0){m.def=Math.floor(m.def*.9);addLog('<span class="info">【破甲之力】怪物防御-10%！</span>')}
+if(p8Active)addLog('<span class="info">【战意昂扬】连杀加成！</span>');
+if(G.p.pet){
+    var pet=G.p.pet, q=PET_Q[pet.q];
+    if(isBoss && pet.lv>=90){
+        m.atk=Math.floor(m.atk*0.95);m.def=Math.floor(m.def*0.95);
+        addLog('<span style="color:var(--lv)">'+getPetEmoji(pet.lv)+' 【狐假虎威】BOSS攻防下降5%！</span>');
     }
-    if(!cands.length){isP=!isP;continue}
-    var pick=cands[Math.floor(Math.random()*cands.length)];
-    var dup=false;
-    for(var j=0;j<pool.length;j++)if(pool[j].s.id===pick.s.id)dup=true;
-    if(!dup)pool.push(pick)
-  }
-  G.ce=pool;
+    if(!isBoss && pet.lv>=10 && Math.random()<0.03*q.skM){
+        G.cmb.petSkipped=true;m.hp=0;
+        addLog('<span style="color:var(--yw)">'+getPetEmoji(pet.lv)+' 【咸鱼突刺】！怪物被直接吓跑了！</span>');
+        setTimeout(function(){ battleWin(); }, 1200);
+        return;
+    }
 }
-function applyStatCh(i){var ch=G.ce[i],p=G.p;if(ch.k==='empty'){}else if(ch.k==='fear'){var fe=ch.fe;if(fe.k==='gold'){p.gold=Math.max(0,p.gold+fe.amt)}else{p[fe.k]=(p[fe.k]||0)+fe.amt;p.hp=Math.min(p.hp,calcMaxHp(p))}}else if(ch.k==='firstCrit')p.firstCrit=true;else if(ch.k==='survive')p.survive=true;else{p[ch.k]=(p[ch.k]||0)+ch.v;p.hp=Math.min(p.hp,calcMaxHp(p))}if(p.lv%5===0&&p.lv<=100){genSkCh();G.scr='lskill';rc()}else if(p.statPts>0){G.scr='assign';rc()}else checkLvlUp()}
-function applySkCh(i){var ch=G.ce[i],p=G.p;if(ch.isP){if(p.pSkl.length>=maxPassiveSlots(p)){G.ce._rp={id:ch.s.id,isP:true};G.scr='replace';rc();return}p.pSkl.push(ch.s.id)}else{if(p.aSkl.length>=maxActiveSlots(p)){G.ce._rp={id:ch.s.id,isP:false};G.scr='replace';rc();return}p.aSkl.push(ch.s.id)}if(p.statPts>0){G.scr='assign';rc()}else checkLvlUp()}
-function replSk(idx){var info=G.ce._rp,p=G.p;var arr=info.isP?p.pSkl:p.aSkl;arr[idx]=info.id;if(p.statPts>0){G.scr='assign';rc()}else checkLvlUp()}
-function buyItem(idx){var it=SHOP[idx],p=G.p;if(p.gold<it.p)return;p.gold-=it.p;it.f(p);p.hp=Math.min(p.hp,calcMaxHp(p));rc();autoSave()}/* 存档系统 */
-function save(){try{localStorage.setItem(SK,JSON.stringify({v:VER,p:G.p,pr:G.prog}))}catch(e){}try{_sb.from('save').upsert({id:myDevice,game_data:{v:VER,p:G.p,pr:G.prog},updated_at:Date.now()})}catch(e){}}
-function load(){try{var d=JSON.parse(localStorage.getItem(SK));if(d){if(d.v===VER){G.p=d.p;G.prog=d.pr;return true}if(d.v===6&&d.p){G.p=d.p;G.prog=d.pr;if(G.p.consecutiveKills===undefined)G.p.consecutiveKills=0;return true}}}catch(e){}return false}
-async function loadCloud(){try{var r=await _sb.from('save').select('game_data').eq('id',myDevice).single();if(r.data&&r.data.game_data&&r.data.game_data.v===VER){G.p=r.data.game_data.p;G.prog=r.data.game_data.pr;localStorage.setItem(SK,JSON.stringify({v:VER,p:G.p,pr:G.prog}));return true}if(r.data&&r.data.game_data&&r.data.game_data.v===6&&r.data.game_data.p){G.p=r.data.game_data.p;G.prog=r.data.game_data.pr;if(G.p.consecutiveKills===undefined)G.p.consecutiveKills=0;localStorage.setItem(SK,JSON.stringify({v:VER,p:G.p,pr:G.prog}));return true}}catch(e){}return false}
-function autoSave(){save();saveXiuxianProg()}setInterval(autoSave,30000);
-
-/* 渲染总调度 */
-function render(){var c=$('xgRoot');if(!c)return;switch(G.scr){case'start':rStart(c);break;case'hub':rHub(c);break;case'battle':rBattle(c);break;case'win':rWin(c);break;case'death':rDeath(c);break;case'lattr':rLattr(c);break;case'lskill':rLskill(c);break;case'replace':rReplace(c);break;case'shop':rShop(c);break;case'floors':rFloors(c);break;case'skills':rSkList(c);break;case'save':rSave(c);break;case'assign':rAssign(c);break;case'gmPickActive':rGmPick(c,false);break;case'gmPickPassive':rGmPick(c,true);break;default:rHub(c)}}
-function rStart(c){c.innerHTML='<div class="xg-title"><div class="big-emoji">⚔️</div><h3 onclick="xxGmClick()" style="cursor:default">修仙之路</h3><p>踏上修仙征程，击败妖魔，成为最强修仙者</p><div class="xg-card" style="max-width:400px;margin:0 auto 16px"><input id="xxName" class="lb-name-input" placeholder="输入你的道号..." maxlength="10" style="width:100%;margin-bottom:12px;text-align:center"><button class="xg-btn primary" style="width:100%" onclick="xxNew()">开始修仙</button></div><button class="xg-btn" onclick="xxLoad()">继续上次的存档</button></div>'}
-
-function rHub(c){
-  var p=G.p,pr=G.prog,mxhp=calcMaxHp(p),atk=calcAtk(p),def=calcDef(p),need=expNeed(p.lv);
-  var lvTitle=titleFor(p.lv);
-  var titleColor=lvTitle==='渡劫期'?'color:var(--cinnabar)':lvTitle==='大乘期'?'color:var(--gold)':lvTitle==='合体期'?'color:var(--lv)':lvTitle==='化神期'?'color:var(--b400)':'color:var(--tx)';
-  var h='<div class="xg-hdr"><h2 style="'+titleColor+'">'+lvTitle+'</h2><p>'+p.name+' · Lv.'+p.lv+'</p></div>';
-  h+='<div class="xg-hub-grid">';
-
-  /* 左栏：角色面板 */
-  h+='<div>';
-  h+='<div class="xg-card" style="padding:24px;margin-bottom:16px">';
-  h+='<div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">';
-  h+='<div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--ink),var(--b400));display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;box-shadow:0 4px 16px rgba(45,34,24,.2)">🗡️</div>';
-  h+='<div><div style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.4rem;font-weight:800">'+p.name+'</div>';
-  h+='<div style="font-size:.82rem;color:var(--txm)">Lv.'+p.lv+' · '+lvTitle+'</div></div></div>';
-  h+='<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:700;margin-bottom:4px"><span>❤️ 生命</span><span>'+Math.floor(p.hp)+'/'+mxhp+'</span></div>';
- h+='<div class="xg-hp-bar" style="height:12px"><div class="xg-hp-fill'+(p.hp/mxhp<.3?' low':p.hp/mxhp<.6?' mid':'')+'" style="width:'+Math.floor(p.hp/mxhp*100)+'%"></div></div></div>';
-  h+='<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:700;margin-bottom:4px"><span>⭐ 经验</span><span>'+p.exp+'/'+need+'</span></div>';
-  h+='<div class="xg-exp-bar"><div class="xg-exp-fill" style="width:'+Math.floor(p.exp/need*100)+'%"></div></div></div>';
-  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.82rem">';
-  var stats=[['⚔️ 攻击',atk,'color:var(--cinnabar)'],['🛡️ 防御',def,'color:var(--jade)'],['💀 暴击',Math.floor(calcCritR(p)*100)+'%/'+Math.floor(calcCritD(p)*100)+'%',''],['💨 闪避',Math.floor(calcDodge(p)*100)+'%',''],['🩸 吸血',Math.floor(calcLifeSteal(p))+'%',''],['💰 金币',p.gold,'color:var(--gold)'],['💀 击杀',p.kills,''],['🔥 连杀',p.consecutiveKills||0,'color:var(--pk)']];
-  stats.forEach(function(s){h+='<div style="display:flex;justify-content:space-between;padding:4px 8px;background:var(--b50);border-radius:6px"><span style="color:var(--txm)">'+s[0]+'</span><span style="font-weight:800;'+s[2]+'">'+s[1]+'</span></div>';});
-  if(p.expBonus>0)h+='<div style="display:flex;justify-content:space-between;padding:4px 8px;background:var(--b50);border-radius:6px"><span style="color:var(--txm)">✨ 经验加成</span><span style="font-weight:800;color:var(--mt)">+'+p.expBonus+'%</span></div>';
-  h+='</div></div>';
-  h+='<div class="xg-card" style="padding:20px">';
- h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.1rem;margin-bottom:12px">⚔️ 主动 ('+p.aSkl.length+'/'+maxActiveSlots(p)+')</h4>';
-  if(p.aSkl.length===0)h+='<div style="color:var(--txm);font-size:.82rem;padding:8px 0">尚未习得</div>';
-  p.aSkl.forEach(function(id){var sk=ASKILLS.find(function(s){return s.id===id});if(!sk)return;h+='<div class="xg-item" style="margin-bottom:6px;border-left:3px solid var(--cinnabar)"><span class="it-icon">⚔️</span><div class="it-info"><div class="it-name">'+sk.n+'</div><div class="it-desc">'+sk.d+' · CD:'+sk.cd+'</div></div></div>';});
- h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.1rem;margin:12px 0 10px">🔮 被动 ('+p.pSkl.length+'/'+maxPassiveSlots(p)+')</h4>';
-  if(p.pSkl.length===0)h+='<div style="color:var(--txm);font-size:.82rem;padding:8px 0">尚未习得</div>';
-  p.pSkl.forEach(function(id){var sk=PSKILLS.find(function(s){return s.id===id});if(!sk)return;h+='<div class="xg-item" style="margin-bottom:6px;border-left:3px solid var(--lv)"><span class="it-icon">🔮</span><div class="it-info"><div class="it-name">'+sk.n+'</div><div class="it-desc">'+sk.d+'</div></div></div>';});
-  h+='</div></div>';
-
-  /* 右栏：功能按钮分组 */
-  h+='<div class="xg-action-col">';
-  h+='<div class="xg-action-group"><h4>⚔️ 战斗</h4>';
-  h+='<button class="xg-btn primary" onclick="xxFloor('+pr.curFloor+')">挑战第 '+pr.curFloor+' 层</button>';
-  h+='<button class="xg-btn" onclick="xxGoto(\'floors\')">📍 选择楼层</button></div>';
-  h+='<div class="xg-action-group"><h4>📖 功能</h4>';
-  h+='<button class="xg-btn" onclick="xxGoto(\'skills\')">📋 技能列表</button>';
-  h+='<button class="xg-btn" onclick="xxGoto(\'save\')">💾 存档管理</button></div>';
-  h+='<div class="xg-action-group"><h4>🛒 商店</h4>';
-  h+='<button class="xg-btn gold" onclick="xxGoto(\'shop\')">进入商店</button>';
-  h+='<div style="text-align:center;font-size:.75rem;color:var(--txm);margin-top:4px">💰 持有 '+p.gold+' 金币</div></div>';
-  if(_gmUnlocked){h+='<div class="xg-action-group" style="border:2px dashed var(--cinnabar)"><h4>🛠️ GM后台</h4><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
-  h+='<button class="xg-btn gold" onclick="xxGmAxe(\'gold1w\')" style="font-size:.78rem">💰+1万</button>';
-  h+='<button class="xg-btn primary" onclick="xxGmAxe(\'hp\')" style="font-size:.78rem">❤️满血</button>';
-  h+='<button class="xg-btn danger" onclick="xxGmAxe(\'lv5\')" style="font-size:.78rem">⬆️等级+5</button>';
-  h+='<button class="xg-btn primary" onclick="xxGoto(\'gmPickActive\')" style="font-size:.78rem">⚔️自选主动</button>';
-  h+='<button class="xg-btn primary" onclick="xxGoto(\'gmPickPassive\')" style="font-size:.78rem">🔮自选被动</button>';
-  h+='</div></div>';}
-   h+='</div></div>';
-
-  /* 修仙排行榜 */
-  h+='<div class="xg-card" style="margin-top:16px">';
-  h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.1rem;margin-bottom:16px">🏆 修仙排行榜</h4>';
-  if(!xiuxLB||xiuxLB.length===0)h+='<div style="text-align:center;padding:16px;color:var(--txm);font-size:.85rem">暂无数据，开始修仙吧~</div>';
-  else{h+='<div style="display:flex;flex-direction:column;gap:4px">';
-  xiuxLB.forEach(function(r,i){
-    var isMe=r.id===myDevice;
-    var badge=i===0?'🥇':i===1?'🥈':i===2?'🥉':'　';
-    h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:'+(isMe?'rgba(201,169,110,.08)':'transparent')+';border:'+(isMe?'1px solid var(--gold)':'1px solid transparent')+'">';
-    h+='<span style="width:24px;font-size:.9rem">'+badge+'</span>';
-    h+='<span style="font-weight:800;font-size:.82rem;flex:1;'+(isMe?'color:var(--gold)':'')+'">'+(r.name||'匿名修仙者')+'</span>';
-    h+='<span style="font-size:.72rem;color:var(--txm)">'+r.title+'</span>';
-    h+='<span style="font-size:.75rem;font-weight:700;color:var(--b400)">第'+r.max_floor+'层</span>';
-    h+='<span style="font-size:.72rem;color:var(--txm)">Lv.'+r.level+'</span>';
-    h+='</div>';});
-  h+='</div>';}
-  h+='</div>';
-
-  c.innerHTML=h;
+setTimeout(function(){if(G.cmb.petSkipped)return; G.cmb.locked=false;rc();autoLoop()},1000);
 }
-function rBattle(c){
-  var p=G.p,cm=G.cmb,m=cm.m,mxhp=calcMaxHp(p);
-  var playerBuffs=renderBuffTags(cm,p);
-  var playerCls='xg-bp';
-  if(cm.berserkTurns>0)playerCls+=' berserk-active';
-  if(cm.cloneTurns>0)playerCls+=' clone-active';
-  var hpPct=Math.floor(p.hp/mxhp*100);
-  var mHpPct=Math.floor(m.hp/m.mhp*100);
-  var h='<div class="xg-hdr"><h2>⚔️ 战斗中</h2><p style="color:var(--txm)">第 '+cm.floor+' 层'+(cm.isBoss?' · BOSS战':'')+'</p></div>';
-  h+='<div class="xg-battle">';
-  h+='<div class="'+playerCls+'" id="xgPE" style="flex:1">';
-  h+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px"><div class="emoji">🗡️</div>';
-  h+='<div style="text-align:left"><div class="bname">'+p.name+'</div><div class="blv">Lv.'+p.lv+' '+titleFor(p.lv)+'</div></div></div>';
-  h+='<div class="xg-hp-bar" style="margin:8px 0"><div class="xg-hp-fill'+(hpPct<30?' low':hpPct<60?' mid':'')+'" style="width:'+hpPct+'%"></div></div>';
-  h+='<div style="font-size:.85rem;font-weight:800;color:var(--b400);margin-bottom:6px">'+Math.floor(p.hp)+'/'+mxhp+' <span style="font-size:.72rem;color:var(--txm)">('+hpPct+'%)</span></div>';
-  h+='<div class="buff-row">'+playerBuffs+'</div>';
-  h+='<div class="xg-info-bar" style="margin-top:8px">';
-  h+='<span class="xg-info-tag">⚔️ '+calcAtk(p)+'</span><span class="xg-info-tag">🛡️ '+calcDef(p)+'</span>';
-  h+='<span class="xg-info-tag">💥 '+Math.floor(calcCritR(p)*100)+'%×'+Math.floor(calcCritD(p)*100)+'%</span>';
-  h+='<span class="xg-info-tag">💨 '+Math.floor(calcDodge(p)*100)+'%</span>';
-  h+='<span class="xg-info-tag">🩸 '+Math.floor(calcLifeSteal(p))+'%</span>';
-  if(p.expBonus>0)h+='<span class="xg-info-tag" style="color:var(--mt)">✨+'+p.expBonus+'%</span>';
-  h+='</div></div>';
-  h+='<div class="xg-vs">⚡</div>';
-  h+='<div class="xg-bp monster" id="xgME" style="flex:1">';
-  h+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px"><div class="emoji">'+m.emoji+'</div>';
-  h+='<div style="text-align:left"><div class="bname" style="color:var(--cinnabar)">'+m.name+'</div><div class="blv">Lv.'+m.floor+(m.isBoss?' · BOSS':'')+'</div></div></div>';
-  h+='<div class="xg-hp-bar" style="margin:8px 0"><div class="xg-hp-fill'+(mHpPct<30?' low':mHpPct<60?' mid':'')+'" style="width:'+mHpPct+'%"></div></div>';
-  h+='<div style="font-size:.85rem;font-weight:800;color:var(--cinnabar);margin-bottom:6px">'+Math.floor(m.hp)+'/'+m.mhp+' <span style="font-size:.72rem;color:var(--txm)">('+mHpPct+'%)</span></div>';
-  if(m.invTimer>0)h+='<div style="font-size:.75rem;color:var(--gold);font-weight:700;padding:4px 10px;background:rgba(201,169,110,.1);border-radius:6px;border:1px solid rgba(201,169,110,.3);margin-top:4px">🛡️ 无敌 '+m.invTimer+'秒</div>';
-  if(G.p&&G.p.scans>0){h+='<div class="xg-info-bar" style="margin-top:8px"><span class="xg-info-tag">⚔️ '+m.atk+'</span><span class="xg-info-tag">🛡️ '+m.def+'</span></div>';}
-  h+='</div></div>';
-  if(cm.taunt)h+='<div class="xg-taunt">😈 林深大魔王: "'+cm.taunt+'"</div>';
-  h+='<div class="xg-log" style="margin-top:12px">';
-  for(var i=0;i<cm.log.length;i++)h+='<div>'+cm.log[i]+'</div>';
-  h+='</div>';
-  c.innerHTML=h;
+
+function addLog(msg){if(!G.cmb)return;G.cmb.log.unshift(msg);if(G.cmb.log.length>30)G.cmb.log.pop()}
+function getPAtk(p,c){
+var a=calcAtk(p),hp=p.hp,mhp=calcMaxHp(p);
+if(p.pSkl.indexOf('P1')>=0&&hp/mhp<.5)a*=1.2;
+if(p.pSkl.indexOf('P11')>=0)a*=(1+(1-hp/mhp)*.8);
+if(p.pSkl.indexOf('P6')>=0&&c.kPow>0)a*=(1+c.kPow*.02);
+if(p.pSkl.indexOf('P3')>=0&&p.prevCrit)a*=1.3;
+if(p.pSkl.indexOf('P8')>=0&&c.p8Active)a*=c.p8IsBoss?1.1:1.3;
+if(p.lowAtk>0&&hp/mhp<.3)a*=(1+p.lowAtk/100);
+if(p.pSkl.indexOf('P15')>=0&&hp/mhp<.2)a*=1.8;
+if(c.berserkTurns>0)a*=1.5;if(p.pSkl.indexOf('P19')>=0&&c.godOfWarReady)a*=2;
+if(p.pSkl.indexOf('P20')>=0&&c.m.hp/c.m.mhp<.3)a*=1.5;
+a=Math.min(a,calcAtk(p)*15);
+if(p.pet && p.pet.lv>=100 && p.pet.q===3) a=Math.floor(a*1.05);
+return Math.floor(a);
 }
-function rWin(c){var cm=G.cmb;var h='<div class="xg-title"><div class="big-emoji">🎉</div><h3>战斗胜利！</h3><p style="font-size:1.1rem;margin-bottom:8px">获得 <span style="color:var(--b500);font-weight:900;font-size:1.3rem">'+cm.exp+'</span> 经验 和 <span style="color:var(--yw);font-weight:900;font-size:1.3rem">'+cm.gold+'</span> 金币</p><p style="color:var(--txm);font-size:.85rem;margin-bottom:16px">继续刷第'+(G._grindFloor||'?')+'层...</p><div class="xg-actions"><button class="xg-btn primary" onclick="xxContinueNow()">⏩ 立即继续</button><button class="xg-btn gold" onclick="xxGoNextFloor()">⏭️ 进入下一层</button><button class="xg-btn danger" onclick="xxInterrupt()">🛑 停止</button></div></div>';c.innerHTML=h;}
-function rDeath(c){var cm=G.cmb;var h='<div class="xg-title"><div class="big-emoji">💀</div><h3>战斗失败...</h3><p style="margin-bottom:8px">丢失 <span style="color:var(--pk);font-weight:900">'+cm.lost+'</span> 金币</p><p style="color:var(--txm);font-size:.85rem;margin-bottom:20px">不要气馁，修仙之路本就艰难</p><button class="xg-btn primary" onclick="xxGoto(\'hub\')">回到基地</button></div>';c.innerHTML=h;}
+
+function applyOnHitHeal(p,dmg){
+var ls=calcLifeSteal(p);if(ls>0&&dmg>0){var st=Math.floor(dmg*ls/100);if(st>0){p.hp=Math.min(calcMaxHp(p),p.hp+st);addLog('🩸吸血 <span class="heal">+'+st+'</span>')} }
+if(p.healPct>0){var h=Math.floor(calcMaxHp(p)*Math.min(p.healPct,3)/100);p.hp=Math.min(calcMaxHp(p),p.hp+h);addLog('💚回血 <span class="heal">+'+h+'</span>')}
+}
+
+function doNormalAtk(){
+var p=G.p,c=G.cmb,m=c.m;p.prevCrit=false;var atk=getPAtk(p,c);
+if(m.ab===5||m.ab===6){if(Math.random()<.15){addLog('怪物闪避！');return false}atk=Math.floor(atk*.8)}
+var isCrit=Math.random()<calcCritR(p);if(p.firstCrit&&!c.firstCritUsed){isCrit=true;c.firstCritUsed=true;}
+if(p.pSkl.indexOf('P19')>=0&&c.godOfWarReady)isCrit=true;
+if(isCrit)atk=Math.floor(atk*calcCritD(p));p.prevCrit=isCrit;if(p.pSkl.indexOf('P19')>=0&&c.godOfWarReady)c.godOfWarReady=false;
+var dmg=Math.max(1,atk-m.def);m.hp=Math.max(0,m.hp-dmg);
+addLog('造成 <span class="dmg">'+dmg+'</span> 伤害'+(isCrit?' <span class="info">(暴击!)</span>':''));
+floatDmg('xgME',(isCrit?'暴击! ':'')+dmg,isCrit?'#ffd740':'#ff6b6b');
+if(isCrit&&p.pSkl.indexOf('P16')>=0){var crh=Math.floor(calcMaxHp(p)*.02);p.hp=Math.min(calcMaxHp(p),p.hp+crh);}
+applyOnHitHeal(p,dmg);return isCrit;
+}
+
+function doSkillUse(sid){
+var p=G.p,c=G.cmb,m=c.m;p.prevCrit=false;var sk=null;
+for(var i=0;i<ASKILLS.length;i++)if(ASKILLS[i].id===sid){sk=ASKILLS[i];break}if(!sk)return;
+var dmg=0;switch(sid){
+case'A1':dmg=Math.floor(getPAtk(p,c)*2.5);break;
+case'A2':dmg=Math.floor(getPAtk(p,c)*1.5);break;
+case'A3':dmg=Math.floor(getPAtk(p,c)*1.8);if(Math.random()<.5)c.stunM=1;break;
+case'A4':dmg=Math.floor(getPAtk(p,c)*4);break;
+case'A5':var sd=Math.floor(p.hp*.2);p.hp=Math.max(1,p.hp-sd);dmg=Math.floor(p.hp*2);break;
+case'A6':c.buffs.push({t:'减伤50%',v:.5,dur:2});c.cd[sid]=sk.cd;return;
+case'A7':var ba=getPAtk(p,c),td=0;for(var h=0;h<3;h++){var hd=Math.max(1,Math.floor(ba*1.2)-m.def);m.hp=Math.max(0,m.hp-hd);td+=hd;}applyOnHitHeal(p,td);c.cd[sid]=sk.cd;return;
+case'A8':dmg=Math.floor(getPAtk(p,c)*4.5);if(Math.random()<.5)c.stunM=1;break;
+case'A9':var heal=Math.floor(calcMaxHp(p)*.5);p.hp=Math.min(calcMaxHp(p),p.hp+heal);c.invTurns=1;c.cd[sid]=sk.cd;return;
+case'A10':dmg=Math.floor(p.hp*1.5);break;
+case'A11':if(Math.random()<.55){dmg=Math.floor(getPAtk(p,c)*6);addLog('<span class="info">命运眷顾！攻×6！</span>')}else{var sd2=Math.floor(p.hp*.45);p.hp=Math.max(1,p.hp-sd2);addLog('命运反噬！<span class="dmg">自伤'+sd2+'</span>')}break;
+case'A12':var ba2=getPAtk(p,c),td2=0;for(var h=0;h<5;h++){var hd2=Math.max(1,Math.floor(ba2*.5)-m.def);m.hp=Math.max(0,m.hp-hd2);td2+=hd2;}applyOnHitHeal(p,td2);c.cd[sid]=sk.cd;return;
+case'A13':if(!m.is魔王){var dr=m.isBoss?0.1:0.3,dn=Math.floor(m.hp*dr);m.hp=Math.max(0,m.hp-dn);var ha=Math.min(dn,calcMaxHp(p)-p.hp);p.hp+=ha;}c.cd[sid]=sk.cd;return;
+case'A14':c.berserkTurns=3;c.cd[sid]=sk.cd;return;
+case'A15':c.stunM+=m.isBoss?1:2;c.cd[sid]=sk.cd;return;
+case'A16':c.cloneTurns=3;c.cd[sid]=sk.cd;return;
+case'A17':var hpc=Math.floor(p.hp*.5);p.hp=Math.max(1,p.hp-hpc);dmg=Math.floor(getPAtk(p,c)*2.5+hpc);break;
+}
+if(dmg>0){dmg=Math.max(1,dmg-m.def);m.hp=Math.max(0,m.hp-dmg);applyOnHitHeal(p,dmg);}
+c.cd[sid]=sk.cd;
+}
+
+function chooseAutoSkill(){var p=G.p,c=G.cmb;if(!p.aSkl.length)return null;var hp=p.hp/calcMaxHp(p),av=[];for(var i=0;i<p.aSkl.length;i++){var sid=p.aSkl[i];if((c.cd[sid]||0)>0)continue;av.push(sid)}if(!av.length)return null;return av[Math.floor(Math.random()*av.length)];}
+
+function doMonsterAtk(){
+var p=G.p,c=G.cmb,m=c.m;if(c.stunM>0){c.stunM--;addLog('<span class="info">怪物被眩晕</span>');return false}
+var atk=m.atk;if(Math.random()<calcDodge(p)){addLog('你闪避了攻击！');return false}
+if(c.invTurns>0){c.invTurns--;addLog('无敌中');return false}
+var dmg=Math.max(1,atk-calcDef(p));
+if(p.pet && p.pet.lv>=50 && !c.petSaveUsed && dmg >= p.hp){
+    c.petSaveUsed=true;dmg=0;var heal=Math.floor(calcMaxHp(p)*0.15);p.hp=1+heal;
+    addLog('<span style="color:var(--pk)">'+getPetEmoji(p.pet.lv)+' 【忠犬护主】锁血并回血！</span>');
+}else{
+    p.hp=Math.max(0,p.hp-dmg);floatDmg('xgPE','-'+dmg,'#ff6b6b');shakeBattle();
+}
+addLog('怪物造成 <span class="dmg">'+dmg+'</span> 伤害');return true;
+}
+
+function autoLoop(){
+if(!G.cmb||G.cmb.result)return;var p=G.p,c=G.cmb,m=c.m;var sk=chooseAutoSkill();
+if(sk)doSkillUse(sk);else doNormalAtk();
+sfx(sk?'skill':'atk');render();animAfterRender('xgPE','atk-fwd',10);atkTrail();
+if(p.pet && m.hp>0){
+    if(!c.isBoss && p.pet.lv>=30 && m.hp/m.mhp<0.1){
+        m.hp=0;addLog('<span style="color:var(--cinnabar)">'+getPetEmoji(p.pet.lv)+' 【饿犬扑食】一口吞掉残血怪物！</span>');
+    }
+    if(p.pet.lv>=100){
+        var hPct=p.pet.q===3?0.03:0.01, heal=Math.floor(calcMaxHp(p)*hPct);
+        p.hp=Math.min(calcMaxHp(p),p.hp+heal);
+    }
+}
+if(m.hp<=0){m.hp=0;setTimeout(function(){animAfterRender('xgME','die',10);sfx('win');render();setTimeout(battleWin,900)},400);return}
+_abt=setTimeout(function(){
+if(!G.cmb||G.cmb.result)return;doMonsterAtk();render();
+if(p.hp<=0){p.hp=0;sfx('die');stopBGM();render();setTimeout(battleLose,900);return}
+for(var k in c.cd)if(c.cd[k]>0)c.cd[k]--;c.turnCount++;render();autoLoop();
+},1000);
+}
+
+function battleWin(){
+stopAuto();stopBGM();saveXiuxianProg();var p=G.p,c=G.cmb;if(!c)return;
+var rw=rwMul(c.floor,p.lv);
+var ge=Math.floor(c.m.exp*rw.em*(1+(p.expBonus||0)/100)),gd=Math.floor(c.m.gold*rw.gm);
+var petMsg='';
+if(p.pet){
+    var q=PET_Q[p.pet.q];
+    p.pet.exp+=Math.floor(c.m.exp*rw.em*q.expR);
+    p.pet.kills++;
+    var bonusGd=Math.floor(p.pet.lv/10); if(bonusGd>0) gd+=bonusGd;
+    if(c.petSkipped) gd+=10;
+    if(p.pet.lv>=70 && Math.random()<0.01*q.skM){
+        p.statPts++; petMsg+='<br><span style="color:var(--pk);font-size:.85rem;font-weight:700">💊 宠物叼来仙药，未分配属性点 +1！</span>';
+    }
+    var oldLv=p.pet.lv;
+    while(p.pet.lv<100 && p.pet.exp>=expNeed(p.pet.lv)){ p.pet.exp-=expNeed(p.pet.lv); p.pet.lv++; }
+    if(p.pet.lv>oldLv) petMsg+='<br><span style="color:var(--yw);font-size:.85rem;font-weight:700">🎊 宠物升级至 Lv.'+p.pet.lv+'！</span>';
+    if(p.pet.lv>=100) p.pet.exp=0;
+}
+p.exp+=ge;p.gold+=gd;p.kills++;
+if(c.floor>=G.prog.maxFloor)G.prog.maxFloor=c.floor;
+G.prog.cleared[c.floor]=true;if(c.isBoss)G.prog.bossCleared[c.floor]=true;
+G._grindFloor=c.floor;G._grindIsBoss=c.isBoss;G.prog.curFloor=Math.max(G.prog.curFloor,c.floor+1);
+G.cmb={result:'win',exp:ge,gold:gd,petMsg:petMsg};G.scr='win';rc();
+if(G._autoNextTimer)clearTimeout(G._autoNextTimer);
+G._autoNextTimer=setTimeout(function(){G._autoNextTimer=null;G._autoContinue=true;checkLvlUp()},2000);autoSave();
+}
+function battleLose(){stopAuto();stopBGM();var p=G.p;if(!G.cmb)return;var lost=Math.floor(p.gold*.5);p.gold=Math.max(0,p.gold-lost);G.cmb={result:'lose',lost:lost};G.scr='death';rc();autoSave()}
+function rWin(c){var cm=G.cmb;var h='<div class="xg-title"><div class="big-emoji">🎉</div><h3>战斗胜利！</h3><p style="font-size:1.1rem;margin-bottom:8px">获得 <span style="color:var(--b500);font-weight:900;font-size:1.3rem">'+cm.exp+'</span> 经验 和 <span style="color:var(--yw);font-weight:900;font-size:1.3rem">'+cm.gold+'</span> 金币</p>'+(cm.petMsg||'')+'<p style="color:var(--txm);font-size:.85rem;margin-bottom:16px;margin-top:16px">继续刷第'+(G._grindFloor||'?')+'层...</p><div class="xg-actions"><button class="xg-btn primary" onclick="xxContinueNow()">⏩ 继续</button><button class="xg-btn gold" onclick="xxGoNextFloor()">⏭️ 下一层</button><button class="xg-btn danger" onclick="xxInterrupt()">🛑 停止</button></div></div>';c.innerHTML=h;}function rDeath(c){var cm=G.cmb;var h='<div class="xg-title"><div class="big-emoji">💀</div><h3>战斗失败...</h3><p style="margin-bottom:8px">丢失 <span style="color:var(--pk);font-weight:900">'+cm.lost+'</span> 金币</p><p style="color:var(--txm);font-size:.85rem;margin-bottom:20px">不要气馁，修仙之路本就艰难</p><button class="xg-btn primary" onclick="xxGoto(\'hub\')">回到基地</button></div>';c.innerHTML=h;}
 function rLattr(c){var p=G.p;var h='<div class="xg-title"><div class="big-emoji">⬆️</div><h3>升级到 Lv.'+p.lv+'！</h3><p style="color:var(--txm)">选择一项属性提升</p><div class="xg-choices">';for(var i=0;i<G.ce.length;i++){var ch=G.ce[i];var animDelay='animation-delay:'+((i+1)*.15)+'s;';if(ch.k==='empty'){h+='<div class="xg-skill-card" style="border-color:var(--txl);opacity:.7;'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name">🫥 谢谢惠顾</div><div class="sk-desc">'+ch.ds+'</div></div>';}else if(ch.k==='fear'){h+='<div class="xg-skill-card rarity-curse" style="'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name" style="color:#ff4757">😈 '+ch.t+'</div><div class="sk-desc">'+ch.ds+'</div></div>';}else{var rarity=ch.v>=4?'rarity-legendary':ch.v>=3?'rarity-epic':'';h+='<div class="xg-skill-card '+rarity+'" style="'+animDelay+'" onclick="xxStatPick('+i+')"><div class="sk-name">⬆️ '+ch.t+'</div><div class="sk-desc">'+ch.ds+'</div><div class="sk-type active">+'+ch.v+'</div></div>';}}h+='</div>';h+='<button class="xg-btn gold" onclick="xxRefresh()"'+(p.gold<15?' disabled style="opacity:.5"':'')+'>🔄 刷新 (15金币)</button>';h+='</div>';c.innerHTML=h;}
 function rLskill(c){
   var p=G.p;
