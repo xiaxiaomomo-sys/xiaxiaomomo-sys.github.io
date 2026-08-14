@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.0.0">
+<meta name="game-version" content="v1.0.1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -898,7 +898,7 @@ window.xxAssign=function(stat,delta){var p=G.p;if(delta>0&&p.statPts<=0)return;i
 window.xxContinueNow=function(){if(G._autoNextTimer){clearTimeout(G._autoNextTimer);G._autoNextTimer=null}G._autoContinue=true;checkLvlUp()};
 window.xxGoNextFloor=function(){if(G._autoNextTimer){clearTimeout(G._autoNextTimer);G._autoNextTimer=null}G._autoContinue=false;stopAuto();stopBGM();xxFloor(G.prog.curFloor)};
 window.xxInterrupt=function(){if(G._autoNextTimer){clearTimeout(G._autoNextTimer);G._autoNextTimer=null}G._autoContinue=false;stopAuto();stopBGM();G.scr='hub';rc()};
-window.xxLoadCloud=function(){loadCloud().then(function(ok){if(ok){G.scr='hub';rc();alert('云端存档恢复成功！')}else{alert('云端没有找到存档。')}}).catch(function(){alert('云端读取失败，请检查网络。')})};
+window.xxLoadCloud=function(){loadCloud().then(function(ok){if(ok){checkAndResetPet();G.scr='hub';rc();alert('云端存档恢复成功！')}else{alert('云端没有找到存档。')}}).catch(function(){alert('云端读取失败，请检查网络。')})};
 window.xxClear=function(){localStorage.removeItem(SK);G={scr:'start',p:null,prog:null,cmb:null,ce:null};rc()};
 window.showExportModal=showExportModal;window.showImportModal=showImportModal;window.closeImportModal=closeImportModal;window.closeExportModal=closeExportModal;window.confirmImport=confirmImport;window.copyExportCode=copyExportCode;
 
