@@ -498,16 +498,16 @@ window.xgRc=rc;
 
 /* ===== 🐾 宠物系统常量 ===== */
 var PET_QUAL={
-  common:{name:'凡骨',emoji:'🤍',chance:0.6,expRate:0.2,bonusPerLv:0.05,skillMul:1.0,color:'#9e9e9e'},
-  spirit:{name:'灵兽',emoji:'💙',chance:0.3,expRate:0.35,bonusPerLv:0.10,skillMul:1.2,color:'#42a5f5'},
-  fairy:{name:'仙宠',emoji:'💜',chance:0.09,expRate:0.20,bonusPerLv:0.15,skillMul:1.5,color:'#ab47bc'},
-  god:{name:'神兽',emoji:'💛',chance:0.01,expRate:0.35,bonusPerLv:0.20,skillMul:2.0,color:'#ffd740'}
+  common:{name:'凡骨',emoji:'🤍',chance:0.68,expRate:0.2,bonusPerLv:0.05,skillMul:1.0,color:'#9e9e9e'},
+  spirit:{name:'灵兽',emoji:'💙',chance:0.25,expRate:0.35,bonusPerLv:0.10,skillMul:1.2,color:'#42a5f5'},
+  fairy:{name:'仙宠',emoji:'💜',chance:0.05,expRate:0.20,bonusPerLv:0.15,skillMul:1.5,color:'#ab47bc'},
+  god:{name:'神兽',emoji:'💛',chance:0.02,expRate:0.35,bonusPerLv:0.20,skillMul:2.0,color:'#ffd740'}
 };
 function petForm(lv){if(lv>=90)return{emoji:'🦄',name:'洪荒神兽'};if(lv>=50)return{emoji:'🦁',name:'镇派瑞狮'};if(lv>=30)return{emoji:'🦊',name:'通灵仙狐'};if(lv>=10)return{emoji:'🐰',name:'机灵小兽'};return{emoji:'🐹',name:'摸鱼幼崽'}}
 function petExpNeed(lv){return lv*50}
 function petBonusMul(){var p=G.p;if(!p||!p.pet||!p.pet.owned)return 0;var q=PET_QUAL[p.pet.quality];if(!q)return 0;return p.pet.level*q.bonusPerLv/100}
 function petGoldBonus(){var p=G.p;if(!p||!p.pet||!p.pet.owned)return 0;return Math.floor(p.pet.level/10)}
-function rollPetQuality(){var r=Math.random();if(r<0.01)return'god';if(r<0.10)return'fairy';if(r<0.40)return'spirit';return'common'}
+function rollPetQuality(){var r=Math.random();if(r<0.02)return'god';if(r<0.07)return'fairy';if(r<0.32)return'spirit';return'common'}
 function getShopPrice(base){var p=G.p;if(!p||!p.pet||!p.pet.owned||p.pet.level<100)return base;if(p.pet.quality==='god')return Math.floor(base*0.7);return Math.floor(base*0.9)}
 
 /* 音效系统 */
