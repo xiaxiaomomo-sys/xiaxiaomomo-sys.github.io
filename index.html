@@ -893,12 +893,7 @@ function rLskill(c){
   h+='</div><div class="xg-actions" style="margin-top:20px"><button class="xg-btn danger" onclick="xxSkSkip()">🛑 跳过 (放弃领悟技能)</button></div></div>';
   c.innerHTML=h;
 }
-  h+='</div><div class="xg-actions" style="margin-top:20px"><button class="xg-btn danger" onclick="xxSkSkip()">🛑 跳过 (放弃领悟技能)</button></div></div>';
-  c.innerHTML=h;
-}
-  h+='</div><div class="xg-actions" style="margin-top:20px"><button class="xg-btn danger" onclick="xxSkSkip()">🛑 跳过 (放弃领悟技能)</button></div></div>';
-  c.innerHTML=h;
-}function rReplace(c){
+function rReplace(c){
   var info=G.ce._rp,p=G.p;
   var arr=info.isP?p.pSkl:p.aSkl;
   var src=info.isP?PSKILLS:ASKILLS;
@@ -911,7 +906,8 @@ function rLskill(c){
   }
   h+='</div><div class="xg-actions" style="margin-top:20px"><button class="xg-btn danger" onclick="xxReplSkip()">🛑 跳过 (放弃学习此技能)</button></div></div>';
   c.innerHTML=h;
-}function rShop(c){
+}
+function rShop(c){
 var p=G.p;
 var h='<div class="xg-hdr"><h2>\uD83D\uDED2 \u5546\u5E97</h2><p>\u91D1\u5E01: <span style="color:var(--yw);font-weight:900">'+p.gold+'</span></p></div><div class="xg-card">';
 
