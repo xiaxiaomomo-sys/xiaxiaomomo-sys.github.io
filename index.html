@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.0.0">
+<meta name="game-version" content="v1.0.1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -891,8 +891,39 @@ window.xxClaimGift=function(){if(G.p.giftClaimed)return;G.p.giftClaimed=true;G.p
 
 /* 🐾 宠物系统全局函数 */
 window.xxClaimPet=function(){var p=G.p;if(!p||(p.pet&&p.pet.owned))return;var q=rollPetQuality();p.pet={owned:true,quality:q,level:1,exp:0};var info=PET_QUAL[q];showSaveToast(info.emoji,'领养成功！资质：'+info.name+' · 触发率×'+info.skillMul);rc();autoSave()};
-window.xxResetPet=function(){var p=G.p;if(!p||!p.pet||!p.pet.owned)return;var price=getShopPrice(5000);if(p.gold<price)return;p.gold-=price;var oldQ=p.pet.quality;var newQ=rollPetQuality();p.pet.quality=newQ;p.hp=Math.min(p.hp,calcMaxHp(p));var info=PET_QUAL[newQ];var isUp=info.bonusPerLv>PET_QUAL[oldQ].bonusPerLv;showSaveToast(info.emoji,'洗髓成功！新资质：'+info.name+'（触发率×'+info.skillMul+'）'+(isUp?' ↑提升！':''));rc();autoSave()};
-
+/* 🐾 宠物洗髓（带防掉段保底机制） */
+window.xxResetPet=function(){
+    var p=G.p;
+    if(!p||!p.pet||!p.pet.owned) return;
+    var price=getShopPrice(5000);
+    if(p.gold<price) return;
+    p.gold-=price;
+    
+    var oldQ=p.pet.quality;
+    var newQ=rollPetQuality();
+    
+    // 设定阶级：凡骨=1, 灵兽=2, 仙宠=3, 神兽=4
+    var tiers = { 'common': 1, 'spirit': 2, 'fairy': 3, 'god': 4 };
+    
+    // 🌟 核心逻辑：如果新抽到的资质比现在低，就强制保留现在的资质（防掉段）
+    if(tiers[newQ] < tiers[oldQ]) {
+        newQ = oldQ;
+    }
+    
+    p.pet.quality=newQ;
+    p.hp=Math.min(p.hp,calcMaxHp(p));
+    
+    var info=PET_QUAL[newQ];
+    var isUp = tiers[newQ] > tiers[oldQ];
+    
+    // 根据是成功突破还是保底，给予不同的提示
+    var msg = isUp ? '洗髓突破！新资质：'+info.name+'（触发率×'+info.skillMul+'） ↑提升！' 
+                   : '洗髓完毕！资质维持在：'+info.name+'（防掉段保护生效）';
+                   
+    showSaveToast(info.emoji, msg);
+    rc();
+    autoSave();
+};
 window.xxRefresh=function(){var p=G.p;if(p.gold<15)return;p.gold-=15;G._refreshed=true;genStatCh();rc()};
 window.xxStatPick=function(i){applyStatCh(i)};
 window.xxSkPick=function(i){applySkCh(i)};
