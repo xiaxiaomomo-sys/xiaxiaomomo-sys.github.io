@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.1.8">
+<meta name="game-version" content="v1.1.9">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -571,6 +571,28 @@ var SK='xx_save_s1',VER=100,G={scr:'start',p:null,prog:null,cmb:null,ce:null};
 function $(id){return document.getElementById(id)}
 function rc(){var c=$('xgRoot');if(c)render()}
 window.xgRc=rc;
+/* 核心路由渲染函数（补全缺失的部分） */
+function render() {
+    var c = $('xgRoot');
+    if (!c) return;
+    
+    // 根据当前游戏状态 (G.scr) 渲染对应的界面
+    if (G.scr === 'start') rStart(c);
+    else if (G.scr === 'hub') rHub(c);
+    else if (G.scr === 'battle') rBattle(c);
+    else if (G.scr === 'win') rWin(c);
+    else if (G.scr === 'death') rDeath(c);
+    else if (G.scr === 'lattr') rLattr(c);
+    else if (G.scr === 'lskill') rLskill(c);
+    else if (G.scr === 'replace') rReplace(c);
+    else if (G.scr === 'shop') rShop(c);
+    else if (G.scr === 'floors') rFloors(c);
+    else if (G.scr === 'skills') rSkList(c);
+    else if (G.scr === 'save') rSave(c);
+    else if (G.scr === 'assign') rAssign(c);
+    else if (G.scr === 'gmPickActive') rGmPick(c, false);
+    else if (G.scr === 'gmPickPassive') rGmPick(c, true);
+}
 
 /* ===== 🐾 宠物系统常量 ===== */
 var PET_QUAL={
