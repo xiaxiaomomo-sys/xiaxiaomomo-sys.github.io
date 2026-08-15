@@ -810,7 +810,16 @@ function getPAtk(p, c){
 
     return Math.floor(Math.min(finalAtk, base * 10)); 
 }
-
+function getSuppression(floor, playerLv) {
+    var diff = floor - playerLv;
+    if (diff > 15) return { pDmg: 0.50, mDmg: 1.50 };
+    if (diff > 10) return { pDmg: 0.70, mDmg: 1.30 };
+    if (diff > 5)  return { pDmg: 0.85, mDmg: 1.15 };
+    if (diff < -15) return { pDmg: 1.50, mDmg: 0.50 };
+    if (diff < -10) return { pDmg: 1.30, mDmg: 0.70 };
+    if (diff < -5)  return { pDmg: 1.15, mDmg: 0.85 };
+    return { pDmg: 1.0, mDmg: 1.0 };
+}
 /* 🌟 境界压制与硬核回血 (最高吸血8%) */
 function applyHeal(p, amount, isLifesteal) {
     var c = G.cmb;
