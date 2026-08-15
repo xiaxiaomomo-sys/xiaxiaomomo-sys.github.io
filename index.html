@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.0.4">
+<meta name="game-version" content="v1.0.5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -697,7 +697,11 @@ function calcCritD(p){
     return 1.00 + bonus / 100;
 }
 function calcDodge(p){var d = Math.min((p.pDodge||0)/100, 0.10); if(p.pSkl.indexOf('P4')>=0) d += 0.10; return Math.min(d, 0.20)} // 总上限20%
-function calcLifeSteal(p){var s = (p.pLife||0); if(p.pSkl.indexOf('P5')>=0) s += 2; return Math.min(s, 3)} // 总上限3%
+function calcLifeSteal(p){
+    var s = (p.pLife||0); // 三选一给的，每次+1%
+    if(p.pSkl.indexOf('P5')>=0) s += 2; // 吸血光环给+2%
+    return Math.min(s, 3); // 总上限3%
+}
 function maxActiveSlots(p){return 3;} // 死锁3个
 function maxPassiveSlots(p){return 4;} // 死锁4个
 
@@ -757,7 +761,7 @@ function applyHeal(p, amount, isLifesteal) {
     
     var maxHp = calcMaxHp(p);
     if(isLifesteal){
-        var limit = maxHp * 0.1; // 吸血最高不超过 10%
+        var limit = maxHp * 0.03; // 吸血最高不超过 3%
         if(amount > limit) amount = limit;
     }
     amount = Math.floor(amount);
@@ -1064,7 +1068,7 @@ function genStatCh(){
         var pick = null;
 
         // 10%基础概率，触发保底时概率变为100%
-        if ((isPity || roll < 0.10) && rcR < 25 && !pool.some(function(x){return x.k==='pCritR'})) { 
+        if ((isPity || roll < 0.10) && rcR < 30 && !pool.some(function(x){return x.k==='pCritR'})) { 
             pick = {t:'暴击率', v:1.0, k:'pCritR', ds:'永久增加1.0%暴击率'}; 
         }
         else if ((isPity || roll < 0.20) && rd < 10 && !pool.some(function(x){return x.k==='pDodge'})) { 
@@ -1175,7 +1179,7 @@ function rHub(c){
         ['🛡️ 防御',def,'color:var(--jade)'],
         ['💀 暴击',(calcCritR(p)*100).toFixed(1)+'%/'+(calcCritD(p)*100).toFixed(1)+'%',''],
         ['💨 闪避',(calcDodge(p)*100).toFixed(1)+'%',''],
-        ['🩸 吸血',calcLifeSteal(p).toFixed(1)+'%',''],
+        ['🩸 吸血',calcLifeSteal(p).toFixed(1)+'%'+((p.pSkl.indexOf('P5')>=0?' (光环+2%)':'')),''],
         ['💰 金币',p.gold,'color:var(--gold)'],
         ['💀 击杀',p.kills,''],
         ['🔥 连杀',p.consecutiveKills||0,'color:var(--pk)']
@@ -1183,7 +1187,10 @@ function rHub(c){
     stats.forEach(function(s){h+='<div style="display:flex;justify-content:space-between;padding:4px 8px;background:var(--b50);border-radius:6px"><span style="color:var(--txm)">'+s[0]+'</span><span style="font-weight:800;'+s[2]+'">'+s[1]+'</span></div>'});
     if(p.expBonus>0)h+='<div style="display:flex;justify-content:space-between;padding:4px 8px;background:var(--b50);border-radius:6px"><span style="color:var(--txm)">✨ 经验加成</span><span style="font-weight:800;color:var(--mt)">+'+p.expBonus+'%</span></div>';
     h+='</div></div>';
-
+// 暴伤进度文案
+var nextCritKills = p.kills>=5000?'已满':p.kills>=3000?'5000只':p.kills>=1500?'3000只':p.kills>=500?'1500只':p.kills>=200?'500只':'200只';
+var nextCritBonus = p.kills>=5000?'150':p.kills>=3000?'140':p.kills>=1500?'130':p.kills>=500?'120':p.kills>=200?'110':'110';
+h+='<div style="padding:4px 8px;background:var(--b50);border-radius:6px;font-size:.75rem;color:var(--txm);text-align:center">暴伤成长: 击杀'+nextCritKills+'怪物 → '+nextCritBonus+'%暴伤</div>';
     /* 🌟 宠物图文明细面板 */
     if(p.pet&&p.pet.owned){
         var pq=PET_QUAL[p.pet.quality];var pf=petForm(p.pet.level);var pNeed=petExpNeed(p.pet.level);
