@@ -686,9 +686,18 @@ function calcAtk(p){var base=Math.floor(10+p.atkPts*1.5+(p.pAtk||0));var pm=petB
 function calcDef(p){var base=Math.floor(p.defPts*1.0+(p.pDef||0));var pm=petBonusMul();return pm>0?Math.floor(base*(1+pm)):base}
 function calcMaxHp(p){var base=Math.floor(100+p.conPts*12+(p.pHp||0));var pm=petBonusMul();return pm>0?Math.floor(base*(1+pm)):base}
 function calcCritR(p){return Math.min((p.pCritR||0)/100, 0.25)} // 上限锁定25%
-function calcCritD(p){return 1.30} // 固化130%
+function calcCritD(p){
+    var kills = p.kills||0;
+    var bonus = 0;
+    if(kills >= 5000) bonus = 50;
+    else if(kills >= 3000) bonus = 40;
+    else if(kills >= 1500) bonus = 30;
+    else if(kills >= 500) bonus = 20;
+    else if(kills >= 200) bonus = 10;
+    return 1.00 + bonus / 100;
+}
 function calcDodge(p){var d = Math.min((p.pDodge||0)/100, 0.10); if(p.pSkl.indexOf('P4')>=0) d += 0.10; return Math.min(d, 0.20)} // 总上限20%
-function calcLifeSteal(p){var s = Math.min((p.pLife||0), 1); if(p.pSkl.indexOf('P5')>=0) s += 3; return Math.min(s, 4)} // 总上限4%
+function calcLifeSteal(p){var s = (p.pLife||0); if(p.pSkl.indexOf('P5')>=0) s += 2; return Math.min(s, 3)} // 总上限3%
 function maxActiveSlots(p){return 3;} // 死锁3个
 function maxPassiveSlots(p){return 4;} // 死锁4个
 
