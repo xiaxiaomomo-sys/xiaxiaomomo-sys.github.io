@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.0.1">
+<meta name="game-version" content="v1.0.2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -500,7 +500,7 @@ var EXP_PER_LV=72,MAX_LV=100;var mxSec=0,mxLastMin=-1,mxLastMsg='',mxLastTime=Da
 var mxExp=parseFloat(localStorage.getItem('fishExp')||'0');var myName=localStorage.getItem('fishName')||'';
 var lbData={},dbReady=false;
 function getWeekNumber(d){d=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));var dayNum=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-dayNum);var yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1));return Math.ceil(((d-yearStart)/864e5+1)/7);}
-var curWeek='w'+getWeekNumber(new Date())+'_'+new Date().getFullYear();
+var curWeek='s1_w'+getWeekNumber(new Date())+'_'+new Date().getFullYear();
 var savedWeek=localStorage.getItem('fishWeek');
 if(savedWeek&&savedWeek!==curWeek){mxExp=0;localStorage.setItem('fishExp','0');localStorage.setItem('fishWeek',curWeek);}
 if(!savedWeek)localStorage.setItem('fishWeek',curWeek);
@@ -1037,19 +1037,33 @@ if(c.floor>=G.prog.maxFloor)G.prog.maxFloor=c.floor;G.prog.cleared[c.floor]=true
 
 function battleLose(){stopAuto();stopBGM();var p=G.p;if(!G.cmb)return;p.consecutiveKills=0;p.p8RemainingBattles=0;var lost=Math.floor(p.gold*0.5);p.gold=Math.max(0,p.gold-lost);G.cmb={result:'lose',lost:lost};G.scr='death';rc();autoSave()}
 
-/* 🌟 S1 全新属性 3选1 池 (精准保底机制) */
-function checkLvlUp(){var p=G.p;if(p.lv>=100){G._autoContinue=false;G.scr='hub';rc();return}if(p.exp>=expNeed(p.lv)){p.exp-=expNeed(p.lv);p.lv++;p.statPts+=ptsPerLv(p.lv);G._refreshed=false;genStatCh();G.scr='lattr';rc()}else{if(G._autoContinue){G._autoContinue=false;var gf=G._grindFloor||G.prog.curFloor;var gb=G._grindIsBoss!=null?G._grindIsBoss:(gf%10===0);G.p.hp=calcMaxHp(G.p);startBattle(gf,gb)}else{G.scr='hub';rc()}}}
+/* 🌟 S1 全新属性 3选1 池 (70级必满保底机制) */
 function genStatCh(){
     var pool=[], p=G.p;
     var rcR = p.pCritR||0, rd = p.pDodge||0, rl = p.pLife||0;
+
+    // 计算距离 70 级的剩余升级次数 (每级选1次)
+    var lvlsLeft = Math.max(1, 70 - p.lv);
+    // 计算距离拿满所有稀有属性，还差多少次 (暴击25次, 闪避10次, 吸血1次)
+    var raresNeeded = Math.max(0, 25 - rcR) + Math.max(0, 10 - rd) + Math.max(0, 1 - rl);
+
     for (var i=0; i<3; i++) {
         var roll = Math.random();
-        // 动态提升：如果等级即将满级还没凑够，大幅提高稀有出现率，以确保70级前大概率满配
-        var boost = (p.lv / 100) * 0.5; 
+        
+        // 核心保底：如果剩下的升级次数，刚好等于需要的稀有属性次数，则强制100%出稀有！
+        var isPity = (raresNeeded >= lvlsLeft); 
         var pick = null;
-        if (roll < 0.10 + boost && rcR < 25) { pick = {t:'暴击率', v:1.0, k:'pCritR', ds:'永久增加1.0%暴击率'}; }
-        else if (roll < 0.20 + boost*2 && rd < 10) { pick = {t:'闪避率', v:1.0, k:'pDodge', ds:'永久增加1.0%闪避率'}; }
-        else if (roll < 0.30 + boost*3 && rl < 1) { pick = {t:'吸血率', v:1.0, k:'pLife', ds:'永久增加1.0%吸血比例'}; }
+
+        // 10%基础概率，触发保底时概率变为100%
+        if ((isPity || roll < 0.10) && rcR < 25 && !pool.some(function(x){return x.k==='pCritR'})) { 
+            pick = {t:'暴击率', v:1.0, k:'pCritR', ds:'永久增加1.0%暴击率'}; 
+        }
+        else if ((isPity || roll < 0.20) && rd < 10 && !pool.some(function(x){return x.k==='pDodge'})) { 
+            pick = {t:'闪避率', v:1.0, k:'pDodge', ds:'永久增加1.0%闪避率'}; 
+        }
+        else if ((isPity || roll < 0.30) && rl < 1 && !pool.some(function(x){return x.k==='pLife'})) { 
+            pick = {t:'吸血率', v:1.0, k:'pLife', ds:'永久增加1.0%吸血比例'}; 
+        }
         else {
             var commons = [
                 {t:'攻击力',v:Math.floor(Math.random()*2)+1,k:'pAtk',ds:'永久增加1~2点攻击力'},
@@ -1058,6 +1072,7 @@ function genStatCh(){
             ];
             pick = commons[Math.floor(Math.random()*commons.length)];
         }
+        
         var dup=false; for(var j=0;j<pool.length;j++) if(pool[j].k===pick.k) dup=true;
         if(dup) { i--; continue; } 
         pool.push(pick);
