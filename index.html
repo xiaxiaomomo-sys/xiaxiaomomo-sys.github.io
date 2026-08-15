@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.0.4">
+<meta name="game-version" content="v1.0.5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -541,8 +541,27 @@ function closeExportModal(){var mask=document.getElementById('xgImportMask');var
 function copyExportCode(){var textarea=document.getElementById('xgExportCode');if(!textarea||!textarea.value)return;textarea.select();textarea.setSelectionRange(0,99999);navigator.clipboard.writeText(textarea.value).then(function(){showSaveToast('✅','存档码已复制到剪贴板！');closeExportModal()}).catch(function(){document.execCommand('copy');showSaveToast('✅','存档码已复制到剪贴板！');closeExportModal()})}
 function showImportModal(){var mask=document.getElementById('xgImportMask');var popup=document.getElementById('xgImportPopup');var textarea=document.getElementById('xgImportCode');if(mask&&popup){if(textarea)textarea.value='';mask.classList.add('show');popup.classList.add('show')}}
 function closeImportModal(){var mask=document.getElementById('xgImportMask');var popup=document.getElementById('xgImportPopup');if(mask)mask.classList.remove('show');if(popup)popup.classList.remove('show')}
-function confirmImport(){var textarea=document.getElementById('xgImportCode');if(!textarea)return;var code=textarea.value.trim();if(!code){showSaveToast('❌','请先粘贴存档码！');return}try{var decoded=decodeURIComponent(escape(atob(code)));JSON.parse(decoded);localStorage.setItem(SK,decoded);closeImportModal();showSaveToast('✅','存档导入成功！页面即将刷新...');setTimeout(function(){location.reload()},1200)}catch(e){showSaveToast('❌','存档码无效或已损坏，请检查后重试！')}}
-function showSaveToast(icon,text){var toast=document.getElementById('xgSaveToast');if(!toast){toast=document.createElement('div');toast.id='xgSaveToast';toast.className='xg-save-toast';toast.innerHTML='<span class="toast-icon"></span><div class="toast-text"></div>';document.body.appendChild(toast)}toast.querySelector('.toast-icon').textContent=icon;toast.querySelector('.toast-text').textContent=text;toast.classList.add('show');setTimeout(function(){toast.classList.remove('show')},1800)}
+function confirmImport(){
+    var textarea=document.getElementById('xgImportCode');
+    if(!textarea)return;
+    var code=textarea.value.trim();
+    if(!code){showSaveToast('❌','请先粘贴存档码！');return}
+    try{
+        var decoded=decodeURIComponent(escape(atob(code)));
+        var parsed = JSON.parse(decoded);
+        
+        // 🌟 核心：跨设备同化机制
+        if(parsed && parsed.p && parsed.p.uid) {
+            // 将当前平板/电脑的设备ID，强行覆盖为手机的ID！
+            localStorage.setItem('fishDevice', parsed.p.uid); 
+        }
+        
+        localStorage.setItem(SK,decoded);
+        closeImportModal();
+        showSaveToast('✅','存档导入成功！页面即将刷新...');
+        setTimeout(function(){location.reload()},1200)
+    }catch(e){showSaveToast('❌','存档码无效或已损坏，请检查后重试！')}
+}function showSaveToast(icon,text){var toast=document.getElementById('xgSaveToast');if(!toast){toast=document.createElement('div');toast.id='xgSaveToast';toast.className='xg-save-toast';toast.innerHTML='<span class="toast-icon"></span><div class="toast-text"></div>';document.body.appendChild(toast)}toast.querySelector('.toast-icon').textContent=icon;toast.querySelector('.toast-text').textContent=text;toast.classList.add('show');setTimeout(function(){toast.classList.remove('show')},1800)}
 
 /* 暴击闪光 (终极修复版) */
 function critLine(){var pe=document.getElementById('xgPE');if(!pe)return;var emoji=pe.querySelector('.emoji');if(!emoji)return;var rect=emoji.getBoundingClientRect();var cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;var f=document.createElement('div');f.style.cssText='position:fixed;left:'+cx+'px;top:'+cy+'px;width:'+(rect.width*1.5)+'px;height:'+(rect.height*1.5)+'px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,64,.9),rgba(255,215,64,.3),transparent);transform:translate(-50%,-50%);z-index:51;pointer-events:none;transition:all .4s ease-out;opacity:1;';document.body.appendChild(f);var r=document.createElement('div');r.style.cssText='position:fixed;left:'+cx+'px;top:'+cy+'px;width:20px;height:20px;border-radius:50%;border:3px solid rgba(255,215,64,.8);transform:translate(-50%,-50%);z-index:51;pointer-events:none;transition:all .5s ease-out;opacity:1;';document.body.appendChild(r);requestAnimationFrame(function(){requestAnimationFrame(function(){if(f){f.style.transform='translate(-50%,-50%) scale(2.5)';f.style.opacity='0'}if(r){r.style.width='120px';r.style.height='120px';r.style.opacity='0'}})});setTimeout(function(){if(f&&f.parentNode)f.remove();if(r&&r.parentNode)r.remove()},600)}function floatDmg(targetId,text,color){setTimeout(function(){var tEl=$(targetId);if(!tEl)return;var isCrit=text.indexOf('\u66B4\u51FB')>=0;var f=document.createElement('div');f.textContent=text;var sz=isCrit?'2rem':'1.4rem';var anim=isCrit?'dmgPopCrit 1s ease forwards':'dmgPop .8s ease forwards';f.style.cssText='position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);font-size:'+sz+';font-weight:900;color:'+color+';z-index:99;pointer-events:none;text-shadow:0 2px 12px rgba(0,0,0,.3),0 0 20px '+color+';animation:'+anim+';white-space:nowrap;font-style:italic';tEl.style.position='relative';tEl.appendChild(f);setTimeout(function(){if(f.parentNode)f.remove()},1000)},50)}
@@ -600,7 +619,7 @@ var BE=['🐲','🧙','👑','😈','👹','🐉','✨','⚡'];
 /* 怪物生成 */
 function genMon(floor,isBoss){var hp=Math.floor(floor*floor*2.5+80),atk=Math.floor(floor*floor*0.2+floor*2.5+10),df=Math.floor(floor*floor*0.08+floor*1.5+5);var ge=floor*18+Math.floor(floor*floor*.3),gd=Math.floor(floor/10)+3;if(isBoss){if(floor===100)return{name:'林深大魔王',emoji:'😈',hp:200000,mhp:200000,atk:2800,def:1000,exp:9999,gold:99999,isBoss:true,floor:100,ab:7,is魔王:true,invTimer:30};var bi=Math.min(Math.floor(floor/10)-1,7);hp=Math.floor(hp*1.8);atk=Math.floor(atk*1.3);df=df+5;ge=Math.floor(ge*3);gd=Math.floor(gd*3);return{name:BN[bi],emoji:BE[bi],hp:hp,mhp:hp,atk:atk,def:df,exp:ge,gold:gd,isBoss:true,floor:floor,ab:bi}}return{name:MN[floor%MN.length],emoji:ME[floor%ME.length],hp:hp,mhp:hp,atk:atk,def:df,exp:ge,gold:gd,isBoss:false,floor:floor,ab:-1}}
 function rwMul(flv,plv){var d=plv-flv;if(d<=15)return{em:1,gm:1};if(d<=30)return{em:.8,gm:.8};if(d<=50)return{em:.5,gm:.5};return{em:.3,gm:.3}}
-function mkP(nm){return{name:nm,lv:1,exp:0,gold:700,hp:100,atkPts:2,defPts:1,conPts:2,statPts:5,pAtk:0,pDef:0,pHp:0,pCritR:0,pCritD:0,pDodge:0,pLife:0,healPct:0,lowAtk:0,firstCrit:false,survive:false,aSkl:[],pSkl:[],revives:0,scans:0,kills:0,expBonus:0,expBonusCount:0,consecutiveKills:0,activeSlotExp:0,passiveSlotExp:0,p8RemainingBattles:0,pet:{owned:false,quality:null,level:1,exp:0}}}
+function mkP(nm){return{uid:myDevice,name:nm,lv:1,exp:0,gold:700,hp:100,atkPts:2,defPts:1,conPts:2,statPts:5,pAtk:0,pDef:0,pHp:0,pCritR:0,pCritD:0,pDodge:0,pLife:0,healPct:0,lowAtk:0,firstCrit:false,survive:false,aSkl:[],pSkl:[],revives:0,scans:0,kills:0,expBonus:0,expBonusCount:0,consecutiveKills:0,activeSlotExp:0,passiveSlotExp:0,p8RemainingBattles:0,pet:{owned:false,quality:null,level:1,exp:0}}}
 
 /* 属性计算（含宠物加成） */
 function expNeed(lv){if(lv<=10)return lv*lv*50;if(lv<=20)return lv*lv*80;if(lv<=30)return lv*lv*120;if(lv<=40)return lv*lv*180;if(lv<=50)return lv*lv*250;if(lv<=60)return lv*lv*350;if(lv<=80)return lv*lv*500;return lv*lv*700}
@@ -856,39 +875,57 @@ async function loadXiuxianLB(){try{var r=await _sb.from('xiuxian_leaderboard').s
 setTimeout(loadXiuxianLB,5000);setInterval(loadXiuxianLB,30000);
 
 window.xxNew=function(){var nm=document.getElementById('xxName');if(!nm||!nm.value.trim())return;G.p=mkP(nm.value.trim());G.prog={maxFloor:1,cleared:{},bossCleared:{},curFloor:1};G.scr='hub';rc();autoSave()};
-/* === 核心：老玩家宠物等级一键重置补丁 === */
-function checkAndResetPet() {
-    // 如果玩家存在，且没被打过"重置"标记，说明是老玩家第一次加载新版本
-    if (G.p && !G.p.petResetS4) {
-        // 如果老玩家已经领养了宠物，且等级大于1
-        if (G.p.pet && G.p.pet.owned && G.p.pet.level > 1) {
-            G.p.pet.level = 1; // 强制降回1级
-            G.p.pet.exp = 0;   // 经验清零
-            
-            // 弹出安抚公告（告知保留了原资质）
-            setTimeout(function(){ 
-                alert("【系统公告】灵兽经验系统已重制优化！\n\n为保证全服数值公平，已将您的灵兽等级回退至 Lv.1。\n不要慌！我们已为您完美保留了原有的【" + PET_QUAL[G.p.pet.quality].name + "】稀有资质！\n快带着它重新踏上修仙之路吧！"); 
-            }, 600);
+/* === 核心：老玩家数据修补与设备同化 === */
+function checkAndPatchData() {
+    if (G.p) {
+        var needSave = false;
+        // 1. 宠物等级重置补丁
+        if (!G.p.petResetS4) {
+            if (G.p.pet && G.p.pet.owned && G.p.pet.level > 1) {
+                G.p.pet.level = 1;
+                G.p.pet.exp = 0;
+                setTimeout(function(){ 
+                    alert("【系统公告】灵兽经验系统已重制优化！\n\n为保证全服数值公平，已将您的灵兽等级回退至 Lv.1。\n不要慌！我们已为您完美保留了原有的【" + PET_QUAL[G.p.pet.quality].name + "】稀有资质！\n快带着它重新踏上修仙之路吧！"); 
+                }, 600);
+            }
+            G.p.petResetS4 = true;
+            needSave = true;
         }
-        G.p.petResetS4 = true; // 给存档打上标记，以后再读取就不会被重置了
-        save(); // 强制保存一下
+        // 2. 🌟 核心：为老存档绑定唯一通行证 UID
+        if (!G.p.uid) {
+            G.p.uid = myDevice; // 把当前设备的ID烙印进存档
+            needSave = true;
+        }
+        if(needSave) save(); 
     }
 }
 
 window.xxLoad=function(){
     if(load()){
-        checkAndResetPet(); // 读取成功后触发检测
+        checkAndPatchData(); 
         G.scr='hub';rc();
     }else{
         loadCloud().then(function(ok){
             if(ok){
-                checkAndResetPet(); // 云端读取成功后触发检测
+                checkAndPatchData(); 
                 G.scr='hub';rc();
             }else{
                 alert('本地和云端都没有找到存档！');
             }
         });
     }
+};
+
+window.xxLoadCloud=function(){
+    loadCloud().then(function(ok){
+        if(ok){
+            checkAndPatchData(); // 云端读取也要触发补丁
+            G.scr='hub';rc();
+            alert('云端存档恢复成功！');
+        }else{
+            alert('云端没有找到存档。');
+        }
+    }).catch(function(){alert('云端读取失败，请检查网络。')})
 };
 window.xxFloor=function(f){G.p.hp=calcMaxHp(G.p);startBattle(f,f%10===0)};
 window.xxGoto=function(s){G.scr=s;rc()};
