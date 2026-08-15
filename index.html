@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.0.5">
+<meta name="game-version" content="v1.0.6">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -874,8 +874,48 @@ async function saveXiuxianProg(){if(!G.p||!dbReady)return;if(G.p.name==='测试�
 async function loadXiuxianLB(){try{var r=await _sb.from('xiuxian_leaderboard').select('*').order('max_floor',{ascending:false}).order('level',{ascending:false}).limit(20);if(r.data)xiuxLB=r.data.filter(function(row){return row.name!=='测试用小号'});if(G.scr==='hub')rc()}catch(e){}}
 setTimeout(loadXiuxianLB,5000);setInterval(loadXiuxianLB,30000);
 
-window.xxNew=function(){var nm=document.getElementById('xxName');if(!nm||!nm.value.trim())return;G.p=mkP(nm.value.trim());G.prog={maxFloor:1,cleared:{},bossCleared:{},curFloor:1};G.scr='hub';rc();autoSave()};
-/* === 核心：老玩家数据修补与设备同化 === */
+/* === 核心：新角色全服查重与防重名机制 === */
+window.xxNew = async function() {
+    var nm = document.getElementById('xxName');
+    if (!nm || !nm.value.trim()) return;
+    var newName = nm.value.trim();
+
+    // 1. 过滤系统保留字（保护作者名字）
+    if (newName === '林深' || newName === '林深大魔王' || newName === '测试用小号') {
+        alert('此乃天道禁忌之名，凡人不可冒用！');
+        return;
+    }
+
+    // 2. 按钮进入等待状态，防止连点
+    var btn = document.querySelector('button[onclick="xxNew()"]');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerText = '🔍 查阅天道名册中...';
+    }
+
+    try {
+        // 3. 去云端数据库查询是否已有此名字
+        // 逻辑：只要名字一样，且绑定的设备ID不是当前玩家的设备，就视为被“别人”占用了
+        var r = await _sb.from('xiuxian_leaderboard').select('id').eq('name', newName).limit(1);
+        
+        if (r.data && r.data.length > 0 && r.data[0].id !== myDevice) {
+            alert('⚠️ 道号【' + newName + '】已被其他修士抢先注册，请另赐雅号！');
+            if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; }
+            return; // 名字重复，拦截建号流程！
+        }
+
+        // 4. 查重通过，正式创建角色并进入游戏
+        G.p = mkP(newName);
+        G.prog = { maxFloor: 1, cleared: {}, bossCleared: {}, curFloor: 1 };
+        G.scr = 'hub';
+        rc();
+        autoSave();
+
+    } catch (e) {
+        alert('天道网络波动，验证道号失败，请重试！');
+        if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; }
+    }
+};/* === 核心：老玩家数据修补与设备同化 === */
 function checkAndPatchData() {
     if (G.p) {
         var needSave = false;
