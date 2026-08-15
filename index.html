@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.1.1">
+<meta name="game-version" content="v1.0.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -589,6 +589,8 @@ function getShopPrice(base){var p=G.p;if(!p||!p.pet||!p.pet.owned||p.pet.level<1
 /* 音效系统 */
 var _actx=null;function getCtx(){if(!_actx)_actx=new(window.AudioContext||window.webkitAudioContext)();return _actx}
 function sfx(t){try{var c=getCtx();if(c.state==='suspended')c.resume();if(t==='atk'){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='square';o.frequency.setValueAtTime(800,c.currentTime);o.frequency.exponentialRampToValueAtTime(200,c.currentTime+.1);g.gain.setValueAtTime(.15,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.12);o.start(c.currentTime);o.stop(c.currentTime+.12)}else if(t==='hit'){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(150,c.currentTime);o.frequency.exponentialRampToValueAtTime(50,c.currentTime+.15);g.gain.setValueAtTime(.2,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.15);o.start(c.currentTime);o.stop(c.currentTime+.15)}else if(t==='skill'){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sawtooth';o.frequency.setValueAtTime(300,c.currentTime);o.frequency.exponentialRampToValueAtTime(1200,c.currentTime+.15);g.gain.setValueAtTime(.08,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.25);o.start(c.currentTime);o.stop(c.currentTime+.25)}else if(t==='die'){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sawtooth';o.frequency.setValueAtTime(500,c.currentTime);o.frequency.exponentialRampToValueAtTime(40,c.currentTime+.7);g.gain.setValueAtTime(.18,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.8);o.start(c.currentTime);o.stop(c.currentTime+.8)}else if(t==='win'){[523,659,784,1047].forEach(function(f,i){var o2=c.createOscillator(),g2=c.createGain();o2.connect(g2);g2.connect(c.destination);o2.type='square';o2.frequency.value=f;g2.gain.setValueAtTime(.08,c.currentTime+i*.12);g2.gain.exponentialRampToValueAtTime(.001,c.currentTime+i*.12+.25);o2.start(c.currentTime+i*.12);o2.stop(c.currentTime+i*.12+.25)})}else if(t==='heal'){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(400,c.currentTime);o.frequency.exponentialRampToValueAtTime(800,c.currentTime+.2);g.gain.setValueAtTime(.08,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.25);o.start(c.currentTime);o.stop(c.currentTime+.25)}else if(t==='taunt'){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';o.frequency.setValueAtTime(400,c.currentTime);o.frequency.setValueAtTime(300,c.currentTime+.08);o.frequency.setValueAtTime(450,c.currentTime+.16);g.gain.setValueAtTime(.08,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.25);o.start(c.currentTime);o.stop(c.currentTime+.25)}}catch(e){}}
+
+/* BGM */
 var _bgmTimer=null,_bgmBeat=0,_bgmOn=false;
 function startBGM(){if(_bgmOn)return;_bgmOn=true;_bgmBeat=0;var c=getCtx();if(c.state==='suspended')c.resume();var bpm=125,beatMs=60000/bpm/2;var bass=[0,0,0,0,7,7,7,7,8,8,8,8,5,5,7,7];var melody=[0,3,7,12,10,7,3,2,0,3,5,7,8,7,5,-1];function tick(){if(!_bgmOn)return;var t=c.currentTime,ms=beatMs/1000;var bn=bass[_bgmBeat%bass.length];var bf=65.41*Math.pow(2,bn/12);var bo=c.createOscillator(),bg=c.createGain();bo.type='triangle';bo.frequency.value=bf;bg.gain.setValueAtTime(.05,t);bg.gain.exponentialRampToValueAtTime(.001,t+ms*.9);bo.connect(bg);bg.connect(c.destination);bo.start(t);bo.stop(t+ms);if(_bgmBeat%2===0){var mn=melody[(_bgmBeat/2)%melody.length];if(mn>=0){var mf=523.25*Math.pow(2,mn/12);var mo=c.createOscillator(),mg=c.createGain();mo.type='square';mo.frequency.value=mf;mg.gain.setValueAtTime(.025,t);mg.gain.exponentialRampToValueAtTime(.001,t+ms*2*.8);mo.connect(mg);mg.connect(c.destination);mo.start(t);mo.stop(t+ms*2)}}if(_bgmBeat%4===0){var ko=c.createOscillator(),kg=c.createGain();ko.type='sine';ko.frequency.setValueAtTime(120,t);ko.frequency.exponentialRampToValueAtTime(30,t+.1);kg.gain.setValueAtTime(.08,t);kg.gain.exponentialRampToValueAtTime(.001,t+.12);ko.connect(kg);kg.connect(c.destination);ko.start(t);ko.stop(t+.12)}if(_bgmBeat%2===0){var buf=c.createBuffer(1,c.sampleRate*.02,c.sampleRate),d=buf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*.5;var ns=c.createBufferSource();ns.buffer=buf;var ng=c.createGain();ng.gain.setValueAtTime(.03,t);ng.gain.exponentialRampToValueAtTime(.001,t+.02);ns.connect(ng);ng.connect(c.destination);ns.start(t)}_bgmBeat++;_bgmTimer=setTimeout(tick,beatMs)}tick()}
 function stopBGM(){_bgmOn=false;if(_bgmTimer){clearTimeout(_bgmTimer);_bgmTimer=null}}
@@ -683,10 +685,10 @@ function titleFor(lv){if(lv>=81)return'渡劫期';if(lv>=61)return'大乘期';if
 function calcAtk(p){var base=Math.floor(10+p.atkPts*1.5+(p.pAtk||0));var pm=petBonusMul();return pm>0?Math.floor(base*(1+pm)):base}
 function calcDef(p){var base=Math.floor(p.defPts*1.0+(p.pDef||0));var pm=petBonusMul();return pm>0?Math.floor(base*(1+pm)):base}
 function calcMaxHp(p){var base=Math.floor(100+p.conPts*12+(p.pHp||0));var pm=petBonusMul();return pm>0?Math.floor(base*(1+pm)):base}
-function calcCritR(p){return Math.min((p.pCritR||0)/100, 0.25)}
+function calcCritR(p){return Math.min((p.pCritR||0)/100, 0.25)} // 上限锁定25%
 function calcCritD(p){return 1.30} // 固化130%
-function calcDodge(p){var d = Math.min((p.pDodge||0)/100, 0.10); if(p.pSkl.indexOf('P4')>=0) d += 0.10; return Math.min(d, 0.20)}
-function calcLifeSteal(p){var s = Math.min((p.pLife||0), 1); if(p.pSkl.indexOf('P5')>=0) s += 3; return Math.min(s, 4)}
+function calcDodge(p){var d = Math.min((p.pDodge||0)/100, 0.10); if(p.pSkl.indexOf('P4')>=0) d += 0.10; return Math.min(d, 0.20)} // 总上限20%
+function calcLifeSteal(p){var s = Math.min((p.pLife||0), 1); if(p.pSkl.indexOf('P5')>=0) s += 3; return Math.min(s, 4)} // 总上限4%
 function maxActiveSlots(p){return 3;} // 死锁3个
 function maxPassiveSlots(p){return 4;} // 死锁4个
 
@@ -788,7 +790,7 @@ function doNormalAtk(){
     p.prevCrit = isCrit;
     if(p.pSkl.indexOf('P19')>=0 && c.godOfWarReady) c.godOfWarReady=false;
 
-    // 🌟 怪物双轨制护甲减免 (主动伤害与普攻均受影响)
+    // 🌟 怪物双轨制护甲减免
     var mDef = m.def;
     if(p.pSkl.indexOf('P12')>=0) mDef = Math.floor(mDef * (m.isBoss ? 0.95 : 0.90));
     var mDefMul = 500 / (500 + mDef);
@@ -939,7 +941,7 @@ function doMonsterAtk(){
         if(!revived && p.pet&&p.pet.owned&&p.pet.level>=50 && !c.petGuardUsed){
             c.petGuardUsed=true; p.hp=1; applyHeal(p, calcMaxHp(p)*0.15, false); revived=true;
             addLog('<span style="color:var(--lv)">🛡️ '+petForm(p.pet.level).emoji+' 【忠犬护主】强制保留1点生命！</span>');
-            floatDmg('xgPE','+'+gh,'#4caf50');sfx('heal');render();animAfterRender('xgPE','heal-flash',200);revived=true
+            render(); animAfterRender('xgPE','heal-flash',200); sfx('heal');
         }
         if(!revived){
             p.hp=0; sfx('die'); stopBGM(); render(); animAfterRender('xgPE','die',10);
@@ -1042,12 +1044,12 @@ function genStatCh(){
     var rcR = p.pCritR||0, rd = p.pDodge||0, rl = p.pLife||0;
     for (var i=0; i<3; i++) {
         var roll = Math.random();
-        // 动态提升：如果等级即将满级还没凑够，大幅提高稀有出现率
-        var boost = (p.lv >= 50) ? 0.3 : 0;
+        // 动态提升：如果等级即将满级还没凑够，大幅提高稀有出现率，以确保70级前大概率满配
+        var boost = (p.lv / 100) * 0.5; 
         var pick = null;
-        if (roll < 0.1 + boost && rcR < 25) { pick = {t:'暴击率', v:1.0, k:'pCritR', ds:'永久增加1.0%暴击率'}; }
-        else if (roll < 0.2 + boost*2 && rd < 10) { pick = {t:'闪避率', v:1.0, k:'pDodge', ds:'永久增加1.0%闪避率'}; }
-        else if (roll < 0.3 + boost*3 && rl < 1) { pick = {t:'吸血率', v:1.0, k:'pLife', ds:'永久增加1.0%吸血比例'}; }
+        if (roll < 0.10 + boost && rcR < 25) { pick = {t:'暴击率', v:1.0, k:'pCritR', ds:'永久增加1.0%暴击率'}; }
+        else if (roll < 0.20 + boost*2 && rd < 10) { pick = {t:'闪避率', v:1.0, k:'pDodge', ds:'永久增加1.0%闪避率'}; }
+        else if (roll < 0.30 + boost*3 && rl < 1) { pick = {t:'吸血率', v:1.0, k:'pLife', ds:'永久增加1.0%吸血比例'}; }
         else {
             var commons = [
                 {t:'攻击力',v:Math.floor(Math.random()*2)+1,k:'pAtk',ds:'永久增加1~2点攻击力'},
@@ -1069,10 +1071,34 @@ function applySkCh(i){var ch=G.ce[i],p=G.p;if(ch.isP){if(p.pSkl.length>=maxPassi
 function replSk(idx){var info=G.ce._rp,p=G.p;var arr=info.isP?p.pSkl:p.aSkl;arr[idx]=info.id;if(p.statPts>0){G.scr='assign';rc()}else checkLvlUp()}
 function buyItem(idx){var it=SHOP[idx],p=G.p;var price=getShopPrice(it.p);if(p.gold<price)return;p.gold-=price;it.f(p);p.hp=Math.min(p.hp,calcMaxHp(p));rc();autoSave()}
 
-/* 存档系统 */
+/* 🌟 S1 存档系统 (强制隔离旧版本) */
 function save(){try{localStorage.setItem(SK,JSON.stringify({v:VER,p:G.p,pr:G.prog}))}catch(e){}try{_sb.from('save').upsert({id:myDevice,game_data:{v:VER,p:G.p,pr:G.prog},updated_at:Date.now()})}catch(e){}}
-function load(){try{var d=JSON.parse(localStorage.getItem(SK));if(d&&d.v===VER){G.p=d.p;G.prog=d.pr;if(!G.p.pet)G.p.pet={owned:false,quality:null,level:1,exp:0};return true}}catch(e){}return false}
-async function loadCloud(){try{var r=await _sb.from('save').select('game_data').eq('id',myDevice).single();if(r.data&&r.data.game_data){var gd=r.data.game_data;if(gd.v===VER&&gd.p){G.p=gd.p;G.prog=gd.pr;if(!G.p.pet)G.p.pet={owned:false,quality:null,level:1,exp:0};localStorage.setItem(SK,JSON.stringify({v:VER,p:G.p,pr:G.prog}));return true}}}catch(e){}return false}
+function load(){
+    try {
+        var d = JSON.parse(localStorage.getItem(SK));
+        if (d && d.v === VER) {
+            G.p = d.p; G.prog = d.pr;
+            if(!G.p.pet) G.p.pet={owned:false,quality:null,level:1,exp:0};
+            return true;
+        }
+    } catch(e){}
+    return false; 
+}
+async function loadCloud(){
+    try {
+        var r = await _sb.from('save').select('game_data').eq('id',myDevice).single();
+        if(r.data && r.data.game_data){
+            var gd = r.data.game_data;
+            if(gd.v === VER && gd.p){ 
+                G.p = gd.p; G.prog = gd.pr;
+                if(!G.p.pet) G.p.pet={owned:false,quality:null,level:1,exp:0};
+                localStorage.setItem(SK, JSON.stringify({v:VER, p:G.p, pr:G.prog}));
+                return true;
+            }
+        }
+    }catch(e){}
+    return false;
+}
 function autoSave(){save();saveXiuxianProg()}setInterval(autoSave,30000);
 
 /* 渲染总调度 */
@@ -1173,9 +1199,9 @@ function rHub(c){
     h+='</div></div>';}
     h+='</div></div>';
 
-    /* 修仙排行榜 */
+    /* 🌟 S1 修仙排行榜 */
     h+='<div class="xg-card" style="margin-top:16px">';
-    h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.1rem;margin-bottom:16px">🏆 修仙排行榜</h4>';
+    h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.1rem;margin-bottom:16px">🏆 修仙排行榜 (S1赛季)</h4>';
     if(!xiuxLB||xiuxLB.length===0)h+='<div style="text-align:center;padding:16px;color:var(--txm);font-size:.85rem">暂无数据，开始修仙吧~</div>';
     else{h+='<div style="display:flex;flex-direction:column;gap:4px">';
     xiuxLB.forEach(function(r,i){var isMe=r.id===myDevice;var badge=i===0?'🥇':i===1?'🥈':i===2?'🥉':' ';h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:'+(isMe?'rgba(201,169,110,.08)':'transparent')+';border:'+(isMe?'1px solid var(--gold)':'1px solid transparent')+'">';h+='<span style="width:24px;font-size:.9rem">'+badge+'</span>';h+='<span style="font-weight:800;font-size:.82rem;flex:1;'+(isMe?'color:var(--gold)':'')+'">'+(r.name||'匿名修仙者')+'</span>';h+='<span style="font-size:.72rem;color:var(--txm)">'+r.title+'</span>';h+='<span style="font-size:.75rem;font-weight:700;color:var(--b400)">第'+r.max_floor+'层</span>';h+='<span style="font-size:.72rem;color:var(--txm)">Lv.'+r.level+'</span>';h+='</div>'});h+='</div>';}h+='</div>';c.innerHTML=h;
@@ -1249,7 +1275,6 @@ var h='<div class="xg-hdr"><h2>🛒 商店</h2><p>金币: <span style="color:var
 if(p.pet&&p.pet.owned&&p.pet.level>=100){h+=' <span style="font-size:.78rem;color:var(--lv);margin-left:8px">🏷️ 灵兽折扣'+(p.pet.quality==='god'?'7折':'9折')+'</span>';}
 h+='</p></div><div class="xg-card">';
 
-/* 🐾 天降灵宠 */
 if(!p.pet||!p.pet.owned){
   h+='<div class="xg-item" style="border-left:3px solid var(--lv);background:linear-gradient(135deg,var(--white),rgba(100,181,246,.08));margin-bottom:16px">';
   h+='<span class="it-icon">🐾</span><div class="it-info">';
@@ -1265,24 +1290,21 @@ if(!p.pet||!p.pet.owned){
   h+='<button class="xg-btn" disabled style="padding:6px 12px;font-size:.75rem;opacity:.5">✅ 已领养</button></div>';
 }
 
-/* 来自林深大大的关爱 */
 var giftClaimed=p.giftClaimed||false;var giftBtnCls=giftClaimed?'xg-btn':'xg-btn primary';var giftBtnStyle='padding:6px 12px;font-size:.75rem;'+(giftClaimed?'opacity:.5;cursor:not-allowed;':'');var giftBtnAttr=giftClaimed?'disabled':'onclick="xxClaimGift()"';var giftLabel=giftClaimed?'已领取':'🎁 领取1000金币';
 h+='<div class="xg-item" style="border-left:3px solid var(--pk);background:linear-gradient(135deg,var(--white),var(--pks));margin-bottom:16px"><span class="it-icon">💖</span><div class="it-info"><div class="it-name" style="color:var(--pk);font-weight:900">来自林深大大的关爱</div><div class="it-desc" style="color:var(--pk)">每个名字仅限领取一次的专属启动资金~</div></div><button class="'+giftBtnCls+'" style="'+giftBtnStyle+'" '+giftBtnAttr+'>'+giftLabel+'</button></div>';
 
-/* 维护补偿 */
 var compClaimed=p.compClaimed||false;var compBtnCls=compClaimed?'xg-btn':'xg-btn primary';var compBtnStyle='padding:6px 12px;font-size:.75rem;'+(compClaimed?'opacity:.5;cursor:not-allowed;':'');var compBtnAttr=compClaimed?'disabled':'onclick="xxClaimCompensation()"';var compLabel=compClaimed?'已领取':'📜 领取500金币';
 h+='<div class="xg-item" style="border-left:3px solid var(--gold);background:linear-gradient(135deg,var(--white),rgba(201,169,110,.1));margin-bottom:16px"><span class="it-icon">📜</span><div class="it-info"><div class="it-name" style="color:var(--gold);font-weight:900">林深的维护补偿</div><div class="it-desc">全服维护补偿奖励，每位修士限领一次~</div></div><button class="'+compBtnCls+'" style="'+compBtnStyle+'" '+compBtnAttr+'>'+compLabel+'</button></div>';
-/* 🎙️ 神秘语音彩蛋 */
+
 var eggClaimed=p.eggClaimed||false;
 var eggBtnCls=eggClaimed?'xg-btn':'xg-btn';
 var eggBtnStyle='padding:6px 12px;font-size:.75rem;'+(eggClaimed?'opacity:.5;cursor:not-allowed;':'background:linear-gradient(135deg, #ab47bc, #7b68ae);border-color:#7b68ae;color:#fff;animation:epicPulse 2s infinite;');
 var eggBtnAttr=eggClaimed?'disabled':'onclick="xxStartEasterEgg()"';
 var eggLabel=eggClaimed?'✅ 彩蛋已触发':'🎙️ 开启隐藏试炼';
 h+='<div class="xg-item" style="border-left:3px solid var(--lv);background:linear-gradient(135deg,var(--white),rgba(123,104,174,.1));margin-bottom:16px"><span class="it-icon">🎙️</span><div class="it-info"><div class="it-name" style="color:var(--lv);font-weight:900">【神秘试炼】</div><div class="it-desc" id="eggStatus" style="color:var(--txm)">对着麦克风喊3次“林深你真帅”或“林深最帅”试试？</div></div><button id="eggBtn" class="'+eggBtnCls+'" style="'+eggBtnStyle+'" '+eggBtnAttr+'>'+eggLabel+'</button></div>';
-/* 商店道具 */
+
 for(var i=0;i<SHOP.length;i++){var it=SHOP[i];var price=getShopPrice(it.p);var canBuy=p.gold>=price;var isExpStone=(i===0);var atLimit=isExpStone&&p.expBonus>=150;if(it.maxCount){var cc=p[it.countKey]||0;if(cc>=it.maxCount)atLimit=true}if(atLimit)canBuy=false;var countInfo=isExpStone?(p.expBonusCount||0)+'次 · +'+(p.expBonus||0)+'%':'';if(it.maxCount){var cc2=p[it.countKey]||0;countInfo=cc2+'/'+it.maxCount+'次'}var buyLabel=atLimit?'🔒 已满':'💰'+price+(price<it.p?' <s style="font-size:.6rem;opacity:.6">'+it.p+'</s>':'');var btnCls=canBuy?'xg-btn gold':'xg-btn';var btnStyle='padding:6px 12px;font-size:.75rem;'+(canBuy?'':'opacity:.5;cursor:not-allowed;');var btnAttr=canBuy?'onclick="xxBuy('+i+')"':'disabled';h+='<div class="xg-item"><span class="it-icon">'+it.ic+'</span><div class="it-info"><div class="it-name">'+it.n+(countInfo?' <span style="font-size:.7rem;color:var(--txm)">('+countInfo+')</span>':'')+'</div><div class="it-desc">'+it.d+(atLimit?' <span style="color:var(--cinnabar);font-weight:700">已达到上限</span>':'')+'</div></div><button class="'+btnCls+'" style="'+btnStyle+'" '+btnAttr+'>'+buyLabel+'</button></div>'}
 
-/* 洗髓丹 */
 if(p.pet&&p.pet.owned){var washPrice=getShopPrice(5000);var canWash=p.gold>=washPrice;
 h+='<div class="xg-item" style="border-left:3px solid var(--cinnabar)"><span class="it-icon">💊</span><div class="it-info"><div class="it-name">洗髓丹</div><div class="it-desc">重新抽取宠物资质（等级和经验不变）</div></div><button class="'+(canWash?'xg-btn gold':'xg-btn')+'" style="padding:6px 12px;font-size:.75rem;'+(canWash?'':'opacity:.5;cursor:not-allowed;')+'" '+(canWash?'onclick="xxResetPet()"':'disabled')+'>💰'+washPrice+(washPrice<5000?' <s style="font-size:.6rem;opacity:.6">5000</s>':'')+'</button></div>'}
 
