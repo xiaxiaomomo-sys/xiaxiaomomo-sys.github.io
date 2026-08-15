@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.1.1">
+<meta name="game-version" content="v1.1.5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -621,7 +621,7 @@ var PSKILLS=[
     {id:'P2',n:'铁壁',lv:10,d:'受大伤害40%概率减免25%'},
     {id:'P3',n:'乘胜追击',lv:15,d:'暴击后下一次伤害+15%'},
     {id:'P4',n:'鬼魅身法',lv:20,d:'闪避率额外+10% (总上限20%)'},
-    {id:'P5',n:'吸血光环',lv:25,d:'吸血率额外+2% (总上限3%)'},
+   {id:'P5',n:'吸血光环',lv:25,d:'吸血率额外+5% (总上限8%)'},
     {id:'P6',n:'复仇之魂',lv:30,d:'每次受击攻击+2%，最高叠加5层'},
     {id:'P7',n:'不屈意志',lv:35,d:'HP<45%时防御力×1.5'},
     {id:'P8',n:'战意昂扬',lv:40,d:'连杀5只后攻击+30%(BOSS+10%)持续3场'},
@@ -705,9 +705,9 @@ function calcCritD(p){
 }
 function calcDodge(p){var d = Math.min((p.pDodge||0)/100, 0.10); if(p.pSkl.indexOf('P4')>=0) d += 0.10; return Math.min(d, 0.20)} // 总上限20%
 function calcLifeSteal(p){
-    var s = (p.pLife||0); // 三选一给的，每次+1%
-    if(p.pSkl.indexOf('P5')>=0) s += 2; // 吸血光环给+2%
-    return Math.min(s, 3); // 总上限3%
+    var s = (p.pLife||0);
+    if(p.pSkl.indexOf('P5')>=0) s += 5;
+    return Math.min(s, 8); // 8
 }
 function maxActiveSlots(p){return 3;} // 死锁3个
 function maxPassiveSlots(p){return 4;} // 死锁4个
@@ -751,29 +751,21 @@ function getPAtk(p, c){
     return Math.floor(Math.min(finalAtk, base * 10)); 
 }
 
-/* 🌟 境界压制与硬核回血 (最高吸血3%) */
-function getSuppression(floor, lv) {
-    var diff = floor - lv;
-    if (diff > 5) {
-        var penalty = Math.min((diff - 5) * 0.10, 0.50); 
-        return { pDmg: 1 - penalty, mDmg: 1 + penalty };
-    }
-    return { pDmg: 1, mDmg: 1 };
-}
-
+/* 🌟 境界压制与硬核回血 (最高吸血8%) */
 function applyHeal(p, amount, isLifesteal) {
     var c = G.cmb;
     if(amount <= 0) return;
-    if(c.floor >= 50) amount *= 0.5; // 高层禁疗
-    
+
     var maxHp = calcMaxHp(p);
     if(isLifesteal){
-        var limit = maxHp * 0.03; // 吸血最高不超过 3%
+        var limit = maxHp * 0.05; // 单次上限 maxHP 的 5%
         if(amount > limit) amount = limit;
     }
     amount = Math.floor(amount);
     if(amount <= 0) return;
-    
+
+    if(c.floor >= 50) amount = Math.max(1, Math.floor(amount * 0.7)); // 禁疗30%，至少保留1点
+
     var old = p.hp;
     p.hp = Math.min(maxHp, p.hp + amount);
     var act = p.hp - old;
@@ -850,12 +842,15 @@ function doSkillUse(sid){
             if(Math.random()<0.55){ rawDmg=getPAtk(p,c)*3.0; addLog('<span class="info">命运眷顾！攻击×3.0！</span>'); }
             else { var bsd=Math.floor(p.hp*0.40); p.hp=Math.max(1,p.hp-bsd); addLog('命运反噬！<span class="dmg">自伤'+bsd+'</span>HP'); } break;
         case 'A12': rawDmg = getPAtk(p,c)*0.3; break; // 逻辑下置循环
-        case 'A13': 
-            if(m.is魔王){ applyHeal(p, calcMaxHp(p)*0.3, false); }
-            else { 
-                var drain = Math.floor(m.hp * (m.isBoss ? 0.05 : 0.15)); m.hp = Math.max(0, m.hp-drain);
-                applyHeal(p, drain, false); floatDmg('xgME','-'+drain,'#ff6b6b');
-            } c.cd[sid]=sk.cd; return;
+        case 'A13':
+    if(m.is魔王){ applyHeal(p, calcMaxHp(p)*0.3, false); }
+    else {
+        var drain = Math.floor(m.hp * (m.isBoss ? 0.05 : 0.15));
+        m.hp = Math.max(0, m.hp-drain);
+        var maxDrain = Math.floor(calcMaxHp(p) * 0.10);
+        if(drain > maxDrain) drain = maxDrain;
+        applyHeal(p, drain, false); floatDmg('xgME','-'+drain,'#ff6b6b');
+    } c.cd[sid]=sk.cd; return;
         case 'A14': c.berserkTurns=3; addLog('<span class="info">狂暴化！攻+25%防-25%（3回合）</span>'); c.cd[sid]=sk.cd; return;
         case 'A15': c.stunM += m.isBoss ? 1 : 2; addLog('<span class="info">时间冻结！</span>'); c.cd[sid]=sk.cd; return;
         case 'A17': 
@@ -1065,7 +1060,7 @@ function genStatCh(){
     // 计算距离 70 级的剩余升级次数 (每级选1次)
     var lvlsLeft = Math.max(1, 70 - p.lv);
     // 计算距离拿满所有稀有属性，还差多少次 (暴击25次, 闪避10次, 吸血1次)
-    var raresNeeded = Math.max(0, 25 - rcR) + Math.max(0, 10 - rd) + Math.max(0, 1 - rl);
+    var raresNeeded = Math.max(0, 25 - rcR) + Math.max(0, 10 - rd) + Math.max(0, 3 - rl);
 
     for (var i=0; i<3; i++) {
         var roll = Math.random();
@@ -1081,7 +1076,7 @@ function genStatCh(){
         else if ((isPity || roll < 0.20) && rd < 10 && !pool.some(function(x){return x.k==='pDodge'})) { 
             pick = {t:'闪避率', v:1.0, k:'pDodge', ds:'永久增加1.0%闪避率'}; 
         }
-        else if ((isPity || roll < 0.30) && rl < 1 && !pool.some(function(x){return x.k==='pLife'})) { 
+        else if ((isPity || roll < 0.30) && rl < 3 && !pool.some(function(x){return x.k==='pLife'})) {
             pick = {t:'吸血率', v:1.0, k:'pLife', ds:'永久增加1.0%吸血比例'}; 
         }
         else {
@@ -1186,7 +1181,7 @@ function rHub(c){
         ['🛡️ 防御',def,'color:var(--jade)'],
         ['💀 暴击',(calcCritR(p)*100).toFixed(1)+'%/'+(calcCritD(p)*100).toFixed(1)+'%',''],
         ['💨 闪避',(calcDodge(p)*100).toFixed(1)+'%',''],
-        ['🩸 吸血',calcLifeSteal(p).toFixed(1)+'%'+((p.pSkl.indexOf('P5')>=0?' (光环+2%)':'')),''],
+        ['🩸 吸血',calcLifeSteal(p).toFixed(1)+'%'+((p.pSkl.indexOf('P5')>=0?' (光环+5%)':'')),''],
         ['💰 金币',p.gold,'color:var(--gold)'],
         ['💀 击杀',p.kills,''],
         ['🔥 连杀',p.consecutiveKills||0,'color:var(--pk)']
