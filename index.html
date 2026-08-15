@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.1.5">
+<meta name="game-version" content="v1.1.6">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -592,7 +592,67 @@ function sfx(t){try{var c=getCtx();if(c.state==='suspended')c.resume();if(t==='a
 
 /* BGM */
 var _bgmTimer=null,_bgmBeat=0,_bgmOn=false;
-function startBGM(){if(_bgmOn)return;_bgmOn=true;_bgmBeat=0;var c=getCtx();if(c.state==='suspended')c.resume();var bpm=125,beatMs=60000/bpm/2;var bass=[0,0,0,0,7,7,7,7,8,8,8,8,5,5,7,7];var melody=[0,3,7,12,10,7,3,2,0,3,5,7,8,7,5,-1];function tick(){if(!_bgmOn)return;var t=c.currentTime,ms=beatMs/1000;var bn=bass[_bgmBeat%bass.length];var bf=65.41*Math.pow(2,bn/12);var bo=c.createOscillator(),bg=c.createGain();bo.type='triangle';bo.frequency.value=bf;bg.gain.setValueAtTime(.05,t);bg.gain.exponentialRampToValueAtTime(.001,t+ms*.9);bo.connect(bg);bg.connect(c.destination);bo.start(t);bo.stop(t+ms);if(_bgmBeat%2===0){var mn=melody[(_bgmBeat/2)%melody.length];if(mn>=0){var mf=523.25*Math.pow(2,mn/12);var mo=c.createOscillator(),mg=c.createGain();mo.type='square';mo.frequency.value=mf;mg.gain.setValueAtTime(.025,t);mg.gain.exponentialRampToValueAtTime(.001,t+ms*2*.8);mo.connect(mg);mg.connect(c.destination);mo.start(t);mo.stop(t+ms*2)}}if(_bgmBeat%4===0){var ko=c.createOscillator(),kg=c.createGain();ko.type='sine';ko.frequency.setValueAtTime(120,t);ko.frequency.exponentialRampToValueAtTime(30,t+.1);kg.gain.setValueAtTime(.08,t);kg.gain.exponentialRampToValueAtTime(.001,t+.12);ko.connect(kg);kg.connect(c.destination);ko.start(t);ko.stop(t+.12)}if(_bgmBeat%2===0){var buf=c.createBuffer(1,c.sampleRate*.02,c.sampleRate),d=buf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*.5;var ns=c.createBufferSource();ns.buffer=buf;var ng=c.createGain();ng.gain.setValueAtTime(.03,t);ng.gain.exponentialRampToValueAtTime(.001,t+.02);ns.connect(ng);ng.connect(c.destination);ns.start(t)}_bgmBeat++;_bgmTimer=setTimeout(tick,beatMs)}tick()}
+function startBGM(){
+    try {
+        if(_bgmOn)return;
+        _bgmOn=true;
+        _bgmBeat=0;
+        var c=getCtx();
+        if(c.state==='suspended')c.resume();
+        var bpm=125,beatMs=60000/bpm/2;
+        var bass=[0,0,0,0,7,7,7,7,8,8,8,8,5,5,7,7];
+        var melody=[0,3,7,12,10,7,3,2,0,3,5,7,8,7,5,-1];
+        function tick(){
+            try {
+                if(!_bgmOn)return;
+                var t=c.currentTime,ms=beatMs/1000;
+                var bn=bass[_bgmBeat%bass.length];
+                var bf=65.41*Math.pow(2,bn/12);
+                var bo=c.createOscillator(),bg=c.createGain();
+                bo.type='triangle';bo.frequency.value=bf;
+                bg.gain.setValueAtTime(.05,t);bg.gain.exponentialRampToValueAtTime(.001,t+ms*.9);
+                bo.connect(bg);bg.connect(c.destination);
+                bo.start(t);bo.stop(t+ms);
+                if(_bgmBeat%2===0){
+                    var mn=melody[(_bgmBeat/2)%melody.length];
+                    if(mn>=0){
+                        var mf=523.25*Math.pow(2,mn/12);
+                        var mo=c.createOscillator(),mg=c.createGain();
+                        mo.type='square';mo.frequency.value=mf;
+                        mg.gain.setValueAtTime(.025,t);mg.gain.exponentialRampToValueAtTime(.001,t+ms*2*.8);
+                        mo.connect(mg);mg.connect(c.destination);
+                        mo.start(t);mo.stop(t+ms*2)
+                    }
+                }
+                if(_bgmBeat%4===0){
+                    var ko=c.createOscillator(),kg=c.createGain();
+                    ko.type='sine';ko.frequency.setValueAtTime(120,t);
+                    ko.frequency.exponentialRampToValueAtTime(30,t+.1);
+                    kg.gain.setValueAtTime(.08,t);kg.gain.exponentialRampToValueAtTime(.001,t+.12);
+                    ko.connect(kg);kg.connect(c.destination);
+                    ko.start(t);ko.stop(t+.12)
+                }
+                if(_bgmBeat%2===0){
+                    var buf=c.createBuffer(1,c.sampleRate*.02,c.sampleRate),d=buf.getChannelData(0);
+                    for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*.5;
+                    var ns=c.createBufferSource();ns.buffer=buf;
+                    var ng=c.createGain();ng.gain.setValueAtTime(.03,t);
+                    ng.gain.exponentialRampToValueAtTime(.001,t+.02);
+                    ns.connect(ng);ng.connect(c.destination);
+                    ns.start(t)
+                }
+                _bgmBeat++;
+                _bgmTimer=setTimeout(tick,beatMs)
+            } catch (err) {
+                // 如果浏览器强制阻断音频，静默忽略，不引发全局崩溃
+                _bgmOn=false;
+            }
+        }
+        tick()
+    } catch (err) {
+        _bgmOn=false;
+    }
+}
 function stopBGM(){_bgmOn=false;if(_bgmTimer){clearTimeout(_bgmTimer);_bgmTimer=null}}
 
 var TAUNTS=['就这？就这点本事？','你真菜！就这水平也敢来？','你怎么可能打得过我林深大魔王！','再去练练吧！弱者！','回去喝奶吧小宝贝~','这点伤害给我挠痒痒都不够！','我让你一只手都能赢你！','你是在给我按摩吗？好舒服~','修仙？你还是去修车吧！','就你这修为？笑死我了！','我林深大魔王的威名你也敢挑战？','看看你那可怜的血量...真可怜啊','别挣扎了，放弃吧！','弱者不配与我对战！','你是不是没吃饭？攻击软绵绵的！','你的攻击就像蚊子咬！','我闭着眼睛都能赢你！','等你修炼到猴年马月再来吧！','你是不是把修为都用来摸鱼了？','下次带点零食来，打你的间隙我能吃！','不自量力说的就是你！','回去再修炼100年吧！','连我一根头发都伤不到！','你的修仙之路到此为止了！','菜就多练练！','我一根手指就能碾死你！','就这？我见过的蚂蚁都比你强！','林深大魔王天下无敌！你算老几？','你的修仙资质评级：不合格！','给你一次机会，回去重新修炼！'];
