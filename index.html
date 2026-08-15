@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.1.0">
+<meta name="game-version" content="v1.1.1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -609,7 +609,7 @@ var ASKILLS=[
     {id:'A8',n:'九天神雷',lv:35,cd:7,d:'攻击力×2.5，30%概率眩晕1回合'},
     {id:'A9',n:'逆天改命',lv:40,cd:8,d:'回复40%最大HP，绝对无敌1回合'},
     {id:'A10',n:'湮灭',lv:50,cd:6,d:'造成自身当前HP×0.8的真实伤害'},
-    {id:'A11',n:'命运轮盘',lv:1,cd:3,d:'55%概率攻击×3.0，45%反噬扣除自身65%当前HP'},
+    {id:'A11',n:'命运轮盘',lv:1,cd:3,d:'55%概率攻击×3.0，45%反噬扣除自身40%当前HP'},
     {id:'A12',n:'连斩',lv:12,cd:3,d:'连续攻击5次，每次造成×0.3伤害'},
     {id:'A13',n:'噬魂',lv:25,cd:5,d:'吸取怪物15%当前HP(BOSS仅5%)'},
     {id:'A14',n:'狂暴化',lv:30,cd:4,d:'攻击力+25%，防御力-25%持续3回合'},
@@ -848,7 +848,7 @@ function doSkillUse(sid){
         case 'A10': trueDmg = p.hp*0.8; break; // 半真伤
         case 'A11': 
             if(Math.random()<0.55){ rawDmg=getPAtk(p,c)*3.0; addLog('<span class="info">命运眷顾！攻击×3.0！</span>'); }
-            else { var bsd=Math.floor(p.hp*0.65); p.hp=Math.max(1,p.hp-bsd); addLog('命运反噬！<span class="dmg">自伤'+bsd+'</span>HP'); } break;
+            else { var bsd=Math.floor(p.hp*0.40); p.hp=Math.max(1,p.hp-bsd); addLog('命运反噬！<span class="dmg">自伤'+bsd+'</span>HP'); } break;
         case 'A12': rawDmg = getPAtk(p,c)*0.3; break; // 逻辑下置循环
         case 'A13': 
             if(m.is魔王){ applyHeal(p, calcMaxHp(p)*0.3, false); }
