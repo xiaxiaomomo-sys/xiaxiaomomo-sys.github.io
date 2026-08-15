@@ -817,7 +817,13 @@ h+='<div class="xg-item" style="border-left:3px solid var(--pk);background:linea
 /* 维护补偿 */
 var compClaimed=p.compClaimed||false;var compBtnCls=compClaimed?'xg-btn':'xg-btn primary';var compBtnStyle='padding:6px 12px;font-size:.75rem;'+(compClaimed?'opacity:.5;cursor:not-allowed;':'');var compBtnAttr=compClaimed?'disabled':'onclick="xxClaimCompensation()"';var compLabel=compClaimed?'已领取':'📜 领取500金币';
 h+='<div class="xg-item" style="border-left:3px solid var(--gold);background:linear-gradient(135deg,var(--white),rgba(201,169,110,.1));margin-bottom:16px"><span class="it-icon">📜</span><div class="it-info"><div class="it-name" style="color:var(--gold);font-weight:900">林深的维护补偿</div><div class="it-desc">全服维护补偿奖励，每位修士限领一次~</div></div><button class="'+compBtnCls+'" style="'+compBtnStyle+'" '+compBtnAttr+'>'+compLabel+'</button></div>';
-
+/* 🎙️ 神秘语音彩蛋 */
+var eggClaimed=p.eggClaimed||false;
+var eggBtnCls=eggClaimed?'xg-btn':'xg-btn';
+var eggBtnStyle='padding:6px 12px;font-size:.75rem;'+(eggClaimed?'opacity:.5;cursor:not-allowed;':'background:linear-gradient(135deg, #ab47bc, #7b68ae);border-color:#7b68ae;color:#fff;animation:epicPulse 2s infinite;');
+var eggBtnAttr=eggClaimed?'disabled':'onclick="xxStartEasterEgg()"';
+var eggLabel=eggClaimed?'✅ 彩蛋已触发':'🎙️ 开启隐藏试炼';
+h+='<div class="xg-item" style="border-left:3px solid var(--lv);background:linear-gradient(135deg,var(--white),rgba(123,104,174,.1));margin-bottom:16px"><span class="it-icon">🎙️</span><div class="it-info"><div class="it-name" style="color:var(--lv);font-weight:900">【神秘试炼】</div><div class="it-desc" id="eggStatus" style="color:var(--txm)">对着麦克风喊3次“林深你真帅”或“林深最帅”试试？</div></div><button id="eggBtn" class="'+eggBtnCls+'" style="'+eggBtnStyle+'" '+eggBtnAttr+'>'+eggLabel+'</button></div>';
 /* 商店道具 */
 for(var i=0;i<SHOP.length;i++){var it=SHOP[i];var price=getShopPrice(it.p);var canBuy=p.gold>=price;var isExpStone=(i===0);var atLimit=isExpStone&&p.expBonus>=150;if(it.maxCount){var cc=p[it.countKey]||0;if(cc>=it.maxCount)atLimit=true}if(atLimit)canBuy=false;var countInfo=isExpStone?(p.expBonusCount||0)+'次 · +'+(p.expBonus||0)+'%':'';if(it.maxCount){var cc2=p[it.countKey]||0;countInfo=cc2+'/'+it.maxCount+'次'}var buyLabel=atLimit?'🔒 已满':'💰'+price+(price<it.p?' <s style="font-size:.6rem;opacity:.6">'+it.p+'</s>':'');var btnCls=canBuy?'xg-btn gold':'xg-btn';var btnStyle='padding:6px 12px;font-size:.75rem;'+(canBuy?'':'opacity:.5;cursor:not-allowed;');var btnAttr=canBuy?'onclick="xxBuy('+i+')"':'disabled';h+='<div class="xg-item"><span class="it-icon">'+it.ic+'</span><div class="it-info"><div class="it-name">'+it.n+(countInfo?' <span style="font-size:.7rem;color:var(--txm)">('+countInfo+')</span>':'')+'</div><div class="it-desc">'+it.d+(atLimit?' <span style="color:var(--cinnabar);font-weight:700">已达到上限</span>':'')+'</div></div><button class="'+btnCls+'" style="'+btnStyle+'" '+btnAttr+'>'+buyLabel+'</button></div>'}
 
@@ -909,7 +915,136 @@ window.xxGmAxe=function(t){if(!_gmUnlocked)return;if(t==='gold1w'){G.p.gold+=100
 
 function rGmPick(c,isPassive){var p=G.p;var src=isPassive?PSKILLS:ASKILLS;var unacquired=src.filter(function(s){return(isPassive?p.pSkl:p.aSkl).indexOf(s.id)<0});var h='<div class="xg-hdr"><h2>🛠️ 自选'+(isPassive?'被动':'主动')+'技能</h2><p>点击即可直接领悟</p></div>';h+='<div class="xg-card"><div class="xg-choices" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">';if(unacquired.length===0)h+='<div style="color:var(--txm);padding:20px">所有技能已全部习得！</div>';else{unacquired.forEach(function(s){h+='<div class="xg-skill-card rarity-legendary" style="min-width:200px;max-width:280px;cursor:pointer" onclick="xxGmPickSkill(\''+s.id+'\','+isPassive+')"><div class="sk-type '+(isPassive?'passive':'active')+'">'+(isPassive?'🔮被动':'⚔️主动')+'</div><div class="sk-name">'+s.n+'</div><div class="sk-desc">'+s.d+'</div><div style="font-size:.65rem;color:var(--txm);margin-top:4px">点击领悟</div></div>'})}h+='</div></div><div class="xg-actions"><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 返回基地</button></div>';c.innerHTML=h;}
 window.xxGmPickSkill=function(id,isPassive){var p=G.p;if(isPassive){if(p.pSkl.indexOf(id)<0)p.pSkl.push(id)}else{if(p.aSkl.indexOf(id)<0)p.aSkl.push(id)}rc();autoSave()};
+/* === 🎙️ 隐藏彩蛋：林深最帅 语音识别与录音系统 === */
+window.xxStartEasterEgg = function() {
+    // 兼容性检测
+    var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("抱歉，当前浏览器不支持语音识别或麦克风录音哦！请尝试使用最新版 Chrome 或 Edge 浏览器。");
+        return;
+    }
 
+    var btn = document.getElementById('eggBtn');
+    var status = document.getElementById('eggStatus');
+    btn.disabled = true;
+    btn.innerText = "🔴 正在聆听...";
+    btn.style.animation = "none";
+    btn.style.opacity = "0.8";
+    btn.style.background = "#c41e3a";
+    btn.style.borderColor = "#c41e3a";
+    status.innerHTML = "请说话，已识别 <span style='color:var(--cinnabar);font-weight:bold;font-size:1.1rem'>0</span> / 3 次";
+
+    var recognition = new SpeechRec();
+    recognition.lang = 'zh-CN';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    var count = 0;
+    var audioChunks = [];
+    var mediaRecorder;
+    var streamRef;
+
+    // 请求麦克风权限并开始录音
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+        streamRef = stream;
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
+
+        mediaRecorder.ondataavailable = function(e) {
+            audioChunks.push(e.data);
+        };
+
+        // 录音结束后的处理
+        mediaRecorder.onstop = function() {
+            var audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+            var audioUrl = URL.createObjectURL(audioBlob);
+            showEggRewardModal(audioUrl);
+        };
+
+        // 开启语音识别
+        recognition.start();
+
+        recognition.onresult = function(event) {
+            var transcript = event.results[event.results.length - 1][0].transcript;
+            
+            // 匹配是否说了“林深你真帅”或“林深最帅”
+            if (transcript.includes("林深") && (transcript.includes("帅") || transcript.includes("真帅") || transcript.includes("最帅"))) {
+                // 如果一口气说了多次，用正则计算次数
+                var match = transcript.match(/(林深.*?帅)/g);
+                count += match ? match.length : 1;
+
+                if (count >= 3) {
+                    status.innerHTML = "<span style='color:var(--jade);font-weight:bold'>识别成功！试炼完成！</span>";
+                    recognition.stop(); // 识别到3次，立刻停止
+                } else {
+                    status.innerHTML = "请说话，已识别 <span style='color:var(--cinnabar);font-weight:bold;font-size:1.1rem'>" + count + "</span> / 3 次";
+                }
+            }
+        };
+
+        recognition.onerror = function(e) {
+            if(e.error !== 'no-speech'){
+                alert("语音识别中断: " + e.error + "。请刷新页面重试。");
+                resetEggUI();
+                if(streamRef) streamRef.getTracks().forEach(function(track){ track.stop(); });
+            }
+        };
+
+        recognition.onend = function() {
+            if (count < 3) {
+                // 浏览器由于静音自动断开，但此时还没满3次，则自动重新开启监听
+                try { recognition.start(); } catch(e){}
+            } else {
+                // 满3次，结束录音，并关闭麦克风轨道
+                mediaRecorder.stop();
+                if(streamRef) streamRef.getTracks().forEach(function(track){ track.stop(); });
+            }
+        };
+    }).catch(function(err) {
+        alert("未获得麦克风权限，试炼无法开启！");
+        resetEggUI();
+    });
+
+    function resetEggUI() {
+        btn.disabled = false;
+        btn.innerText = "🎙️ 开启隐藏试炼";
+        btn.style.opacity = "1";
+        btn.style.background = "linear-gradient(135deg, #ab47bc, #7b68ae)";
+        btn.style.borderColor = "#7b68ae";
+        status.innerHTML = "对着麦克风喊3次“林深你真帅”或“林深最帅”试试？";
+    }
+};
+
+/* 弹出专属奖励+播放“社死录音”界面 */
+function showEggRewardModal(audioUrl) {
+    G.p.eggClaimed = true; // 标记已领取，永久不再触发
+    G.p.gold += 2000;      // 奖励 2000 金币
+    autoSave();
+
+    var mask = document.createElement('div');
+    mask.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;display:flex;align-items:center;justify-content:center;animation:gfFade 0.3s ease forwards;backdrop-filter:blur(3px);';
+
+    var h = '<div style="background:var(--white);border-radius:20px;padding:34px;max-width:400px;width:90%;text-align:center;box-shadow:var(--sl);border:3px solid var(--lv);animation:cardFlipIn .6s var(--ss2) both">';
+    h += '<div style="font-size:4.5rem;margin-bottom:10px;animation:fs 2s ease-in-out infinite">🎁</div>';
+    h += '<h3 style="color:var(--lv);font-family:\'Ma Shan Zheng\',cursive;font-size:1.8rem;margin-bottom:8px">试炼通过！彩蛋解锁</h3>';
+    h += '<p style="font-size:.95rem;color:var(--txb);margin-bottom:16px;line-height:1.7">恭喜你获得林深大大的隐藏奖励！<br>商城专属图标已解锁<br><span style="color:var(--yw);font-weight:900;font-size:1.3rem">金币 + 2000 💰</span></p>';
+    
+    h += '<div style="background:var(--b50);padding:14px;border-radius:12px;margin-bottom:20px;border:1px dashed var(--b200)">';
+    h += '<p style="font-size:.8rem;color:var(--txm);margin-bottom:8px;font-weight:bold">👇 下面是你夸我帅的绝版“社死”录音：</p>';
+    h += '<audio controls autoplay src="' + audioUrl + '" style="width:100%;height:40px;outline:none;border-radius:8px"></audio>';
+    h += '</div>';
+
+    h += '<button id="eggCloseBtn" class="xg-btn primary" style="width:100%;padding:12px;border-radius:99px;font-size:1rem;background:linear-gradient(135deg,var(--lv),#ab47bc);border-color:var(--lv);box-shadow:0 4px 15px rgba(123,104,174,.4)">太羞耻了，快关掉！</button>';
+    h += '</div>';
+
+    mask.innerHTML = h;
+    document.body.appendChild(mask);
+
+    document.getElementById('eggCloseBtn').onclick = function() {
+        mask.remove();
+        rc(); // 关闭弹窗时刷新界面，隐藏彩蛋按钮变为不可用状态
+    };
+}
 rc();
 })();
 </script>
