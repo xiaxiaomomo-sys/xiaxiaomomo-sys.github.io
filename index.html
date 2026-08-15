@@ -432,7 +432,7 @@ body.dark::after{opacity:.06}
 
     document.getElementById('updNowBtn').onclick = function(){
       localStorage.setItem('ver_dismissed', latestVer);
-      location.reload();
+      window.location.href = window.location.href.split('?')[0] + '?t=' + new Date().getTime();
     };
   }
   
