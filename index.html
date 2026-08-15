@@ -621,7 +621,7 @@ var PSKILLS=[
     {id:'P2',n:'铁壁',lv:10,d:'受大伤害40%概率减免25%'},
     {id:'P3',n:'乘胜追击',lv:15,d:'暴击后下一次伤害+15%'},
     {id:'P4',n:'鬼魅身法',lv:20,d:'闪避率额外+10% (总上限20%)'},
-    {id:'P5',n:'吸血光环',lv:25,d:'吸血率额外+3.0% (总上限4.0%)'},
+    {id:'P5',n:'吸血光环',lv:25,d:'吸血率额外+2% (总上限3%)'},
     {id:'P6',n:'复仇之魂',lv:30,d:'每次受击攻击+2%，最高叠加5层'},
     {id:'P7',n:'不屈意志',lv:35,d:'HP<45%时防御力×1.5'},
     {id:'P8',n:'战意昂扬',lv:40,d:'连杀5只后攻击+30%(BOSS+10%)持续3场'},
@@ -642,13 +642,13 @@ var PSKILLS=[
 ];
 
 var SHOP=[
+    {n:'✨ 经验增幅石',ic:'✨',d:'永久EXP获取+1%',p:1000,maxCount:30,countKey:'expBonusCount',f:function(p){p.expBonus=Math.min((p.expBonus||0)+1,130);p.expBonusCount=(p.expBonusCount||0)+1}},
     {n:'攻击药水',ic:'⚔️',d:'攻击力永久 +1',p:100,f:function(p){p.pAtk+=1}},
     {n:'防御药水',ic:'🛡️',d:'防御力永久 +1',p:100,f:function(p){p.pDef+=1}},
     {n:'生命药水',ic:'❤️',d:'最大HP永久 +5',p:100,f:function(p){p.pHp+=5}},
     {n:'透视卷轴',ic:'🔮',d:'永久显示怪物属性',p:600,maxCount:1,countKey:'scans',f:function(p){p.scans++}},
     {n:'洗点丹',ic:'🔄',d:'重置属性分配',p:400,f:function(p){var t=p.atkPts+p.defPts+p.conPts;p.atkPts=0;p.defPts=0;p.conPts=0;p.statPts+=t;p.hp=calcMaxHp(p)}}
 ];
-
 var MN=['灵蛇','妖狐','石魔','鬼蛛','邪修','恶灵','魔猿','毒蝎','血蝠','骷髅兵','邪傀','怨魂','影魔','噬魂兽','狂暴熊','冰霜狼','赤炎蟒','幽冥鸦','九尾狐','修罗将'];
 var ME=['🐍','🦊','🗿','🕷️','👿','👻','🐒','🦂','🦇','💀','🤖','👁️','👤','🦁','🐻‍❄️','🐺','🐍','🦅','🦊','⚔️'];
 var BN=['炼气妖兽','筑基魔修','金丹鬼王','元婴邪尊','化神天魔','合体妖皇','大乘真仙','渡劫雷兽'];
@@ -663,8 +663,15 @@ function genMon(floor,isBoss){
     var gd= 2 + Math.floor((floor - 1) / 20); 
     if(gd < 2) gd = 2;
 
-    if(isBoss){
-        if(floor===100) return {name:'林深大魔王',emoji:'😈',hp:200000,mhp:200000,atk:2800,def:1000,exp:9999,gold:99999,isBoss:true,floor:100,ab:7,is魔王:true,invTimer:30};
+   if(isBoss){
+    if(floor===100){
+        var hp100=Math.floor((80+100*20*Math.pow(1.05,100))*1.8);
+        var atk100=Math.floor((10+100*3.0*Math.pow(1.04,100))*1.3);
+        var def100=Math.floor((5+100*1.5*Math.pow(1.03,100))*1.2);
+        var exp100=Math.floor((100*18+Math.floor(100*100*0.3))*3);
+        var gold100=Math.floor((Math.floor(100/10)+3)*3);
+        return {name:'林深大魔王',emoji:'😈',hp:hp100,mhp:hp100,atk:atk100,def:def100,exp:exp100,gold:gold100,isBoss:true,floor:100,ab:7,is魔王:true,invTimer:30};
+    }
         var bi=Math.min(Math.floor(floor/10)-1,7);
         hp=Math.floor(hp*1.8);
         atk=Math.floor(atk*1.3);
@@ -1068,7 +1075,7 @@ function genStatCh(){
         var pick = null;
 
         // 10%基础概率，触发保底时概率变为100%
-        if ((isPity || roll < 0.10) && rcR < 30 && !pool.some(function(x){return x.k==='pCritR'})) { 
+        if ((isPity || roll < 0.10) && rcR < 25 && !pool.some(function(x){return x.k==='pCritR'})) {
             pick = {t:'暴击率', v:1.0, k:'pCritR', ds:'永久增加1.0%暴击率'}; 
         }
         else if ((isPity || roll < 0.20) && rd < 10 && !pool.some(function(x){return x.k==='pDodge'})) { 
@@ -1358,7 +1365,8 @@ var eggBtnAttr=eggClaimed?'disabled':'onclick="xxStartEasterEgg()"';
 var eggLabel=eggClaimed?'✅ 彩蛋已触发':'🎙️ 开启隐藏试炼';
 h+='<div class="xg-item" style="border-left:3px solid var(--lv);background:linear-gradient(135deg,var(--white),rgba(123,104,174,.1));margin-bottom:16px"><span class="it-icon">🎙️</span><div class="it-info"><div class="it-name" style="color:var(--lv);font-weight:900">【神秘试炼】</div><div class="it-desc" id="eggStatus" style="color:var(--txm)">对着麦克风喊3次“林深你真帅”或“林深最帅”试试？</div></div><button id="eggBtn" class="'+eggBtnCls+'" style="'+eggBtnStyle+'" '+eggBtnAttr+'>'+eggLabel+'</button></div>';
 
-for(var i=0;i<SHOP.length;i++){var it=SHOP[i];var price=getShopPrice(it.p);var canBuy=p.gold>=price;var isExpStone=(i===0);var atLimit=isExpStone&&p.expBonus>=150;if(it.maxCount){var cc=p[it.countKey]||0;if(cc>=it.maxCount)atLimit=true}if(atLimit)canBuy=false;var countInfo=isExpStone?(p.expBonusCount||0)+'次 · +'+(p.expBonus||0)+'%':'';if(it.maxCount){var cc2=p[it.countKey]||0;countInfo=cc2+'/'+it.maxCount+'次'}var buyLabel=atLimit?'🔒 已满':'💰'+price+(price<it.p?' <s style="font-size:.6rem;opacity:.6">'+it.p+'</s>':'');var btnCls=canBuy?'xg-btn gold':'xg-btn';var btnStyle='padding:6px 12px;font-size:.75rem;'+(canBuy?'':'opacity:.5;cursor:not-allowed;');var btnAttr=canBuy?'onclick="xxBuy('+i+')"':'disabled';h+='<div class="xg-item"><span class="it-icon">'+it.ic+'</span><div class="it-info"><div class="it-name">'+it.n+(countInfo?' <span style="font-size:.7rem;color:var(--txm)">('+countInfo+')</span>':'')+'</div><div class="it-desc">'+it.d+(atLimit?' <span style="color:var(--cinnabar);font-weight:700">已达到上限</span>':'')+'</div></div><button class="'+btnCls+'" style="'+btnStyle+'" '+btnAttr+'>'+buyLabel+'</button></div>'}
+for(var i=0;i<SHOP.length;i++){var it=SHOP[i];var price=getShopPrice(it.p);var canBuy=p.gold>=price;var isExpStone=(i===0);
+var atLimit=isExpStone&&(p.expBonus||0)>=130;if(it.maxCount){var cc=p[it.countKey]||0;if(cc>=it.maxCount)atLimit=true}if(atLimit)canBuy=false;var countInfo=isExpStone?(p.expBonusCount||0)+'次 · +'+(p.expBonus||0)+'%':'';if(it.maxCount){var cc2=p[it.countKey]||0;countInfo=cc2+'/'+it.maxCount+'次'}var buyLabel=atLimit?'🔒 已满':'💰'+price+(price<it.p?' <s style="font-size:.6rem;opacity:.6">'+it.p+'</s>':'');var btnCls=canBuy?'xg-btn gold':'xg-btn';var btnStyle='padding:6px 12px;font-size:.75rem;'+(canBuy?'':'opacity:.5;cursor:not-allowed;');var btnAttr=canBuy?'onclick="xxBuy('+i+')"':'disabled';h+='<div class="xg-item"><span class="it-icon">'+it.ic+'</span><div class="it-info"><div class="it-name">'+it.n+(countInfo?' <span style="font-size:.7rem;color:var(--txm)">('+countInfo+')</span>':'')+'</div><div class="it-desc">'+it.d+(atLimit?' <span style="color:var(--cinnabar);font-weight:700">已达到上限</span>':'')+'</div></div><button class="'+btnCls+'" style="'+btnStyle+'" '+btnAttr+'>'+buyLabel+'</button></div>'}
 
 if(p.pet&&p.pet.owned){var washPrice=getShopPrice(5000);var canWash=p.gold>=washPrice;
 h+='<div class="xg-item" style="border-left:3px solid var(--cinnabar)"><span class="it-icon">💊</span><div class="it-info"><div class="it-name">洗髓丹</div><div class="it-desc">重新抽取宠物资质（等级和经验不变）</div></div><button class="'+(canWash?'xg-btn gold':'xg-btn')+'" style="padding:6px 12px;font-size:.75rem;'+(canWash?'':'opacity:.5;cursor:not-allowed;')+'" '+(canWash?'onclick="xxResetPet()"':'disabled')+'>💰'+washPrice+(washPrice<5000?' <s style="font-size:.6rem;opacity:.6">5000</s>':'')+'</button></div>'}
