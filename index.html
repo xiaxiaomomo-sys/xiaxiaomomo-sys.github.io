@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.0.3">
+<meta name="game-version" content="v1.0.4">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -1081,6 +1081,30 @@ function genStatCh(){
 }
 
 function genSkCh(){var pool=[],cnt=0;while(pool.length<3&&cnt<100){cnt++;var isP=Math.random()<0.5;var src=isP?PSKILLS:ASKILLS;var cands=[];for(var i=0;i<src.length;i++){var owned=isP?G.p.pSkl:G.p.aSkl;if(owned.indexOf(src[i].id)<0){if(isP&&(src[i].id==='P14'||src[i].id==='P17')&&Math.random()>0.05)continue;cands.push({s:src[i],isP:isP})}}if(!cands.length){isP=!isP;continue}var pick=cands[Math.floor(Math.random()*cands.length)];var dup=false;for(var j=0;j<pool.length;j++)if(pool[j].s.id===pick.s.id)dup=true;if(!dup)pool.push(pick)}G.ce=pool}
+function checkLvlUp(){
+    var p=G.p;
+    if(p.lv>=100){G._autoContinue=false;G.scr='hub';rc();return}
+    if(p.exp>=expNeed(p.lv)){
+        p.exp-=expNeed(p.lv);
+        p.lv++;
+        p.statPts+=ptsPerLv(p.lv);
+        G._refreshed=false;
+        genStatCh();
+        G.scr='lattr';
+        rc()
+    }else{
+        if(G._autoContinue){
+            G._autoContinue=false;
+            var gf=G._grindFloor||G.prog.curFloor;
+            var gb=G._grindIsBoss!=null?G._grindIsBoss:(gf%10===0);
+            G.p.hp=calcMaxHp(G.p);
+            startBattle(gf,gb)
+        }else{
+            G.scr='hub';
+            rc()
+        }
+    }
+}
 function applyStatCh(i){var ch=G.ce[i],p=G.p;if(ch.k==='empty'){}else if(ch.k==='fear'){var fe=ch.fe;if(fe.k==='gold'){p.gold=Math.max(0,p.gold+fe.amt)}else{p[fe.k]=(p[fe.k]||0)+fe.amt;p.hp=Math.min(p.hp,calcMaxHp(p))}}else if(ch.k==='firstCrit')p.firstCrit=true;else if(ch.k==='survive')p.survive=true;else{p[ch.k]=(p[ch.k]||0)+ch.v;p.hp=Math.min(p.hp,calcMaxHp(p))}if(p.lv%5===0&&p.lv<=100){genSkCh();G.scr='lskill';rc()}else if(p.statPts>0){G.scr='assign';rc()}else checkLvlUp()}
 function applySkCh(i){var ch=G.ce[i],p=G.p;if(ch.isP){if(p.pSkl.length>=maxPassiveSlots(p)){G.ce._rp={id:ch.s.id,isP:true};G.scr='replace';rc();return}p.pSkl.push(ch.s.id)}else{if(p.aSkl.length>=maxActiveSlots(p)){G.ce._rp={id:ch.s.id,isP:false};G.scr='replace';rc();return}p.aSkl.push(ch.s.id)}if(p.statPts>0){G.scr='assign';rc()}else checkLvlUp()}
 function replSk(idx){var info=G.ce._rp,p=G.p;var arr=info.isP?p.pSkl:p.aSkl;arr[idx]=info.id;if(p.statPts>0){G.scr='assign';rc()}else checkLvlUp()}
