@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.0.0">
+<meta name="game-version" content="v1.0.1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -583,8 +583,16 @@ var TAUNTS=['就这？就这点本事？','你真菜！就这水平也敢来？'
 var ASKILLS=[{id:'A1',n:'破天一剑',lv:5,cd:3,d:'攻击力×2.5伤害'},{id:'A2',n:'御风斩',lv:5,cd:2,d:'攻击力×1.5，必中'},{id:'A3',n:'天雷引',lv:10,cd:4,d:'攻击力×1.8，50%麻痹'},{id:'A4',n:'万剑归宗',lv:15,cd:5,d:'攻击力×4伤害'},{id:'A5',n:'血祭',lv:15,cd:4,d:'消耗20%HP，HP×2伤害'},{id:'A6',n:'金刚不坏',lv:20,cd:6,d:'下2回合伤害减半'},{id:'A7',n:'剑气纵横',lv:25,cd:5,d:'3次攻击每次×1.2'},{id:'A8',n:'九天神雷',lv:35,cd:7,d:'攻击力×5，50%眩晕'},{id:'A9',n:'逆天改命',lv:40,cd:8,d:'回复50%HP，无敌1回合'},{id:'A10',n:'湮灭',lv:50,cd:6,d:'当前HP×1.5伤害'},{id:'A11',n:'命运轮盘',lv:1,cd:3,d:'55%概率攻×5，45%自伤HP×0.7'},{id:'A12',n:'连斩',lv:12,cd:3,d:'连续5次攻击，每次×0.5'},{id:'A13',n:'噬魂',lv:25,cd:5,d:'吸取怪物30%当前HP(BOSS仅10%，大魔王仅回血)'},{id:'A14',n:'狂暴化',lv:30,cd:4,d:'攻+50%防-50%持续3回合'},{id:'A15',n:'时间冻结',lv:35,cd:6,d:'怪物无法行动2回合(BOSS减半)'},{id:'A16',n:'分身术',lv:30,cd:5,d:'3回合分身协助攻击(伤害-50%×基础攻击)'},{id:'A17',n:'以命换命',lv:35,cd:6,d:'消耗50%当前HP，造成2.5倍攻击+消耗血量伤害'}];
 var PSKILLS=[{id:'P1',n:'怒气爆发',lv:5,d:'HP<50%攻击力+20%'},{id:'P2',n:'铁壁',lv:10,d:'大伤害40%减伤25%'},{id:'P3',n:'乘胜追击',lv:15,d:'暴击后下一击+30%'},{id:'P4',n:'鬼魅身法',lv:20,d:'+10%闪避率(上限25%)'},{id:'P5',n:'吸血光环',lv:25,d:'攻击回复+3%伤害(上限5%)'},{id:'P6',n:'复仇之魂',lv:30,d:'被攻击攻击+2%×5层'},{id:'P7',n:'不屈意志',lv:35,d:'HP<45%防御×1.5'},{id:'P8',n:'战意昂扬',lv:40,d:'连杀5只后攻击+30%(BOSS+10%)持续3场'},{id:'P9',n:'修罗之体',lv:50,d:'每回合回复2.5%最大HP'},{id:'P10',n:'天道庇佑',lv:60,d:'致死25%恢复30%HP'},{id:'P11',n:'嗜血狂暴',lv:70,d:'根据已损失生命增加攻击力(最高+80%)'},{id:'P12',n:'破甲之力',lv:20,d:'攻击无视怪物10%防御'},{id:'P13',n:'荆棘之甲',lv:15,d:'受到攻击反弹15%伤害(BOSS仅5%)'},{id:'P14',n:'嗜血本能',lv:10,d:'每击杀50只永久攻击+1'},{id:'P15',n:'不灭之火',lv:30,d:'HP<20%时攻击力+80%'},{id:'P16',n:'灵魂链接',lv:25,d:'每次暴击回复2%最大HP'},{id:'P17',n:'适应进化',lv:40,d:'每受100次攻击永久防御+1'},{id:'P18',n:'时间守护者',lv:35,d:'每回合10%概率额外行动一次'},{id:'P19',n:'战神附体',lv:45,d:'连续5次普攻后下次攻击暴击+伤害翻倍'},{id:'P20',n:'死亡凝视',lv:55,d:'怪物HP<30%时伤害+50%'},{id:'P21',n:'风暴之心',lv:65,d:'每回合10%概率触发1.5倍攻击'}];
 var STAT_POOL=[{t:'攻击力',v:[2,4],k:'pAtk',ds:'永久增加攻击力'},{t:'最大生命',v:[8,15],k:'pHp',ds:'永久增加最大生命值'},{t:'防御力',v:[1,3],k:'pDef',ds:'永久增加防御力'},{t:'暴击率',v:[1,2],k:'pCritR',ds:'永久增加暴击率'},{t:'暴击伤害',v:[3,8],k:'pCritD',ds:'永久增加暴击伤害'},{t:'闪避率',v:[0,1],k:'pDodge',ds:'永久增加闪避率'},{t:'吸血率',v:[0,1],k:'pLife',ds:'永久增加吸血比例(%)'},{t:'攻击回血',v:[0,1],k:'healPct',ds:'每次攻击回复0~1%最大HP(上限3%)'},{t:'低血增攻',v:[5,10],k:'lowAtk',ds:'HP<30%时攻击力提升%'},{t:'首次暴击',v:[1,1],k:'firstCrit',ds:'首次攻击必定暴击'},{t:'濒死保命',v:[1,1],k:'survive',ds:'致死时保留1HP'}];
-var SHOP=[{n:'经验增幅石',ic:'✨',d:'永久EXP获取+1%',p:500,f:function(p){p.expBonus=Math.min((p.expBonus||0)+1,150);p.expBonusCount=(p.expBonusCount||0)+1}},{n:'攻击药水',ic:'⚔️',d:'攻击力永久+2',p:60,f:function(p){p.pAtk+=2}},{n:'防御药水',ic:'🛡️',d:'防御力永久+1',p:55,f:function(p){p.pDef+=1}},{n:'生命药水',ic:'❤️',d:'最大HP永久+10',p:50,f:function(p){p.pHp+=10}},{n:'透视卷轴',ic:'🔮',d:'永久显示怪物属性',p:600,f:function(p){p.scans++}},{n:'洗点丹',ic:'🔄',d:'重置属性分配',p:400,f:function(p){var t=p.atkPts+p.defPts+p.conPts;p.atkPts=0;p.defPts=0;p.conPts=0;p.statPts+=t;p.hp=calcMaxHp(p)}},{n:'主动技能扩充栏',ic:'⚔️',d:'增加1个主动技能格子',p:1000,maxCount:2,countKey:'activeSlotExp',f:function(p){p.activeSlotExp=Math.min((p.activeSlotExp||0)+1,2)}},{n:'被动技能扩充栏',ic:'🔮',d:'增加1个被动技能格子',p:1000,maxCount:3,countKey:'passiveSlotExp',f:function(p){p.passiveSlotExp=Math.min((p.passiveSlotExp||0)+1,3)}}];
-
+var SHOP=[
+    {n:'经验增幅石',ic:'✨',d:'永久EXP获取+1%',p:500,f:function(p){p.expBonus=Math.min((p.expBonus||0)+1,150);p.expBonusCount=(p.expBonusCount||0)+1}},
+    {n:'攻击药水',ic:'⚔️',d:'攻击力永久+2',p:60,f:function(p){p.pAtk+=2}},
+    {n:'防御药水',ic:'🛡️',d:'防御力永久+1',p:55,f:function(p){p.pDef+=1}},
+    {n:'生命药水',ic:'❤️',d:'最大HP永久+10',p:50,f:function(p){p.pHp+=10}},
+    {n:'透视卷轴',ic:'🔮',d:'永久显示怪物属性',p:600,maxCount:1,countKey:'scans',f:function(p){p.scans++}},
+    {n:'洗点丹',ic:'🔄',d:'重置属性分配',p:400,f:function(p){var t=p.atkPts+p.defPts+p.conPts;p.atkPts=0;p.defPts=0;p.conPts=0;p.statPts+=t;p.hp=calcMaxHp(p)}},
+    {n:'主动技能扩充栏',ic:'⚔️',d:'增加1个主动技能格子',p:1000,maxCount:2,countKey:'activeSlotExp',f:function(p){p.activeSlotExp=Math.min((p.activeSlotExp||0)+1,2)}},
+    {n:'被动技能扩充栏',ic:'🔮',d:'增加1个被动技能格子',p:1000,maxCount:3,countKey:'passiveSlotExp',f:function(p){p.passiveSlotExp=Math.min((p.passiveSlotExp||0)+1,3)}}
+];
 var MN=['灵蛇','妖狐','石魔','鬼蛛','邪修','恶灵','魔猿','毒蝎','血蝠','骷髅兵','邪傀','怨魂','影魔','噬魂兽','狂暴熊','冰霜狼','赤炎蟒','幽冥鸦','九尾狐','修罗将'];
 var ME=['🐍','🦊','🗿','🕷️','👿','👻','🐒','🦂','🦇','💀','🤖','👁️','👤','🦁','🐻‍❄️','🐺','🐍','🦅','🦊','⚔️'];
 var BN=['炼气妖兽','筑基魔修','金丹鬼王','元婴邪尊','化神天魔','合体妖皇','大乘真仙','渡劫雷兽'];
