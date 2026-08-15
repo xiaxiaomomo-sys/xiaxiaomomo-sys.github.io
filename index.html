@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.0.2">
+<meta name="game-version" content="v1.0.3">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -1333,11 +1333,13 @@ function rSkList(c){var p=G.p;var h='<div class="xg-hdr"><h2>📖 技能列表</
 function rSave(c){var h='<div class="xg-hdr"><h2>💾 存档</h2></div><div class="xg-card"><div style="text-align:center;padding:20px"><div style="font-size:2.5rem;margin-bottom:12px">💾</div><p style="margin-bottom:20px;color:var(--txb)">存档自动保存到本地浏览器</p><button class="xg-btn primary" onclick="xxSave()" style="margin-bottom:10px">💾 立即存档</button><br><button class="xg-btn danger" onclick="if(confirm(\'确定清除存档？\'))xxClear()">🗑️ 清除存档</button><br><button class="xg-btn" style="margin-top:10px" onclick="xxLoadCloud()">☁️ 从云端恢复存档</button></div></div><div class="xg-save-group" style="margin-bottom:16px"><h4>💾 存档码</h4><button class="xg-btn" onclick="showExportModal()">👇 导出存档码</button><button class="xg-btn" onclick="showImportModal()">👇 导入存档码</button><div class="xg-save-tip">存档码就是一段 base64 文本，保存在记事本或发给自己都行。</div></div><div class="xg-actions"><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 返回</button></div>';c.innerHTML=h;}
 
 function rAssign(c){var p=G.p;var h='<div class="xg-hdr"><h2>📊 属性分配</h2><p>剩余: <span style="color:var(--b500);font-weight:900">'+p.statPts+'</span> 点</p></div><div class="xg-card">';h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--b100)"><span style="font-weight:700">⚔️ 攻击: '+p.atkPts+'</span><div><button class="xg-btn primary" style="padding:4px 12px" onclick="xxAssign(\'atkPts\',1)"'+(p.statPts<=0?' disabled':'')+'>+</button></div></div>';h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--b100)"><span style="font-weight:700">🛡️ 防御: '+p.defPts+'</span><div><button class="xg-btn primary" style="padding:4px 12px" onclick="xxAssign(\'defPts\',1)"'+(p.statPts<=0?' disabled':'')+'>+</button></div></div>';h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0"><span style="font-weight:700">❤️ 体力: '+p.conPts+'</span><div><button class="xg-btn primary" style="padding:4px 12px" onclick="xxAssign(\'conPts\',1)"'+(p.statPts<=0?' disabled':'')+'>+</button></div></div>';h+='<div style="margin-top:16px;padding-top:12px;border-top:1px dashed var(--b100);font-size:.85rem;color:var(--txm)">⚔️攻击:'+calcAtk(p)+' | 🛡️防御:'+calcDef(p)+' | ❤️HP:'+calcMaxHp(p)+'</div>';h+='</div><div class="xg-actions"><button class="xg-btn primary" onclick="xxAssignDone()">↩️ 确认</button></div>';c.innerHTML=h;}
-
 /* 全局函数绑定 */
 var xiuxLB=[];
-async function saveXiuxianProg(){if(!G.p||!dbReady)return;if(G.p.name==='测试用小号')return;try{await _sb.from('xiuxian_leaderboard').upsert({id:myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||G.prog.curFloor||1:1,level:G.p.lv,title:titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()})}catch(e){}}
-async function loadXiuxianLB(){try{var r=await _sb.from('xiuxian_leaderboard').select('*').order('max_floor',{ascending:false}).order('level',{ascending:false}).limit(20);if(r.data)xiuxLB=r.data.filter(function(row){return row.name!=='测试用小号'});if(G.scr==='hub')rc()}catch(e){}}
+// 🌟 隔离修复1：上传数据时，强制打上 s1_ 烙印
+async function saveXiuxianProg(){if(!G.p||!dbReady)return;if(G.p.name==='测试用小号')return;try{await _sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||G.prog.curFloor||1:1,level:G.p.lv,title:titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()})}catch(e){}}
+
+// 🌟 隔离修复2：拉取数据时，只拉取带有 s1_ 烙印的数据（彻底无视旧版幽灵数据）
+async function loadXiuxianLB(){try{var r=await _sb.from('xiuxian_leaderboard').select('*').like('id','s1_%').order('max_floor',{ascending:false}).order('level',{ascending:false}).limit(20);if(r.data)xiuxLB=r.data.filter(function(row){return row.name!=='测试用小号'});if(G.scr==='hub')rc()}catch(e){}}
 setTimeout(loadXiuxianLB,5000);setInterval(loadXiuxianLB,30000);
 
 /* === 核心：新角色全服查重与防重名机制 === */
@@ -1354,8 +1356,9 @@ window.xxNew = async function() {
     if (btn) { btn.disabled = true; btn.innerText = '🔍 查阅天道名册中...'; }
 
     try {
-        var r = await _sb.from('xiuxian_leaderboard').select('id').eq('name', newName).limit(1);
-        if (r.data && r.data.length > 0 && r.data[0].id !== myDevice) {
+        // 🌟 隔离修复3：查重时也只查 S1 赛季的玩家，把旧名字释放出来让大家抢注
+        var r = await _sb.from('xiuxian_leaderboard').select('id').eq('name', newName).like('id','s1_%').limit(1);
+        if (r.data && r.data.length > 0 && r.data[0].id !== 's1_' + myDevice) {
             alert('⚠️ 道号【' + newName + '】已被其他修士抢先注册，请另赐雅号！');
             if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; } return; 
         }
@@ -1370,7 +1373,6 @@ window.xxNew = async function() {
         if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; }
     }
 };
-
 window.xxLoad=function(){
     if(load()){
         if(!G.p.uid) { G.p.uid = myDevice; save(); }
