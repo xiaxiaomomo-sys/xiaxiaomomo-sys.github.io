@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.0">
+<meta name="game-version" content="v1.2.1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -2012,7 +2012,7 @@ function rLskill(c){var p=G.p;var h='<div class="xg-title"><div class="big-emoji
 
 function rReplace(c){var info=G.ce._rp,p=G.p;var arr=info.isP?p.pSkl:p.aSkl;var src=info.isP?PSKILLS:ASKILLS;var newSk=src.find(function(s){return s.id===info.id});var h='<div class="xg-title"><div class="big-emoji">🔄</div><h3>技能栏已满</h3><p style="color:var(--txm)">选择一个替换为 ['+newSk.n+']，或直接跳过保持原样</p><div class="xg-choices">';for(var i=0;i<arr.length;i++){var oldSk=src.find(function(s){return s.id===arr[i]});if(!oldSk)continue;h+='<div class="xg-skill-card" style="animation-delay:'+((i+1)*.12)+'s" onclick="xxReplPick('+i+')"><div class="sk-name">'+oldSk.n+'</div><div class="sk-desc">'+oldSk.d+'</div></div>'}h+='</div><div class="xg-actions" style="margin-top:20px"><button class="xg-btn danger" onclick="xxReplSkip()">🛑 跳过 (放弃学习此技能)</button></div></div>';c.innerHTML=h;}
 /* 更新公告栏 */
-var UPDATE_NOTICE='<div id="xxUpdateNotice" style="margin-bottom:16px"><div style="background:linear-gradient(135deg,rgba(77,186,100,.06),rgba(201,169,110,.06));border:2px solid rgba(77,186,100,.2);border-radius:16px;overflow:hidden"><div onclick="toggleNotice()" style="cursor:pointer;padding:14px 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.4rem">⚔️</span><div><div style="font-weight:900;font-size:1rem">V1.2.0大更新</div><div style="font-size:.72rem;color:var(--txm)">点击展开查看更新内容</div></div></div><span id="noticeArrow" style="font-size:.85rem;color:var(--txm);transition:transform .3s">▼</span></div><div id="noticeBody" style="display:none;padding:0 20px 20px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:.82rem"><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🆕 装备系统</div><div style="font-size:.72rem;color:var(--txm)">五品三类型，击败BOSS掉落，随机属性+被动</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">⚒️ 装备强化</div><div style="font-size:.72rem;color:var(--txm)">部位+10，属性暴涨，强化石防掉级</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">✨ 套装效果</div><div style="font-size:.72rem;color:var(--txm)">全部+10激活神级光环，30%秒杀+金币加成</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🏆 成就系统</div><div style="font-size:.72rem;color:var(--txm)">12个成就，永久属性奖励，称号系统</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🌙 离线收益</div><div style="font-size:.72rem;color:var(--txm)">挂机8小时，一键领取金币经验</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">💎 强化石商店</div><div style="font-size:.72rem;color:var(--txm)">6666金币/颗，林深大大的关爱</div></div></div></div></div></div>';
+var UPDATE_NOTICE='<div id="xxUpdateNotice" style="margin-bottom:16px"><div style="background:linear-gradient(135deg,rgba(77,186,100,.06),rgba(201,169,110,.06));border:2px solid rgba(77,186,100,.2);border-radius:16px;overflow:hidden"><div onclick="toggleNotice()" style="cursor:pointer;padding:14px 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.4rem">⚔️</span><div><div style="font-weight:900;font-size:1rem">V1.2.1大更新</div><div style="font-size:.72rem;color:var(--txm)">点击展开查看更新内容</div></div></div><span id="noticeArrow" style="font-size:.85rem;color:var(--txm);transition:transform .3s">▼</span></div><div id="noticeBody" style="display:none;padding:0 20px 20px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:.82rem"><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🆕 装备系统</div><div style="font-size:.72rem;color:var(--txm)">五品三类型，击败BOSS掉落，随机属性+被动</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">⚒️ 装备强化</div><div style="font-size:.72rem;color:var(--txm)">部位+10，属性暴涨，强化石防掉级</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">✨ 套装效果</div><div style="font-size:.72rem;color:var(--txm)">全部+10激活神级光环，30%秒杀+金币加成</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🏆 成就系统</div><div style="font-size:.72rem;color:var(--txm)">12个成就，永久属性奖励，称号系统</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🌙 离线收益</div><div style="font-size:.72rem;color:var(--txm)">挂机8小时，一键领取金币经验</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">💎 强化石商店</div><div style="font-size:.72rem;color:var(--txm)">6666金币/颗，林深大大的关爱</div></div></div></div></div></div>';
 
 function toggleNotice(){
     var body=document.getElementById('noticeBody');
@@ -2132,12 +2132,14 @@ window.xxNew = async function() {
 window.xxLoad=function(){
     if(load()){
         if(!G.p.uid) { G.p.uid = myDevice; saveLocal(); }
-        G.scr='hub';rc();
+_sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||1:1,level:G.p.lv,title:titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()});
+G.scr='hub';rc();
     }else{
         loadCloud().then(function(ok){
             if(ok){
-                if(!G.p.uid) { G.p.uid = myDevice; saveLocal(); }
-                G.scr='hub';rc();
+               if(!G.p.uid) { G.p.uid = myDevice; saveLocal(); }
+_sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||1:1,level:G.p.lv,title:titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()});
+G.scr='hub';rc();
             }else{ alert('本地和云端都没有找到存档！'); }
         });
     }
@@ -2147,7 +2149,8 @@ window.xxLoadCloud=function(){
     loadCloud().then(function(ok){
         if(ok){
             if(!G.p.uid) { G.p.uid = myDevice; saveLocal(); }
-            G.scr='hub';rc(); alert('云端存档恢复成功！');
+_sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||1:1,level:G.p.lv,title:titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()});
+G.scr='hub';rc(); alert('云端存档恢复成功！');
         }else{ alert('云端没有找到存档。'); }
     }).catch(function(){alert('云端读取失败，请检查网络。')});
 };
