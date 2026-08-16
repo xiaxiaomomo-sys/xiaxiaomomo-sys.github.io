@@ -1885,7 +1885,32 @@ h+='</div>';
 }
 
 function rBattle(c){
-  var p=G.p,cm=G.cmb,m=cm.m,mxhp=calcMaxHp(p);
+  var p=G.p,cm=G.cmb;
+  if(cm.result==='win'||cm.result==='lose'){
+    /* 战斗结束后直接显示结果 */
+    var h='<div class="xg-hdr" style="margin-bottom:16px"><h2 style="font-size:1.3rem">⚔️ 战斗结束</h2></div>';
+    if(cm.result==='win'){
+      var pbg=cm.petBonusGold||0,peG=cm.petExpGained||0;
+      h+='<div class="xg-result-box win"><span class="big-emoji">🎉</span><h3>战斗胜利！</h3>';
+      h+='<div style="font-size:.88rem;margin-bottom:6px">获得 <span style="color:var(--b500);font-weight:900">'+cm.exp+'</span> 经验 和 <span style="color:var(--yw);font-weight:900">'+cm.gold+'</span> 金币</div>';
+      if(peG>0||pbg>0){h+='<div style="font-size:.72rem;color:var(--txm);margin-bottom:4px">';if(peG>0){h+='🐾灵兽+'+peG+'经验';if(cm.petLeveled)h+='→<span style="color:var(--lv)">Lv.'+cm.petNewLv+'!</span> ';}if(pbg>0)h+='💰灵兽+'+pbg+'金币';h+='</div>';}
+      if(cm.setBonusGold>0)h+='<div style="font-size:.72rem;color:var(--gold);font-weight:700;margin-bottom:4px">✨ 套装金币+'+cm.setBonusGold+'</div>';
+      if(cm.equipDrop){var dr=cm.equipDrop;if(dr.action==='bag'||dr.action==='replace'){var eq=dr.equip;var rc2=RARITY_TAG[eq.rarity];h+='<div style="font-size:.72rem;margin-bottom:4px">🆕 '+eq.emoji+' '+eq.name+' <span style="color:'+rc2.color+'">['+rc2.label+']</span></div>';}}
+      if(cm.stoneDrop===true)h+='<div style="font-size:.72rem;color:var(--lv);font-weight:700;margin-bottom:4px">💎 获得强化石！('+G.p.stones.length+'/10)</div>';
+      h+='<div style="display:flex;gap:6px;justify-content:center;margin-top:10px">';
+      h+='<button class="xg-btn primary" onclick="xxContinueNow()" style="padding:8px 16px;font-size:.82rem">⏩ 继续</button>';
+      h+='<button class="xg-btn gold" onclick="xxGoNextFloor()" style="padding:8px 16px;font-size:.82rem">⏭️ 下一层</button>';
+      h+='<button class="xg-btn" onclick="xxInterrupt()" style="padding:8px 16px;font-size:.82rem">🛑 停止</button>';
+      h+='</div></div>';
+    }
+    if(cm.result==='lose'){
+      h+='<div class="xg-result-box lose"><span class="big-emoji">💀</span><h3>战斗失败...</h3>';
+      h+='<div style="font-size:.88rem;margin-bottom:10px">丢失 <span style="color:var(--pk);font-weight:900">'+cm.lost+'</span> 金币</div>';
+      h+='<button class="xg-btn primary" onclick="xxGoto(\'hub\')" style="padding:8px 20px">↩️ 回到基地</button></div>';
+    }
+    c.innerHTML=h;return;
+  }
+  var m=cm.m,mxhp=calcMaxHp(p);
   var playerBuffs=renderBuffTags(cm,p);
   var playerCls='xg-bp';if(cm.berserkTurns>0)playerCls+=' berserk-active';if(cm.cloneTurns>0)playerCls+=' clone-active';
   var hpPct=Math.floor(p.hp/mxhp*100);var mHpPct=Math.floor(m.hp/m.mhp*100);
