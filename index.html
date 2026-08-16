@@ -1233,7 +1233,14 @@ function load(){
         if (d && d.v === VER) {
             G.p = d.p; G.prog = d.pr;
             if(!G.p.pet) G.p.pet={owned:false,quality:null,level:1,exp:0};
+            if(!G.prog.cleared) G.prog.cleared={};
+            if(!G.prog.bossCleared) G.prog.bossCleared={};
+            if(!G.prog.curFloor) G.prog.curFloor=G.prog.maxFloor||1;
             return true;
+        }
+    } catch(e){}
+    return false;
+}
         }
     } catch(e){}
     return false; 
@@ -1243,14 +1250,17 @@ async function loadCloud(){
         var r = await _sb.from('save').select('game_data').eq('id',myDevice).single();
         if(r.data && r.data.game_data){
             var gd = r.data.game_data;
-            if(gd.v === VER && gd.p){ 
+            if(gd.v === VER && gd.p){
                 G.p = gd.p; G.prog = gd.pr;
                 if(!G.p.pet) G.p.pet={owned:false,quality:null,level:1,exp:0};
+                if(!G.prog.cleared) G.prog.cleared={};
+                if(!G.prog.bossCleared) G.prog.bossCleared={};
+                if(!G.prog.curFloor) G.prog.curFloor=G.prog.maxFloor||1;
                 localStorage.setItem(SK, JSON.stringify({v:VER, p:G.p, pr:G.prog}));
                 return true;
             }
         }
-    }catch(e){}
+    } catch(e){}
     return false;
 }
 function autoSave(){save();saveXiuxianProg()}setInterval(autoSave,30000);
@@ -1324,7 +1334,7 @@ h+='<div style="padding:4px 8px;background:var(--b50);border-radius:6px;font-siz
         
             var ps=[{lv:10,n:'⚔️ 咸鱼突刺',d:'3%概率直接秒杀非BOSS怪物+10金币'},{lv:15,n:'🌿 灵兽庇佑',d:'攻击+10/防御+10/生命+30，每回合回复5%HP，20%减伤50%(1次/战)'},{lv:20,n:'🍖 饿犬扑食',d:'瞬间斩杀血量低于10%的普通怪'},{lv:30,n:'🛡️ 忠犬护主',d:'致死时保留1血并回复15%生命(限1次)'},{lv:40,n:'💊 大郎吃药了',d:'胜利后1%概率随机获得1点属性'},{lv:50,n:'🦊 狐假虎威',d:'面对BOSS时削弱其5%攻击与防御'},{lv: 55, n: '✨ 终极化形', d: '受击后按品级额外回血(1%/2%/3%/5%)，主人攻击+10%'},{lv:100,n:'👑 神兽之力',d:'仅神兽·全伤害+5%'}];
         h += '<div style="font-size:.75rem;margin-bottom:10px;display:flex;flex-direction:column;gap:5px;">';
-        petSkills.forEach(function(ps) {
+        ps.forEach(function(ps) {
             var isUnlk = p.pet.level >= ps.lv;
             var cColor = isUnlk ? 'var(--tx)' : 'var(--txm)';
             var op = isUnlk ? '1' : '0.4';
@@ -1590,6 +1600,8 @@ window.showExportModal=showExportModal;window.showImportModal=showImportModal;wi
 var _gmClicks=0,_gmTimer=null,_gmUnlocked=false;
 window.xxGmClick=function(){_gmClicks++;if(_gmClicks===1)_gmTimer=setTimeout(function(){_gmClicks=0},5000);if(_gmClicks>=10){clearTimeout(_gmTimer);_gmClicks=0;var code=prompt('请输入GM密码：');if(code==='83266121'){_gmUnlocked=true;alert('GM权限已解锁！');rc()}else{alert('密码错误！')}}};
 window.xxGmAxe=function(t){if(!_gmUnlocked)return;if(t==='gold1w'){G.p.gold+=10000;rc();autoSave()}else if(t==='hp'){G.p.hp=calcMaxHp(G.p);rc();autoSave()}else if(t==='lv5'){for(var i=0;i<5;i++){G.p.lv++;G.p.statPts+=ptsPerLv(G.p.lv)}G.p.hp=calcMaxHp(G.p);rc();autoSave()}};
+window.xxClear=function(){localStorage.removeItem(SK);G.p=null;G.prog=null;G.scr='start';rc();alert('存档已清除！')};
+function rGmPick(c,isPassive){
 function rGmPick(c,isPassive){var p=G.p;var src=isPassive?PSKILLS:ASKILLS;var unacquired=src.filter(function(s){return(isPassive?p.pSkl:p.aSkl).indexOf(s.id)<0});var h='<div class="xg-hdr"><h2>🛠️ 自选'+(isPassive?'被动':'主动')+'技能</h2><p>点击即可直接领悟</p></div>';h+='<div class="xg-card"><div class="xg-choices" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">';if(unacquired.length===0)h+='<div style="color:var(--txm);padding:20px">所有技能已全部习得！</div>';else{unacquired.forEach(function(s){h+='<div class="xg-skill-card rarity-legendary" style="min-width:200px;max-width:280px;cursor:pointer" onclick="xxGmPickSkill(\''+s.id+'\','+isPassive+')"><div class="sk-type '+(isPassive?'passive':'active')+'">'+(isPassive?'🔮被动':'⚔️主动')+'</div><div class="sk-name">'+s.n+'</div><div class="sk-desc">'+s.d+'</div><div style="font-size:.65rem;color:var(--txm);margin-top:4px">点击领悟</div></div>'})}h+='</div></div><div class="xg-actions"><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 返回基地</button></div>';c.innerHTML=h;}
 window.xxGmPickSkill=function(id,isPassive){var p=G.p;if(isPassive){if(p.pSkl.indexOf(id)<0)p.pSkl.push(id)}else{if(p.aSkl.indexOf(id)<0)p.aSkl.push(id)}rc();autoSave()};
 
