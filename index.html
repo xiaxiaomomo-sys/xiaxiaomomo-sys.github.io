@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.9">
+<meta name="game-version" content="v1.2.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -259,7 +259,8 @@ body.dark::after{opacity:.06}
 .xg-btn.gold{background:linear-gradient(135deg,var(--gold),#b8944a);color:#fff;border-color:var(--gold)}
 
 /* ===== Hub双栏布局 ===== */
-.xg-hub-grid{display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start}
+.xg-hub-grid{display:grid;grid-template-columns:1fr 280px;gap:24px;align-items:start}
+@media(max-width:900px){.xg-hub-grid{grid-template-columns:1fr}}
 .xg-action-col{display:flex;flex-direction:column;gap:16px}
 .xg-action-group{background:var(--white);border:1px solid var(--bd);border-radius:var(--r);padding:18px;box-shadow:var(--ss)}
 .xg-action-group::before{content:'';display:block;width:24px;height:3px;background:var(--gold);border-radius:3px;margin-bottom:12px}
@@ -1759,7 +1760,7 @@ function rHub(c){
     h+='<div class="xg-hp-bar" style="height:12px"><div class="xg-hp-fill'+(p.hp/mxhp<0.3?' low':p.hp/mxhp<0.6?' mid':'')+'" style="width:'+Math.floor(p.hp/mxhp*100)+'%"></div></div></div>';
     h+='<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:700;margin-bottom:4px"><span>⭐ 经验</span><span>'+p.exp+'/'+need+'</span></div>';
     h+='<div class="xg-exp-bar"><div class="xg-exp-fill" style="width:'+Math.floor(p.exp/need*100)+'%"></div></div></div>';
-    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.82rem">';
+    h+='<div style="display:grid;grid-template-columns:1fr;gap:4px;font-size:.85rem">';
     var stats=[
         ['⚔️ 攻击',atk,'color:var(--cinnabar)'],
         ['🛡️ 防御',def,'color:var(--jade)'],
@@ -1806,7 +1807,7 @@ h+='<div style="padding:4px 8px;background:var(--b50);border-radius:6px;font-siz
 /* Hub装备展示 */
 h+='<div class="xg-card" style="padding:20px;margin-bottom:16px">';
 h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.1rem;margin-bottom:14px">⚔️ 装备</h4>';
-h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">';
+h+='<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">';
 var _hubSlots=[{key:'weapon',label:'武器',emoji:'🗡️'},{key:'armor',label:'护甲',emoji:'🛡️'},{key:'trinket',label:'饰品',emoji:'💍'}];
 _hubSlots.forEach(function(s){
     var eq=p.equip?p.equip[s.key]:null;
@@ -2038,7 +2039,7 @@ function rLskill(c){var p=G.p;var h='<div class="xg-title"><div class="big-emoji
 
 function rReplace(c){var info=G.ce._rp,p=G.p;var arr=info.isP?p.pSkl:p.aSkl;var src=info.isP?PSKILLS:ASKILLS;var newSk=src.find(function(s){return s.id===info.id});var h='<div class="xg-title"><div class="big-emoji">🔄</div><h3>技能栏已满</h3><p style="color:var(--txm)">选择一个替换为 ['+newSk.n+']，或直接跳过保持原样</p><div class="xg-choices">';for(var i=0;i<arr.length;i++){var oldSk=src.find(function(s){return s.id===arr[i]});if(!oldSk)continue;h+='<div class="xg-skill-card" style="animation-delay:'+((i+1)*.12)+'s" onclick="xxReplPick('+i+')"><div class="sk-name">'+oldSk.n+'</div><div class="sk-desc">'+oldSk.d+'</div></div>'}h+='</div><div class="xg-actions" style="margin-top:20px"><button class="xg-btn danger" onclick="xxReplSkip()">🛑 跳过 (放弃学习此技能)</button></div></div>';c.innerHTML=h;}
 /* 更新公告栏 */
-var UPDATE_NOTICE='<div id="xxUpdateNotice" style="margin-bottom:16px"><div style="background:linear-gradient(135deg,rgba(77,186,100,.06),rgba(201,169,110,.06));border:2px solid rgba(77,186,100,.2);border-radius:16px;overflow:hidden"><div onclick="toggleNotice()" style="cursor:pointer;padding:14px 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.4rem">⚔️</span><div><div style="font-weight:900;font-size:1rem">V1.2.9 大更新</div><div style="font-size:.72rem;color:var(--txm)">点击展开查看更新内容</div></div></div><span id="noticeArrow" style="font-size:.85rem;color:var(--txm);transition:transform .3s">▼</span></div><div id="noticeBody" style="display:none;padding:0 20px 20px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:.82rem"><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🆕 装备系统</div><div style="font-size:.72rem;color:var(--txm)">五品三类型，击败BOSS掉落，随机属性+被动</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">⚒️ 装备强化</div><div style="font-size:.72rem;color:var(--txm)">部位+10，属性暴涨，强化石防掉级</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">✨ 套装效果</div><div style="font-size:.72rem;color:var(--txm)">全部+10激活神级光环，30%秒杀+金币加成</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🏆 成就系统</div><div style="font-size:.72rem;color:var(--txm)">12个成就，永久属性奖励，称号系统</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🌙 离线收益</div><div style="font-size:.72rem;color:var(--txm)">挂机8小时，一键领取金币经验</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">💎 强化石商店</div><div style="font-size:.72rem;color:var(--txm)">6666金币/颗，林深大大的关爱</div></div></div></div></div></div>';
+var UPDATE_NOTICE='<div id="xxUpdateNotice" style="margin-bottom:16px"><div style="background:linear-gradient(135deg,rgba(77,186,100,.06),rgba(201,169,110,.06));border:2px solid rgba(77,186,100,.2);border-radius:16px;overflow:hidden"><div onclick="toggleNotice()" style="cursor:pointer;padding:14px 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.4rem">⚔️</span><div><div style="font-weight:900;font-size:1rem">V1.2.0 大更新</div><div style="font-size:.72rem;color:var(--txm)">点击展开查看更新内容</div></div></div><span id="noticeArrow" style="font-size:.85rem;color:var(--txm);transition:transform .3s">▼</span></div><div id="noticeBody" style="display:none;padding:0 20px 20px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:.82rem"><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🆕 装备系统</div><div style="font-size:.72rem;color:var(--txm)">五品三类型，击败BOSS掉落，随机属性+被动</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">⚒️ 装备强化</div><div style="font-size:.72rem;color:var(--txm)">部位+10，属性暴涨，强化石防掉级</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">✨ 套装效果</div><div style="font-size:.72rem;color:var(--txm)">全部+10激活神级光环，30%秒杀+金币加成</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🏆 成就系统</div><div style="font-size:.72rem;color:var(--txm)">12个成就，永久属性奖励，称号系统</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🌙 离线收益</div><div style="font-size:.72rem;color:var(--txm)">挂机8小时，一键领取金币经验</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">💎 强化石商店</div><div style="font-size:.72rem;color:var(--txm)">6666金币/颗，林深大大的关爱</div></div></div></div></div></div>';
 
 window.toggleNotice=function(){
     var body=document.getElementById('noticeBody');
