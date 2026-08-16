@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.1">
+<meta name="game-version" content="v1.2.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -571,6 +571,8 @@ function confirmImport(){
         localStorage.setItem(SK,decoded);
         closeImportModal();
         showSaveToast('✅','存档导入成功！页面即将刷新...');
+        入成功！页面即将刷新...');
+_importMode=true;
         setTimeout(function(){location.reload()},1200)
     }catch(e){showSaveToast('❌','存档码无效或已损坏，请检查后重试！')}
 }function showSaveToast(icon,text){var toast=document.getElementById('xgSaveToast');if(!toast){toast=document.createElement('div');toast.id='xgSaveToast';toast.className='xg-save-toast';toast.innerHTML='<span class="toast-icon"></span><div class="toast-text"></div>';document.body.appendChild(toast)}toast.querySelector('.toast-icon').textContent=icon;toast.querySelector('.toast-text').textContent=text;toast.classList.add('show');setTimeout(function(){toast.classList.remove('show')},1800)}
@@ -1172,6 +1174,7 @@ function formatEquipWithEnhance(eq,slot){
     return s;
 }
 /* UI设置 */
+var _importMode=false;
 var _showDmg=localStorage.getItem('xx_showDmg')!=='0';
 var _detailOpen=localStorage.getItem('xx_detailOpen')!=='0';
 
@@ -1705,7 +1708,7 @@ function forceSaveCloud(){
 }
 function autoSave(){saveLocal();saveCloud()}
 setInterval(autoSave,30000);
-window.addEventListener('beforeunload',function(){saveLocal();forceSaveCloud()});
+window.addEventListener('beforeunload',function(){if(_importMode)return;saveLocal();forceSaveCloud()});
 /* 渲染总调度 */
 function rStart(c){
     var hasSave = false;
