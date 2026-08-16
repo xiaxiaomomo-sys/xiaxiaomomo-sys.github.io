@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.1">
+<meta name="game-version" content="v1.2.2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -2185,6 +2185,7 @@ window.xxStatPick=function(i){applyStatCh(i)};
 window.xxSkPick=function(i){applySkCh(i)};
 window.xxReplPick=function(i){replSk(i)};
 window.xxSkSkip=function(){var p=G.p;if(p.statPts>0){G.scr='assign';rc()}else{checkLvlUp()}};
+window.xxReplSkip=function(){var p=G.p;if(p.statPts>0){G.scr='assign';rc()}else{checkLvlUp()}};
 window.xxSave=function(){saveLocal();saveCloud();alert('存档成功！')};
 window.xxAssignDone=function(){checkLvlUp()};
 window.xxAssign=function(stat,delta){var p=G.p;if(delta>0&&p.statPts<=0)return;if(delta<0&&p[stat]<=0)return;p[stat]+=delta;p.statPts-=delta;p.hp=Math.min(p.hp,calcMaxHp(p));autoSave();rc()};
@@ -2476,10 +2477,7 @@ window.xxDoEnhance=function(slot){
 var _xxOrigBattleWin=battleWin;
 battleWin=function(){
     _xxOrigBattleWin.apply(this,arguments);
-    saveLB();
-    checkAchievements();
 };
-
 /* 暴击计数 */
 var _xxOrigDoNormalAtk=doNormalAtk;
 doNormalAtk=function(){
