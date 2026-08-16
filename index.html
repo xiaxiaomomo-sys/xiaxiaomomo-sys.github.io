@@ -1887,8 +1887,12 @@ h+='</div>';
 function rBattle(c){
   var p=G.p,cm=G.cmb;
   if(cm.result==='win'||cm.result==='lose'){
-    /* 战斗结束后直接显示结果 */
-    var h='<div class="xg-hdr" style="margin-bottom:16px"><h2 style="font-size:1.3rem">⚔️ 战斗结束</h2></div>';
+    /* 战斗结束后：保留战斗面板 + 底部显示结果 */
+    var h='<div class="xg-hdr" style="margin-bottom:16px"><h2 style="font-size:1.3rem">⚔️ 第 '+cm.floor+' 层'+(cm.isBoss?' · BOSS战':'')+'</h2></div>';
+    /* 显示最后一帧战斗日志 */
+    h+='<div class="xg-log">';for(var i=0;i<cm.log.length;i++)h+='<div>'+cm.log[i]+'</div>';h+='</div>';
+
+    if(cm.result==='win'){
     if(cm.result==='win'){
       var pbg=cm.petBonusGold||0,peG=cm.petExpGained||0;
       h+='<div class="xg-result-box win"><span class="big-emoji">🎉</span><h3>战斗胜利！</h3>';
