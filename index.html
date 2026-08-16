@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.1">
+<meta name="game-version" content="v1.2.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -571,7 +571,6 @@ function confirmImport(){
         localStorage.setItem(SK,decoded);
         closeImportModal();
         showSaveToast('✅','存档导入成功！页面即将刷新...');
-        入成功！页面即将刷新...');
 _importMode=true;
         setTimeout(function(){location.reload()},1200)
     }catch(e){showSaveToast('❌','存档码无效或已损坏，请检查后重试！')}
