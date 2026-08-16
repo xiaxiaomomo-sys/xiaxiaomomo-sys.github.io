@@ -1218,6 +1218,7 @@ function doNormalAtk(){
     var supp = getSuppression(c.floor, p.lv);
 
     var dmg = Math.max(1, Math.floor(rawDmg * mDefMul * supp.pDmg));
+    if(p.pSkl.indexOf('P20')>=0 && m.hp/m.mhp < 0.3) dmg = Math.floor(dmg * 1.5);
     if(p.pet&&p.pet.owned&&p.pet.level>=100&&p.pet.quality==='god') dmg = Math.floor(dmg*1.05);
 
     m.hp = Math.max(0, m.hp-dmg);
