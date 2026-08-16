@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.0">
+<meta name="game-version" content="v1.2.1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -1598,7 +1598,6 @@ var _gmClicks=0,_gmTimer=null,_gmUnlocked=false;
 window.xxGmClick=function(){_gmClicks++;if(_gmClicks===1)_gmTimer=setTimeout(function(){_gmClicks=0},5000);if(_gmClicks>=10){clearTimeout(_gmTimer);_gmClicks=0;var code=prompt('请输入GM密码：');if(code==='83266121'){_gmUnlocked=true;alert('GM权限已解锁！');rc()}else{alert('密码错误！')}}};
 window.xxGmAxe=function(t){if(!_gmUnlocked)return;if(t==='gold1w'){G.p.gold+=10000;rc();autoSave()}else if(t==='hp'){G.p.hp=calcMaxHp(G.p);rc();autoSave()}else if(t==='lv5'){for(var i=0;i<5;i++){G.p.lv++;G.p.statPts+=ptsPerLv(G.p.lv)}G.p.hp=calcMaxHp(G.p);rc();autoSave()}};
 window.xxClear=function(){localStorage.removeItem(SK);G.p=null;G.prog=null;G.scr='start';rc();alert('存档已清除！')};
-function rGmPick(c,isPassive){
 function rGmPick(c,isPassive){var p=G.p;var src=isPassive?PSKILLS:ASKILLS;var unacquired=src.filter(function(s){return(isPassive?p.pSkl:p.aSkl).indexOf(s.id)<0});var h='<div class="xg-hdr"><h2>🛠️ 自选'+(isPassive?'被动':'主动')+'技能</h2><p>点击即可直接领悟</p></div>';h+='<div class="xg-card"><div class="xg-choices" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">';if(unacquired.length===0)h+='<div style="color:var(--txm);padding:20px">所有技能已全部习得！</div>';else{unacquired.forEach(function(s){h+='<div class="xg-skill-card rarity-legendary" style="min-width:200px;max-width:280px;cursor:pointer" onclick="xxGmPickSkill(\''+s.id+'\','+isPassive+')"><div class="sk-type '+(isPassive?'passive':'active')+'">'+(isPassive?'🔮被动':'⚔️主动')+'</div><div class="sk-name">'+s.n+'</div><div class="sk-desc">'+s.d+'</div><div style="font-size:.65rem;color:var(--txm);margin-top:4px">点击领悟</div></div>'})}h+='</div></div><div class="xg-actions"><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 返回基地</button></div>';c.innerHTML=h;}
 window.xxGmPickSkill=function(id,isPassive){var p=G.p;if(isPassive){if(p.pSkl.indexOf(id)<0)p.pSkl.push(id)}else{if(p.aSkl.indexOf(id)<0)p.aSkl.push(id)}rc();autoSave()};
 
