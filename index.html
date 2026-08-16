@@ -976,7 +976,7 @@ function hasEquipPassive(key){
 }
 function calcAtk(p){var base=Math.floor(10+p.atkPts*2.0+(p.pAtk||0)+getEquipFlat('atk'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=15)result+=10;var eqPct=getEquipPct('atkPct');if(eqPct>0)result=Math.floor(result*(1+eqPct));return result}
 function calcDef(p){var base=Math.floor(5+p.defPts*2.0+(p.pDef||0)+getEquipFlat('def'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=15)result+=10;var eqPct=getEquipPct('defPct');if(eqPct>0)result=Math.floor(result*(1+eqPct));return result}
-function calcMaxHp(p){var base=Math.floor(100+p.conPts*5+(p.pHp||0)+getEquipFlat('hp'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=15)result+=30;var eqPct=getEquipPct('hpPct');if(eqPct>0)result=Math.floor(result*(1+eqPct));return result}
+function calcMaxHp(p){var base=Math.floor(100+p.conPts*10+(p.pHp||0)+getEquipFlat('hp'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=15)result+=30;var eqPct=getEquipPct('hpPct');if(eqPct>0)result=Math.floor(result*(1+eqPct));return result}
 function calcCritR(p){var cap=p._achCritCapBreak?0.28:0.25;var val=(p.pCritR||0)+getEquipFlat('critR')+(getEquipPct('critR')||0);return Math.min(val/100,cap)} // 上限锁定25%
 function calcCritD(p){
     var kills = p.kills||0;
