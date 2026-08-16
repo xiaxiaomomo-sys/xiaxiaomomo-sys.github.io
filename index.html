@@ -1241,10 +1241,7 @@ function load(){
     } catch(e){}
     return false;
 }
-        }
-    } catch(e){}
-    return false; 
-}
+ 
 async function loadCloud(){
     try {
         var r = await _sb.from('save').select('game_data').eq('id',myDevice).single();
