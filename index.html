@@ -1323,7 +1323,6 @@ h+='<div style="padding:4px 8px;background:var(--b50);border-radius:6px;font-siz
         h+='<div class="xg-exp-bar"><div class="xg-exp-fill" style="width:'+Math.floor(p.pet.exp/pNeed*100)+'%"></div></div></div>';
         
             var ps=[{lv:10,n:'⚔️ 咸鱼突刺',d:'3%概率直接秒杀非BOSS怪物+10金币'},{lv:15,n:'🌿 灵兽庇佑',d:'攻击+10/防御+10/生命+30，每回合回复5%HP，20%减伤50%(1次/战)'},{lv:20,n:'🍖 饿犬扑食',d:'瞬间斩杀血量低于10%的普通怪'},{lv:30,n:'🛡️ 忠犬护主',d:'致死时保留1血并回复15%生命(限1次)'},{lv:40,n:'💊 大郎吃药了',d:'胜利后1%概率随机获得1点属性'},{lv:50,n:'🦊 狐假虎威',d:'面对BOSS时削弱其5%攻击与防御'},{lv: 55, n: '✨ 终极化形', d: '受击后按品级额外回血(1%/2%/3%/5%)，主人攻击+10%'},{lv:100,n:'👑 神兽之力',d:'仅神兽·全伤害+5%'}];
-];
         h += '<div style="font-size:.75rem;margin-bottom:10px;display:flex;flex-direction:column;gap:5px;">';
         petSkills.forEach(function(ps) {
             var isUnlk = p.pet.level >= ps.lv;
