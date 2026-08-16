@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.0">
+<meta name="game-version" content="v1.2.1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -2122,7 +2122,7 @@ window.xxNew = async function() {
 
         G.p = mkP(newName);
        G.prog = { maxFloor: 1, cleared: {}, bossCleared: {}, curFloor: 1, ach: {} };
-        _sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:newName,max_floor:1,level:1,title:'凡人',kills:0,updated_at:Date.now()});
+        await _sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:newName,max_floor:1,level:1,title:'凡人',kills:0,updated_at:Date.now()});
         G.scr = 'hub';
         rc(); autoSave();
 
