@@ -1292,7 +1292,7 @@ function doSkillUse(sid){
 
     if (rawDmg > 0) dmg += Math.floor(rawDmg * mDefMul * supp.pDmg);
     if (trueDmg > 0) dmg += Math.floor(trueDmg);
-    
+    if(p.pSkl.indexOf('P20')>=0 && m.hp/m.mhp < 0.3) dmg = Math.floor(dmg * 1.5);
     if(p.pet&&p.pet.owned&&p.pet.level>=100&&p.pet.quality==='god') dmg = Math.floor(dmg*1.05);
 
     if(dmg > 0){
