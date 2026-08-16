@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.1.9">
+<meta name="game-version" content="v1.2.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -1129,7 +1129,8 @@ _abt=setTimeout(function(){
     for(var k in c.cd){if(c.cd[k]>0)c.cd[k]--}
     if(c.berserkTurns>0){c.berserkTurns--;if(c.berserkTurns<=0)addLog('<span class="info">狂暴化结束</span>')}
     if(p.pSkl.indexOf('P9')>=0) applyHeal(p, calcMaxHp(p)*0.025, false);
-    if(p.pet&&p.pet.owned&&p.pet.level>=55&&p.hp>0){var _petHealRate=0.01;if(p.pet.quality==='god')_petHealRate=0.05;else if(p.pet.quality==='fairy')_petHealRate=0.03;else if(p.pet.quality==='spirit')_petHealRate=0.02;applyHeal(p, calcMaxHp(p)*_petHealRate, false);}
+    if(p.pet&&p.pet.owned&&p.pet.level>=15&&p.hp>0){applyHeal(p, Math.floor(calcMaxHp(p)*0.05), false);}
+    if(p.pet&&p.pet.owned&&p.pet.level>=55&&p.hp>0){var _petHealRate=0.01;if(p.pet.quality==='god')_petHealRate=0.05;else if(p.pet.quality==='fairy')_petHealRate=0.03;else if(p.pet.quality==='spirit')_petHealRate=0.02;applyHeal(p, Math.floor(calcMaxHp(p)*_petHealRate), false);}
     if((m.ab===1||m.ab===6||m.ab===7)&&c.turnCount%3===0&&c.turnCount>0){m.hp=Math.min(m.mhp,m.hp+Math.floor(m.mhp*0.05));addLog('<span class="info">怪物回血</span>')}
     c.turnCount++;c.round++;render();
     if(p.pSkl.indexOf('P18')>=0&&Math.random()<0.1&&m.hp>0){
@@ -1321,14 +1322,7 @@ h+='<div style="padding:4px 8px;background:var(--b50);border-radius:6px;font-siz
         h+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:3px"><span>⭐ 经验</span><span>'+p.pet.exp+'/'+pNeed+'</span></div>';
         h+='<div class="xg-exp-bar"><div class="xg-exp-fill" style="width:'+Math.floor(p.pet.exp/pNeed*100)+'%"></div></div></div>';
         
-        var petSkills = [
-    {lv: 10, n: '⚔️ 咸鱼突刺', d: '3%概率直接秒杀非BOSS怪物'},
-    {lv: 15, n: '🌿 灵兽庇佑', d: '攻击+10/防御+10/生命+30，每回合回复5%HP，20%减伤50%(1次/战)'},
-    {lv: 20, n: '🍖 饿犬扑食', d: '瞬间斩杀血量低于10%的普通怪'},
-    {lv: 30, n: '🛡️ 忠犬护主', d: '致死时保留1血并回复15%生命(限1次)'},
-    {lv: 40, n: '💊 大郎吃药了', d: '胜利后1%概率随机获得1点属性'},
-    {lv: 50, n: '🦊 狐假虎威', d: '面对BOSS时削弱其5%攻击与防御'},
-    {lv: 55, n: '✨ 终极化形', d: '回合结束按品级回血(1%/2%/3%/5%)，主人攻击+10%'}
+            var ps=[{lv:10,n:'⚔️ 咸鱼突刺',d:'3%概率直接秒杀非BOSS怪物+10金币'},{lv:15,n:'🌿 灵兽庇佑',d:'攻击+10/防御+10/生命+30，每回合回复5%HP，20%减伤50%(1次/战)'},{lv:20,n:'🍖 饿犬扑食',d:'瞬间斩杀血量低于10%的普通怪'},{lv:30,n:'🛡️ 忠犬护主',d:'致死时保留1血并回复15%生命(限1次)'},{lv:40,n:'💊 大郎吃药了',d:'胜利后1%概率随机获得1点属性'},{lv:50,n:'🦊 狐假虎威',d:'面对BOSS时削弱其5%攻击与防御'},{lv: 55, n: '✨ 终极化形', d: '受击后按品级额外回血(1%/2%/3%/5%)，主人攻击+10%'},{lv:100,n:'👑 神兽之力',d:'仅神兽·全伤害+5%'}];
 ];
         h += '<div style="font-size:.75rem;margin-bottom:10px;display:flex;flex-direction:column;gap:5px;">';
         petSkills.forEach(function(ps) {
