@@ -2647,7 +2647,6 @@ window.xxStartEasterEgg = function() {
         status.innerHTML = "对着麦克风喊3次“林深你真帅”或“林深最帅”试试？";
     }
 };
-
 function showEggRewardModal(audioUrl) {
     G.p.eggClaimed = true; G.p.gold += 1000; autoSave();
     var mask = document.createElement('div');
@@ -2660,7 +2659,8 @@ function showEggRewardModal(audioUrl) {
     h += '<p style="font-size:.8rem;color:var(--txm);margin-bottom:8px;font-weight:bold">👇 下面是你夸我帅的绝版录音：</p>';
     h += '<audio controls autoplay src="' + audioUrl + '" style="width:100%;height:40px;outline:none;border-radius:8px"></audio>';
     h += '</div><button id="eggCloseBtn" class="xg-btn primary" style="width:100%;padding:12px;border-radius:99px;font-size:1rem;background:linear-gradient(135deg,var(--lv),#ab47bc);border-color:var(--lv);box-shadow:0 4px 15px rgba(123,104,174,.4)">太羞耻了，快关掉！</button></div>';
-    mask.innerHTML = h; document.body.appendChild(mask);
+    mask.innerHTML = h;
+    document.body.appendChild(mask);
     document.getElementById('eggCloseBtn').onclick = function() { mask.remove(); rc(); };
 }
 rc();
