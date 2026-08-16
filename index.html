@@ -1179,7 +1179,7 @@ function toggleDmgFloat(){
     _showDmg=document.getElementById('dmgToggle').checked;
     localStorage.setItem('xx_showDmg',_showDmg?'1':'0');
 }
-
+window.toggleDmgFloat=toggleDmgFloat;
 function toggleBattleDetail(){
     _detailOpen=!_detailOpen;
     localStorage.setItem('xx_detailOpen',_detailOpen?'1':'0');
