@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.1">
+<meta name="game-version" content="v1.2.2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -1697,7 +1697,7 @@ function saveCloud(){
     },10000);
 }
 function saveLB(){
-    if(!G.p||!dbReady)return;
+    if(!G.p)return;
     try{_sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||1:1,level:G.p.lv,title:G.p._title||titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()})}catch(e){}
 }
 function forceSaveCloud(){
@@ -2092,14 +2092,24 @@ function rSave(c){var h='<div class="xg-hdr"><h2>💾 存档</h2></div><div clas
 function rAssign(c){var p=G.p;var h='<div class="xg-hdr"><h2>📊 属性分配</h2><p>剩余: <span style="color:var(--b500);font-weight:900">'+p.statPts+'</span> 点</p></div><div class="xg-card">';h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--b100)"><span style="font-weight:700">⚔️ 攻击: '+p.atkPts+'</span><div><button class="xg-btn primary" style="padding:4px 12px" onclick="xxAssign(\'atkPts\',1)"'+(p.statPts<=0?' disabled':'')+'>+</button></div></div>';h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--b100)"><span style="font-weight:700">🛡️ 防御: '+p.defPts+'</span><div><button class="xg-btn primary" style="padding:4px 12px" onclick="xxAssign(\'defPts\',1)"'+(p.statPts<=0?' disabled':'')+'>+</button></div></div>';h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0"><span style="font-weight:700">❤️ 体力: '+p.conPts+'</span><div><button class="xg-btn primary" style="padding:4px 12px" onclick="xxAssign(\'conPts\',1)"'+(p.statPts<=0?' disabled':'')+'>+</button></div></div>';h+='<div style="margin-top:16px;padding-top:12px;border-top:1px dashed var(--b100);font-size:.85rem;color:var(--txm)">⚔️攻击:'+calcAtk(p)+' | 🛡️防御:'+calcDef(p)+' | ❤️HP:'+calcMaxHp(p)+'</div>';h+='</div><div class="xg-actions"><button class="xg-btn primary" onclick="xxAssignDone()">↩️ 确认</button></div>';c.innerHTML=h;}
 /* 全局函数绑定 */
 var xiuxLB=[];
-// 🌟 隔离修复1：上传数据时，强制打上 s1_ 烙印
-async function saveXiuxianProg(){if(!G.p||!dbReady)return;if(G.p.name==='测试用小号')return;try{await _sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||G.prog.curFloor||1:1,level:G.p.lv,title:titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()})}catch(e){}}
+// 🌟 修复1：解除对 dbReady 的错误依赖，确保修仙高等级数据正常上传
+async function saveXiuxianProg(){
+    if(!G.p)return; 
+    if(G.p.name==='测试用小号')return; // 保持测试小号不上传
+    try{await _sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||G.prog.curFloor||1:1,level:G.p.lv,title:titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()})}catch(e){}
+}
 
-// 🌟 隔离修复2：拉取数据时，只拉取带有 s1_ 烙印的数据（彻底无视旧版幽灵数据）
-async function loadXiuxianLB(){try{var r=await _sb.from('xiuxian_leaderboard').select('*').like('id','s1_%').order('max_floor',{ascending:false}).order('level',{ascending:false}).limit(20);if(r.data)xiuxLB=r.data.filter(function(row){return row.name!=='测试用小号'});if(G.scr==='hub')rc()}catch(e){}}
+// 🌟 修复2：保持排行榜不显示测试号
+async function loadXiuxianLB(){
+    try{
+        var r=await _sb.from('xiuxian_leaderboard').select('*').like('id','s1_%').order('max_floor',{ascending:false}).order('level',{ascending:false}).limit(20);
+        if(r.data)xiuxLB=r.data.filter(function(row){return row.name!=='测试用小号'});
+        if(G.scr==='hub')rc()
+    }catch(e){}
+}
 setTimeout(loadXiuxianLB,5000);setInterval(loadXiuxianLB,30000);
 
-/* === 核心：新角色全服查重与防重名机制 === */
+/* === 核心：新角色全服查重与防覆盖机制 === */
 window.xxNew = async function() {
     var nm = document.getElementById('xxName');
     if (!nm || !nm.value.trim()) return;
@@ -2115,61 +2125,66 @@ window.xxNew = async function() {
 
     try {
         var isTaken = false;
+        var isMyOldSave = false;
 
-        // 第一层防御：本地排行榜快速查重兜底（防缓存延迟）
+        // 第一层防御：本地排行榜兜底检查
         if (window.xiuxLB && window.xiuxLB.length > 0) {
             for (var j = 0; j < window.xiuxLB.length; j++) {
-                // 只要名字一样，且 ID 不属于当前设备，判定占用
-                if (window.xiuxLB[j].name === newName && window.xiuxLB[j].id !== ('s1_' + myDevice) && window.xiuxLB[j].id !== myDevice) {
-                    isTaken = true;
-                    break;
+                if (window.xiuxLB[j].name === newName) {
+                    if (window.xiuxLB[j].id === 's1_' + myDevice) isMyOldSave = true;
+                    else isTaken = true;
                 }
             }
         }
 
-        // 第二层防御：数据库全量精准查重
-        if (!isTaken) {
-            var r = await _sb.from('xiuxian_leaderboard')
-                .select('id, name')
-                .eq('name', newName);
-            
+        // 第二层防御：数据库全量查重
+        if (!isTaken && !isMyOldSave) {
+            var r = await _sb.from('xiuxian_leaderboard').select('id, name').eq('name', newName);
             if (r.data && r.data.length > 0) {
                 for (var i = 0; i < r.data.length; i++) {
-                    var rowId = r.data[i].id;
-                    // 核心修复：无论旧版ID还是新版ID，只要不是当前设备的，就判定为占用！
-                    if (rowId && rowId !== myDevice && rowId !== ('s1_' + myDevice)) {
-                        isTaken = true;
-                        break;
-                    }
+                    if (r.data[i].id === 's1_' + myDevice) isMyOldSave = true;
+                    else isTaken = true;
                 }
             }
         }
         
-        // 【特权】：允许你在任意设备无限注册“测试用小号”进行测试，不受重名限制
+        // 特权：测试用小号不设限
         if (newName === '测试用小号') {
             isTaken = false;
+            isMyOldSave = false;
         }
         
+        // 别人占用了这个名字 -> 拦截
         if (isTaken) {
             alert('⚠️ 道号【' + newName + '】已被其他修士抢先注册，请另赐雅号！');
             if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; } 
             return;
         }
 
+        // 自己曾经注册过这个名字 -> 弹出危险警告
+        if (isMyOldSave) {
+            var confirmReset = confirm('⚠️ 你的道号【' + newName + '】已有修仙记录！\n如果继续注册，将会【清空你的进度】并重置到Lv.1！\n\n如果你想继续游玩，请点击取消，然后使用【继续上次的存档】。\n\n是否确定要清空并重新开始？');
+            if (!confirmReset) {
+                if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; }
+                return;
+            }
+        }
+
         // 注册成功，初始化数据
         G.p = mkP(newName);
         G.prog = { maxFloor: 1, cleared: {}, bossCleared: {}, curFloor: 1, ach: {} };
         
-        // 立即将新角色上报到天道（数据库占位）
-        await _sb.from('xiuxian_leaderboard').upsert({
-            id: 's1_' + myDevice,
-            name: newName,
-            max_floor: 1,
-            level: 1,
-            title: '凡人',
-            kills: 0,
-            updated_at: Date.now()
-        });
+        if (newName !== '测试用小号') {
+            await _sb.from('xiuxian_leaderboard').upsert({
+                id: 's1_' + myDevice,
+                name: newName,
+                max_floor: 1,
+                level: 1,
+                title: '凡人',
+                kills: 0,
+                updated_at: Date.now()
+            });
+        }
         
         G.scr = 'hub';
         rc(); autoSave();
@@ -2180,17 +2195,18 @@ window.xxNew = async function() {
         if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; }
     }
 };
+
 window.xxLoad=function(){
     if(load()){
         if(!G.p.uid) { G.p.uid = myDevice; saveLocal(); }
-_sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||1:1,level:G.p.lv,title:titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()});
-G.scr='hub';rc();
+        if(G.p.name !== '测试用小号') _sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||1:1,level:G.p.lv,title:titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()});
+        G.scr='hub';rc();
     }else{
         loadCloud().then(function(ok){
             if(ok){
                if(!G.p.uid) { G.p.uid = myDevice; saveLocal(); }
-_sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||1:1,level:G.p.lv,title:titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()});
-G.scr='hub';rc();
+               if(G.p.name !== '测试用小号') _sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||1:1,level:G.p.lv,title:titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()});
+               G.scr='hub';rc();
             }else{ alert('本地和云端都没有找到存档！'); }
         });
     }
@@ -2200,8 +2216,8 @@ window.xxLoadCloud=function(){
     loadCloud().then(function(ok){
         if(ok){
             if(!G.p.uid) { G.p.uid = myDevice; saveLocal(); }
-_sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||1:1,level:G.p.lv,title:titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()});
-G.scr='hub';rc(); alert('云端存档恢复成功！');
+            if(G.p.name !== '测试用小号') _sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:G.p.name,max_floor:G.prog?G.prog.maxFloor||1:1,level:G.p.lv,title:titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()});
+            G.scr='hub';rc(); alert('云端存档恢复成功！');
         }else{ alert('云端没有找到存档。'); }
     }).catch(function(){alert('云端读取失败，请检查网络。')});
 };
