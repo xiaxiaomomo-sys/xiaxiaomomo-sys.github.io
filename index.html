@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.0">
+<meta name="game-version" content="v1.2.1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -2287,8 +2287,23 @@ window.xxBuyStone=function(){
     showSaveToast('💎','获得强化石！('+p.stones.length+'/10)');
     rc();autoSave();
 };
-window.xxClaimPet=function(){var p=G.p;if(!p||(p.pet&&p.pet.owned))return;var q=rollPetQuality();p.pet={owned:true,quality:q,level:1,exp:0};var info=PET_QUAL[q];showSaveToast(info.emoji,'领养成功！资质：'+info.name+' · 触发率×'+info.skillMul);rc();autoSave()};
-window.xxResetPet=function(){
+window.xxClaimPet=function(){
+    var p=G.p;
+    if(!p||(p.pet&&p.pet.owned))return;
+    
+    // 🌟 首次领养专属概率：没有神兽(god)，仅在 凡骨(common)、灵兽(spirit)、仙宠(fairy) 中随机
+    var r=Math.random();
+    var q='common';
+    if(r<0.05) q='fairy';      // 5% 概率获得仙宠
+    else if(r<0.30) q='spirit';  // 25% 概率获得灵兽
+    else q='common';           // 70% 概率获得凡骨
+    
+    p.pet={owned:true,quality:q,level:1,exp:0};
+    var info=PET_QUAL[q];
+    showSaveToast(info.emoji,'领养成功！资质：'+info.name+' · 触发率×'+info.skillMul);
+    rc();
+    autoSave();
+};window.xxResetPet=function(){
     var p=G.p; if(!p||!p.pet||!p.pet.owned) return;
     var price=getShopPrice(5000); if(p.gold<price) return;
     p.gold-=price;
