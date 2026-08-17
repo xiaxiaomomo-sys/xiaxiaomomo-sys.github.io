@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.2">
+<meta name="game-version" content="v1.2.3">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -2161,10 +2161,10 @@ window.xxNew = async function() {
             return;
         }
 
-        // 自己曾经注册过这个名字 -> 弹出危险警告
+       // 自己曾经注册过这个名字 -> 弹出危险警告与正确指引
         if (isMyOldSave) {
-            var confirmReset = confirm('⚠️ 你的道号【' + newName + '】已有修仙记录！\n如果继续注册，将会【清空你的进度】并重置到Lv.1！\n\n如果你想继续游玩，请点击取消，然后使用【继续上次的存档】。\n\n是否确定要清空并重新开始？');
-            if (!confirmReset) {
+            var confirmStr = prompt('⚠️ 你的道号【' + newName + '】已有修仙记录！\n\n👉 如果你想在当前设备接着玩，请点击【取消】，去点下方的【☁️ 从云端恢复存档】！\n\n⚠️ 危险：如果你执意要删号重练（这将清空你所有设备上的该角色），请输入“重置”二字：');
+            if (confirmStr !== '重置') {
                 if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; }
                 return;
             }
