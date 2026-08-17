@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.1">
+<meta name="game-version" content="v1.2.2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -950,8 +950,7 @@ function genMon(floor,isBoss){
     return{name:MN[floor%MN.length],emoji:ME[floor%ME.length],hp:hp,mhp:hp,atk:atk,def:df,exp:ge,gold:gd,isBoss:false,floor:floor,ab:-1}
 }
 
-function mkP(nm){return{uid:myDevice,name:nm,lv:1,exp:0,gold:700,hp:100,atkPts:2,defPts:1,conPts:2,statPts:5,pAtk:0,pDef:0,pHp:0,pCritR:0,pCritD:0,pDodge:0,pLife:0,healPct:0,lowAtk:0,firstCrit:false,survive:false,aSkl:[],pSkl:[],revives:0,scans:0,kills:0,hitsTaken:0,expBonus:0,expBonusCount:0,consecutiveKills:0,p8RemainingBattles:0,pet:{owned:false,quality:null,level:1,exp:0},equip:{weapon:null,armor:null,trinket:null},bag:[],enhance:{weapon:0,armor:0,trinket:0},stones:[],_totalCrits:0,_maxHealInBattle:0,_achCritCapBreak:false,_achDodgeCapBreak:false,_achLifeCapBreak:false,_achPetExpBonus:0,_shopDiscount:1.0,_title:''}}
-/* 属性计算与限制 */
+function mkP(nm){return{uid:myDevice,name:nm,lv:1,exp:0,gold:700,hp:100,atkPts:2,defPts:1,conPts:2,statPts:5,pAtk:0,pDef:0,pHp:0,pCritR:0,pCritD:0,pDodge:0,pLife:0,healPct:0,lowAtk:0,firstCrit:false,survive:false,aSkl:[],pSkl:[],revives:0,scans:0,kills:0,hitsTaken:0,expBonus:0,expBonusCount:0,consecutiveKills:0,p8RemainingBattles:0,pet:{owned:false,quality:null,level:1,exp:0},equip:{weapon:null,armor:null,trinket:null},bag:[],enhance:{weapon:0,armor:0,trinket:0},stones:[],_totalCrits:0,_maxHealInBattle:0,_achCritCapBreak:false,_achDodgeCapBreak:false,_achLifeCapBreak:false,_achPetExpBonus:0,_shopDiscount:1.0,_title:'',hasSelectedActiveSkill:false}}
 function expNeed(lv){if(lv<=10)return lv*lv*50;if(lv<=20)return lv*lv*80;if(lv<=30)return lv*lv*120;if(lv<=40)return lv*lv*180;if(lv<=50)return lv*lv*250;if(lv<=60)return lv*lv*350;if(lv<=80)return lv*lv*500;return lv*lv*700}
 function ptsPerLv(lv){return 1;} // 每次升级1点
 function titleFor(lv){if(lv>=81)return'渡劫期';if(lv>=61)return'大乘期';if(lv>=51)return'合体期';if(lv>=41)return'化神期';if(lv>=31)return'元婴期';if(lv>=21)return'金丹期';if(lv>=11)return'筑基期';if(lv>=1)return'炼气期';return'凡人'}
@@ -1684,6 +1683,10 @@ function migrate(d){
     if(d.p._achPetExpBonus===undefined) d.p._achPetExpBonus=0;
     if(d.p._shopDiscount===undefined) d.p._shopDiscount=1.0;
     if(d.p._title===undefined) d.p._title='';
+    
+    // 🌟 加上这行，防止老存档报错
+    if(d.p.hasSelectedActiveSkill===undefined) d.p.hasSelectedActiveSkill=false;
+
     if(!d.pr) d.pr={};
     if(!d.pr.ach) d.pr.ach={};
     if(!d.pr.cleared) d.pr.cleared={};
