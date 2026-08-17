@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.5">
+<meta name="game-version" content="v1.2.6">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -2130,6 +2130,7 @@ h+='<div class="it-desc">每个角色终身限选1次，免费任选一个心仪
 h+='</div>';
 h+='<button class="'+skillBtnCls+'" style="'+skillBtnStyle+'" '+skillBtnAttr+'>'+skillLabel+'</button>';
 h+='</div>';
+
 var giftCount=(typeof p.giftClaimed==='number')?p.giftClaimed:(p.giftClaimed===true?1:0);var giftMax=6;var giftDone=giftCount>=giftMax;var giftBtnCls=giftDone?'xg-btn':'xg-btn primary';var giftBtnStyle='padding:6px 12px;font-size:.75rem;'+(giftDone?'opacity:.5;cursor:not-allowed;':'');var giftBtnAttr=giftDone?'disabled':'onclick="xxClaimGift()"';var giftLabel=giftDone?'已领完 ('+giftCount+'/'+giftMax+')':'🎁 领取1000金币 ('+giftCount+'/'+giftMax+')';
 h+='<div class="xg-item" style="border-left:3px solid '+(giftDone?'var(--txl)':'var(--pk)')+';background:linear-gradient(135deg,var(--white),'+(giftDone?'var(--b50)':'var(--pks)')+');margin-bottom:16px;'+(giftDone?'opacity:.6;':'')+'"><span class="it-icon">'+(giftDone?'🤍':'💖')+'</span><div class="it-info"><div class="it-name" style="color:'+(giftDone?'var(--txm)':'var(--pk)')+';font-weight:900">来自林深大大的关爱</div><div class="it-desc" style="color:'+(giftDone?'var(--txm)':'var(--pk)')+'">每个名字可领取'+giftMax+'次的专属启动资金~</div></div><button class="'+giftBtnCls+'" style="'+giftBtnStyle+'" '+giftBtnAttr+'>'+giftLabel+'</button></div>';
 var compClaimed=p.compClaimed||false;var compBtnCls=compClaimed?'xg-btn':'xg-btn primary';var compBtnStyle='padding:6px 12px;font-size:.75rem;'+(compClaimed?'opacity:.5;cursor:not-allowed;':'');var compBtnAttr=compClaimed?'disabled':'onclick="xxClaimCompensation()"';var compLabel=compClaimed?'已领取':'📜 领取500金币';
@@ -2141,7 +2142,6 @@ var eggBtnStyle='padding:6px 12px;font-size:.75rem;'+(eggClaimed?'opacity:.5;cur
 var eggBtnAttr=eggClaimed?'disabled':'onclick="xxStartEasterEgg()"';
 var eggLabel=eggClaimed?'✅ 彩蛋已触发':'🎙️ 开启隐藏试炼';
 h+='<div class="xg-item" style="border-left:3px solid var(--lv);background:linear-gradient(135deg,var(--white),rgba(123,104,174,.1));margin-bottom:16px"><span class="it-icon">🎙️</span><div class="it-info"><div class="it-name" style="color:var(--lv);font-weight:900">【神秘试炼】</div><div class="it-desc" id="eggStatus" style="color:var(--txm)">对着麦克风喊3次“林深你真帅”或“林深最帅”试试？</div></div><button id="eggBtn" class="'+eggBtnCls+'" style="'+eggBtnStyle+'" '+eggBtnAttr+'>'+eggLabel+'</button></div>';
-
 /* 商店强化石 */
 var stoneCount=p.stones?p.stones.length:0;
 var stoneFull=stoneCount>=10;
@@ -2302,7 +2302,26 @@ window.xxLoadCloud=function(){
     }).catch(function(){alert('云端读取失败，请检查网络。')});
 };
 window.xxFloor=function(f){G.p.hp=calcMaxHp(G.p);startBattle(f,f%10===0)};
-window.xxGoto=function(s){G.scr=s;rc()};
+window.xxGoto = function(s) {
+    if (s === 'bag') {
+        // 如果是从战斗中点进背包，暂停自动战斗，并记录返回目标为 battle
+        if (G.scr === 'battle') {
+            stopAuto();
+            G._bagReturn = 'battle';
+        } else {
+            G._bagReturn = 'hub';
+        }
+    }
+    G.scr = s;
+    rc();
+};
+window.xxReturnToBattle = function() {
+    G.scr = 'battle';
+    rc();
+    if (G.cmb && !G.cmb.result) {
+        autoLoop(); // 恢复自动战斗循环
+    }
+};
 window.xxBuy=function(i){buyItem(i)};
 window.xxClaimCompensation=function(){if(G.p.compClaimed)return;G.p.compClaimed=true;G.p.gold+=500;if(typeof showSaveToast==='function')showSaveToast('📜','成功领取维护补偿 500 金币！');rc();autoSave()};
 window.xxClaimGift=function(){
@@ -2508,7 +2527,10 @@ function rBag(c){
     h+='<span style="font-size:1.2rem">💎</span><span style="font-weight:800">强化石: '+p.stones.length+'/10</span>';
     h+='</div><div style="font-size:.72rem;color:var(--txm);text-align:center;margin-top:4px">20层以上BOSS掉落 · 商店可购买 · 强化+5以上使用可防止掉级</div></div>';
 
-    h+='<div class="xg-actions" style="margin-top:16px"><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 返回基地</button></div>';
+    var returnScr = G._bagReturn || 'hub';
+var returnText = returnScr === 'battle' ? '↩️ 返回战斗' : '↩️ 返回基地';
+var returnAction = returnScr === 'battle' ? 'xxReturnToBattle()' : 'xxGoto(\'hub\')';
+h+='<div class="xg-actions" style="margin-top:16px"><button class="xg-btn primary" onclick="'+returnAction+'">'+returnText+'</button></div>';
     c.innerHTML=h;
 }
 
