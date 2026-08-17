@@ -2112,21 +2112,34 @@ window.xxNew = async function() {
     var btn = document.querySelector('button[onclick="xxNew()"]');
     if (btn) { btn.disabled = true; btn.innerText = '🔍 查阅天道名册中...'; }
 
-    try {
-        // 🌟 隔离修复3：查重时也只查 S1 赛季的玩家，把旧名字释放出来让大家抢注
+       try {
         var r = await _sb.from('xiuxian_leaderboard').select('id').eq('name', newName).limit(1);
+        console.log('查重结果:', JSON.stringify(r));
+
+        if (r.error) {
+            console.log('查重出错:', r.error.message);
+            alert('查重接口报错: ' + r.error.message);
+            if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; } return;
+        }
+
         if (r.data && r.data.length > 0 && r.data[0].id !== 's1_' + myDevice) {
             alert('⚠️ 道号【' + newName + '】已被其他修士抢先注册，请另赐雅号！');
-            if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; } return; 
+            if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; } return;
         }
 
         G.p = mkP(newName);
-       G.prog = { maxFloor: 1, cleared: {}, bossCleared: {}, curFloor: 1, ach: {} };
-        await _sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:newName,max_floor:1,level:1,title:'凡人',kills:0,updated_at:Date.now()});
+        G.prog = { maxFloor: 1, cleared: {}, bossCleared: {}, curFloor: 1, ach: {} };
+        var wr = await _sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:newName,max_floor:1,level:1,title:'凡人',kills:0,updated_at:Date.now()});
+        console.log('写入结果:', JSON.stringify(wr));
+
         G.scr = 'hub';
         rc(); autoSave();
 
     } catch (e) {
+        console.log('异常:', e);
+        alert('天道网络波动，验证道号失败: ' + e.message);
+        if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; }
+    }
         alert('天道网络波动，验证道号失败，请重试！');
         if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; }
     }
