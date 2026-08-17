@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.0">
+<meta name="game-version" content="v1.2.1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -2114,27 +2114,46 @@ window.xxNew = async function() {
     if (btn) { btn.disabled = true; btn.innerText = '🔍 查阅天道名册中...'; }
 
     try {
-        // 🌟 终极修复方案：放弃可能存在兼容问题的 like 语法，直接取同名记录在 JS 本地过滤
-        var r = await _sb.from('xiuxian_leaderboard')
-            .select('id, name')
-            .eq('name', newName);
-            
-        if (r.data && r.data.length > 0) {
-            var isTaken = false;
-            for (var i = 0; i < r.data.length; i++) {
-                var rowId = r.data[i].id;
-                // 判断：只要这个名字属于 S1 赛季，且设备ID不是当前设备，就说明被别人抢了
-                if (rowId && rowId.indexOf('s1_') === 0 && rowId !== ('s1_' + myDevice)) {
+        var isTaken = false;
+
+        // 第一层防御：本地排行榜快速查重兜底（防缓存延迟）
+        if (window.xiuxLB && window.xiuxLB.length > 0) {
+            for (var j = 0; j < window.xiuxLB.length; j++) {
+                // 只要名字一样，且 ID 不属于当前设备，判定占用
+                if (window.xiuxLB[j].name === newName && window.xiuxLB[j].id !== ('s1_' + myDevice) && window.xiuxLB[j].id !== myDevice) {
                     isTaken = true;
                     break;
                 }
             }
+        }
+
+        // 第二层防御：数据库全量精准查重
+        if (!isTaken) {
+            var r = await _sb.from('xiuxian_leaderboard')
+                .select('id, name')
+                .eq('name', newName);
             
-            if (isTaken) {
-                alert('⚠️ 道号【' + newName + '】已被其他修士抢先注册，请另赐雅号！');
-                if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; } 
-                return;
+            if (r.data && r.data.length > 0) {
+                for (var i = 0; i < r.data.length; i++) {
+                    var rowId = r.data[i].id;
+                    // 核心修复：无论旧版ID还是新版ID，只要不是当前设备的，就判定为占用！
+                    if (rowId && rowId !== myDevice && rowId !== ('s1_' + myDevice)) {
+                        isTaken = true;
+                        break;
+                    }
+                }
             }
+        }
+        
+        // 【特权】：允许你在任意设备无限注册“测试用小号”进行测试，不受重名限制
+        if (newName === '测试用小号') {
+            isTaken = false;
+        }
+        
+        if (isTaken) {
+            alert('⚠️ 道号【' + newName + '】已被其他修士抢先注册，请另赐雅号！');
+            if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; } 
+            return;
         }
 
         // 注册成功，初始化数据
