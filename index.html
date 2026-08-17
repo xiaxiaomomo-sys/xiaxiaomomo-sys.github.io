@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.7">
+<meta name="game-version" content="v1.2.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -590,7 +590,7 @@ _importMode=true;
 function critLine(){var pe=document.getElementById('xgPE');if(!pe)return;var emoji=pe.querySelector('.emoji');if(!emoji)return;var rect=emoji.getBoundingClientRect();var cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;var f=document.createElement('div');f.style.cssText='position:fixed;left:'+cx+'px;top:'+cy+'px;width:'+(rect.width*1.5)+'px;height:'+(rect.height*1.5)+'px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,64,.9),rgba(255,215,64,.3),transparent);transform:translate(-50%,-50%);z-index:51;pointer-events:none;transition:all .4s ease-out;opacity:1;';document.body.appendChild(f);var r=document.createElement('div');r.style.cssText='position:fixed;left:'+cx+'px;top:'+cy+'px;width:20px;height:20px;border-radius:50%;border:3px solid rgba(255,215,64,.8);transform:translate(-50%,-50%);z-index:51;pointer-events:none;transition:all .5s ease-out;opacity:1;';document.body.appendChild(r);requestAnimationFrame(function(){requestAnimationFrame(function(){if(f){f.style.transform='translate(-50%,-50%) scale(2.5)';f.style.opacity='0'}if(r){r.style.width='120px';r.style.height='120px';r.style.opacity='0'}})});setTimeout(function(){if(f&&f.parentNode)f.remove();if(r&&r.parentNode)r.remove()},600)}function floatDmg(targetId,text,color){if(!_showDmg)return;setTimeout(function(){var tEl=$(targetId);if(!tEl)return;var isCrit=text.indexOf('\u66B4\u51FB')>=0;var f=document.createElement('div');f.textContent=text;var sz=isCrit?'2rem':'1.4rem';var anim=isCrit?'dmgPopCrit 1s ease forwards':'dmgPop .8s ease forwards';f.style.cssText='position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);font-size:'+sz+';font-weight:900;color:'+color+';z-index:99;pointer-events:none;text-shadow:0 2px 12px rgba(0,0,0,.3),0 0 20px '+color+';animation:'+anim+';white-space:nowrap;font-style:italic';tEl.style.position='relative';tEl.appendChild(f);setTimeout(function(){if(f.parentNode)f.remove()},1000)},50)}
 function renderBuffTags(c,p){var tags='';if(c.berserkTurns>0)tags+='<span class="xg-buff-tag berserk">⚔️狂暴'+c.berserkTurns+'回合</span>';if(c.cloneTurns>0)tags+='<span class="xg-buff-tag clone">🎭分身'+c.cloneTurns+'回合</span>';if(c.invTurns>0)tags+='<span class="xg-buff-tag inv">🛡️无敌</span>';if(c.godOfWarReady)tags+='<span class="xg-buff-tag warrior">⚡战神就绪</span>';if(c.p8Active)tags+='<span class="xg-buff-tag p8buff">🔥战意+30% ('+(G.p.p8RemainingBattles||'')+'场)</span>';if(c.buffs)for(var i=0;i<c.buffs.length;i++){tags+='<span class="xg-buff-tag shield">🛡️'+c.buffs[i].t+'</span>'}if(c.stunM>0)tags+='<span class="xg-buff-tag stun">💫麻痹'+c.stunM+'</span>';return tags}
 
-var SK='xx_save_s1',VER=101,G={scr:'start',p:null,prog:null,cmb:null,ce:null};
+var SK='xx_save_s2',VER=102,G={scr:'start',p:null,prog:null,cmb:null,ce:null};
 function $(id){return document.getElementById(id)}
 function rc(){var c=$('xgRoot');if(c)render()}
 window.xgRc=rc;
@@ -648,8 +648,7 @@ function petGoldBonus(){
     return rawBonus; // god品级神兽不受限制
 }
 function rollPetQuality(){var r=Math.random();if(r<0.02)return'god';if(r<0.07)return'fairy';if(r<0.32)return'spirit';return'common'}
-function getShopPrice(base){var p=G.p;if(!p)return base;var price=base;if(p.pet&&p.pet.owned&&p.pet.level>=100)price=Math.floor(price*(p.pet.quality==='god'?0.7:0.9));if(p._shopDiscount&&p._shopDiscount<1)price=Math.floor(price*p._shopDiscount);return Math.max(1,price)}
-
+function getShopPrice(base){var p=G.p;if(!p)return base;var off=0;if(p.pet&&p.pet.owned&&p.pet.level>=100)off+=(p.pet.quality==='god'?0.2:0.1);if(p._shopDiscount&&p._shopDiscount<1)off+=(1.0-p._shopDiscount);off=Math.min(off,0.3);return Math.max(1,Math.floor(base*(1-off)))}
 /* 音效系统 */
 var _actx=null;function getCtx(){if(!_actx)_actx=new(window.AudioContext||window.webkitAudioContext)();return _actx}
 function sfx(t){try{var c=getCtx();if(c.state==='suspended')c.resume();if(t==='atk'){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='square';o.frequency.setValueAtTime(800,c.currentTime);o.frequency.exponentialRampToValueAtTime(200,c.currentTime+.1);g.gain.setValueAtTime(.15,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.12);o.start(c.currentTime);o.stop(c.currentTime+.12)}else if(t==='hit'){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(150,c.currentTime);o.frequency.exponentialRampToValueAtTime(50,c.currentTime+.15);g.gain.setValueAtTime(.2,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.15);o.start(c.currentTime);o.stop(c.currentTime+.15)}else if(t==='skill'){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sawtooth';o.frequency.setValueAtTime(300,c.currentTime);o.frequency.exponentialRampToValueAtTime(1200,c.currentTime+.15);g.gain.setValueAtTime(.08,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.25);o.start(c.currentTime);o.stop(c.currentTime+.25)}else if(t==='die'){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sawtooth';o.frequency.setValueAtTime(500,c.currentTime);o.frequency.exponentialRampToValueAtTime(40,c.currentTime+.7);g.gain.setValueAtTime(.18,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.8);o.start(c.currentTime);o.stop(c.currentTime+.8)}else if(t==='win'){[523,659,784,1047].forEach(function(f,i){var o2=c.createOscillator(),g2=c.createGain();o2.connect(g2);g2.connect(c.destination);o2.type='square';o2.frequency.value=f;g2.gain.setValueAtTime(.08,c.currentTime+i*.12);g2.gain.exponentialRampToValueAtTime(.001,c.currentTime+i*.12+.25);o2.start(c.currentTime+i*.12);o2.stop(c.currentTime+i*.12+.25)})}else if(t==='heal'){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(400,c.currentTime);o.frequency.exponentialRampToValueAtTime(800,c.currentTime+.2);g.gain.setValueAtTime(.08,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.25);o.start(c.currentTime);o.stop(c.currentTime+.25)}else if(t==='taunt'){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';o.frequency.setValueAtTime(400,c.currentTime);o.frequency.setValueAtTime(300,c.currentTime+.08);o.frequency.setValueAtTime(450,c.currentTime+.16);g.gain.setValueAtTime(.08,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.25);o.start(c.currentTime);o.stop(c.currentTime+.25)}}catch(e){}}
@@ -1021,10 +1020,9 @@ function hasEquipPassive(key){
     var groupMap={atkPct:'atkPct',defPct:'defPct',hpPct:'hpPct',critR:'critR',burn:'burn',regen:'regen',thorns:'thorns'};
     return!!passives[groupMap[key]||key];
 }
-function calcAtk(p){var base=Math.floor(10+p.atkPts*2.0+(p.pAtk||0)+getEquipFlat('atk'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=15)result+=10;var eqPct=getEquipPct('atkPct');if(eqPct>0)result=Math.floor(result*(1+eqPct));return result}
-function calcDef(p){var base=Math.floor(5+p.defPts*2.0+(p.pDef||0)+getEquipFlat('def'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=15)result+=10;var eqPct=getEquipPct('defPct');if(eqPct>0)result=Math.floor(result*(1+eqPct));return result}
-function calcMaxHp(p){var base=Math.floor(100+p.conPts*10+(p.pHp||0)+getEquipFlat('hp'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=15)result+=30;var eqPct=getEquipPct('hpPct');if(eqPct>0)result=Math.floor(result*(1+eqPct));return result}
-function calcCritR(p){var cap=p._achCritCapBreak?0.28:0.25;var val=(p.pCritR||0)+getEquipFlat('critR')+(getEquipPct('critR')||0);return Math.min(val/100,cap)} // 上限锁定25%
+function calcAtk(p){var base=Math.floor(10+p.atkPts*2.0+(p.pAtk||0)+getEquipFlat('atk'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=1)result+=10;var eqPct=getEquipPct('atkPct');if(eqPct>0)result=Math.floor(result*(1+eqPct));return result}
+function calcDef(p){var base=Math.floor(5+p.defPts*2.0+(p.pDef||0)+getEquipFlat('def'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=1)result+=10;var eqPct=getEquipPct('defPct');if(eqPct>0)result=Math.floor(result*(1+eqPct));return result}
+function calcMaxHp(p){var base=Math.floor(100+p.conPts*10+(p.pHp||0)+getEquipFlat('hp'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=1)result+=30;var eqPct=getEquipPct('hpPct');if(eqPct>0)result=Math.floor(result*(1+eqPct));return result}function calcCritR(p){var cap=p._achCritCapBreak?0.28:0.25;var val=(p.pCritR||0)+getEquipFlat('critR')+(getEquipPct('critR')||0);return Math.min(val/100,cap)} // 上限锁定25%
 function calcCritD(p){
     var kills = p.kills||0;
     var bonus = 0;
@@ -1404,7 +1402,7 @@ function doMonsterAtk(){
         dmg = Math.floor(dmg * 0.75); addLog('<span class="info">【铁壁】减免25%伤害！</span>');
     }
 // 灵兽庇佑：20%减伤50%，一场战斗一次
-if(p.pet&&p.pet.owned&&p.pet.level>=15&&!c.auraReduced&&Math.random()<0.20){
+if(p.pet&&p.pet.owned&&p.pet.level>=1&&!c.auraReduced&&Math.random()<0.20){
     dmg=Math.floor(dmg*0.5);c.auraReduced=true;
     addLog('<span style="color:var(--jade)">🌿 灵兽庇佑！伤害减半！</span>');
 }
@@ -1535,7 +1533,7 @@ _abt=setTimeout(function(){
     for(var k in c.cd){if(c.cd[k]>0)c.cd[k]--}
     if(c.berserkTurns>0){c.berserkTurns--;if(c.berserkTurns<=0)addLog('<span class="info">狂暴化结束</span>')}
     if(p.pSkl.indexOf('P9')>=0) applyHeal(p, calcMaxHp(p)*0.025, false);
-    if(p.pet&&p.pet.owned&&p.pet.level>=15&&p.hp>0){applyHeal(p, Math.floor(calcMaxHp(p)*0.05), false);}
+    if(p.pet&&p.pet.owned&&p.pet.level>=1&&p.hp>0){applyHeal(p, Math.floor(calcMaxHp(p)*0.05), false);}
     if(p.pet&&p.pet.owned&&p.pet.level>=55&&p.hp>0){var _petHealRate=0.01;if(p.pet.quality==='god')_petHealRate=0.05;else if(p.pet.quality==='fairy')_petHealRate=0.03;else if(p.pet.quality==='spirit')_petHealRate=0.02;applyHeal(p, Math.floor(calcMaxHp(p)*_petHealRate), false);}
     if(hasEquipPassive('regen')&&p.hp>0){var regenVal=getEquipPct('regen');applyHeal(p,Math.floor(calcMaxHp(p)*regenVal/100),false)}
     if((m.ab===1||m.ab===6||m.ab===7)&&c.turnCount%3===0&&c.turnCount>0){m.hp=Math.min(m.mhp,m.hp+Math.floor(m.mhp*0.05));addLog('<span class="info">怪物回血</span>')}
@@ -1554,7 +1552,7 @@ p.exp+=ge;p.gold+=gd;p.kills++;p.consecutiveKills=(p.consecutiveKills||0)+1;
 if (p.kills % 150 === 0 && p.pSkl.indexOf('P14') >= 0) { p.pAtk += 1; addLog('<span class="info">【嗜血本能】永久攻击+1！</span>'); }
 var bonusGold=petGoldBonus()+(c.petBonusGold||0);p.gold+=bonusGold;
 var petExpGained=0,petLeveled=false,petNewLv=0;if(p.pet&&p.pet.owned&&p.pet.level<100){var pq=PET_QUAL[p.pet.quality];petExpGained=Math.floor(ge*pq.expRate);p.pet.exp+=petExpGained;var oldPetLv=p.pet.level;while(p.pet.exp>=petExpNeed(p.pet.level)&&p.pet.level<100){p.pet.exp-=petExpNeed(p.pet.level);p.pet.level++}if(p.pet.level>oldPetLv){petLeveled=true;petNewLv=p.pet.level;var nf=petForm(p.pet.level);setTimeout(function(){showSaveToast(nf.emoji,'灵兽升级！Lv.'+p.pet.level+' '+nf.name)},300)}}else if(p.pet&&p.pet.owned&&p.pet.level>=100){petNewLv=100}
-if(p.pet&&p.pet.owned&&p.pet.level>=40){var pq2=PET_QUAL[p.pet.quality];if(Math.random()<0.01*pq2.skillMul){p.statPts+=1;setTimeout(function(){showSaveToast('💊','【大郎，吃药了】白嫖1点属性！')},600)}}
+if(p.pet&&p.pet.owned&&p.pet.level>=40){var pq2=PET_QUAL[p.pet.quality];if(Math.random()<0.02*pq2.skillMul){p.statPts+=1;setTimeout(function(){showSaveToast('💊','【大郎，吃药了】白嫖1点属性！')},600)}}
 if(p.p8RemainingBattles>0){p.p8RemainingBattles--;if(p.p8RemainingBattles<=0){p.consecutiveKills=0}}
 if(c.floor>=G.prog.maxFloor)G.prog.maxFloor=c.floor;G.prog.cleared[c.floor]=true;if(c.isBoss)G.prog.bossCleared[c.floor]=true;G._grindFloor=c.floor;G._grindIsBoss=c.isBoss;G.prog.curFloor=Math.max(G.prog.curFloor,c.floor+1);/* 装备掉落 */
 var dropResult=null;
@@ -1623,8 +1621,8 @@ var ACHIEVEMENTS=[
 {id:'ach_60f',name:'金丹大道',emoji:'💊',desc:'通关第60层',cond:function(p,pr){return pr.maxFloor>=60},reward:function(p){p.pAtk+=50;p.pDef+=50;p.pHp+=150},toast:'攻击+50 防御+50 生命+150'},
 {id:'ach_kill1k',name:'千人斩',emoji:'⚔️',desc:'累计击杀1000只怪物',cond:function(p){return p.kills>=1000},reward:function(p){p.pAtk+=20},toast:'攻击力永久+20'},
 {id:'ach_kill10k',name:'万骨枯',emoji:'💀',desc:'击杀10000只怪物',cond:function(p){return p.kills>=10000},reward:function(p){p.pCritR+=3;p.pDodge+=3;p._achCritCapBreak=true;p._achDodgeCapBreak=true},toast:'暴击率+3% 闪避率+3% (可突破上限)'},
-{id:'ach_gold5w',name:'一掷千金',emoji:'💰',desc:'存够50000金币',cond:function(p){return p.gold>=50000},reward:function(p){p._shopDiscount=0.9},toast:'商店永久9折'},
-{id:'ach_gold10w',name:'铁公鸡',emoji:'🐔',desc:'存够100000金币',cond:function(p){return p.gold>=100000},reward:function(p){p._shopDiscount=0.8},toast:'商店永久8折'},
+{id:'ach_gold5w',name:'一掷千金',emoji:'💰',desc:'存够50000金币',cond:function(p){return p.gold>=50000},reward:function(p){p._shopDiscount=0.95},toast:'商店永久9.5折'},
+{id:'ach_gold10w',name:'铁公鸡',emoji:'🐔',desc:'存够100000金币',cond:function(p){return p.gold>=100000},reward:function(p){p._shopDiscount=0.9},toast:'商店永久9折'},
 {id:'ach_heal500',name:'不死之身',emoji:'💚',desc:'单次战斗回复超过500HP',cond:function(p){return(p._maxHealInBattle||0)>=500},reward:function(p){p.pLife+=3;p._achLifeCapBreak=true},toast:'吸血率+3% (可突破上限)'},
 {id:'ach_pet50',name:'宠物达人',emoji:'🐾',desc:'灵兽达到Lv.50',cond:function(p){return p.pet&&p.pet.owned&&p.pet.level>=50},reward:function(p){p._achPetExpBonus=20},toast:'宠物经验+20%'},
 {id:'ach_petGod',name:'神兽觉醒',emoji:'💛',desc:'获得神兽品质灵兽',cond:function(p){return p.pet&&p.pet.owned&&p.pet.quality==='god'},reward:function(p){p.pAtk+=20;p.pDef+=20;p.pHp+=200},toast:'全属性+20'},
@@ -1843,7 +1841,7 @@ h+='<div style="padding:4px 8px;background:var(--b50);border-radius:6px;font-siz
         h+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:3px"><span>⭐ 经验</span><span>'+p.pet.exp+'/'+pNeed+'</span></div>';
         h+='<div class="xg-exp-bar"><div class="xg-exp-fill" style="width:'+Math.floor(p.pet.exp/pNeed*100)+'%"></div></div></div>';
         
-            var ps=[{lv:10,n:'⚔️ 咸鱼突刺',d:'3%概率直接秒杀非BOSS怪物+10金币'},{lv:15,n:'🌿 灵兽庇佑',d:'攻击+10/防御+10/生命+30，每回合回复5%HP，20%减伤50%(1次/战)'},{lv:20,n:'🍖 饿犬扑食',d:'瞬间斩杀血量低于10%的普通怪'},{lv:30,n:'🛡️ 忠犬护主',d:'致死时保留1血并回复15%生命(限1次)'},{lv:40,n:'💊 大郎吃药了',d:'胜利后1%概率随机获得1点属性'},{lv:50,n:'🦊 狐假虎威',d:'面对BOSS时削弱其5%攻击与防御'},{lv: 55, n: '✨ 终极化形', d: '受击后按品级额外回血(1%/2%/3%/5%)，主人攻击+10%'},{lv:100,n:'👑 神兽之力',d:'仅神兽·全伤害+5%'}];
+           var ps=[{lv:10,n:'⚔️ 咸鱼突刺',d:'3%概率直接秒杀非BOSS怪物+10金币'},{lv:1,n:'🌿 灵兽庇佑',d:'攻击+10/防御+10/生命+30，每回合回复5%HP，20%减伤50%(1次/战)'},{lv:20,n:'🍖 饿犬扑食',d:'瞬间斩杀血量低于10%的普通怪'},{lv:30,n:'🛡️ 忠犬护主',d:'致死时保留1血并回复15%生命(限1次)'},{lv:40,n:'💊 大郎吃药了',d:'胜利后2%概率随机获得1点属性'},{lv:50,n:'🦊 狐假虎威',d:'面对BOSS时削弱其5%攻击与防御'},{lv: 55, n: '✨ 终极化形', d: '受击后按品级额外回血(1%/2%/3%/5%)，主人攻击+10%'},{lv:100,n:'👑 神兽之力',d:'仅神兽·全伤害+5%'}];
         h += '<div style="font-size:.75rem;margin-bottom:10px;display:flex;flex-direction:column;gap:5px;">';
         ps.forEach(function(ps) {
             var isUnlk = p.pet.level >= ps.lv;
@@ -2081,7 +2079,8 @@ function rLskill(c){var p=G.p;var h='<div class="xg-title"><div class="big-emoji
 
 function rReplace(c){var info=G.ce._rp,p=G.p;var arr=info.isP?p.pSkl:p.aSkl;var src=info.isP?PSKILLS:ASKILLS;var newSk=src.find(function(s){return s.id===info.id});var h='<div class="xg-title"><div class="big-emoji">🔄</div><h3>技能栏已满</h3><p style="color:var(--txm)">选择一个替换为 ['+newSk.n+']，或直接跳过保持原样</p><div class="xg-choices">';for(var i=0;i<arr.length;i++){var oldSk=src.find(function(s){return s.id===arr[i]});if(!oldSk)continue;h+='<div class="xg-skill-card" style="animation-delay:'+((i+1)*.12)+'s" onclick="xxReplPick('+i+')"><div class="sk-name">'+oldSk.n+'</div><div class="sk-desc">'+oldSk.d+'</div></div>'}h+='</div><div class="xg-actions" style="margin-top:20px"><button class="xg-btn danger" onclick="xxReplSkip()">🛑 跳过 (放弃学习此技能)</button></div></div>';c.innerHTML=h;}
 /* 更新公告栏 */
-var UPDATE_NOTICE='<div id="xxUpdateNotice" style="margin-bottom:16px"><div style="background:linear-gradient(135deg,rgba(77,186,100,.06),rgba(201,169,110,.06));border:2px solid rgba(77,186,100,.2);border-radius:16px;overflow:hidden"><div onclick="toggleNotice()" style="cursor:pointer;padding:14px 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.4rem">⚔️</span><div><div style="font-weight:900;font-size:1rem">V1.2.1大更新</div><div style="font-size:.72rem;color:var(--txm)">点击展开查看更新内容</div></div></div><span id="noticeArrow" style="font-size:.85rem;color:var(--txm);transition:transform .3s">▼</span></div><div id="noticeBody" style="display:none;padding:0 20px 20px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:.82rem"><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🆕 装备系统</div><div style="font-size:.72rem;color:var(--txm)">五品三类型，击败BOSS掉落，随机属性+被动</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">⚒️ 装备强化</div><div style="font-size:.72rem;color:var(--txm)">部位+10，属性暴涨，强化石防掉级</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">✨ 套装效果</div><div style="font-size:.72rem;color:var(--txm)">全部+10激活神级光环，30%秒杀+金币加成</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🏆 成就系统</div><div style="font-size:.72rem;color:var(--txm)">12个成就，永久属性奖励，称号系统</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">🌙 离线收益</div><div style="font-size:.72rem;color:var(--txm)">挂机8小时，一键领取金币经验</div></div><div style="padding:10px;background:var(--white);border-radius:10px"><div style="font-weight:800;margin-bottom:4px">💎 强化石商店</div><div style="font-size:.72rem;color:var(--txm)">6666金币/颗，林深大大的关爱</div></div></div></div></div></div>';
+/* 更新公告栏 */
+var UPDATE_NOTICE='<div id="xxUpdateNotice" style="margin-bottom:16px"><div style="background:linear-gradient(135deg,rgba(77,186,100,.06),rgba(201,169,110,.06));border:2px solid rgba(77,186,100,.2);border-radius:16px;overflow:hidden"><div onclick="toggleNotice()" style="cursor:pointer;padding:14px 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.4rem">⚠️</span><div><div style="font-weight:900;font-size:1rem;color:var(--cinnabar)">全服重置公告 (V1.2.0)</div><div style="font-size:.72rem;color:var(--txm)">点击查看“天道崩塌”真相</div></div></div><span id="noticeArrow" style="font-size:.85rem;color:var(--txm);transition:transform .3s">▼</span></div><div id="noticeBody" style="display:none;padding:0 20px 20px"><div style="font-size:.82rem;color:var(--txb);line-height:1.7"><p>诸位道友，因早期天道法则存在漏洞（刷神兽Bug），导致修仙界战力崩坏。</p><p style="color:var(--cinnabar);font-weight:bold;margin:8px 0">林深大魔王已施展无上法力，将时光倒流，全服删档重置！</p><p>为了弥补大家的损失，现在重新建号，商城新增<b>洗髓丹保底机制（1次必仙，5次必神）</b>，并且灵兽1级即可参战护主！快来重新开启你的修仙之路吧！</p></div></div></div></div>';
 
 function toggleNotice(){
     var body=document.getElementById('noticeBody');
@@ -2099,15 +2098,29 @@ window.toggleNotice=toggleNotice;
 function rShop(c){
 var p=G.p;
 var h='<div class="xg-hdr"><h2>🛒 商店</h2><p>金币: <span style="color:var(--yw);font-weight:900">'+p.gold+'</span>';
-if(p.pet&&p.pet.owned&&p.pet.level>=100){h+=' <span style="font-size:.78rem;color:var(--lv);margin-left:8px">🏷️ 灵兽折扣'+(p.pet.quality==='god'?'7折':'9折')+'</span>';}
+
+// 动态计算并显示最终折数
+var off = 0;
+if(p.pet && p.pet.owned && p.pet.level >= 100) off += (p.pet.quality === 'god' ? 0.2 : 0.1);
+if(p._shopDiscount && p._shopDiscount < 1) off += (1.0 - p._shopDiscount);
+
+if(off > 0) {
+    off = Math.min(off, 0.3); // 最高7折
+    var zhe = Math.round((1 - off) * 10); 
+    h+=' <span style="font-size:.78rem;color:var(--lv);margin-left:8px">🏷️ 商店特权 '+zhe+'折</span>';
+}
 h+='</p></div><div class="xg-card">';
 
 if(!p.pet||!p.pet.owned){
   h+='<div class="xg-item" style="border-left:3px solid var(--lv);background:linear-gradient(135deg,var(--white),rgba(100,181,246,.08));margin-bottom:16px">';
   h+='<span class="it-icon">🐾</span><div class="it-info">';
   h+='<div class="it-name" style="font-weight:900;color:var(--lv)">天降灵宠</div>';
-  h+='<div class="it-desc">Lv.1免费领养一只灵兽伙伴！陪你修仙、打怪、赚金币~</div></div>';
-  h+='<button class="xg-btn primary" style="padding:6px 12px;font-size:.75rem" onclick="xxClaimPet()">🎁 免费领养</button></div>';
+  h+='<div class="it-desc">人物达到 Lv.10 后，免费领养一只灵兽！陪你修仙、打怪、赚金币~</div></div>';
+  if(p.lv < 10){
+      h+='<button class="xg-btn" disabled style="padding:6px 12px;font-size:.75rem;opacity:.5">Lv.10 解锁</button></div>';
+  }else{
+      h+='<button class="xg-btn primary" style="padding:6px 12px;font-size:.75rem" onclick="xxClaimPet()">🎁 免费领养</button></div>';
+  }
 }else{
   var pq=PET_QUAL[p.pet.quality];var pf=petForm(p.pet.level);
   h+='<div class="xg-item" style="border-left:3px solid '+pq.color+';opacity:.75;margin-bottom:16px">';
@@ -2116,7 +2129,6 @@ if(!p.pet||!p.pet.owned){
   h+='<div class="it-desc">已领养 '+pf.name+' · '+pq.emoji+pq.name+' Lv.'+p.pet.level+'</div></div>';
   h+='<button class="xg-btn" disabled style="padding:6px 12px;font-size:.75rem;opacity:.5">✅ 已领养</button></div>';
 }
-
 /* 🛒 商城单行条目：主动技能自选 */
 var hasChosen = p.hasSelectedActiveSkill;
 var skillBtnCls = hasChosen ? 'xg-btn' : 'xg-btn primary';
@@ -2159,8 +2171,13 @@ h+='</div>';
 for(var i=0;i<SHOP.length;i++){var it=SHOP[i];var price=getShopPrice(it.p);var canBuy=p.gold>=price;var isExpStone=(i===0);
 var atLimit=isExpStone&&(p.expBonus||0)>=130;if(it.maxCount){var cc=p[it.countKey]||0;if(cc>=it.maxCount)atLimit=true}if(atLimit)canBuy=false;var countInfo='';if(isExpStone){countInfo=(p.expBonusCount||0)+'次 · +'+(p.expBonus||0)+'%'}else if(it.maxCount){var cc2=p[it.countKey]||0;countInfo=cc2+'/'+it.maxCount+'次'}else if(it.countKey){var cc3=p[it.countKey]||0;if(cc3>0)countInfo='已购'+cc3+'次'}var buyLabel=atLimit?'🔒 已满':'💰'+price+(price<it.p?' <s style="font-size:.6rem;opacity:.6">'+it.p+'</s>':'');var btnCls=canBuy?'xg-btn gold':'xg-btn';var btnStyle='padding:6px 12px;font-size:.75rem;'+(canBuy?'':'opacity:.5;cursor:not-allowed;');var btnAttr=canBuy?'onclick="xxBuy('+i+')"':'disabled';h+='<div class="xg-item"><span class="it-icon">'+it.ic+'</span><div class="it-info"><div class="it-name">'+it.n+(countInfo?' <span style="font-size:.7rem;color:var(--txm)">('+countInfo+')</span>':'')+'</div><div class="it-desc">'+it.d+(atLimit?' <span style="color:var(--cinnabar);font-weight:700">已达到上限</span>':'')+'</div></div><button class="'+btnCls+'" style="'+btnStyle+'" '+btnAttr+'>'+buyLabel+'</button></div>'}
 
-if(p.pet&&p.pet.owned){var washPrice=getShopPrice(5000);var canWash=p.gold>=washPrice;
-h+='<div class="xg-item" style="border-left:3px solid var(--cinnabar)"><span class="it-icon">💊</span><div class="it-info"><div class="it-name">洗髓丹</div><div class="it-desc">重新抽取宠物资质（等级和经验不变）</div></div><button class="'+(canWash?'xg-btn gold':'xg-btn')+'" style="padding:6px 12px;font-size:.75rem;'+(canWash?'':'opacity:.5;cursor:not-allowed;')+'" '+(canWash?'onclick="xxResetPet()"':'disabled')+'>💰'+washPrice+(washPrice<5000?' <s style="font-size:.6rem;opacity:.6">5000</s>':'')+'</button></div>'}
+if(p.pet&&p.pet.owned){
+    var washPrice=getShopPrice(5000);var canWash=p.gold>=washPrice;
+    var washCount=p.petWashCount||0;
+    var pityTxt=washCount===0?' <span style="color:var(--cinnabar)">(首洗必出仙宠)</span>':(washCount<5?' <span style="color:var(--gold)">('+(5-washCount)+'次后必出神兽)</span>':'');
+    
+    h+='<div class="xg-item" style="border-left:3px solid var(--cinnabar)"><span class="it-icon">💊</span><div class="it-info"><div class="it-name">洗髓丹</div><div class="it-desc">重新抽取宠物资质'+pityTxt+'</div></div><button class="'+(canWash?'xg-btn gold':'xg-btn')+'" style="padding:6px 12px;font-size:.75rem;'+(canWash?'':'opacity:.5;cursor:not-allowed;')+'" '+(canWash?'onclick="xxResetPet()"':'disabled')+'>💰'+washPrice+(washPrice<5000?' <s style="font-size:.6rem;opacity:.6">5000</s>':'')+'</button></div>';
+}
 
 h+='</div><div class="xg-actions"><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 返回</button></div>';
 c.innerHTML=h;}
@@ -2378,27 +2395,40 @@ window.xxBuyStone=function(){
 };
 window.xxClaimPet=function(){
     var p=G.p;
-    if(!p||(p.pet&&p.pet.owned))return;
+    // 增加 Lv.10 的硬性限制
+    if(!p||(p.pet&&p.pet.owned)||p.lv<10) return;
     
-    // 🌟 首次领养专属概率：没有神兽(god)，仅在 凡骨(common)、灵兽(spirit)、仙宠(fairy) 中随机
     var r=Math.random();
     var q='common';
-    if(r<0.05) q='fairy';      // 5% 概率获得仙宠
-    else if(r<0.30) q='spirit';  // 25% 概率获得灵兽
-    else q='common';           // 70% 概率获得凡骨
+    if(r<0.05) q='fairy';      
+    else if(r<0.30) q='spirit';  
+    else q='common';            
     
     p.pet={owned:true,quality:q,level:1,exp:0};
     var info=PET_QUAL[q];
     showSaveToast(info.emoji,'领养成功！资质：'+info.name+' · 触发率×'+info.skillMul);
     rc();
     autoSave();
-};window.xxResetPet=function(){
+};
+
+window.xxResetPet=function(){
     var p=G.p; if(!p||!p.pet||!p.pet.owned) return;
     var price=getShopPrice(5000); if(p.gold<price) return;
     p.gold-=price;
-    var oldQ=p.pet.quality; var newQ=rollPetQuality();
+    
+    // 🌟 洗髓次数记录
+    p.petWashCount = (p.petWashCount || 0) + 1;
+    
+    var oldQ=p.pet.quality; 
+    var newQ=rollPetQuality();
+    
+    // 🌟 核心保底机制：第1次必仙，第5次必神！
+    if(p.petWashCount === 1) newQ = 'fairy';
+    if(p.petWashCount === 5) newQ = 'god';
+
     var tiers = { 'common': 1, 'spirit': 2, 'fairy': 3, 'god': 4 };
     if(tiers[newQ] < tiers[oldQ]) { newQ = oldQ; }
+    
     p.pet.quality=newQ; p.hp=Math.min(p.hp,calcMaxHp(p));
     var info=PET_QUAL[newQ]; var isUp = tiers[newQ] > tiers[oldQ];
     var msg = isUp ? '洗髓突破！新资质：'+info.name+'（触发率×'+info.skillMul+'） ↑提升！' : '洗髓完毕！资质维持在：'+info.name+'（防掉段保护生效）';
