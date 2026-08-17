@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.8">
+<meta name="game-version" content="v1.2.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -1722,7 +1722,7 @@ async function loadCloud(){
                 if(!G.prog.bossCleared) G.prog.bossCleared={};
                 if(!G.prog.curFloor) G.prog.curFloor=G.prog.maxFloor||1;
                 localStorage.setItem(SK, JSON.stringify({v:VER,p:G.p,pr:G.prog,ts:Date.now()}));
-            var rw=calcOfflineReward(gd.ts);if(rw&&(rw.gold>0||rw.exp>0))setTimeout(function(){showOfflineResource(rw)},1500); // 注意：此处原代码是 showOfflineReward(rw)
+            var rw=calcOfflineReward(gd.ts);if(rw&&(rw.gold>0||rw.exp>0))setTimeout(function(){showOfflineReward(rw)},1500); // 注意：此处原代码是 showOfflineReward(rw)
                 return true;
             }
         }
@@ -2651,7 +2651,7 @@ function showOfflineReward(rw){
             rc(); autoSave();
         }
     };
-
+}
 /* ===== 路由绑定 ===== */
 window.xxBagEquip=xxBagEquip;
 window.xxBagUnequip=xxBagUnequip;
