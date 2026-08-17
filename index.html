@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.4">
+<meta name="game-version" content="v1.2.5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -636,7 +636,16 @@ function getSetBonus(){
     if(minLv>=5)return{gold:minLv,instakill:0};
     return{gold:0,instakill:0};
 }
-function petGoldBonus(){var p=G.p;if(!p||!p.pet||!p.pet.owned)return 0;return Math.floor(p.pet.level/10)}
+function petGoldBonus(){
+    var p = G.p;
+    if(!p || !p.pet || !p.pet.owned) return 0;
+    var rawBonus = Math.floor(p.pet.level / 10);
+    var q = p.pet.quality;
+    if(q === 'common') return Math.min(rawBonus, 3);
+    if(q === 'spirit') return Math.min(rawBonus, 5);
+    if(q === 'fairy') return Math.min(rawBonus, 7);
+    return rawBonus; // god品级神兽不受限制
+}
 function rollPetQuality(){var r=Math.random();if(r<0.02)return'god';if(r<0.07)return'fairy';if(r<0.32)return'spirit';return'common'}
 function getShopPrice(base){var p=G.p;if(!p)return base;var price=base;if(p.pet&&p.pet.owned&&p.pet.level>=100)price=Math.floor(price*(p.pet.quality==='god'?0.7:0.9));if(p._shopDiscount&&p._shopDiscount<1)price=Math.floor(price*p._shopDiscount);return Math.max(1,price)}
 
