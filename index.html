@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.4">
+<meta name="game-version" content="v1.2.5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -1486,6 +1486,7 @@ _abt=setTimeout(function(){
 },spd)}
 
 function battleWin(){stopAuto();stopBGM();saveXiuxianProg();var p=G.p,c=G.cmb;if(!c)return;
+p.hp=calcMaxHp(p);
 var ge=Math.floor(c.m.exp*(1+(p.expBonus||0)/100)),gd=c.m.gold;
 p.exp+=ge;p.gold+=gd;p.kills++;p.consecutiveKills=(p.consecutiveKills||0)+1;
 if (p.kills % 150 === 0 && p.pSkl.indexOf('P14') >= 0) { p.pAtk += 1; addLog('<span class="info">【嗜血本能】永久攻击+1！</span>'); }
@@ -2266,7 +2267,7 @@ window.xxAssignDone=function(){checkLvlUp()};
 window.xxAssign=function(stat,delta){var p=G.p;if(delta>0&&p.statPts<=0)return;if(delta<0&&p[stat]<=0)return;p[stat]+=delta;p.statPts-=delta;p.hp=Math.min(p.hp,calcMaxHp(p));autoSave();rc()};
 window.xxContinueNow=function(){if(G._autoNextTimer){clearTimeout(G._autoNextTimer);G._autoNextTimer=null}G._autoContinue=true;checkLvlUp()};
 window.xxGoNextFloor=function(){if(G._autoNextTimer){clearTimeout(G._autoNextTimer);G._autoNextTimer=null}G._autoContinue=false;stopAuto();stopBGM();xxFloor(G.prog.curFloor)};
-window.xxInterrupt=function(){if(G._autoNextTimer){clearTimeout(G._autoNextTimer);G._autoNextTimer=null}G._autoContinue=false;stopAuto();stopBGM();G.scr='hub';rc()};
+window.xxInterrupt=function(){if(G._autoNextTimer){clearTimeout(G._autoNextTimer);G._autoNextTimer=null}G._autoContinue=false;stopAuto();stopBGM();G.p.hp=calcMaxHp(G.p);G.scr='hub';rc()};
 window.showExportModal=showExportModal;window.showImportModal=showImportModal;window.closeImportModal=closeImportModal;window.closeExportModal=closeExportModal;window.confirmImport=confirmImport;window.copyExportCode=copyExportCode;
 
 var _gmClicks=0,_gmTimer=null,_gmUnlocked=false;
