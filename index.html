@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.6">
+<meta name="game-version" content="v1.2.7">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -791,11 +791,38 @@ var PASSIVE_ORANGE=[
 ];
 
 /* 装备掉落概率 */
+/* 装备掉落概率与品级限制 */
 function getEquipRates(floor){
-    if(floor>=100)return{white:0,green:0,blue:0.40,purple:0.40,orange:0.20};
-    if(floor>=60)return{white:0.25,green:0.30,blue:0.30,purple:0.12,orange:0.03};
-    if(floor===10)return{white:0.90,green:0.06,blue:0.03,purple:0.009,orange:0.001};
-    return{white:0.50,green:0.36,blue:0.10,purple:0.03,orange:0.01};
+    if(floor === 10) {
+        // 10层：100%只掉白装
+        return {white: 1.0, green: 0, blue: 0, purple: 0, orange: 0};
+    }
+    if(floor === 20) {
+        // 20层：解锁绿装
+        return {white: 0.70, green: 0.30, blue: 0, purple: 0, orange: 0};
+    }
+    if(floor === 30) {
+        // 30层：解锁蓝装
+        return {white: 0.55, green: 0.30, blue: 0.15, purple: 0, orange: 0};
+    }
+    if(floor === 40) {
+        // 40层：解锁紫装
+        return {white: 0.45, green: 0.30, blue: 0.20, purple: 0.05, orange: 0};
+    }
+    if(floor === 50) {
+        // 50层：解锁所有品级（包括神品金装）
+        return {white: 0.40, green: 0.30, blue: 0.20, purple: 0.08, orange: 0.02};
+    }
+    if(floor >= 60 && floor <= 90) {
+        // 60~90层：白绿装逐渐减少，蓝紫金概率提升
+        return {white: 0.25, green: 0.30, blue: 0.30, purple: 0.12, orange: 0.03};
+    }
+    if(floor >= 100) {
+        // 100层魔王：不出白绿装，保底蓝装，紫金概率大增
+        return {white: 0, green: 0, blue: 0.40, purple: 0.40, orange: 0.20};
+    }
+    // 兜底默认值
+    return {white: 0.50, green: 0.36, blue: 0.10, purple: 0.03, orange: 0.01};
 }
 
 /* 权重随机：数值越高概率越低，最低≥2% */
@@ -1078,12 +1105,28 @@ function applyOnHitHeal(p, dmg){
 var _abt=null;function stopAuto(){if(_abt){clearTimeout(_abt);_abt=null}}
 /* 装备掉落处理 */
 function tryDropAndStore(floor){
+    // 🌟 核心：判定当前楼层的总体掉落率
+    var dropChance = 0;
+    if (floor === 10) dropChance = 0.05; // 5%
+    else if (floor === 20) dropChance = 0.10; // 10%
+    else if (floor >= 30 && floor <= 50) dropChance = 0.15; // 15%
+    else if (floor >= 60 && floor <= 90) dropChance = 0.30; // 30%
+    else if (floor >= 100) dropChance = 0.40; // 40%
+
+    // 未命中掉落概率，直接不掉装备
+    if (Math.random() > dropChance) {
+        return null; 
+    }
+
     var p=G.p;
     var rates=getEquipRates(floor);
     var roll=Math.random();
     var cum=0,rarity=null;
     var tiers=['white','green','blue','purple','orange'];
-    for(var i=0;i<tiers.length;i++){cum+=rates[tiers[i]];if(roll<cum){rarity=tiers[i];break}}
+    for(var i=0;i<tiers.length;i++){
+        cum+=rates[tiers[i]];
+        if(roll<cum){rarity=tiers[i];break}
+    }
     if(!rarity)return null;
 
     var slots=['weapon','armor','trinket'];
