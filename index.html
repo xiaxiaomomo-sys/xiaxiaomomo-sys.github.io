@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.0">
+<meta name="game-version" content="v1.2.1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -1871,7 +1871,7 @@ h+='</div>';
     h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.1rem;margin-bottom:16px">🏆 修仙排行榜 (S1赛季)</h4>';
     if(!xiuxLB||xiuxLB.length===0)h+='<div style="text-align:center;padding:16px;color:var(--txm);font-size:.85rem">暂无数据，开始修仙吧~</div>';
     else{h+='<div style="display:flex;flex-direction:column;gap:4px">';
-    xiuxLB.forEach(function(r,i){var isMe=r.id===myDevice;var badge=i===0?'🥇':i===1?'🥈':i===2?'🥉':' ';h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:'+(isMe?'rgba(201,169,110,.08)':'transparent')+';border:'+(isMe?'1px solid var(--gold)':'1px solid transparent')+'">';h+='<span style="width:24px;font-size:.9rem">'+badge+'</span>';h+='<span style="font-weight:800;font-size:.82rem;flex:1;'+(isMe?'color:var(--gold)':'')+'">'+(r.name||'匿名修仙者')+'</span>';h+='<span style="font-size:.72rem;color:var(--txm)">'+r.title+'</span>';h+='<span style="font-size:.75rem;font-weight:700;color:var(--b400)">第'+r.max_floor+'层</span>';h+='<span style="font-size:.72rem;color:var(--txm)">Lv.'+r.level+'</span>';h+='</div>'});h+='</div>';}h+='</div>';c.innerHTML=h;
+    xiuxLB.forEach(function(r,i){var isMe=r.id===('s1_'+myDevice);var badge=i===0?'🥇':i===1?'🥈':i===2?'🥉':' ';h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:'+(isMe?'rgba(201,169,110,.08)':'transparent')+';border:'+(isMe?'1px solid var(--gold)':'1px solid transparent')+'">';h+='<span style="width:24px;font-size:.9rem">'+badge+'</span>';h+='<span style="font-weight:800;font-size:.82rem;flex:1;'+(isMe?'color:var(--gold)':'')+'">'+(r.name||'匿名修仙者')+'</span>';h+='<span style="font-size:.72rem;color:var(--txm)">'+r.title+'</span>';h+='<span style="font-size:.75rem;font-weight:700;color:var(--b400)">第'+r.max_floor+'层</span>';h+='<span style="font-size:.72rem;color:var(--txm)">Lv.'+r.level+'</span>';h+='</div>'});h+='</div>';}h+='</div>';c.innerHTML=h;
 }
 
 function rBattle(c){
@@ -2105,23 +2105,31 @@ window.xxNew = async function() {
     if (!nm || !nm.value.trim()) return;
     var newName = nm.value.trim();
 
-    if (newName === '林深' || newName === '林深大魔王' || newName === '测试用小号') {
-        alert('此乃天道禁忌之名，凡人不可冒用！'); return;
-    }
-
+   if (newName === '林深' || newName === '林深大魔王') {
+    alert('此乃天道禁忌之名，凡人不可冒用！'); return;
+}
     var btn = document.querySelector('button[onclick="xxNew()"]');
     if (btn) { btn.disabled = true; btn.innerText = '🔍 查阅天道名册中...'; }
 
     try {
-        // 🌟 隔离修复3：查重时也只查 S1 赛季的玩家，把旧名字释放出来让大家抢注
-        var r = await _sb.from('xiuxian_leaderboard').select('id').eq('name', newName).limit(1);
-        if (r.data && r.data.length > 0 && r.data[0].id !== 's1_' + myDevice) {
-            alert('⚠️ 道号【' + newName + '】已被其他修士抢先注册，请另赐雅号！');
-            if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; } return; 
+        // 🌟 隔离修复3：查重时明确只查 S1 赛季的玩家，并遍历所有匹配记录
+        var r = await _sb.from('xiuxian_leaderboard')
+            .select('id')
+            .eq('name', newName)
+            .like('id', 's1_%'); // 必须加上这个限定，否则会查出旧赛季的干扰记录
+            
+        if (r.data && r.data.length > 0) {
+            // 如果查出来的记录里，存在不是当前设备的ID，说明已被其他人抢注
+            var isTaken = r.data.some(function(row) { return row.id !== 's1_' + myDevice; });
+            if (isTaken) {
+                alert('⚠️ 道号【' + newName + '】已被其他修士抢先注册，请另赐雅号！');
+                if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; } 
+                return;
+            }
         }
 
         G.p = mkP(newName);
-       G.prog = { maxFloor: 1, cleared: {}, bossCleared: {}, curFloor: 1, ach: {} };
+        G.prog = { maxFloor: 1, cleared: {}, bossCleared: {}, curFloor: 1, ach: {} };
         await _sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:newName,max_floor:1,level:1,title:'凡人',kills:0,updated_at:Date.now()});
         G.scr = 'hub';
         rc(); autoSave();
