@@ -2112,7 +2112,7 @@ window.xxNew = async function() {
     var btn = document.querySelector('button[onclick="xxNew()"]');
     if (btn) { btn.disabled = true; btn.innerText = '🔍 查阅天道名册中...'; }
 
-       try {
+    try {
         var r = await _sb.from('xiuxian_leaderboard').select('id').eq('name', newName).limit(1);
         console.log('查重结果:', JSON.stringify(r));
 
@@ -2138,9 +2138,6 @@ window.xxNew = async function() {
     } catch (e) {
         console.log('异常:', e);
         alert('天道网络波动，验证道号失败: ' + e.message);
-        if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; }
-    }
-        alert('天道网络波动，验证道号失败，请重试！');
         if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; }
     }
 };
