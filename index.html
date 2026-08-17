@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.1">
+<meta name="game-version" content="v1.2.2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -2105,22 +2105,31 @@ window.xxNew = async function() {
     if (!nm || !nm.value.trim()) return;
     var newName = nm.value.trim();
 
-   if (newName === '林深' || newName === '林深大魔王') {
-    alert('此乃天道禁忌之名，凡人不可冒用！'); return;
-}
+    // 禁忌之名拦截
+    if (newName === '林深' || newName === '林深大魔王') {
+        alert('此乃天道禁忌之名，凡人不可冒用！'); return;
+    }
+
     var btn = document.querySelector('button[onclick="xxNew()"]');
     if (btn) { btn.disabled = true; btn.innerText = '🔍 查阅天道名册中...'; }
 
     try {
-        // 🌟 隔离修复3：查重时明确只查 S1 赛季的玩家，并遍历所有匹配记录
+        // 🌟 终极修复方案：放弃可能存在兼容问题的 like 语法，直接取同名记录在 JS 本地过滤
         var r = await _sb.from('xiuxian_leaderboard')
-            .select('id')
-            .eq('name', newName)
-            .like('id', 's1_%'); // 必须加上这个限定，否则会查出旧赛季的干扰记录
+            .select('id, name')
+            .eq('name', newName);
             
         if (r.data && r.data.length > 0) {
-            // 如果查出来的记录里，存在不是当前设备的ID，说明已被其他人抢注
-            var isTaken = r.data.some(function(row) { return row.id !== 's1_' + myDevice; });
+            var isTaken = false;
+            for (var i = 0; i < r.data.length; i++) {
+                var rowId = r.data[i].id;
+                // 判断：只要这个名字属于 S1 赛季，且设备ID不是当前设备，就说明被别人抢了
+                if (rowId && rowId.indexOf('s1_') === 0 && rowId !== ('s1_' + myDevice)) {
+                    isTaken = true;
+                    break;
+                }
+            }
+            
             if (isTaken) {
                 alert('⚠️ 道号【' + newName + '】已被其他修士抢先注册，请另赐雅号！');
                 if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; } 
@@ -2128,6 +2137,30 @@ window.xxNew = async function() {
             }
         }
 
+        // 注册成功，初始化数据
+        G.p = mkP(newName);
+        G.prog = { maxFloor: 1, cleared: {}, bossCleared: {}, curFloor: 1, ach: {} };
+        
+        // 立即将新角色上报到天道（数据库占位）
+        await _sb.from('xiuxian_leaderboard').upsert({
+            id: 's1_' + myDevice,
+            name: newName,
+            max_floor: 1,
+            level: 1,
+            title: '凡人',
+            kills: 0,
+            updated_at: Date.now()
+        });
+        
+        G.scr = 'hub';
+        rc(); autoSave();
+
+    } catch (e) {
+        console.error('注册验证失败:', e);
+        alert('天道网络波动，验证道号失败，请重试！');
+        if (btn) { btn.disabled = false; btn.innerText = '开始修仙'; }
+    }
+};
         G.p = mkP(newName);
         G.prog = { maxFloor: 1, cleared: {}, bossCleared: {}, curFloor: 1, ach: {} };
         await _sb.from('xiuxian_leaderboard').upsert({id:'s1_'+myDevice,name:newName,max_floor:1,level:1,title:'凡人',kills:0,updated_at:Date.now()});
