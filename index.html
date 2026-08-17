@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.5">
+<meta name="game-version" content="v1.2.6">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -1585,16 +1585,16 @@ function checkAchievements(){
 }
 
 /* 离线收益 */
-function calcOfflineReward(){
-    var ts=parseInt(localStorage.getItem('xx_offline_ts')||'0');
+function calcOfflineReward(lastTs){
+    var ts=parseInt(lastTs||'0');
     if(!ts)return null;
     var elapsed=Date.now()-ts;
     var minutes=Math.floor(elapsed/60000);
     if(minutes<2)return null;
     minutes=Math.min(minutes,480);
     var f=G.prog?G.prog.maxFloor||1:1;
-    var goldPerMin=Math.floor((f*0.5+2)*0.4);
-    var expPerMin=Math.floor((f*0.3+1)*0.4);
+    var goldPerMin=Math.floor((f*0.5+2)*0.2);
+    var expPerMin=Math.floor((f*0.3+1)*0.2);
     return{minutes:minutes,hours:Math.floor(minutes/60),mins:minutes%60,gold:goldPerMin*minutes,exp:expPerMin*minutes};
 }
 function checkLvlUp(){
@@ -1658,7 +1658,7 @@ function load(){
             if(!G.prog.bossCleared) G.prog.bossCleared={};
             if(!G.prog.curFloor) G.prog.curFloor=G.prog.maxFloor||1;
             saveLocal();
-           var rw=calcOfflineReward();if(rw&&rw.gold>0)setTimeout(function(){showOfflineReward(rw)},1500);
+           var rw=calcOfflineReward(d.ts);if(rw&&rw.gold>0)setTimeout(function(){showOfflineReward(rw)},1500);
             return true;
         }
     } catch(e){}
@@ -1678,7 +1678,7 @@ async function loadCloud(){
                 if(!G.prog.bossCleared) G.prog.bossCleared={};
                 if(!G.prog.curFloor) G.prog.curFloor=G.prog.maxFloor||1;
                 localStorage.setItem(SK, JSON.stringify({v:VER,p:G.p,pr:G.prog,ts:Date.now()}));
-             var rw=calcOfflineReward();if(rw&&rw.gold>0)setTimeout(function(){showOfflineReward(rw)},1500);   
+            var rw=calcOfflineReward(gd.ts);if(rw&&rw.gold>0)setTimeout(function(){showOfflineReward(rw)},1500);
                 return true;
             }
         }
