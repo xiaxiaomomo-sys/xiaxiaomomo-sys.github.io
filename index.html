@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>林深的小天地</title>
-<meta name="game-version" content="v1.2.7">
+<meta name="game-version" content="v1.2.8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -1636,8 +1636,9 @@ function calcOfflineReward(lastTs){
     if(minutes<2)return null;
     minutes=Math.min(minutes,480);
     var f=G.prog?G.prog.maxFloor||1:1;
-    var goldPerMin=Math.floor((f*0.5+2)*0.2);
-    var expPerMin=Math.floor((f*0.3+1)*0.2);
+    // 🌟 优化：确保每分钟至少能获得 1 点金币和经验，并适当调高成长曲线
+    var goldPerMin=Math.max(1, Math.floor((f*1.5+5)*0.2));
+    var expPerMin=Math.max(1, Math.floor((f*3+10)*0.2));
     return{minutes:minutes,hours:Math.floor(minutes/60),mins:minutes%60,gold:goldPerMin*minutes,exp:expPerMin*minutes};
 }
 function checkLvlUp(){
@@ -1701,7 +1702,7 @@ function load(){
             if(!G.prog.bossCleared) G.prog.bossCleared={};
             if(!G.prog.curFloor) G.prog.curFloor=G.prog.maxFloor||1;
             saveLocal();
-           var rw=calcOfflineReward(d.ts);if(rw&&rw.gold>0)setTimeout(function(){showOfflineReward(rw)},1500);
+           var rw=calcOfflineReward(d.ts);if(rw&&(rw.gold>0||rw.exp>0))setTimeout(function(){showOfflineReward(rw)},1500);
             return true;
         }
     } catch(e){}
@@ -1721,7 +1722,7 @@ async function loadCloud(){
                 if(!G.prog.bossCleared) G.prog.bossCleared={};
                 if(!G.prog.curFloor) G.prog.curFloor=G.prog.maxFloor||1;
                 localStorage.setItem(SK, JSON.stringify({v:VER,p:G.p,pr:G.prog,ts:Date.now()}));
-            var rw=calcOfflineReward(gd.ts);if(rw&&rw.gold>0)setTimeout(function(){showOfflineReward(rw)},1500);
+            var rw=calcOfflineReward(gd.ts);if(rw&&(rw.gold>0||rw.exp>0))setTimeout(function(){showOfflineResource(rw)},1500); // 注意：此处原代码是 showOfflineReward(rw)
                 return true;
             }
         }
@@ -2636,15 +2637,20 @@ function showOfflineReward(rw){
         '<button id="offlineClaimBtn" style="padding:12px 32px;border-radius:9999px;border:none;background:linear-gradient(135deg,var(--b400),var(--b500));color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:.95rem;cursor:pointer">开心收下 🎉</button>'+
         '</div>';
     document.body.appendChild(mask);
-    document.getElementById('offlineClaimBtn').onclick=function(){
-        G.p.gold+=rw.gold;G.p.exp+=rw.exp;
-        localStorage.removeItem('xx_offline_ts');
+   document.getElementById('offlineClaimBtn').onclick=function(){
+        G.p.gold+=rw.gold;
+        G.p.exp+=rw.exp;
         mask.remove();
         showSaveToast('🌙','离线收益已领取！');
         checkAchievements();
-        rc();autoSave();
+        
+        // 🌟 核心：如果离线经验达到了升级线，自动触发升级选属性/技能
+        if(typeof checkLvlUp === 'function' && G.p.exp >= expNeed(G.p.lv)){
+            checkLvlUp();
+        } else {
+            rc(); autoSave();
+        }
     };
-}
 
 /* ===== 路由绑定 ===== */
 window.xxBagEquip=xxBagEquip;
