@@ -96,7 +96,7 @@ body.dark::after{opacity:.06}
 @keyframes gexitFlip{0%{opacity:1;transform:perspective(600px) rotateY(0)}100%{opacity:0;transform:perspective(600px) rotateY(90deg)}}
 @keyframes gexitBlur{0%{opacity:1;filter:blur(0)}100%{opacity:0;filter:blur(20px)}}
 
-.xg{max-width:720px;width:100%;margin:0 auto}
+.xg{max-width:900px;width:100%;margin:0 auto;padding:0 16px}
 .xg-hdr{text-align:center;margin-bottom:28px;position:relative}.xg-hdr h2{font-size:2rem;font-weight:900;margin-bottom:6px}.xg-hdr p{color:var(--txm);font-size:.95rem}
 .xg-card{background:var(--white);border-radius:var(--r);box-shadow:var(--sd);border:1px solid var(--bd);padding:24px;margin-bottom:20px;transition:background .4s;position:relative}
 .xg-stat-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--b100);font-size:.88rem;font-weight:700}.xg-stat-row:last-child{border:none}
@@ -197,7 +197,11 @@ body.dark::after{opacity:.06}
 .xg-save-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);z-index:10000;background:var(--white);border-radius:var(--r);box-shadow:var(--sl);border:2px solid var(--b200);padding:20px 28px;text-align:center;opacity:0;pointer-events:none;transition:all .3s var(--sp)}.xg-save-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:all}
 .xg-save-toast .toast-icon{font-size:2.5rem;margin-bottom:8px;display:block}
 .xg-save-toast .toast-text{font-size:.9rem;font-weight:700;color:var(--tx)}
-@media(max-width:768px){.xg-hub-grid{grid-template-columns:1fr}.xg-action-col{order:-1}.xg-battle{flex-direction:column}.xg-vs{padding:4px 0}.xg-choices .xg-skill-card{min-width:140px}.xg-log{max-height:120px;font-size:.7rem}.xg-btn{padding:8px 14px;font-size:.78rem}.xg-skill-card{padding:12px}.xg-skill-card .sk-name{font-size:.85rem}}
+@media(max-width:768px){.xg-hub-grid{grid-template-columns:1fr}.xg-action-col{order:-1}.xg-battle{flex-direction:column}.xg-vs{padding:4px 0}.xg-choices .xg-skill-card{min-width:140px}.xg-log{max-height:120px;font-size:.7rem}.xg-btn{padding:8px 14px;font-size:.78rem}.xg-skill-card{padding:12px}.xg-skill-card .sk-name{font-size:.85rem}.char-body{width:80px;height:80px;font-size:2rem}.xg-hdr h2{font-size:1.4rem}.xg-card{padding:16px}}
+
+@media(min-width:1200px){.xg{max-width:1000px}.xg-battle{gap:24px}.xg-card{padding:28px}.xg-hdr h2{font-size:2.2rem}}
+
+@media(min-width:1600px){.xg{max-width:1100px}.char-body{width:120px;height:120px;font-size:3.2rem}.xg-bp{padding:22px 18px}}
 
 /* ===== 召唤物品级攻击特效 ===== */
 .summon-projectile{position:absolute;pointer-events:none;font-size:1.4rem;z-index:10}
@@ -241,7 +245,7 @@ body.dark::after{opacity:.06}
 
 /* ===== 战斗角色样式 (移植自battle-demo) ===== */
 .character{width:160px;text-align:center;position:relative;transition:transform .15s}
-.char-body{width:100px;height:100px;margin:0 auto 8px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;font-size:2.8rem;transition:all .3s}
+.char-body{width:clamp(70px,12vw,110px);height:clamp(70px,12vw,110px);margin:0 auto 8px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;font-size:clamp(1.8rem,4vw,3rem);transition:all .3s}
 .character.player .char-body{background:linear-gradient(135deg,var(--white),var(--b50));box-shadow:0 8px 32px rgba(45,34,24,.1),inset 0 0 20px rgba(201,169,110,.1);border:3px solid var(--b200)}
 .character.monster .char-body{background:linear-gradient(135deg,rgba(196,30,58,.08),rgba(196,30,58,.15));box-shadow:0 8px 32px rgba(196,30,58,.15),inset 0 0 20px rgba(196,30,58,.08);border:3px solid rgba(196,30,58,.25)}
 body.dark .character.player .char-body{background:linear-gradient(135deg,#2d2218,#4a3f2f);box-shadow:0 8px 32px rgba(45,34,24,.4),inset 0 0 20px rgba(201,169,110,.1);border:3px solid rgba(201,169,110,.3)}
