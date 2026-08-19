@@ -18,7 +18,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);line-h
 body.dark{--bg:#1a1714;--white:#252018;--gs:rgba(37,32,24,.95);--b50:#2e2820;--b100:#3d3628;--b200:#4d4638;--b300:#8b7e6a;--b400:#c9a96e;--b500:#e8d5a0;--b600:#f0e8d0;--tx:#e8e0d0;--txb:#b5a996;--txm:#8b7e6a;--txl:#5a4e3e;--bd:rgba(201,169,110,.15);--pk:#ff6b6b;--pks:#3a2020;--mt:#7dba7a;--lv:#a990d0;--yw:#e8d5a0;--ink:#e8e0d0;--ink-lt:rgba(232,224,208,.04);--cinnabar:#ff6b6b;--jade:#7dba7a;--gold:#e8d5a0;--gold-lt:#f0e8d0}
 
 /* 全屏游戏容器 */
-#xgRoot{width:100%;max-width:760px;margin:0 auto;height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:52px 12px 70px}
+#xgRoot{width:100%;height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:52px 0 70px}
 @media(min-width:769px){#xgRoot{padding:52px 20px 20px}}
 
 /* 顶部栏 */
@@ -96,14 +96,14 @@ body.dark::after{opacity:.06}
 @keyframes gexitFlip{0%{opacity:1;transform:perspective(600px) rotateY(0)}100%{opacity:0;transform:perspective(600px) rotateY(90deg)}}
 @keyframes gexitBlur{0%{opacity:1;filter:blur(0)}100%{opacity:0;filter:blur(20px)}}
 
-.xg{max-width:720px;width:100%;margin:0 auto;padding:0 16px}
-.xg-card,.xg-hdr,.xg-battle,.xg-log,.xg-actions,.xg-hub-grid{max-width:720px;margin-left:auto;margin-right:auto}
+.xg{max-width:min(90vw,800px);width:100%;margin:0 auto;padding:0 16px}
+.xg-card,.xg-hdr,.xg-log,.xg-actions{width:100%}
 .xg-hdr{text-align:center;margin-bottom:28px;position:relative}.xg-hdr h2{font-size:2rem;font-weight:900;margin-bottom:6px}.xg-hdr p{color:var(--txm);font-size:.95rem}
 .xg-card{background:var(--white);border-radius:var(--r);box-shadow:var(--sd);border:1px solid var(--bd);padding:24px;margin-bottom:20px;transition:background .4s;position:relative}
 .xg-stat-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--b100);font-size:.88rem;font-weight:700}.xg-stat-row:last-child{border:none}
 .xg-hp-bar{height:14px;background:var(--b50);border-radius:10px;overflow:hidden;margin:8px 0;position:relative}.xg-hp-fill{height:100%;border-radius:10px;transition:width .4s ease;background:linear-gradient(90deg,#4caf50,#81c784)}.xg-hp-fill.low{background:linear-gradient(90deg,#ff6b6b,#ff9800)}.xg-hp-fill.mid{background:linear-gradient(90deg,#ff9800,#ffc107)}
 .xg-exp-bar{height:8px;background:var(--b50);border-radius:8px;overflow:hidden;margin:6px 0}.xg-exp-fill{height:100%;background:linear-gradient(90deg,var(--b300),var(--lv));border-radius:8px;transition:width .4s}
-.xg-battle{display:flex;gap:16px;align-items:stretch;margin-bottom:16px;position:relative;transition:transform .1s}.xg-battle.shake{animation:shake .3s ease}
+.xg-battle{display:flex;gap:16px;align-items:stretch;margin-bottom:16px;position:relative;transition:transform .1s;width:100%}.xg-battle.shake{animation:shake .3s ease}
 .xg-bp{flex:1;background:var(--white);border-radius:var(--r);padding:18px 14px;text-align:center;border:2px solid var(--b100);transition:all .3s;position:relative;overflow:visible}.xg-bp.monster{border-color:var(--pk)}.xg-bp .emoji{font-size:3rem;display:block;margin:4px 0;position:relative;z-index:1}.xg-bp .bname{font-size:.95rem;font-weight:800;margin-bottom:2px}.xg-bp .blv{font-size:.72rem;color:var(--txm);font-weight:600;margin-bottom:6px}
 .xg-bp .buff-row{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin:4px 0;min-height:20px}
 .xg-buff-tag{display:inline-flex;align-items:center;gap:2px;padding:2px 6px;border-radius:var(--rf);font-size:.6rem;font-weight:700;line-height:1;white-space:nowrap}
@@ -200,11 +200,9 @@ body.dark::after{opacity:.06}
 .xg-save-toast .toast-text{font-size:.9rem;font-weight:700;color:var(--tx)}
 @media(max-width:768px){.xg-hub-grid{grid-template-columns:1fr}.xg-action-col{order:-1}.xg-battle{flex-direction:column}.xg-vs{padding:4px 0}.xg-choices .xg-skill-card{min-width:140px}.xg-log{max-height:120px;font-size:.7rem}.xg-btn{padding:8px 14px;font-size:.78rem}.xg-skill-card{padding:12px}.xg-skill-card .sk-name{font-size:.85rem}.char-body{width:80px;height:80px;font-size:2rem}.xg-hdr h2{font-size:1.4rem}.xg-card{padding:16px}}
 
-@media(min-width:1200px){.xg{max-width:760px}}
+@media(min-width:1200px){.xg{max-width:min(80vw,900px)}}
 
-@media(min-width:1600px){.xg{max-width:760px}}
-
-@media(min-width:2560px){.xg{max-width:760px}}
+@media(min-width:2560px){.xg{max-width:min(50vw,900px)}}
 
 /* ===== 召唤物品级攻击特效 ===== */
 .summon-projectile{position:absolute;pointer-events:none;font-size:1.4rem;z-index:10}
