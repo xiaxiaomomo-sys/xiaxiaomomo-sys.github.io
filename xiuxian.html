@@ -18,8 +18,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);line-h
 body.dark{--bg:#1a1714;--white:#252018;--gs:rgba(37,32,24,.95);--b50:#2e2820;--b100:#3d3628;--b200:#4d4638;--b300:#8b7e6a;--b400:#c9a96e;--b500:#e8d5a0;--b600:#f0e8d0;--tx:#e8e0d0;--txb:#b5a996;--txm:#8b7e6a;--txl:#5a4e3e;--bd:rgba(201,169,110,.15);--pk:#ff6b6b;--pks:#3a2020;--mt:#7dba7a;--lv:#a990d0;--yw:#e8d5a0;--ink:#e8e0d0;--ink-lt:rgba(232,224,208,.04);--cinnabar:#ff6b6b;--jade:#7dba7a;--gold:#e8d5a0;--gold-lt:#f0e8d0}
 
 /* 全屏游戏容器 */
-#gameRoot{width:100%;height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:52px 12px 70px}
-@media(min-width:769px){#gameRoot{padding:52px 20px 20px}}
+#xgRoot{width:100%;height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:52px 12px 70px}
+@media(min-width:769px){#xgRoot{padding:52px 20px 20px}}
 
 /* 顶部栏 */
 .game-topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);box-shadow:var(--ss);transition:background .4s}
@@ -207,7 +207,7 @@ body.dark::after{opacity:.06}
 </div>
 
 <!-- 游戏主容器 -->
-<div id="gameRoot"></div>
+<div id="xgRoot"></div>
 
 <!-- 存档弹窗 -->
 <div class="xg-import-mask" id="xgImportMask" onclick="closeImportModal();closeExportModal()"></div>
