@@ -42,6 +42,13 @@ body.dark::after{opacity:.06}
 @keyframes healFloat{0%{opacity:1;transform:translateY(0) scale(1)}50%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-60px) scale(.8)}}
 @keyframes critGlow{0%{box-shadow:inset 0 0 0 transparent}30%{box-shadow:inset 0 0 30px rgba(255,212,0,.5)}100%{box-shadow:inset 0 0 0 transparent}}
 @keyframes berserkPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,107,0)}50%{box-shadow:0 0 20px 4px rgba(255,107,107,.3)}}
+@keyframes lightningBolt{0%{opacity:0;transform:scaleY(0)}30%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(0)}}
+@keyframes bloodMistAnim{0%{opacity:0;transform:scale(0)}50%{opacity:.6;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
+@keyframes protectiveGlowAnim{0%{opacity:0;transform:scale(0)}40%{opacity:.6;transform:scale(1.2)}100%{opacity:0;transform:scale(1.8)}}
+@keyframes rouletteSpin{0%{transform:rotate(0) scale(0)}50%{transform:rotate(360deg) scale(1.2)}100%{transform:rotate(720deg) scale(0)}}
+@keyframes coinFly{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(-80px) rotate(360deg)}}
+@keyframes shieldPulse{0%{opacity:0;transform:scale(0)}40%{opacity:.6;transform:scale(1.1)}100%{opacity:0;transform:scale(1.5)}}
+.berserk-active{animation:berserkPulse 1.2s infinite}
 @keyframes cloneGlow{0%,100%{box-shadow:0 0 0 0 rgba(75,166,247,0)}50%{box-shadow:0 0 15px 3px rgba(75,166,247,.25)}}
 @keyframes legendaryPulse{0%,100%{box-shadow:0 0 8px 0 rgba(255,212,0,.15)}50%{box-shadow:0 0 20px 4px rgba(255,212,0,.3)}}
 @keyframes epicPulse{0%,100%{box-shadow:0 0 8px 0 rgba(150,80,255,.15)}50%{box-shadow:0 0 16px 3px rgba(150,80,255,.25)}}
@@ -58,7 +65,7 @@ body.dark::after{opacity:.06}
 @keyframes shieldFlash{0%{box-shadow:inset 0 0 0 transparent}30%{box-shadow:inset 0 0 50px rgba(66,165,245,.5)}60%{box-shadow:inset 0 0 30px rgba(66,165,245,.3)}100%{box-shadow:inset 0 0 0 transparent}}
 @keyframes summonGlow{0%{filter:brightness(1) drop-shadow(0 0 0 transparent)}30%{filter:brightness(1.3) drop-shadow(0 0 12px rgba(100,181,246,.6))}60%{filter:brightness(1.15) drop-shadow(0 0 8px rgba(100,181,246,.3))}100%{filter:brightness(1) drop-shadow(0 0 0 transparent)}}
 @keyframes coinBurst{0%{filter:brightness(1)}25%{filter:brightness(1.5) drop-shadow(0 0 16px rgba(201,169,110,.8))}50%{filter:brightness(1.3) drop-shadow(0 0 10px rgba(201,169,110,.5))}100%{filter:brightness(1) drop-shadow(0 0 0 transparent)}}
-@keyframes slashTrail{0%{opacity:0;transform:scaleX(0)}20%{opacity:.8;transform:scaleX(1.2)}50%{opacity:.5;transform:scaleX(1)}100%{opacity:0;transform:scaleX(.3)}}
+@keyframes slashTrail{0%{opacity:0;transform:translateX(-30px) scaleX(0)}30%{opacity:1;transform:translateX(0) scaleX(1)}100%{opacity:0;transform:translateX(60px) scaleX(.3)}}
 @keyframes fadeSlideUp{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-30px)}}
 @keyframes xgAtk{0%{transform:translateX(0) scale(1)}15%{transform:translateX(-15px) scale(.92)}45%{transform:translateX(40px) scale(1.12) rotate(-4deg)}65%{transform:translateX(40px) scale(1.12) rotate(-4deg)}100%{transform:translateX(0) scale(1) rotate(0)}}
 @keyframes xgSkill{0%{box-shadow:inset 0 0 0 transparent}20%{box-shadow:inset 0 0 50px rgba(201,169,110,.5)}50%{box-shadow:inset 0 0 60px rgba(201,169,110,.6)}100%{box-shadow:inset 0 0 0 transparent}}
@@ -862,12 +869,12 @@ function getPAtk(p, c){
 
     if(p.pSkl.indexOf('P1')>=0 && hpRatio<0.5){
         bonus += 0.15;
-        if(c.turnCount===0||Math.random()<0.3) addLog('<span class="info">【怒气爆发】攻击力+15%！</span>');
+        if(c.turnCount===0||true) addLog('<span class="info">【怒气爆发】HP<50%，攻击+15%！</span>');
     }
     if(p.pSkl.indexOf('P11')>=0){
         var rage = (1 - hpRatio) * 0.3;
         bonus += rage;
-        if(rage>0.2 && Math.random()<0.2) addLog('<span class="info">【嗜血狂暴】提升攻击！</span>');
+        if(rage>0.05) addLog('<span class="info">【嗜血狂暴】攻击提升'+Math.round(rage*100)+'%！</span>');
     }
     if(p.pSkl.indexOf('P6')>=0 && c.kPow>0) bonus += (c.kPow * 0.02);
     if(p.pSkl.indexOf('P3')>=0 && p.prevCrit){
@@ -878,7 +885,7 @@ function getPAtk(p, c){
     if((p.lowAtk||0)>0 && hpRatio<0.3) bonus += (p.lowAtk / 100);
     if(p.pSkl.indexOf('P15')>=0 && hpRatio<0.2){
         bonus += 0.5;
-        if(Math.random()<0.3) addLog('<span class="info">【不灭之火】攻击+50%！</span>');
+        addLog('<span class="info">【不灭之火】HP<20%，攻击+50%！</span>');
     }
     if(c.berserkTurns>0) bonus += 0.25;
 
@@ -1005,7 +1012,7 @@ function processSummons(){
         if(s.special==='crit20') critR+=0.20;
         if(Math.random()<critR){isCrit=true;rawAtk=Math.floor(rawAtk*calcCritD(p));}
         // P20 死亡凝视
-        if(p.pSkl.indexOf('P20')>=0 && m.hp/m.mhp<0.3) rawAtk=Math.floor(rawAtk*1.5);
+        if(p.pSkl.indexOf('P20')>=0 && m.hp/m.mhp<0.3){ rawAtk=Math.floor(rawAtk*1.5); addLog('<span class="info">【死亡凝视】HP<30%，伤害+50%！</span>'); }
         var sDmg=Math.max(1, Math.floor(rawAtk*mDefMul*supp.pDmg));
         // BOSS单次上限3%
         if(m.isBoss) sDmg=Math.min(sDmg, Math.floor(m.mhp*0.03));
@@ -1369,13 +1376,13 @@ function doNormalAtk(){
     var supp = getSuppression(c.floor, p.lv);
 
     var dmg = Math.max(1, Math.floor(rawDmg * mDefMul * supp.pDmg));
-    if(p.pSkl.indexOf('P20')>=0 && m.hp/m.mhp < 0.3) dmg = Math.floor(dmg * 1.5);
+    if(p.pSkl.indexOf('P20')>=0 && m.hp/m.mhp < 0.3){ dmg = Math.floor(dmg * 1.5); addLog('<span class="info">【死亡凝视】HP<30%，伤害+50%！</span>'); }
     if(p.pet&&p.pet.owned&&p.pet.level>=100&&p.pet.quality==='god') dmg = Math.floor(dmg*1.05);
 
     m.hp = Math.max(0, m.hp-dmg);
     addLog('造成 <span class="dmg">'+dmg+'</span> 伤害'+(isCrit?' <span class="info">(暴击!)</span>':''));
     floatDmg('xgME',(isCrit?'暴击! ':'')+dmg,isCrit?'#ffd740':'#ff6b6b');
-    if(isCrit && p.pSkl.indexOf('P16')>=0){ applyHeal(p, calcMaxHp(p)*0.02, false); }
+    if(isCrit && p.pSkl.indexOf('P16')>=0){ applyHeal(p, calcMaxHp(p)*0.02, false); addLog('<span class="info">【灵魂链接】暴击回复'+Math.floor(calcMaxHp(p)*0.02)+'HP</span>'); }
     applyOnHitHeal(p, dmg);
     /* P26 蚀骨之毒：15%概率附加1层(BOSS7.5%)，上限10层 */
     if(p.pSkl.indexOf('P26')>=0 && m.hp>0){
@@ -1399,24 +1406,24 @@ function doSkillUse(sid){
 
     var rawDmg=0, trueDmg=0;
     switch(sid){
-        case 'A1': rawDmg = getPAtk(p,c)*1.5; break;
-        case 'A2': rawDmg = getPAtk(p,c)*1.2; addLog('<span class="info">御风斩必中！</span>'); break;
-        case 'A3': rawDmg = getPAtk(p,c)*1.4; if(Math.random()<0.3){c.stunM=1;addLog('<span class="info">麻痹1回合！</span>')} break;
-        case 'A4': rawDmg = getPAtk(p,c)*2.0; break;
+        case 'A1': skillChargeGlow('#c9a96e',500);spawnSwordSlash(5);rawDmg = getPAtk(p,c)*1.5; break;
+        case 'A2': spawnSwordSlash(3);rawDmg = getPAtk(p,c)*1.2; addLog('<span class="info">御风斩必中！</span>'); break;
+        case 'A3': skillChargeGlow('#ffd740',400);spawnLightning();rawDmg = getPAtk(p,c)*1.4; if(Math.random()<0.3){c.stunM=1;addLog('<span class="info">麻痹1回合！</span>')} break;
+        case 'A4': skillChargeGlow('#c9a96e',600);spawnSwordSlash(8);rawDmg = getPAtk(p,c)*2.0; break;
         case 'A5': 
-            var sd=Math.floor(p.hp*0.2); p.hp=Math.max(1,p.hp-sd); trueDmg=sd*1.5; 
+            spawnBloodMist();var sd=Math.floor(p.hp*0.2); p.hp=Math.max(1,p.hp-sd); trueDmg=sd*1.5; 
             addLog('消耗 <span class="dmg">'+sd+'</span> HP'); break;
-        case 'A6': c.buffs.push({t:'减伤60%',v:0.4,dur:2}); addLog('减伤60%（2回合）'); c.cd[sid]=sk.cd; return;
-        case 'A7': rawDmg = getPAtk(p,c)*0.6; break; // 逻辑下置循环
-        case 'A8': rawDmg = getPAtk(p,c)*2.5; if(Math.random()<0.2){c.stunM=1;addLog('<span class="info">眩晕1回合！</span>')} break;
-        case 'A9': applyHeal(p, calcMaxHp(p)*0.4, false); c.invTurns=1; addLog('无敌1回合'); c.cd[sid]=sk.cd; return;
-        case 'A10': trueDmg = p.hp*0.5; break; // 半真伤
+        case 'A6': spawnProtectiveGlow('rgba(201,169,110,.3)');c.buffs.push({t:'减伤60%',v:0.4,dur:2}); addLog('减伤60%（2回合）'); c.cd[sid]=sk.cd; return;
+        case 'A7': spawnMultiSlash(3);rawDmg = getPAtk(p,c)*0.6; break; // 逻辑下置循环
+        case 'A8': skillChargeGlow('#ffd740',500);spawnLightning();spawnLightning();rawDmg = getPAtk(p,c)*2.5; if(Math.random()<0.2){c.stunM=1;addLog('<span class="info">眩晕1回合！</span>')} break;
+        case 'A9': spawnProtectiveGlow('rgba(76,175,80,.3)');applyHeal(p, calcMaxHp(p)*0.4, false); c.invTurns=1; addLog('无敌1回合'); c.cd[sid]=sk.cd; return;
+        case 'A10': skillChargeGlow('#ff6b6b',600);spawnBloodMist();trueDmg = p.hp*0.5; break; // 半真伤
         case 'A11': 
-            if(Math.random()<0.55){ rawDmg=getPAtk(p,c)*3.0; addLog('<span class="info">命运眷顾！攻击×3.0！</span>'); }
+            spawnRouletteEffect();if(Math.random()<0.55){ rawDmg=getPAtk(p,c)*3.0; addLog('<span class="info">命运眷顾！攻击×3.0！</span>'); }
             else { var bsd=Math.floor(p.hp*0.40); p.hp=Math.max(1,p.hp-bsd); addLog('命运反噬！<span class="dmg">自伤'+bsd+'</span>HP'); } break;
-        case 'A12': rawDmg = getPAtk(p,c)*0.3; break; // 逻辑下置循环
+        case 'A12': spawnMultiSlash(5);rawDmg = getPAtk(p,c)*0.3; break; // 逻辑下置循环
         case 'A13':
-    if(m.is魔王){ applyHeal(p, calcMaxHp(p)*0.3, false); }
+    spawnSoulDrain();if(m.is魔王){ applyHeal(p, calcMaxHp(p)*0.3, false); }
     else {
         var drain = Math.floor(m.hp * (m.isBoss ? 0.08 : 0.15));
         m.hp = Math.max(0, m.hp-drain);
@@ -1424,16 +1431,16 @@ function doSkillUse(sid){
         if(drain > maxDrain) drain = maxDrain;
         applyHeal(p, drain, false); floatDmg('xgME','-'+drain,'#ff6b6b');
     } c.cd[sid]=sk.cd; return;
-        case 'A14': c.berserkTurns=3; addLog('<span class="info">狂暴化！攻+25%防-25%（3回合）</span>'); c.cd[sid]=sk.cd; return;
-        case 'A15': c.stunM += m.isBoss ? 1 : 2; addLog('<span class="info">时间冻结！</span>'); c.cd[sid]=sk.cd; return;
+        case 'A14': spawnBerserkAura();skillChargeGlow('#ff4757',500);c.berserkTurns=3; addLog('<span class="info">狂暴化！攻+25%防-25%（3回合）</span>'); c.cd[sid]=sk.cd; return;
+        case 'A15': spawnFreezeEffect();c.stunM += m.isBoss ? 1 : 2; addLog('<span class="info">时间冻结！</span>'); c.cd[sid]=sk.cd; return;
         case 'A17': 
-            var hCost=Math.floor(p.hp*0.5); p.hp=Math.max(1,p.hp-hCost); 
+            spawnBloodMist();skillChargeGlow('#ff6b6b',400);var hCost=Math.floor(p.hp*0.5); p.hp=Math.max(1,p.hp-hCost); 
             rawDmg=getPAtk(p,c)*1.5; trueDmg=hCost; addLog('消耗 <span class="dmg">'+hCost+'</span> HP'); break;
         case 'A18':
             addSummon(null); c.cd[sid]=sk.cd; return;
         case 'A19':
             if(!c.summons||!c.summons.length){addLog('没有召唤物可引爆');c.cd[sid]=sk.cd;return}
-            var totalExplode=0;for(var si=0;si<c.summons.length;si++){totalExplode+=c.summons[si].hp}
+            spawnSummonExplode();var totalExplode=0;for(var si=0;si<c.summons.length;si++){totalExplode+=c.summons[si].hp}
             c.summons=[]; trueDmg=totalExplode;
             addLog('万灵归一！引爆总伤害 <span class="dmg">'+totalExplode+'</span>'); break;
         case 'A20':
@@ -1442,7 +1449,7 @@ function doSkillUse(sid){
             addLog('消耗 <span style="color:var(--gold)">50</span> 金币'); break;
         case 'A21':
             var bigCost=Math.max(10,Math.floor(p.gold*0.20));
-            p.gold-=bigCost; trueDmg=bigCost*3;
+            spawnGoldExplosion();p.gold-=bigCost; trueDmg=bigCost*3;
             if(m.isBoss) trueDmg=Math.min(trueDmg,Math.floor(m.mhp*0.10));
             addLog('消耗 <span style="color:var(--gold)">'+bigCost+'</span> 金币'); break;
         case 'A22':
@@ -1454,14 +1461,14 @@ function doSkillUse(sid){
             c.cd[sid]=sk.cd; return;
         case 'A23':
             if(!c.poison||c.poison.stacks<=0){addLog('无中毒层数！');c.cd[sid]=sk.cd;return}
-            var _stk=c.poison.stacks; var poisonDmg=_stk*getPAtk(p,c)*0.5; c.poison.stacks=0;
+            skillChargeGlow('#ab47bc',500);spawnPoisonClouds();var _stk=c.poison.stacks; var poisonDmg=_stk*getPAtk(p,c)*0.5; c.poison.stacks=0;
             rawDmg=poisonDmg; addLog('毒爆！引爆 '+_stk+' 层中毒'); break;
         case 'A24':
             var shieldAmt=Math.floor(calcMaxHp(p)*0.25);
             applyShield(shieldAmt,3);
             c.cd[sid]=sk.cd; return;
         case 'A25':
-            c.buffs.push({t:'以守为攻·蓄力',v:2,dur:1,type:'def'});
+            spawnDefendCharge();c.buffs.push({t:'以守为攻·蓄力',v:2,dur:1,type:'def'});
             c._nextAtkTriple=true;
             addLog('<span class="info">以守为攻！本回合防御×2，下回合攻击×3</span>');
             c.cd[sid]=sk.cd; return;
@@ -1491,7 +1498,7 @@ function doSkillUse(sid){
 
     if (rawDmg > 0) dmg += Math.floor(rawDmg * mDefMul * supp.pDmg);
     if (trueDmg > 0) dmg += Math.floor(trueDmg);
-    if(p.pSkl.indexOf('P20')>=0 && m.hp/m.mhp < 0.3) dmg = Math.floor(dmg * 1.5);
+    if(p.pSkl.indexOf('P20')>=0 && m.hp/m.mhp < 0.3){ dmg = Math.floor(dmg * 1.5); addLog('<span class="info">【死亡凝视】HP<30%，伤害+50%！</span>'); }
     if(p.pet&&p.pet.owned&&p.pet.level>=100&&p.pet.quality==='god') dmg = Math.floor(dmg*1.05);
 
     if(dmg > 0){
@@ -1688,6 +1695,24 @@ if(p.pSkl.indexOf('P30')>=0 && c.shield && c.shield.hp>0 && dmg>0){
     return true;
 }
 
+function screenFlash(color){var f=document.createElement('div');f.style.cssText='position:fixed;inset:0;z-index:9999;pointer-events:none;background:'+color+';opacity:0;transition:opacity .15s';document.body.appendChild(f);requestAnimationFrame(function(){f.style.opacity='1';setTimeout(function(){f.style.opacity='0';setTimeout(function(){if(f.parentNode)f.remove()},200)},100)})}
+
+/* ===== 技能特效系统 ===== */
+function skillChargeGlow(color,duration){var pe=document.getElementById('xgPE');if(!pe)return;var body=pe.querySelector('.emoji');if(!body)return;body.style.transition='all .3s';body.style.textShadow='0 0 30px '+color+',0 0 60px '+color;setTimeout(function(){body.style.textShadow=''},duration||500)}
+function spawnSwordSlash(count){var me=document.getElementById('xgME');if(!me)return;var rect=me.getBoundingClientRect(),sr=document.querySelector('.xg-battle').getBoundingClientRect();for(var i=0;i<(count||3);i++){(function(j){setTimeout(function(){var s=document.createElement('div');s.style.cssText='position:absolute;width:100px;height:3px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.8),transparent);border-radius:2px;pointer-events:none;z-index:20;animation:slashTrail .4s ease forwards;';s.style.left=(rect.left-sr.left-20+j*15)+'px';s.style.top=(rect.top-sr.top+rect.height/2-10+j*15)+'px';s.style.transform='rotate('+(-20+j*20)+'deg)';document.querySelector('.xg-battle').appendChild(s);setTimeout(function(){if(s.parentNode)s.remove()},500)},j*60)})(i)}}
+function spawnLightning(){var me=document.getElementById('xgME');if(!me)return;var rect=me.getBoundingClientRect(),sr=document.querySelector('.xg-battle').getBoundingClientRect();for(var i=0;i<5;i++){(function(j){setTimeout(function(){var l=document.createElement('div');l.style.cssText='position:absolute;width:3px;background:linear-gradient(180deg,#ffd740,#ff9800,transparent);pointer-events:none;z-index:20;animation:lightningBolt .3s ease forwards;';l.style.height=(60+Math.random()*40)+'px';l.style.left=(rect.left-sr.left+rect.width/2-30+j*15)+'px';l.style.top=(rect.top-sr.top-40)+'px';l.style.transform='rotate('+(-10+Math.random()*20)+'deg)';document.querySelector('.xg-battle').appendChild(l);setTimeout(function(){if(l.parentNode)l.remove()},400)},j*50)})(i)}}
+function spawnBloodMist(){var pe=document.getElementById('xgPE');if(!pe)return;var rect=pe.getBoundingClientRect(),sr=document.querySelector('.xg-battle').getBoundingClientRect();for(var i=0;i<8;i++){var m=document.createElement('div');var sz=15+Math.random()*25;m.style.cssText='position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(196,30,58,.4),transparent);pointer-events:none;z-index:20;animation:bloodMistAnim .8s ease forwards;';m.style.width=sz+'px';m.style.height=sz+'px';m.style.left=(rect.left-sr.left+rect.width/2+Math.random()*40-20)+'px';m.style.top=(rect.top-sr.top+rect.height/2+Math.random()*40-20)+'px';m.style.animationDelay=(i*0.05)+'s';document.querySelector('.xg-battle').appendChild(m);setTimeout(function(el){if(el.parentNode)el.remove()},1000,m)}}
+function spawnProtectiveGlow(color){var pe=document.getElementById('xgPE');if(!pe)return;var rect=pe.getBoundingClientRect(),sr=document.querySelector('.xg-battle').getBoundingClientRect();var g=document.createElement('div');g.style.cssText='position:absolute;border-radius:50%;pointer-events:none;z-index:20;animation:protectiveGlowAnim .8s ease forwards;';g.style.width='120px';g.style.height='120px';g.style.left=(rect.left-sr.left+rect.width/2-60)+'px';g.style.top=(rect.top-sr.top+rect.height/2-60)+'px';g.style.background='radial-gradient(circle,'+color+',transparent)';document.querySelector('.xg-battle').appendChild(g);setTimeout(function(){if(g.parentNode)g.remove()},1000)}
+function spawnMultiSlash(count){var me=document.getElementById('xgME');if(!me)return;var rect=me.getBoundingClientRect(),sr=document.querySelector('.xg-battle').getBoundingClientRect();for(var i=0;i<count;i++){(function(j){setTimeout(function(){var s=document.createElement('div');var colors=['#c9a96e','#ff6b6b','#42a5f5'];s.style.cssText='position:absolute;width:80px;height:3px;background:linear-gradient(90deg,transparent,'+colors[j%3]+',transparent);border-radius:2px;pointer-events:none;z-index:20;animation:slashTrail .3s ease forwards;';s.style.left=(rect.left-sr.left-10+j*8)+'px';s.style.top=(rect.top-sr.top+rect.height/3+j*12)+'px';s.style.transform='rotate('+(-30+j*15)+'deg)';document.querySelector('.xg-battle').appendChild(s);setTimeout(function(){if(s.parentNode)s.remove()},400)},j*80)})(i)}}
+function spawnSoulDrain(){var me=document.getElementById('xgME');if(!me)return;var pe=document.getElementById('xgPE');if(!pe)return;var mr=me.getBoundingClientRect(),pr=pe.getBoundingClientRect(),sr=document.querySelector('.xg-battle').getBoundingClientRect();for(var i=0;i<6;i++){(function(j){setTimeout(function(){var s=document.createElement('div');s.style.cssText='position:absolute;width:10px;height:10px;border-radius:50%;background:radial-gradient(circle,#ab47bc,#7b1fa2);pointer-events:none;z-index:20;';s.style.left=(mr.left-sr.left+mr.width/2)+'px';s.style.top=(mr.top-sr.top+mr.height/2)+'px';s.style.transition='all .5s ease-in';document.querySelector('.xg-battle').appendChild(s);requestAnimationFrame(function(){requestAnimationFrame(function(){s.style.left=(pr.left-sr.left+pr.width/2)+'px';s.style.top=(pr.top-sr.top+pr.height/2)+'px';s.style.opacity='0';s.style.transform='scale(0.3)'})});setTimeout(function(){if(s.parentNode)s.remove()},600)},j*80)})(i)}}
+function spawnBerserkAura(){var pe=document.getElementById('xgPE');if(!pe)return;pe.classList.add('berserk-active');setTimeout(function(){pe.classList.remove('berserk-active')},3000)}
+function spawnFreezeEffect(){var me=document.getElementById('xgME');if(!me)return;me.style.filter='brightness(1.5) saturate(0.3) hue-rotate(180deg)';me.style.transition='filter .3s';setTimeout(function(){me.style.filter=''},2000)}
+function spawnRouletteEffect(){var me=document.getElementById('xgME');if(!me)return;var rect=me.getBoundingClientRect(),sr=document.querySelector('.xg-battle').getBoundingClientRect();var wheel=document.createElement('div');wheel.style.cssText='position:absolute;width:80px;height:80px;border:3px solid rgba(201,169,110,.5);border-radius:50%;pointer-events:none;z-index:20;animation:rouletteSpin 1s ease forwards;';wheel.style.left=(rect.left-sr.left+rect.width/2-40)+'px';wheel.style.top=(rect.top-sr.top+rect.height/2-40)+'px';wheel.innerHTML='<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2rem">🎰</div>';document.querySelector('.xg-battle').appendChild(wheel);setTimeout(function(){if(wheel.parentNode)wheel.remove()},1200)}
+function spawnSummonExplode(){var me=document.getElementById('xgME');if(!me)return;var rect=me.getBoundingClientRect(),sr=document.querySelector('.xg-battle').getBoundingClientRect();for(var i=0;i<12;i++){var p=document.createElement('div');var colors=['#64b5f6','#42a5f5','#90caf9','#1e88e5'];p.style.cssText='position:absolute;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:20;';p.style.background=colors[i%4];p.style.boxShadow='0 0 6px '+colors[i%4];p.style.left=(rect.left-sr.left+rect.width/2)+'px';p.style.top=(rect.top-sr.top+rect.height/2)+'px';p.style.transition='all .6s ease-out';document.querySelector('.xg-battle').appendChild(p);var angle=Math.random()*Math.PI*2;var dist=40+Math.random()*60;requestAnimationFrame(function(el,a,d){requestAnimationFrame(function(){el.style.transform='translate('+Math.cos(a)*d+'px,'+Math.sin(a)*d+'px)';el.style.opacity='0'})}.bind(null,p,angle,dist));setTimeout(function(el){if(el.parentNode)el.remove()},800,p)}screenFlash('rgba(100,181,246,.3)')}
+function spawnGoldExplosion(){var me=document.getElementById('xgME');if(!me)return;var rect=me.getBoundingClientRect(),sr=document.querySelector('.xg-battle').getBoundingClientRect();for(var i=0;i<15;i++){(function(j){setTimeout(function(){var c=document.createElement('div');c.textContent='💰';c.style.cssText='position:absolute;font-size:1.2rem;pointer-events:none;z-index:20;animation:coinFly .8s ease forwards;';c.style.left=(rect.left-sr.left+rect.width/2+Math.random()*40-20)+'px';c.style.top=(rect.top-sr.top+rect.height/2)+'px';document.querySelector('.xg-battle').appendChild(c);setTimeout(function(){if(c.parentNode)c.remove()},1000)},j*40)})(i)}screenFlash('rgba(255,215,64,.3)')}
+function spawnDefendCharge(){var pe=document.getElementById('xgPE');if(!pe)return;var rect=pe.getBoundingClientRect(),sr=document.querySelector('.xg-battle').getBoundingClientRect();var shield=document.createElement('div');shield.style.cssText='position:absolute;width:120px;height:120px;border:3px solid rgba(76,175,80,.5);border-radius:50%;pointer-events:none;z-index:20;animation:shieldPulse 1s ease forwards;background:radial-gradient(circle,rgba(76,175,80,.1),transparent);';shield.style.left=(rect.left-sr.left+rect.width/2-60)+'px';shield.style.top=(rect.top-sr.top+rect.height/2-60)+'px';document.querySelector('.xg-battle').appendChild(shield);setTimeout(function(){if(shield.parentNode)shield.remove()},1200)}
+function spawnPoisonClouds(){var me=document.getElementById('xgME');if(!me)return;var rect=me.getBoundingClientRect(),sr=document.querySelector('.xg-battle').getBoundingClientRect();for(var i=0;i<6;i++){(function(j){setTimeout(function(){var c=document.createElement('div');var sz=20+Math.random()*20;c.style.cssText='position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(171,71,188,.5),transparent);pointer-events:none;z-index:20;animation:bloodMistAnim .7s ease forwards;';c.style.width=sz+'px';c.style.height=sz+'px';c.style.left=(rect.left-sr.left+rect.width/2+Math.random()*60-30)+'px';c.style.top=(rect.top-sr.top+rect.height/2+Math.random()*40-20)+'px';document.querySelector('.xg-battle').appendChild(c);setTimeout(function(){if(c.parentNode)c.remove()},900)},j*60)})(i)}}
+
 function autoLoop(){if(!G.cmb||G.cmb.result)return;var spd=1000;var p=G.p,c=G.cmb,m=c.m;var petStrike=false;
 
 /* 🌟 阶段1: DoT毒伤先结算（回合开始时） */
@@ -1791,8 +1816,8 @@ _abt=setTimeout(function(){
     for(var i=c.buffs.length-1;i>=0;i--){c.buffs[i].dur--;if(c.buffs[i].dur<=0)c.buffs.splice(i,1)}
     for(var k in c.cd){if(c.cd[k]>0)c.cd[k]--}
     if(c.berserkTurns>0){c.berserkTurns--;if(c.berserkTurns<=0)addLog('<span class="info">狂暴化结束</span>')}
-    if(p.pSkl.indexOf('P9')>=0) applyHeal(p, calcMaxHp(p)*0.025, false);
-    if(p.pSkl.indexOf('P29')>=0 && p.hp>0) applyHeal(p, Math.floor(calcMaxHp(p)*0.015), false);
+    if(p.pSkl.indexOf('P9')>=0){applyHeal(p, calcMaxHp(p)*0.025, false);if(Math.random()<0.2)addLog('<span class="info">【修罗之体】回复'+Math.floor(calcMaxHp(p)*0.025)+'HP</span>');}
+    if(p.pSkl.indexOf('P29')>=0 && p.hp>0){applyHeal(p, Math.floor(calcMaxHp(p)*0.015), false);if(Math.random()<0.2)addLog('<span class="info">【龟息术】回复'+Math.floor(calcMaxHp(p)*0.015)+'HP</span>');}
     if(p.pet&&p.pet.owned&&p.pet.level>=1&&p.hp>0){applyHeal(p, Math.floor(calcMaxHp(p)*0.05), false);}
     if(p.pet&&p.pet.owned&&p.pet.level>=55&&p.hp>0){var _petHealRate=0.01;if(p.pet.quality==='god')_petHealRate=0.05;else if(p.pet.quality==='fairy')_petHealRate=0.03;else if(p.pet.quality==='spirit')_petHealRate=0.02;applyHeal(p, Math.floor(calcMaxHp(p)*_petHealRate), false);}
     if(hasEquipPassive('regen')&&p.hp>0){var regenVal=getEquipPct('regen');applyHeal(p,Math.floor(calcMaxHp(p)*regenVal/100),false)}
@@ -2251,11 +2276,11 @@ function rBattle(c){
     cm.summons.forEach(function(s){
       var sColor=SUMMON_RARITY_COLOR[s.rarity]||'#9e9e9e';
       var sHpPct=Math.floor(s.hp/s.maxHp*100);
-      h+='<div style="display:flex;align-items:center;gap:6px;margin:2px 0;font-size:.7rem">';
-      h+='<span style="font-weight:800;color:'+sColor+'">'+s.emoji+s.name+'</span>';
-      h+='<div style="flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+sHpPct+'%;background:'+sColor+';border-radius:4px"></div></div>';
-      h+='<span style="color:'+sColor+';font-weight:700">⚔️'+s.atk+'</span>';
-      h+='<span style="color:var(--txl)">⏱'+s.dur+'</span>';
+      h+='<div style="display:flex;align-items:center;gap:5px;margin:2px 0;font-size:.68rem">';
+      h+='<span style="font-weight:800;color:'+sColor+';min-width:60px">'+s.emoji+s.name+'</span>';
+      h+='<div style="flex:1;height:5px;background:rgba(255,255,255,.1);border-radius:5px;overflow:hidden"><div style="height:100%;width:'+sHpPct+'%;background:'+sColor+';border-radius:5px"></div></div>';
+      h+='<span style="color:'+sColor+';font-weight:700;font-size:.65rem">⚔️'+s.atk+'</span>';
+      h+='<span style="color:var(--txl);font-size:.6rem">⏱'+s.dur+'</span>';
       h+='</div>';
     });
     h+='</div>';
@@ -2384,7 +2409,7 @@ function rLskill(c){var p=G.p;var h='<div class="xg-title"><div class="big-emoji
 function rReplace(c){var info=G.ce._rp,p=G.p;var arr=info.isP?p.pSkl:p.aSkl;var src=info.isP?PSKILLS:ASKILLS;var newSk=src.find(function(s){return s.id===info.id});var h='<div class="xg-title"><div class="big-emoji">🔄</div><h3>技能栏已满</h3><p style="color:var(--txm)">选择一个替换为 ['+newSk.n+']，或直接跳过保持原样</p><div class="xg-choices">';for(var i=0;i<arr.length;i++){var oldSk=src.find(function(s){return s.id===arr[i]});if(!oldSk)continue;h+='<div class="xg-skill-card" style="animation-delay:'+((i+1)*.12)+'s" onclick="xxReplPick('+i+')"><div class="sk-name">'+oldSk.n+'</div><div class="sk-desc">'+oldSk.d+'</div></div>'}h+='</div><div class="xg-actions" style="margin-top:20px"><button class="xg-btn danger" onclick="xxReplSkip()">🛑 跳过 (放弃学习此技能)</button></div></div>';c.innerHTML=h;}
 /* 更新公告栏 */
 /* 更新公告栏 */
-var UPDATE_NOTICE='<div id="xxUpdateNotice" style="margin-bottom:16px"><div style="background:linear-gradient(135deg,rgba(150,80,255,.06),rgba(201,169,110,.06));border:2px solid rgba(150,80,255,.2);border-radius:16px;overflow:hidden"><div onclick="toggleNotice()" style="cursor:pointer;padding:14px 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.4rem">🆕</span><div><div style="font-weight:900;font-size:1rem;color:var(--lv)">天道法则更新 (V1.3.0)</div><div style="font-size:.72rem;color:var(--txm)">点击查看修仙界最新变化</div></div></div><span id="noticeArrow" style="font-size:.85rem;color:var(--txm);transition:transform .3s">▼</span></div><div id="noticeBody" style="display:none;padding:0 20px 20px"><div style="font-size:.82rem;color:var(--txb);line-height:1.7"><p style="font-weight:700;color:var(--lv);margin-bottom:8px">🆕 V1.3.0 更新内容：</p><p>• <b>召唤流派上线</b>：学习召唤技能后，每回合随机召唤1~3只灵兽助战！13只召唤物各有专属台词和特殊效果。</p><p>• <b>四大新流派</b>：毒流(持续消耗)、召唤流(人海战术)、金钱流(爆发秒杀)、龟壳流(持久防御)</p><p>• <b>技能池分层</b>：技能按等级逐步解锁，Lv40可选全部技能</p><p>• <b>战斗UI升级</b>：新增攻击动画、剑气轨迹、召唤物品质光效</p><p>• <b>技能平衡调整</b>：P11/P15削弱，A6/A13/P14加强，P22分身永久化</p><p>• <b>怪物AOE</b>：所有怪物每2回合发动一次全体攻击</p><p>• <b>技能刷新</b>：每5级技能选择时，可花50金币刷新一次</p><p style="color:var(--cinnabar);font-weight:bold;margin-top:8px">⚠️ 存档完全兼容，无需重新开始！</p></div></div></div></div>';
+var UPDATE_NOTICE='<div id="xxUpdateNotice" style="margin-bottom:16px"><div style="background:linear-gradient(135deg,rgba(150,80,255,.06),rgba(201,169,110,.06));border:2px solid rgba(150,80,255,.2);border-radius:16px;overflow:hidden"><div onclick="toggleNotice()" style="cursor:pointer;padding:14px 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.4rem">🆕</span><div><div style="font-weight:900;font-size:1rem;color:var(--lv)">天道法则更新 (V1.4.0)</div><div style="font-size:.72rem;color:var(--txm)">点击查看修仙界最新变化</div></div></div><span id="noticeArrow" style="font-size:.85rem;color:var(--txm);transition:transform .3s">▼</span></div><div id="noticeBody" style="display:none;padding:0 20px 20px"><div style="font-size:.82rem;color:var(--txb);line-height:1.7"><p style="font-weight:700;color:var(--lv);margin-bottom:8px">🆕 V1.4.0 更新内容：</p><p>• <b>全技能特效上线</b>：25个主动技能全部拥有专属视觉特效（剑气/雷电/血雾/毒雾/召唤阵/金币雨/护盾等）</p><p>• <b>被动技能文案提醒</b>：所有被动技能触发时显示文字提示（怒气爆发/铁壁/不灭之火/死亡凝视等）</p><p>• <b>召唤物属性可见</b>：召唤物现在显示HP条和ATK数值</p><p>• <b>宠物品级标识</b>：宠物面板显示品级颜色（凡骨灰/灵兽蓝/仙宠紫/神兽金）</p><p>• <b>召唤流派上线</b>：13只召唤物各有专属台词和特殊效果</p><p>• <b>四大新流派</b>：毒流/召唤流/金钱流/龟壳流</p><p>• <b>属性上限重做</b>：暴击率20%+装备5%/吸血率8%+装备2%/闪避率18%+装备2%</p><p>• <b>定时关服</b>：每天00:30-08:00为维护时间，请早点休息</p><p>• <b>离线经验修复</b>：云端恢复时正确计算离线收益</p><p style="color:var(--cinnabar);font-weight:bold;margin-top:8px">⚠️ 存档完全兼容，无需重新开始！</p></div></div></div></div>';
 
 function toggleNotice(){
     var body=document.getElementById('noticeBody');
