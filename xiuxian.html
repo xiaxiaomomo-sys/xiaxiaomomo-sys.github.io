@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>修仙之路</title>
-<meta name="game-version" content="v1.3.9">
+<meta name="game-version" content="v1.4.0">
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -1989,8 +1989,14 @@ if(setBonus.gold>0){p.gold+=setBonus.gold}
 G.cmb={result:'win',exp:ge,gold:gd,petBonusGold:bonusGold,petExpGained:petExpGained,petLeveled:petLeveled,petNewLv:petNewLv,equipDrop:dropResult,stoneDrop:stoneResult,setBonusGold:setBonus.gold};
 G.scr='win';rc();if(G._autoNextTimer)clearTimeout(G._autoNextTimer);G._autoNextTimer=setTimeout(function(){G._autoNextTimer=null;G._autoContinue=true;checkLvlUp()},2000);autoSave()}
 
-function battleLose(){stopAuto();stopBGM();var p=G.p;if(!G.cmb)return;p.consecutiveKills=0;p.p8RemainingBattles=0;var lost=Math.floor(p.gold*0.5);p.gold=Math.max(0,p.gold-lost);p.hp=calcMaxHp(p);G.cmb={result:'lose',lost:lost};G.scr='death';rc();autoSave();checkAchievements()}
-/* 🌟 S1 全新属性 3选1 池 (70级必满保底机制) */
+function battleLose(){
+    stopAuto();stopBGM();var p=G.p;if(!G.cmb)return;
+    p.consecutiveKills=0;p.p8RemainingBattles=0;
+    // 🌟 如果已经是负债状态，死亡不扣钱（防止负数扣除变加钱）
+    var lost = p.gold > 0 ? Math.floor(p.gold * 0.5) : 0;
+    p.gold -= lost;
+    p.hp=calcMaxHp(p);G.cmb={result:'lose',lost:lost};G.scr='death';rc();autoSave();checkAchievements()
+}
 function genStatCh(){
     var pool=[], p=G.p;
     var rcR = p.pCritR||0, rd = p.pDodge||0, rl = p.pLife||0;
@@ -2303,7 +2309,7 @@ var claimed = JSON.parse(localStorage.getItem(claimKey) || '[]');
                     G.p.gold += item.gold;
                     showNoticeModal('🎁', '天道福泽', item.message || ('获得金币 +' + item.gold));
                 } else if (item.gold < 0) {
-                    G.p.gold = Math.max(0, G.p.gold + item.gold);
+                    G.p.gold += item.gold; // 🌟 允许扣成负数（负债状态）
                     showNoticeModal('⚡', '天道神罚', item.message || ('扣除金币 ' + item.gold));
                 }
                 claimed.push(item.id);
@@ -3668,7 +3674,24 @@ function rAchievements(c){
     c.innerHTML=h;
 }
 function rGmPick(c,isPassive){var p=G.p;var src=isPassive?PSKILLS:ASKILLS;var unacquired=src.filter(function(s){return(isPassive?p.pSkl:p.aSkl).indexOf(s.id)<0});var h='<div class="xg-hdr"><h2>🛠️ 自选'+(isPassive?'被动':'主动')+'技能</h2><p>点击即可直接领悟</p></div>';h+='<div class="xg-card"><div class="xg-choices" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">';if(unacquired.length===0)h+='<div style="color:var(--txm);padding:20px">所有技能已全部习得！</div>';else{unacquired.forEach(function(s){h+='<div class="xg-skill-card rarity-legendary" style="min-width:200px;max-width:280px;cursor:pointer" onclick="xxGmPickSkill(\''+s.id+'\','+isPassive+')"><div class="sk-type '+(isPassive?'passive':'active')+'">'+(isPassive?'🔮被动':'⚔️主动')+'</div><div class="sk-name">'+s.n+'</div><div class="sk-desc">'+s.d+'</div><div style="font-size:.65rem;color:var(--txm);margin-top:4px">点击领悟</div></div>'})}h+='</div></div><div class="xg-actions"><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 返回基地</button></div>';c.innerHTML=h;}
-window.xxGmPickSkill=function(id,isPassive){var p=G.p;if(isPassive){if(p.pSkl.indexOf(id)>=0){showSaveToast('❌','已有此被动技能');return}p.pSkl.push(id)}else{if(p.aSkl.indexOf(id)>=0){showSaveToast('❌','已有此主动技能');return}if(p.aSkl.length>=maxActiveSlots(p)){p.aSkl[p.aSkl.length-1]=id;showSaveToast('🔄','已替换最后1个主动技能')}else{p.aSkl.push(id)}}if(id==='A18')p.summonLocked=true;if(id==='A19')p.summonLocked=true;rc();autoSave()};
+window.xxGmPickSkill = function(id, isPassive) {
+    var p = G.p;
+    if (isPassive) {
+        if (p.pSkl.indexOf(id) >= 0) { showSaveToast('❌', '已有此被动技能'); return; }
+        p.pSkl.push(id); // 🌟 直接叠加，不限制槽位上限
+        var sk = PSKILLS.find(function(s){ return s.id === id; });
+        showSaveToast('🔮', '成功领悟被动：' + (sk ? sk.n : ''));
+    } else {
+        if (p.aSkl.indexOf(id) >= 0) { showSaveToast('❌', '已有此主动技能'); return; }
+        p.aSkl.push(id); // 🌟 直接叠加，不再替换最后一个技能
+        var sk = ASKILLS.find(function(s){ return s.id === id; });
+        showSaveToast('⚔️', '成功领悟主动：' + (sk ? sk.n : ''));
+    }
+    if (id === 'A18') p.summonLocked = true;
+    if (id === 'A19') p.summonLocked = true;
+    rc();
+    autoSave();
+};
 /* ===== 背包操作 ===== */
 window.xxBagEquip=function(idx){
     var p=G.p;if(idx<0||idx>=p.bag.length)return;
