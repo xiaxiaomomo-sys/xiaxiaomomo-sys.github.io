@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>修仙之路</title>
-<meta name="game-version" content="v1.3.4">
+<meta name="game-version" content="v1.3.5">
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -645,8 +645,8 @@ var SUMMON_POOL=[
 var SUMMON_RARITY_COLOR={common:'#9e9e9e',rare:'#42a5f5',epic:'#ab47bc',mythic:'#ffd740'};
 
 var SHOP=[
-    {n:'✨ 经验增幅石',ic:'✨',d:'永久EXP获取+1%',p:1000,maxCount:30,countKey:'expBonusCount',f:function(p){p.expBonus=Math.min((p.expBonus||0)+1,130);p.expBonusCount=(p.expBonusCount||0)+1}},
-    {n:'攻击药水',ic:'⚔️',d:'攻击力永久 +1',p:100,countKey:'atkBuyCount',f:function(p){p.pAtk+=1;p.atkBuyCount=(p.atkBuyCount||0)+1}},
+    {n:'✨ 经验增幅石',ic:'✨',d:'永久EXP获取+1%',p:1000,maxCount:100,countKey:'expBonusCount',f:function(p){p.expBonus=Math.min((p.expBonus||0)+1,100);p.expBonusCount=(p.expBonusCount||0)+1}},
+    {n:'攻击药水',ic:'⚔️',d:'攻击力永久 +2',p:100,countKey:'atkBuyCount',f:function(p){p.pAtk+=2;p.atkBuyCount=(p.atkBuyCount||0)+1}},
 {n:'防御药水',ic:'🛡️',d:'防御力永久 +1',p:100,countKey:'defBuyCount',f:function(p){p.pDef+=1;p.defBuyCount=(p.defBuyCount||0)+1}},
 {n:'生命药水',ic:'❤️',d:'最大HP永久 +5',p:100,countKey:'hpBuyCount',f:function(p){p.pHp+=5;p.hpBuyCount=(p.hpBuyCount||0)+1}},
     {n:'透视卷轴',ic:'🔮',d:'永久显示怪物属性',p:600,maxCount:1,countKey:'scans',f:function(p){p.scans++}},
@@ -919,9 +919,13 @@ function calcCritD(p){
 function calcDodge(p){var baseCap=0.18;var baseVal=(p.pDodge||0);var base=Math.min(baseVal/100,baseCap);if(p.pSkl.indexOf('P4')>=0)base+=0.10;if(G.cmb&&G.cmb.summons){for(var wi=0;wi<G.cmb.summons.length;wi++){if(G.cmb.summons[wi].special==='wisdom'){base+=0.10;break}}}var equipBonus=Math.min(getEquipFlat('dodge')/100,0.02);return Math.min(base+equipBonus,0.20)}
 function calcLifeSteal(p){var baseCap=8;var baseVal=(p.pLife||0);if(p.pSkl.indexOf('P5')>=0)baseVal+=5;var base=Math.min(baseVal,baseCap);var equipBonus=Math.min(getEquipFlat('life'),2);return base+equipBonus;
 }
-function maxActiveSlots(p){return (p&&p.summonLocked)?1:3;} // 召唤锁定时仅1个主动槽
-function maxPassiveSlots(p){return 4;} // 死锁4个
-
+function maxActiveSlots(p){
+    var base = (p && p.lv >= 30) ? 4 : 3;
+    return (p && p.summonLocked) ? 1 : base;
+}
+function maxPassiveSlots(p){
+    return (p && p.lv >= 30) ? 5 : 4;
+}
 /* 动画与表现 */
 function animAfterRender(elId,cls,delay){setTimeout(function(){var e=$(elId);if(!e)return;e.classList.remove('atk-fwd','atk-combo','hit','hit-impact','die','heal-flash','skill-glow','skill-charge','poison-burst','shield-flash','summon-glow','coin-burst');void e.offsetWidth;e.classList.add(cls);setTimeout(function(){if(e)e.classList.remove(cls)},700)},delay||0)}
 function shakeBattle(){var el=document.querySelector('.xg-battle');if(!el)return;el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');setTimeout(function(){el.classList.remove('shake')},300)}
@@ -2074,13 +2078,21 @@ function checkLvlUp(){
     var p=G.p;
     if(p.lv>=100){G._autoContinue=false;G.scr='hub';rc();return}
     if(p.exp>=expNeed(p.lv)){
-        p.exp-=expNeed(p.lv);
-        p.lv++;
-        p.statPts+=ptsPerLv(p.lv);
-        G._refreshed=false;
-        genStatCh();
-        G.scr='lattr';
-        rc()
+    p.exp-=expNeed(p.lv);
+    p.lv++;
+    p.statPts+=ptsPerLv(p.lv);
+
+    // 🌟 新增：达到 30 级时仅提醒一次
+    if(p.lv >= 30 && !p._slotNotified30){
+        p._slotNotified30 = true;
+        showSaveToast('✨', '境界突破！已解锁第4个主动法术槽与第5个被动法术槽！');
+    }
+
+    G._refreshed=false;
+    genStatCh();
+    G.scr='lattr';
+    rc()
+}
     }else{
         if(G._autoContinue){
             G._autoContinue=false;
@@ -2675,7 +2687,7 @@ h+='</div>';
 h+='<button class="'+stoneBtnCls+'" style="'+stoneBtnStyle+'" '+(p.gold>=6666&&!stoneFull?'onclick="xxBuyStone()"':'disabled')+'>💰6,666</button>';
 h+='</div>';
 for(var i=0;i<SHOP.length;i++){var it=SHOP[i];var price=getShopPrice(it.p);var canBuy=p.gold>=price;var isExpStone=(i===0);
-var atLimit=isExpStone&&(p.expBonus||0)>=130;if(it.maxCount){var cc=p[it.countKey]||0;if(cc>=it.maxCount)atLimit=true}if(atLimit)canBuy=false;var countInfo='';if(isExpStone){countInfo=(p.expBonusCount||0)+'次 · +'+(p.expBonus||0)+'%'}else if(it.maxCount){var cc2=p[it.countKey]||0;countInfo=cc2+'/'+it.maxCount+'次'}else if(it.countKey){var cc3=p[it.countKey]||0;if(cc3>0)countInfo='已购'+cc3+'次'}var buyLabel=atLimit?'🔒 已满':'💰'+price+(price<it.p?' <s style="font-size:.6rem;opacity:.6">'+it.p+'</s>':'');var btnCls=canBuy?'xg-btn gold':'xg-btn';var btnStyle='padding:6px 12px;font-size:.75rem;'+(canBuy?'':'opacity:.5;cursor:not-allowed;');var btnAttr=canBuy?'onclick="xxBuy('+i+')"':'disabled';h+='<div class="xg-item"><span class="it-icon">'+it.ic+'</span><div class="it-info"><div class="it-name">'+it.n+(countInfo?' <span style="font-size:.7rem;color:var(--txm)">('+countInfo+')</span>':'')+'</div><div class="it-desc">'+it.d+(atLimit?' <span style="color:var(--cinnabar);font-weight:700">已达到上限</span>':'')+'</div></div><button class="'+btnCls+'" style="'+btnStyle+'" '+btnAttr+'>'+buyLabel+'</button></div>'}
+var atLimit=isExpStone&&((p.expBonus||0)>=100||(p.expBonusCount||0)>=100);if(it.maxCount){var cc=p[it.countKey]||0;if(cc>=it.maxCount)atLimit=true}if(atLimit)canBuy=false;var countInfo='';if(isExpStone){countInfo=(p.expBonusCount||0)+'次 · +'+(p.expBonus||0)+'%'}else if(it.maxCount){var cc2=p[it.countKey]||0;countInfo=cc2+'/'+it.maxCount+'次'}else if(it.countKey){var cc3=p[it.countKey]||0;if(cc3>0)countInfo='已购'+cc3+'次'}var buyLabel=atLimit?'🔒 已满':'💰'+price+(price<it.p?' <s style="font-size:.6rem;opacity:.6">'+it.p+'</s>':'');var btnCls=canBuy?'xg-btn gold':'xg-btn';var btnStyle='padding:6px 12px;font-size:.75rem;'+(canBuy?'':'opacity:.5;cursor:not-allowed;');var btnAttr=canBuy?'onclick="xxBuy('+i+')"':'disabled';h+='<div class="xg-item"><span class="it-icon">'+it.ic+'</span><div class="it-info"><div class="it-name">'+it.n+(countInfo?' <span style="font-size:.7rem;color:var(--txm)">('+countInfo+')</span>':'')+'</div><div class="it-desc">'+it.d+(atLimit?' <span style="color:var(--cinnabar);font-weight:700">已达到上限</span>':'')+'</div></div><button class="'+btnCls+'" style="'+btnStyle+'" '+btnAttr+'>'+buyLabel+'</button></div>'}
 
 if(p.pet&&p.pet.owned){
     var washPrice=getShopPrice(5000);var canWash=p.gold>=washPrice;
