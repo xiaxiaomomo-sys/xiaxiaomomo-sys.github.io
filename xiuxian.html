@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>修仙之路</title>
-<meta name="game-version" content="v1.3.6">
+<meta name="game-version" content="v1.3.7">
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -2111,6 +2111,20 @@ function applyStatCh(i){G._skillRefreshed=false;var ch=G.ce[i],p=G.p;if(ch.k==='
 function applySkCh(i){var ch=G.ce[i],p=G.p;if(ch.isP){if(p.pSkl.indexOf(ch.s.id)>=0){showSaveToast('❌','已有此技能');return}if(p.pSkl.length>=maxPassiveSlots(p)){G.ce._rp={id:ch.s.id,isP:true};G.scr='replace';rc();return}p.pSkl.push(ch.s.id)}else{if(p.aSkl.indexOf(ch.s.id)>=0){showSaveToast('❌','已有此技能');return}if(p.aSkl.length>=maxActiveSlots(p)){G.ce._rp={id:ch.s.id,isP:false};G.scr='replace';rc();return}p.aSkl.push(ch.s.id)}if(ch.s.id==='A18')p.summonLocked=true;if(p.statPts>0){G.scr='assign';rc()}else checkLvlUp()}
 function replSk(idx){var info=G.ce._rp,p=G.p;var arr=info.isP?p.pSkl:p.aSkl;var oldId=arr[idx];arr[idx]=info.id;if(oldId==='A18')p.summonLocked=false;if(info.id==='A18')p.summonLocked=true;if(p.statPts>0){G.scr='assign';rc()}else checkLvlUp()}
 function buyItem(idx){var it=SHOP[idx],p=G.p;var price=getShopPrice(it.p);if(p.gold<price)return;p.gold-=price;it.f(p);p.hp=Math.min(p.hp,calcMaxHp(p));rc();autoSave()}
+/* 📌 补全本地存档与自动保存函数 */
+function saveLocal(){
+    try {
+        if(!G.p) return;
+        var data = { v: VER, p: G.p, pr: G.prog, ts: Date.now() };
+        localStorage.setItem(SK, JSON.stringify(data));
+    } catch(e) {
+        console.error('本地存档失败:', e);
+    }
+}
+
+function autoSave(){
+    saveLocal();
+}
 
 function migrate(d){
     if(!d||!d.p) return d;
@@ -2139,6 +2153,7 @@ function migrate(d){
     d.v=VER;
     return d;
 }
+
 function load(){
     try {
         var d = JSON.parse(localStorage.getItem(SK));
@@ -2152,6 +2167,31 @@ function load(){
             saveLocal();
            var rw=calcOfflineReward(d.ts);if(rw&&(rw.gold>0||rw.exp>0))setTimeout(function(){showOfflineReward(rw)},1500);
             return true;
+        }
+    } catch(e){}
+    return false;
+}
+ 
+async function loadCloud(){
+    try {
+        var r = await _sb.from('save').select('game_data').eq('id',getCloudKey()).single();
+        if(r.data && r.data.game_data){
+            var gd = r.data.game_data;
+            if(gd.v && gd.v <= VER && gd.p){
+                gd = migrate(gd);
+                G.p = gd.p; G.prog = gd.pr;
+                if(!G.p.pet) G.p.pet={owned:false,quality:null,level:1,exp:0};
+                if(!G.prog.cleared) G.prog.cleared={};
+                if(!G.prog.bossCleared) G.prog.bossCleared={};
+                if(!G.prog.curFloor) G.prog.curFloor=G.prog.maxFloor||1;
+                // 用本地旧ts计算离线时长（如果有的话）
+                var localData = null;
+                try { localData = JSON.parse(localStorage.getItem(SK)); } catch(e){}
+                var offlineTs = (localData && localData.ts) ? localData.ts : gd.ts;
+                localStorage.setItem(SK, JSON.stringify({v:VER,p:G.p,pr:G.prog,ts:Date.now()}));
+                var rw=calcOfflineReward(offlineTs);if(rw&&(rw.gold>0||rw.exp>0))setTimeout(function(){showOfflineReward(rw)},1500);
+                return true;
+            }
         }
     } catch(e){}
     return false;
