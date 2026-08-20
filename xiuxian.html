@@ -3163,7 +3163,7 @@ window.xxReturnToBattle = function() {
         autoLoop(); // 恢复自动战斗循环
     }
 };
-window.xxBuy=function(i){buyItem(i)};
+window.xxBuy=function(i, count){buyItem(i, count)};
 window.xxClaimCompensation=function(){if(G.p.compClaimed)return;G.p.compClaimed=true;G.p.gold+=500;if(typeof showSaveToast==='function')showSaveToast('📜','成功领取维护补偿 500 金币！');rc();autoSave()};
 window.xxClaimGift=function(){
     var p=G.p;
