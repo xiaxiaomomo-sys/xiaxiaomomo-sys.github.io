@@ -2078,21 +2078,20 @@ function checkLvlUp(){
     var p=G.p;
     if(p.lv>=100){G._autoContinue=false;G.scr='hub';rc();return}
     if(p.exp>=expNeed(p.lv)){
-    p.exp-=expNeed(p.lv);
-    p.lv++;
-    p.statPts+=ptsPerLv(p.lv);
+        p.exp-=expNeed(p.lv);
+        p.lv++;
+        p.statPts+=ptsPerLv(p.lv);
 
-    // 🌟 新增：达到 30 级时仅提醒一次
-    if(p.lv >= 30 && !p._slotNotified30){
-        p._slotNotified30 = true;
-        showSaveToast('✨', '境界突破！已解锁第4个主动法术槽与第5个被动法术槽！');
-    }
+        // 🌟 新增：达到 30 级时仅提醒一次
+        if(p.lv >= 30 && !p._slotNotified30){
+            p._slotNotified30 = true;
+            showSaveToast('✨', '境界突破！已解锁第4个主动法术槽与第5个被动法术槽！');
+        }
 
-    G._refreshed=false;
-    genStatCh();
-    G.scr='lattr';
-    rc()
-}
+        G._refreshed=false;
+        genStatCh();
+        G.scr='lattr';
+        rc()
     }else{
         if(G._autoContinue){
             G._autoContinue=false;
