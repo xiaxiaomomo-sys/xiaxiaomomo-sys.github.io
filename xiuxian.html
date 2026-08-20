@@ -4,42 +4,44 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>修仙之路</title>
-<meta name="game-version" content="v1.3.5">
+<meta name="game-version" content="v1.3.0">
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* 重置与基础布局 */
+/* 重置 */
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);line-height:1.7;transition:background .4s,color .4s}
 
-/* CSS 变量 */
+/* CSS Variables */
 :root{--bg:#f5f0e6;--white:#faf7f0;--gs:rgba(250,247,240,.95);--b50:#f0ebe0;--b100:#e0d8c8;--b200:#c9bfaa;--b300:#8b7e6a;--b400:#6b5c47;--b500:#4a3f2f;--b600:#3a2f1f;--pk:#c41e3a;--pks:#fce4ec;--mt:#5b8c5a;--lv:#7b68ae;--yw:#c9a96e;--tx:#2d2218;--txb:#5a4e3e;--txm:#8b7e6a;--txl:#b5a996;--bd:rgba(45,34,24,.1);--r:16px;--rs:10px;--rl:24px;--rf:9999px;--ss:0 2px 10px rgba(45,34,24,.06);--sd:0 4px 20px rgba(45,34,24,.08);--sm:0 8px 32px rgba(45,34,24,.10);--sl:0 16px 48px rgba(45,34,24,.14);--sp:cubic-bezier(0.34,1.56,0.64,1);--ss2:cubic-bezier(0.22,1.2,0.36,1);--sn:cubic-bezier(0.4,0,0.2,1);--ink:#2d2218;--ink-lt:rgba(45,34,24,.04);--cinnabar:#c41e3a;--jade:#5b8c5a;--gold:#c9a96e;--gold-lt:#e8d5a0}
 body.dark{--bg:#1a1714;--white:#252018;--gs:rgba(37,32,24,.95);--b50:#2e2820;--b100:#3d3628;--b200:#4d4638;--b300:#8b7e6a;--b400:#c9a96e;--b500:#e8d5a0;--b600:#f0e8d0;--tx:#e8e0d0;--txb:#b5a996;--txm:#8b7e6a;--txl:#5a4e3e;--bd:rgba(201,169,110,.15);--pk:#ff6b6b;--pks:#3a2020;--mt:#7dba7a;--lv:#a990d0;--yw:#e8d5a0;--ink:#e8e0d0;--ink-lt:rgba(232,224,208,.04);--cinnabar:#ff6b6b;--jade:#7dba7a;--gold:#e8d5a0;--gold-lt:#f0e8d0}
 
-/* 全屏游戏容器：最大宽度 860px 居中 */
-#xgRoot{width:100%;max-width:860px;margin:0 auto;height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:50px 8px 65px}
-@media(min-width:769px){#xgRoot{padding:56px 16px 24px}}
+/* 全屏游戏容器 */
+#xgRoot{width:100%;height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:52px 0 70px}
+@media(min-width:769px){#xgRoot{padding:52px 20px 20px}}
 
-/* 顶部栏与导航 */
+/* 顶部栏 */
 .game-topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);box-shadow:var(--ss);transition:background .4s}
+
+/* 底部栏(移动端) */
 .game-bottombar{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--white);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 4px;box-shadow:0 -2px 10px rgba(0,0,0,.05);transition:background .4s}
 .game-bottombar button{flex:1;padding:8px 4px;border:none;background:transparent;font-size:.7rem;font-weight:700;color:var(--txm);cursor:pointer;text-align:center;font-family:'Nunito',sans-serif}
 .game-bottombar button.active{color:var(--cinnabar)}
 @media(min-width:769px){.game-bottombar{display:none}}
 
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--b200);border-radius:10px}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--b200);border-radius:10px}
 
 /* 水墨背景 */
 body::after{content:'';position:fixed;bottom:0;left:0;right:0;height:50vh;pointer-events:none;z-index:0;opacity:.035;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 400'%3E%3Cpath d='M0,400 L0,280 Q120,180 240,260 Q360,140 480,230 Q600,100 720,200 Q840,80 960,170 Q1080,60 1200,150 Q1320,100 1440,180 L1440,400Z' fill='%232d2218'/%3E%3Cpath d='M0,400 L0,320 Q180,240 360,300 Q540,210 720,280 Q900,180 1080,250 Q1260,200 1440,260 L1440,400Z' fill='%232d2218' opacity='.5'/%3E%3C/svg%3E") no-repeat bottom center;background-size:100% auto}
 body.dark::after{opacity:.06}
 
-/* ===== 核心动画 ===== */
-@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+/* ===== 游戏UI样式 ===== */
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 @keyframes dmgFloat{0%{opacity:1;transform:translateY(0) scale(1)}50%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-60px) scale(.8)}}
 @keyframes healFloat{0%{opacity:1;transform:translateY(0) scale(1)}50%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-60px) scale(.8)}}
 @keyframes critGlow{0%{box-shadow:inset 0 0 0 transparent}30%{box-shadow:inset 0 0 30px rgba(255,212,0,.5)}100%{box-shadow:inset 0 0 0 transparent}}
-@keyframes berserkPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,107,0)}50%{box-shadow:0 0 15px 3px rgba(255,107,107,.3)}}
+@keyframes berserkPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,107,0)}50%{box-shadow:0 0 20px 4px rgba(255,107,107,.3)}}
 @keyframes lightningBolt{0%{opacity:0;transform:scaleY(0)}30%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(0)}}
 @keyframes bloodMistAnim{0%{opacity:0;transform:scale(0)}50%{opacity:.35;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
 @keyframes protectiveGlowAnim{0%{opacity:0;transform:scale(0)}40%{opacity:.6;transform:scale(1.2)}100%{opacity:0;transform:scale(1.8)}}
@@ -47,7 +49,7 @@ body.dark::after{opacity:.06}
 @keyframes coinFly{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(-80px) rotate(360deg)}}
 @keyframes shieldPulse{0%{opacity:0;transform:scale(0)}40%{opacity:.6;transform:scale(1.1)}100%{opacity:0;transform:scale(1.5)}}
 .berserk-active{animation:berserkPulse 1.2s infinite}
-@keyframes cloneGlow{0%,100%{box-shadow:0 0 0 0 rgba(75,166,247,0)}50%{box-shadow:0 0 12px 2px rgba(75,166,247,.25)}}
+@keyframes cloneGlow{0%,100%{box-shadow:0 0 0 0 rgba(75,166,247,0)}50%{box-shadow:0 0 15px 3px rgba(75,166,247,.25)}}
 @keyframes legendaryPulse{0%,100%{box-shadow:0 0 8px 0 rgba(255,212,0,.15)}50%{box-shadow:0 0 20px 4px rgba(255,212,0,.3)}}
 @keyframes epicPulse{0%,100%{box-shadow:0 0 8px 0 rgba(150,80,255,.15)}50%{box-shadow:0 0 16px 3px rgba(150,80,255,.25)}}
 @keyframes cardReveal{0%{opacity:0;transform:perspective(600px) rotateY(20deg)}100%{opacity:1;transform:perspective(600px) rotateY(0) scale(1)}}
@@ -56,212 +58,291 @@ body.dark::after{opacity:.06}
 @keyframes fs{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 @keyframes cardFlipIn{0%{opacity:0;transform:perspective(800px) rotateY(30deg) scale(.9)}100%{opacity:1;transform:perspective(800px) rotateY(0) scale(1)}}
 @keyframes xgFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-@keyframes attackCombo{0%{transform:translateX(0) scale(1) rotate(0)}10%{transform:translateX(-10px) scale(.92) rotate(-2deg)}25%{transform:translateX(20px) scale(1.05) rotate(-3deg)}50%{transform:translateX(15px) scale(1.03)}65%{transform:translateX(25px) scale(1.08) rotate(-3deg)}100%{transform:translateX(0) scale(1) rotate(0)}}
-@keyframes hitImpact{0%{transform:translateX(0);filter:brightness(1)}8%{transform:translateX(15px) rotate(3deg);filter:brightness(2.5)}25%{transform:translateX(-10px) rotate(-2deg);filter:brightness(1.6)}100%{transform:translateX(0);filter:brightness(1)}}
-@keyframes skillCharge{0%{box-shadow:inset 0 0 0 transparent;transform:scale(1)}35%{box-shadow:inset 0 0 40px rgba(201,169,110,.6);transform:scale(1.04)}100%{box-shadow:inset 0 0 0 transparent;transform:scale(1)}}
-@keyframes poisonBurst{0%{box-shadow:inset 0 0 0 transparent}40%{box-shadow:inset 0 0 50px rgba(150,80,255,.6)}100%{box-shadow:inset 0 0 0 transparent}}
-@keyframes shieldFlash{0%{box-shadow:inset 0 0 0 transparent}40%{box-shadow:inset 0 0 40px rgba(66,165,245,.5)}100%{box-shadow:inset 0 0 0 transparent}}
-@keyframes summonGlow{0%{filter:brightness(1)}30%{filter:brightness(1.3) drop-shadow(0 0 10px rgba(100,181,246,.6))}100%{filter:brightness(1)}}
-@keyframes coinBurst{0%{filter:brightness(1)}25%{filter:brightness(1.4) drop-shadow(0 0 12px rgba(201,169,110,.8))}100%{filter:brightness(1)}}
-@keyframes slashTrail{0%{opacity:0;transform:translateX(-20px) scaleX(0)}30%{opacity:1;transform:translateX(0) scaleX(1)}100%{opacity:0;transform:translateX(40px) scaleX(.3)}}
-@keyframes fadeSlideUp{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-25px)}}
-@keyframes xgAtk{0%{transform:translateX(0) scale(1)}45%{transform:translateX(30px) scale(1.08)}100%{transform:translateX(0) scale(1)}}
-@keyframes xgHit{0%{transform:translateX(0);filter:brightness(1)}15%{transform:translateX(14px) rotate(3deg);filter:brightness(2.2)}100%{transform:translateX(0);filter:brightness(1)}}
-@keyframes xgDie{0%{opacity:1;transform:scale(1)}20%{opacity:.85;transform:scale(1.15) rotate(-6deg);filter:brightness(2)}100%{opacity:0;transform:scale(.15) rotate(30deg);filter:brightness(.2)}}
+@keyframes attackCombo{0%{transform:translateX(0) scale(1) rotate(0)}10%{transform:translateX(-10px) scale(.92) rotate(-2deg)}25%{transform:translateX(30px) scale(1.08) rotate(-5deg)}35%{transform:translateX(35px) scale(1.1) rotate(3deg)}50%{transform:translateX(25px) scale(1.05) rotate(-3deg)}65%{transform:translateX(40px) scale(1.12) rotate(-4deg)}80%{transform:translateX(20px) scale(1.02) rotate(2deg)}100%{transform:translateX(0) scale(1) rotate(0)}}
+@keyframes hitImpact{0%{transform:translateX(0);filter:brightness(1)}8%{transform:translateX(20px) rotate(4deg);filter:brightness(3) saturate(4)}16%{transform:translateX(-15px) rotate(-3deg);filter:brightness(2) saturate(2)}28%{transform:translateX(10px) rotate(2deg);filter:brightness(1.6)}40%{transform:translateX(-6px) rotate(-1deg);filter:brightness(1.3)}55%{transform:translateX(3px);filter:brightness(1.1)}100%{transform:translateX(0);filter:brightness(1)}}
+@keyframes skillCharge{0%{box-shadow:inset 0 0 0 transparent;transform:scale(1)}15%{box-shadow:inset 0 0 30px rgba(201,169,110,.3);transform:scale(1.03)}35%{box-shadow:inset 0 0 60px rgba(201,169,110,.6);transform:scale(1.06)}55%{box-shadow:inset 0 0 80px rgba(255,215,64,.5);transform:scale(1.04)}75%{box-shadow:inset 0 0 40px rgba(201,169,110,.3);transform:scale(1.02)}100%{box-shadow:inset 0 0 0 transparent;transform:scale(1)}}
+@keyframes poisonBurst{0%{box-shadow:inset 0 0 0 transparent}20%{box-shadow:inset 0 0 40px rgba(150,80,255,.4)}40%{box-shadow:inset 0 0 60px rgba(150,80,255,.6)}60%{box-shadow:inset 0 0 30px rgba(150,80,255,.3)}100%{box-shadow:inset 0 0 0 transparent}}
+@keyframes shieldFlash{0%{box-shadow:inset 0 0 0 transparent}30%{box-shadow:inset 0 0 50px rgba(66,165,245,.5)}60%{box-shadow:inset 0 0 30px rgba(66,165,245,.3)}100%{box-shadow:inset 0 0 0 transparent}}
+@keyframes summonGlow{0%{filter:brightness(1) drop-shadow(0 0 0 transparent)}30%{filter:brightness(1.3) drop-shadow(0 0 12px rgba(100,181,246,.6))}60%{filter:brightness(1.15) drop-shadow(0 0 8px rgba(100,181,246,.3))}100%{filter:brightness(1) drop-shadow(0 0 0 transparent)}}
+@keyframes coinBurst{0%{filter:brightness(1)}25%{filter:brightness(1.5) drop-shadow(0 0 16px rgba(201,169,110,.8))}50%{filter:brightness(1.3) drop-shadow(0 0 10px rgba(201,169,110,.5))}100%{filter:brightness(1) drop-shadow(0 0 0 transparent)}}
+@keyframes slashTrail{0%{opacity:0;transform:translateX(-30px) scaleX(0)}30%{opacity:1;transform:translateX(0) scaleX(1)}100%{opacity:0;transform:translateX(60px) scaleX(.3)}}
+@keyframes fadeSlideUp{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-30px)}}
+@keyframes xgAtk{0%{transform:translateX(0) scale(1)}15%{transform:translateX(-15px) scale(.92)}45%{transform:translateX(40px) scale(1.12) rotate(-4deg)}65%{transform:translateX(40px) scale(1.12) rotate(-4deg)}100%{transform:translateX(0) scale(1) rotate(0)}}
+@keyframes xgSkill{0%{box-shadow:inset 0 0 0 transparent}20%{box-shadow:inset 0 0 50px rgba(201,169,110,.5)}50%{box-shadow:inset 0 0 60px rgba(201,169,110,.6)}100%{box-shadow:inset 0 0 0 transparent}}
+@keyframes xgHit{0%{transform:translateX(0);filter:brightness(1)}12%{transform:translateX(18px) rotate(3deg);filter:brightness(2.5) saturate(3)}25%{transform:translateX(-10px) rotate(-2deg);filter:brightness(1.5)}40%{transform:translateX(6px);filter:brightness(1.2)}55%{transform:translateX(-3px);filter:brightness(1.05)}100%{transform:translateX(0);filter:brightness(1)}}
+@keyframes xgDie{0%{opacity:1;transform:scale(1) rotate(0);filter:brightness(1) saturate(1)}20%{opacity:.85;transform:scale(1.25) rotate(-8deg);filter:brightness(2) saturate(2)}50%{opacity:.4;transform:scale(.9) rotate(15deg);filter:brightness(.6) saturate(.5)}100%{opacity:0;transform:scale(.15) rotate(40deg);filter:brightness(.2) saturate(0)}}
+@keyframes xgHeal{0%{box-shadow:inset 0 0 0 transparent}25%{box-shadow:inset 0 0 40px rgba(91,140,90,.5)}50%{box-shadow:inset 0 0 35px rgba(91,140,90,.35)}100%{box-shadow:inset 0 0 0 transparent}}
 @keyframes mythicPulse{0%,100%{filter:drop-shadow(0 0 4px #ffd740)}50%{filter:drop-shadow(0 0 10px #ffd740)}}
-@keyframes dmgPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-10deg)}30%{opacity:1;transform:translate(-50%,-100%) scale(1.2) rotate(5deg)}60%{opacity:1;transform:translate(-50%,-120%) scale(1)}100%{opacity:0;transform:translate(-50%,-150%) scale(.8)}}
-@keyframes dmgPopCrit{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(-15deg)}25%{opacity:1;transform:translate(-50%,-90%) scale(1.4) rotate(8deg)}50%{opacity:1;transform:translate(-50%,-110%) scale(1.1) rotate(-3deg)}75%{opacity:1;transform:translate(-50%,-130%) scale(1)}100%{opacity:0;transform:translate(-50%,-160%) scale(.7)}}
+@keyframes dmgPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-10deg)}30%{opacity:1;transform:translate(-50%,-100%) scale(1.3) rotate(5deg)}60%{opacity:1;transform:translate(-50%,-120%) scale(1)}100%{opacity:0;transform:translate(-50%,-160%) scale(.8)}}
+@keyframes dmgPopCrit{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(-15deg)}25%{opacity:1;transform:translate(-50%,-90%) scale(1.6) rotate(8deg)}50%{opacity:1;transform:translate(-50%,-110%) scale(1.2) rotate(-3deg)}75%{opacity:1;transform:translate(-50%,-130%) scale(1)}100%{opacity:0;transform:translate(-50%,-180%) scale(.7)}}
 @keyframes petShimmer{0%{background-position:-200% center}100%{background-position:200% center}}
-@keyframes auraSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-@keyframes bossPulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}
-@keyframes petBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-@keyframes summonFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-@keyframes vsPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+@keyframes lvlGlow{0%{color:var(--b500);text-shadow:none}50%{color:var(--yw);text-shadow:0 0 12px var(--yw)}100%{color:var(--b500);text-shadow:none}}
+@keyframes hb{0%,100%{transform:scale(1)}15%{transform:scale(1.25)}30%{transform:scale(1)}45%{transform:scale(1.18)}}
+@keyframes bb{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.4)}}
+@keyframes bl{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+@keyframes lp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.7}}
+@keyframes gfFade{0%{opacity:0}100%{opacity:1}}
+@keyframes gSlideL{0%{opacity:0;transform:translateX(100%)}100%{opacity:1;transform:translateX(0)}}
+@keyframes gSlideR{0%{opacity:0;transform:translateX(-100%)}100%{opacity:1;transform:translateX(0)}}
+@keyframes gZoomIn{0%{opacity:0;transform:scale(1.8)}100%{opacity:1;transform:scale(1)}}
+@keyframes gGlitch{0%{opacity:0;transform:translate(0)}20%{opacity:1;transform:translate(-8px,4px)}40%{transform:translate(6px,-3px)}60%{transform:translate(-3px,6px)}80%{transform:translate(4px,-2px)}100%{opacity:1;transform:translate(0)}}
+@keyframes gFlip{0%{opacity:0;transform:perspective(600px) rotateY(-90deg)}100%{opacity:1;transform:perspective(600px) rotateY(0)}}
+@keyframes gBlur{0%{opacity:0;filter:blur(20px);transform:scale(1.1)}100%{opacity:1;filter:blur(0);transform:scale(1)}}
+@keyframes gexitFade{0%{opacity:1}100%{opacity:0}}
+@keyframes gexitSL{0%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(-100%)}}
+@keyframes gexitSR{0%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(100%)}}
+@keyframes gexitZoom{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.6)}}
+@keyframes gexitGlitch{0%{opacity:1}50%{opacity:.3}100%{opacity:0}}
+@keyframes gexitFlip{0%{opacity:1;transform:perspective(600px) rotateY(0)}100%{opacity:0;transform:perspective(600px) rotateY(90deg)}}
+@keyframes gexitBlur{0%{opacity:1;filter:blur(0)}100%{opacity:0;filter:blur(20px)}}
 
-/* ===== 修复1：页面居中与标题居中 ===== */
-.xg{max-width:100%;width:100%;margin:0 auto}
-.xg-title{text-align:center;padding:24px 10px}
-.xg-title .big-emoji{font-size:3.5rem;display:block;margin-bottom:12px;animation:xgFloat 3s ease-in-out infinite}
-.xg-title h3{font-size:1.5rem;font-weight:900;margin-bottom:8px;font-family:'Ma Shan Zheng',cursive;letter-spacing:1px}
-.xg-title p{color:var(--txm);font-size:.9rem;margin-bottom:16px}
+.xg{max-width:min(90vw,800px);width:100%;margin:0 auto;padding:0 16px}
 .xg-card,.xg-hdr,.xg-log,.xg-actions{width:100%}
-.xg-hdr{text-align:center;margin-bottom:16px;position:relative}
-.xg-hdr h2{font-size:clamp(1.3rem, 3.5vw, 1.8rem);font-weight:900;margin-bottom:4px;font-family:'Ma Shan Zheng',cursive;letter-spacing:1px;position:relative;display:inline-block}
-.xg-hdr h2::after{content:'';position:absolute;bottom:-4px;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-.xg-hdr p{color:var(--txm);font-size:clamp(.75rem, 2vw, .9rem)}
-.xg-card{background:var(--white);border-radius:var(--r);box-shadow:var(--sd);border:1px solid var(--bd);padding:clamp(12px, 2.5vw, 20px);margin-bottom:14px;transition:background .4s;position:relative}
-.xg-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.4}
-
-/* 输入框样式 */
-.lb-name-input{padding:8px 12px;border:1.5px solid var(--b200);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.85rem;background:var(--b50);color:var(--tx);outline:none;transition:border-color .3s}
-.lb-name-input:focus{border-color:var(--gold)}
-
-/* ===== 修复2：关卡选择框样式 ===== */
-.xg-chbtn{display:flex;align-items:center;justify-content:center;padding:10px 8px;border-radius:var(--rs);background:var(--white);border:2px solid var(--b100);cursor:pointer;transition:all .25s var(--sp);margin-bottom:4px}
-.xg-chbtn:hover{border-color:var(--b400);transform:translateY(-2px);box-shadow:var(--ss)}
-.xg-chbtn.boss{border-color:var(--yw);background:linear-gradient(135deg,#fff9e6,#fff3cc)}
-
-/* ===== 修复3：全套战斗特效与动画类 ===== */
+.xg-hdr{text-align:center;margin-bottom:28px;position:relative}.xg-hdr h2{font-size:2rem;font-weight:900;margin-bottom:6px}.xg-hdr p{color:var(--txm);font-size:.95rem}
+.xg-card{background:var(--white);border-radius:var(--r);box-shadow:var(--sd);border:1px solid var(--bd);padding:24px;margin-bottom:20px;transition:background .4s;position:relative}
+.xg-stat-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--b100);font-size:.88rem;font-weight:700}.xg-stat-row:last-child{border:none}
+.xg-hp-bar{height:14px;background:var(--b50);border-radius:10px;overflow:hidden;margin:8px 0;position:relative}.xg-hp-fill{height:100%;border-radius:10px;transition:width .4s ease;background:linear-gradient(90deg,#4caf50,#81c784)}.xg-hp-fill.low{background:linear-gradient(90deg,#ff6b6b,#ff9800)}.xg-hp-fill.mid{background:linear-gradient(90deg,#ff9800,#ffc107)}
+.xg-exp-bar{height:8px;background:var(--b50);border-radius:8px;overflow:hidden;margin:6px 0}.xg-exp-fill{height:100%;background:linear-gradient(90deg,var(--b300),var(--lv));border-radius:8px;transition:width .4s}
+.xg-battle{display:flex;gap:clamp(8px,2vw,16px);align-items:stretch;margin-bottom:16px;position:relative;transition:transform .1s;width:100%}.xg-battle.shake{animation:shake .3s ease}
+.xg-bp{flex:1;min-width:0;background:var(--white);border-radius:var(--r);padding:clamp(10px,2vw,18px) clamp(8px,1.5vw,14px);text-align:center;border:2px solid var(--b100);transition:all .3s;position:relative;overflow:visible}.xg-bp.monster{border-color:var(--pk)}.xg-bp .emoji{font-size:3rem;display:block;margin:4px 0;position:relative;z-index:1}.xg-bp .bname{font-size:.95rem;font-weight:800;margin-bottom:2px}.xg-bp .blv{font-size:.72rem;color:var(--txm);font-weight:600;margin-bottom:6px}
+.xg-bp .buff-row{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin:4px 0;min-height:20px}
+.xg-buff-tag{display:inline-flex;align-items:center;gap:2px;padding:2px 6px;border-radius:var(--rf);font-size:.6rem;font-weight:700;line-height:1;white-space:nowrap}
+.xg-buff-tag.atk-up{background:rgba(255,107,107,.15);color:#ff4757}
+.xg-buff-tag.def-down{background:rgba(255,165,0,.15);color:#e67e22}
+.xg-buff-tag.shield{background:rgba(75,166,247,.15);color:var(--b500)}
+.xg-buff-tag.stun{background:rgba(255,212,0,.15);color:#f39c12}
+.xg-buff-tag.clone{background:rgba(150,80,255,.15);color:#9650ff}
+.xg-buff-tag.heal{background:rgba(76,175,80,.15);color:#4caf50}
+.xg-buff-tag.berserk{background:rgba(255,71,87,.15);color:#ff4757;animation:berserkPulse 1s infinite}
+.xg-buff-tag.warrior{background:rgba(255,212,0,.2);color:#d4a840;animation:borderGlow 1.5s infinite}
+.xg-buff-tag.inv{background:rgba(255,212,0,.2);color:#d4b840}
+.xg-buff-tag.p8buff{background:rgba(168,230,207,.3);color:var(--mt)}
+.xg-bp.berserk-active{animation:berserkPulse 1.2s infinite}
+.xg-bp.clone-active{animation:cloneGlow 1.5s infinite}
+.xg-bp.crit-hit{animation:critGlow .5s ease}
+.xg-log{background:var(--b50);border-radius:var(--rs);padding:clamp(8px,1.5vw,14px) clamp(10px,2vw,16px);max-height:clamp(100px,20vh,180px);overflow-y:auto;font-size:clamp(.65rem,1.2vw,.78rem);line-height:1.9;color:var(--txb);margin-bottom:12px;border:1px solid var(--b100)}
+.xg-log .dmg{color:var(--cinnabar);font-weight:800}.xg-log .heal{color:var(--jade);font-weight:800}.xg-log .info{color:var(--gold);font-weight:700}
+.xg-vs{display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:900;color:var(--gold);flex-shrink:0;padding:0 4px;text-shadow:0 2px 8px rgba(201,169,110,.3)}
+.skill-bar,.xg-actions{display:flex;gap:clamp(4px,1vw,8px);flex-wrap:wrap;justify-content:center;margin-top:16px;position:relative;z-index:2}
+.xg-btn{padding:10px 20px;border-radius:var(--rf);border:2px solid var(--b200);background:var(--white);color:var(--tx);font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .25s var(--sp)}.xg-btn:hover{transform:translateY(-2px) scale(1.04);box-shadow:var(--sm);border-color:var(--b400)}.xg-btn:active{transform:scale(.96)}.xg-btn.primary{background:linear-gradient(135deg,var(--ink),var(--b400));color:#faf7f0;border-color:var(--b500);box-shadow:0 3px 14px rgba(45,34,24,.25)}.xg-btn.primary:hover{background:linear-gradient(135deg,var(--cinnabar),var(--ink));box-shadow:0 4px 20px rgba(196,30,58,.25)}.xg-btn.danger{background:var(--cinnabar);color:#fff;border-color:var(--cinnabar)}.xg-btn.danger:hover{opacity:.9}.xg-btn.gold{background:linear-gradient(135deg,var(--gold),#b8944a);color:#fff;border-color:var(--gold)}.xg-btn.gold:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(201,169,110,.4)}.xg-btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.xg-chbtn{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:var(--rs);background:var(--white);border:2px solid var(--b100);cursor:pointer;transition:all .3s var(--sp);margin-bottom:8px}.xg-chbtn:hover{border-color:var(--b400);transform:translateY(-2px);box-shadow:var(--ss)}.xg-chbtn.boss{border-color:var(--yw);background:linear-gradient(135deg,#fff9e6,#fff3cc)}
+.xg-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--rs);background:var(--b50);transition:background .15s;border:1px solid var(--b100);margin-bottom:8px}.xg-item:hover{background:var(--b100);border-color:var(--gold)}
+.xg-skill-card{padding:16px;border-radius:var(--rs);border:2px solid var(--b100);background:var(--white);cursor:pointer;transition:all .3s var(--sp);text-align:center;animation:cardReveal .5s var(--ss2) both}.xg-skill-card:hover{transform:translateY(-4px);box-shadow:var(--sm)}.xg-skill-card .sk-name{font-weight:800;font-size:.95rem;margin-bottom:4px}.xg-skill-card .sk-desc{font-size:.75rem;color:var(--txb);line-height:1.5}.xg-skill-card .sk-type{display:inline-block;padding:3px 10px;border-radius:var(--rf);font-size:.65rem;font-weight:700;margin-bottom:6px}.xg-skill-card .sk-type.active{background:rgba(196,30,58,.1);color:var(--cinnabar);border:1px solid rgba(196,30,58,.2)}.xg-skill-card .sk-type.passive{background:rgba(123,104,174,.1);color:var(--lv);border:1px solid rgba(123,104,174,.2)}
+.xg-skill-card.rarity-epic{border-color:var(--lv);background:linear-gradient(135deg,rgba(123,104,174,.04),rgba(123,104,174,.08));animation:cardReveal .5s var(--ss2) both,epicPulse 2s ease-in-out infinite}
+.xg-skill-card.rarity-legendary{border-color:var(--gold);background:linear-gradient(135deg,rgba(201,169,110,.06),rgba(201,169,110,.12));animation:cardReveal .5s var(--ss2) both,legendaryPulse 2s ease-in-out infinite}
+.xg-skill-card.rarity-curse{border-color:var(--cinnabar);background:linear-gradient(135deg,rgba(196,30,58,.04),rgba(196,30,58,.1))}
+.xg-title{text-align:center;padding:40px 20px}.xg-title .big-emoji{font-size:5rem;display:block;margin-bottom:16px;animation:xgFloat 3s ease-in-out infinite}.xg-title h3{font-size:1.5rem;font-weight:900;margin-bottom:8px}.xg-title p{color:var(--txm);font-size:.95rem;margin-bottom:20px}
+.xg-choices{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:20px}.xg-choices .xg-skill-card{flex:1;min-width:180px;max-width:280px}
+.xg-bp .crit-line{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:10;border-radius:var(--r);animation:xgCritFlash .4s ease forwards}
+@keyframes xgCritFlash{0%{opacity:0}15%{opacity:.6}100%{opacity:0}}
+.xg-bp .crit-line.gold{box-shadow:inset 0 0 40px rgba(201,169,110,.6)}.xg-bp .crit-line.red{box-shadow:inset 0 0 40px rgba(196,30,58,.5)}
+.xg-bp.atk-fwd{animation:xgAtk .4s ease}
+.xg-bp.atk-combo{animation:attackCombo .6s ease}
+.xg-bp.hit-impact{animation:hitImpact .5s ease}
+.xg-bp.skill-charge{animation:skillCharge .7s ease}
+.xg-bp.poison-burst{animation:poisonBurst .5s ease}
+.xg-bp.shield-flash{animation:shieldFlash .6s ease}
+.xg-bp.summon-glow{animation:summonGlow .6s ease}
+.xg-bp.coin-burst{animation:coinBurst .5s ease}
+.xg-bp.atk-fwd::after{content:'';position:absolute;top:20%;left:10%;width:80%;height:60%;border-radius:var(--r);pointer-events:none;z-index:5;opacity:0;animation:atkTrail .5s ease forwards}
+@keyframes atkTrail{0%{opacity:0}20%{opacity:.4;background:linear-gradient(90deg,transparent,rgba(201,169,110,.15))}60%{opacity:.2;background:linear-gradient(90deg,transparent,rgba(201,169,110,.08))}100%{opacity:0}}
 .xg-slash-trail{position:absolute;top:25%;left:5%;width:90%;height:50%;pointer-events:none;z-index:10;border-radius:8px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.25),rgba(255,215,64,.15),transparent);animation:slashTrail .4s ease forwards}
-.summon-projectile{position:absolute;pointer-events:none;font-size:1.4rem;z-index:20}
+.xg-info-bar{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:6px 0}
+.xg-info-tag{padding:3px 10px;border-radius:var(--rf);font-size:.7rem;font-weight:700;background:var(--b50);color:var(--txb);border:1px solid var(--b100)}
+.it-icon{width:42px;height:42px;border-radius:10px;background:var(--b50);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.it-info{flex:1;min-width:0}
+.it-name{font-weight:800;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it-desc{font-size:.75rem;color:var(--txm);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.summon-icon{display:inline-block;font-size:1rem;margin:0 2px;vertical-align:middle;transition:all .2s}.summon-icon:hover{transform:scale(1.3)}
+.summon-icon.common{filter:none}.summon-icon.rare{filter:drop-shadow(0 0 3px #42a5f5)}.summon-icon.epic{filter:drop-shadow(0 0 4px #ab47bc)}.summon-icon.mythic{filter:drop-shadow(0 0 6px #ffd740);animation:mythicPulse 1.5s ease-in-out infinite}
+.xg-pet-glow{position:relative;overflow:hidden}.xg-pet-glow::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,64,0.06),transparent);background-size:200% 100%;animation:petShimmer 4s ease infinite;pointer-events:none}
+.xg-hub-grid{display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start}
+.xg-action-col{display:flex;flex-direction:column;gap:16px}
+.xg-action-group{background:var(--white);border:1px solid var(--bd);border-radius:var(--r);padding:18px;box-shadow:var(--ss)}
+.xg-action-group::before{content:'';display:block;width:24px;height:3px;background:var(--gold);border-radius:3px;margin-bottom:12px}
+.xg-action-group h4{font-family:'Ma Shan Zheng',cursive;font-size:1.1rem;font-weight:800;margin-bottom:10px;color:var(--tx);letter-spacing:1px}
+.xg-action-group .xg-btn{width:100%;justify-content:center;margin-bottom:6px;text-align:center}
+.xg-hdr h2{position:relative;display:inline-block;font-family:'Ma Shan Zheng',cursive;letter-spacing:1px}
+.xg-hdr h2::after{content:'';position:absolute;bottom:-4px;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.xg-bp.monster{border-color:var(--pk);background:linear-gradient(180deg,var(--white),rgba(196,30,58,.03))}
+.xg-bp .bname{font-family:'Ma Shan Zheng',cursive;font-size:1.1rem;letter-spacing:1px}
+.xg-buff-tag.atk-up{border-color:rgba(196,30,58,.3);color:var(--cinnabar);background:rgba(196,30,58,.08)}
+.xg-buff-tag.shield{border-color:rgba(91,140,90,.3);color:var(--jade);background:rgba(91,140,90,.08)}
+.xg-buff-tag.stun{border-color:rgba(201,169,110,.4);color:var(--gold);background:rgba(201,169,110,.1)}
+.xg-buff-tag.clone{border-color:rgba(123,104,174,.3);color:var(--lv);background:rgba(123,104,174,.08)}
+.xg-buff-tag.heal{border-color:rgba(91,140,90,.3);color:var(--jade);background:rgba(91,140,90,.08)}
+.xg-buff-tag.berserk{border-color:rgba(196,30,58,.4);color:var(--cinnabar);background:rgba(196,30,58,.1)}
+.xg-buff-tag.inv{border-color:rgba(201,169,110,.4);color:var(--gold);background:rgba(201,169,110,.12)}
+.xg-hp-fill:not(.low):not(.mid){background:linear-gradient(90deg,var(--jade),#7dba7a)}
+.xg-hp-fill.low{background:linear-gradient(90deg,var(--cinnabar),#e85d6a)}
+.xg-hp-fill.mid{background:linear-gradient(90deg,#d4a04a,var(--gold))}
+.xg-exp-fill{background:linear-gradient(90deg,var(--gold),#b8944a)}
+.xg-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.4}
+.xg-card:hover{box-shadow:var(--sm);border-color:var(--b200)}
+.xg-save-group{background:var(--white);border:1px solid var(--bd);border-radius:var(--r);padding:18px;box-shadow:var(--ss)}
+.xg-save-group::before{content:'';display:block;width:24px;height:3px;background:var(--cinnabar);border-radius:3px;margin-bottom:12px}
+.xg-save-group h4{font-family:'Ma Shan Zheng',cursive;font-size:1.1rem;font-weight:800;margin-bottom:10px;color:var(--tx);letter-spacing:1px}
+.xg-save-group .xg-btn{width:100%;justify-content:center;margin-bottom:6px;text-align:center}
+.xg-save-group .xg-save-tip{font-size:.72rem;color:var(--txm);line-height:1.6;margin-top:8px;padding:8px 10px;background:var(--b50);border-radius:var(--rs);border:1px dashed var(--b100)}
+.xg-import-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;opacity:0;pointer-events:none;transition:opacity .3s}.xg-import-mask.show{opacity:1;pointer-events:all}
+.xg-import-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.85);z-index:9999;background:var(--white);border-radius:var(--rl);box-shadow:var(--sl);border:2px solid var(--b200);padding:32px;text-align:center;opacity:0;pointer-events:none;transition:all .4s var(--sp);max-width:440px;width:90%}.xg-import-popup.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:all}
+.xg-import-popup h4{font-size:1.15rem;font-weight:800;margin-bottom:8px;font-family:'Ma Shan Zheng',cursive;letter-spacing:1px}
+.xg-import-popup p{color:var(--txb);font-size:.85rem;line-height:1.6;margin-bottom:16px}
+.xg-import-popup textarea{width:100%;height:120px;padding:12px;border:2px solid var(--b100);border-radius:var(--rs);font-family:'Nunito',monospace;font-size:.78rem;font-weight:600;color:var(--tx);background:var(--b50);outline:none;resize:vertical;margin-bottom:16px;transition:border-color .3s}.xg-import-popup textarea:focus{border-color:var(--b400)}
+.xg-import-popup .xg-import-btns{display:flex;gap:10px;justify-content:center}.xg-import-popup .xg-import-btns .xg-btn{min-width:100px}
+.xg-export-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.85);z-index:9999;background:var(--white);border-radius:var(--rl);box-shadow:var(--sl);border:2px solid var(--b200);padding:32px;text-align:center;opacity:0;pointer-events:none;transition:all .4s var(--sp);max-width:500px;width:90%}.xg-export-popup.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:all}
+.xg-export-popup h4{font-size:1.15rem;font-weight:800;margin-bottom:8px;font-family:'Ma Shan Zheng',cursive;letter-spacing:1px}
+.xg-export-popup p{color:var(--txb);font-size:.85rem;line-height:1.6;margin-bottom:16px}
+.xg-export-popup textarea{width:100%;height:100px;padding:12px;border:2px solid var(--b100);border-radius:var(--rs);font-family:monospace;font-size:.72rem;font-weight:600;color:var(--tx);background:var(--b50);outline:none;resize:none;margin-bottom:16px;word-break:break-all}
+.xg-export-popup .xg-import-btns{display:flex;gap:10px;justify-content:center}.xg-export-popup .xg-import-btns .xg-btn{min-width:100px}
+.xg-save-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);z-index:10000;background:var(--white);border-radius:var(--r);box-shadow:var(--sl);border:2px solid var(--b200);padding:20px 28px;text-align:center;opacity:0;pointer-events:none;transition:all .3s var(--sp)}.xg-save-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:all}
+.xg-save-toast .toast-icon{font-size:2.5rem;margin-bottom:8px;display:block}
+.xg-save-toast .toast-text{font-size:.9rem;font-weight:700;color:var(--tx)}
+@media(max-width:768px){.xg-hub-grid{grid-template-columns:1fr}.xg-action-col{order:-1}.xg-battle{flex-direction:column}.xg-vs{padding:4px 0}.xg-choices .xg-skill-card{min-width:140px}.xg-log{max-height:120px;font-size:.7rem}.xg-btn{padding:8px 14px;font-size:.78rem}.xg-skill-card{padding:12px}.xg-skill-card .sk-name{font-size:.85rem}.char-body{width:70px;height:70px;font-size:1.8rem}.xg-hdr h2{font-size:1.4rem}.xg-card{padding:14px}}
+
+@media(min-width:1200px){.xg{max-width:min(80vw,900px)}}
+
+@media(min-width:2560px){.xg{max-width:min(50vw,900px)}}
+
+/* ===== 召唤物品级攻击特效 ===== */
+.summon-projectile{position:absolute;pointer-events:none;font-size:1.4rem;z-index:10}
 .summon-projectile.common{animation:projCommon .4s ease forwards}
 .summon-projectile.rare{animation:projRare .5s ease forwards;filter:drop-shadow(0 0 6px #42a5f5)}
 .summon-projectile.epic{animation:projEpic .6s ease forwards;filter:drop-shadow(0 0 10px #ab47bc)}
 .summon-projectile.mythic{animation:projMythic .7s ease forwards;filter:drop-shadow(0 0 15px #ffd740)}
-@keyframes projCommon{0%{opacity:1;transform:translateX(0) translateY(0)}100%{opacity:0;transform:translateX(150px) translateY(-15px)}}
-@keyframes projRare{0%{opacity:1;transform:translateX(0) translateY(0) scale(1)}50%{transform:translateX(75px) translateY(-25px) scale(1.2)}100%{opacity:0;transform:translateX(150px) translateY(-15px) scale(.8)}}
-@keyframes projEpic{0%{opacity:1;transform:translateX(0) translateY(0) scale(1)}30%{transform:translateX(50px) translateY(-30px) scale(1.4)}100%{opacity:0;transform:translateX(150px) translateY(-10px) scale(.5)}}
-@keyframes projMythic{0%{opacity:1;transform:translateX(0) translateY(0) scale(.8)}20%{transform:translateX(30px) translateY(-40px) scale(1.8)}100%{opacity:0;transform:translateX(150px) translateY(0) scale(.3)}}
-
+@keyframes projCommon{0%{opacity:1;transform:translateX(0) translateY(0)}100%{opacity:0;transform:translateX(200px) translateY(-20px)}}
+@keyframes projRare{0%{opacity:1;transform:translateX(0) translateY(0) scale(1)}50%{transform:translateX(100px) translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateX(200px) translateY(-20px) scale(.8)}}
+@keyframes projEpic{0%{opacity:1;transform:translateX(0) translateY(0) scale(1)}30%{transform:translateX(60px) translateY(-40px) scale(1.5)}60%{transform:translateX(140px) translateY(-20px) scale(1.2)}100%{opacity:0;transform:translateX(200px) translateY(-10px) scale(.5)}}
+@keyframes projMythic{0%{opacity:1;transform:translateX(0) translateY(0) scale(.8)}20%{transform:translateX(40px) translateY(-50px) scale(2)}50%{transform:translateX(100px) translateY(-30px) scale(1.5)}100%{opacity:0;transform:translateX(200px) translateY(0) scale(.3)}}
 .hit-burst{position:absolute;pointer-events:none;border-radius:50%}
 .hit-burst.common{width:30px;height:30px;background:radial-gradient(circle,rgba(158,158,158,.6),transparent);animation:hitCommon .4s ease forwards}
-.hit-burst.rare{width:45px;height:45px;background:radial-gradient(circle,rgba(66,165,245,.6),transparent);animation:hitRare .5s ease forwards}
-.hit-burst.epic{width:60px;height:60px;background:radial-gradient(circle,rgba(171,71,188,.6),transparent);animation:hitEpic .6s ease forwards}
-.hit-burst.mythic{width:80px;height:80px;background:radial-gradient(circle,rgba(255,215,64,.6),transparent);animation:hitMythic .8s ease forwards}
+.hit-burst.rare{width:50px;height:50px;background:radial-gradient(circle,rgba(66,165,245,.6),transparent);animation:hitRare .5s ease forwards}
+.hit-burst.epic{width:70px;height:70px;background:radial-gradient(circle,rgba(171,71,188,.6),transparent);animation:hitEpic .6s ease forwards}
+.hit-burst.mythic{width:100px;height:100px;background:radial-gradient(circle,rgba(255,215,64,.6),transparent);animation:hitMythic .8s ease forwards}
 @keyframes hitCommon{0%{opacity:0;transform:scale(0)}40%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
 @keyframes hitRare{0%{opacity:0;transform:scale(0)}30%{opacity:1;transform:scale(1.2)}100%{opacity:0;transform:scale(2)}}
 @keyframes hitEpic{0%{opacity:0;transform:scale(0)}25%{opacity:1;transform:scale(1.5)}100%{opacity:0;transform:scale(2.5)}}
 @keyframes hitMythic{0%{opacity:0;transform:scale(0)}20%{opacity:1;transform:scale(2)}100%{opacity:0;transform:scale(3.5)}}
-
-.monster.hit-common,.character.hit-common{animation:hitCommonAnim .3s ease}
-.monster.hit-rare,.character.hit-rare{animation:hitRareAnim .4s ease}
-.monster.hit-epic,.character.hit-epic{animation:hitEpicAnim .5s ease}
-.monster.hit-mythic,.character.hit-mythic{animation:hitMythicAnim .7s ease}
-@keyframes hitCommonAnim{0%{transform:translateX(0);filter:brightness(1)}30%{transform:translateX(6px);filter:brightness(1.5)}100%{transform:translateX(0);filter:brightness(1)}}
-@keyframes hitRareAnim{0%{transform:translateX(0);filter:brightness(1)}25%{transform:translateX(10px);filter:brightness(2)}100%{transform:translateX(0);filter:brightness(1)}}
-@keyframes hitEpicAnim{0%{transform:translateX(0)}20%{transform:translateX(15px) rotate(4deg);filter:brightness(2.2)}100%{transform:translateX(0);filter:brightness(1)}}
-@keyframes hitMythicAnim{0%{transform:translateX(0)}15%{transform:translateX(20px) scale(1.05);filter:brightness(2.8)}100%{transform:translateX(0);filter:brightness(1)}}
-
+.monster.hit-common{animation:hitCommonAnim .3s ease}
+.monster.hit-rare{animation:hitRareAnim .4s ease}
+.monster.hit-epic{animation:hitEpicAnim .5s ease}
+.monster.hit-mythic{animation:hitMythicAnim .7s ease}
+@keyframes hitCommonAnim{0%{transform:translateX(0);filter:brightness(1)}30%{transform:translateX(8px);filter:brightness(1.5)}100%{transform:translateX(0);filter:brightness(1)}}
+@keyframes hitRareAnim{0%{transform:translateX(0);filter:brightness(1)}25%{transform:translateX(15px);filter:brightness(2)}50%{transform:translateX(-5px);filter:brightness(1.3)}100%{transform:translateX(0);filter:brightness(1)}}
+@keyframes hitEpicAnim{0%{transform:translateX(0) rotate(0);filter:brightness(1)}20%{transform:translateX(20px) rotate(5deg);filter:brightness(2.5)}40%{transform:translateX(-10px) rotate(-3deg);filter:brightness(1.5)}60%{transform:translateX(5px);filter:brightness(1.2)}100%{transform:translateX(0) rotate(0);filter:brightness(1)}}
+@keyframes hitMythicAnim{0%{transform:translateX(0) scale(1);filter:brightness(1)}15%{transform:translateX(25px) scale(1.05);filter:brightness(3)}30%{transform:translateX(-15px) scale(.98);filter:brightness(2)}50%{transform:translateX(10px);filter:brightness(1.5)}70%{transform:translateX(-5px);filter:brightness(1.2)}100%{transform:translateX(0) scale(1);filter:brightness(1)}}
 .shake-light{animation:shakeLight .2s ease}
 .shake-medium{animation:shakeMedium .3s ease}
 .shake-heavy{animation:shakeHeavy .4s ease}
 @keyframes shakeLight{0%,100%{transform:translateX(0)}50%{transform:translateX(-3px)}}
 @keyframes shakeMedium{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 @keyframes shakeHeavy{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
-
 .rarity-glow-common{text-shadow:0 0 4px rgba(158,158,158,.3)}
 .rarity-glow-rare{text-shadow:0 0 8px rgba(66,165,245,.4)}
 .rarity-glow-epic{text-shadow:0 0 12px rgba(171,71,188,.5);animation:epicPulse 2s ease-in-out infinite}
 .rarity-glow-mythic{text-shadow:0 0 16px rgba(255,215,64,.6);animation:mythicPulse 1.5s ease-in-out infinite}
+@keyframes epicPulse{0%,100%{text-shadow:0 0 8px rgba(171,71,188,.3)}50%{text-shadow:0 0 20px rgba(171,71,188,.7)}}
+@keyframes mythicPulse{0%,100%{text-shadow:0 0 12px rgba(255,215,64,.4)}50%{text-shadow:0 0 30px rgba(255,215,64,.8)}}
 
-.xg-bp .crit-line{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:10;border-radius:var(--r);animation:xgCritFlash .4s ease forwards}
-@keyframes xgCritFlash{0%{opacity:0}15%{opacity:.6}100%{opacity:0}}
-.xg-bp .crit-line.gold{box-shadow:inset 0 0 40px rgba(201,169,110,.6)}
-.xg-bp .crit-line.red{box-shadow:inset 0 0 40px rgba(196,30,58,.5)}
-
-/* ===== 对战场景自适应布局 ===== */
-.xg-battle{display:flex;flex-direction:row;gap:clamp(4px, 1.5vw, 12px);align-items:stretch;justify-content:center;margin-bottom:10px;position:relative;width:100%}
-.xg-battle.shake{animation:shake .3s ease}
-
-.xg-bp{flex:1;min-width:0;background:var(--white);border-radius:var(--r);padding:clamp(8px, 1.8vw, 14px) clamp(4px, 1.2vw, 10px);text-align:center;border:2px solid var(--b100);transition:all .3s;position:relative;overflow:visible;display:flex;flex-direction:column;justify-content:flex-start}
-.xg-bp.monster{border-color:var(--pk);background:linear-gradient(180deg,var(--white),rgba(196,30,58,.03))}
-.xg-bp.berserk-active{animation:berserkPulse 1.2s infinite}
-.xg-bp.clone-active{animation:cloneGlow 1.5s infinite}
-.xg-bp.crit-hit{animation:critGlow .5s ease}
-.xg-bp.atk-combo{animation:attackCombo .5s ease}
-.xg-bp.hit-impact{animation:hitImpact .4s ease}
-.xg-bp.die{animation:xgDie .6s forwards}
-.xg-bp .emoji{font-size:clamp(1.5rem, 4vw, 2.5rem);display:block;margin:2px 0}
-.xg-bp .bname{font-family:'Ma Shan Zheng',cursive;font-size:clamp(.88rem, 2.4vw, 1.1rem);letter-spacing:1px}
-.xg-bp .blv{font-size:.68rem;color:var(--txm);font-weight:600;margin-bottom:4px}
-
-.xg-vs{display:flex;align-items:center;justify-content:center;font-size:clamp(1.1rem, 3vw, 1.8rem);font-weight:900;color:var(--gold);flex-shrink:0;padding:0 clamp(2px, 0.6vw, 6px);text-shadow:0 2px 8px rgba(201,169,110,.3);animation:vsPulse 2s ease-in-out infinite}
-
-/* 角色面板自适应 */
-.character{width:100%;max-width:100%;text-align:center;position:relative;transition:transform .15s}
-.char-name{font-weight:800;font-size:clamp(.76rem, 2.2vw, .92rem);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.char-level{font-size:clamp(.6rem, 1.8vw, .72rem);color:var(--txm);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.char-body{width:clamp(46px, 11vw, 84px);height:clamp(46px, 11vw, 84px);margin:0 auto 6px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;font-size:clamp(1.3rem, 3.5vw, 2.2rem);transition:all .3s}
-.character.player .char-body{background:linear-gradient(135deg,var(--white),var(--b50));box-shadow:0 6px 20px rgba(45,34,24,.1);border:2.5px solid var(--b200)}
-.character.monster .char-body{background:linear-gradient(135deg,rgba(196,30,58,.08),rgba(196,30,58,.15));box-shadow:0 6px 20px rgba(196,30,58,.15);border:2.5px solid rgba(196,30,58,.25)}
-body.dark .character.player .char-body{background:linear-gradient(135deg,#2d2218,#4a3f2f);border-color:rgba(201,169,110,.3)}
-body.dark .character.monster .char-body{background:linear-gradient(135deg,#3a1515,#5a1a1a);border-color:rgba(196,30,58,.3)}
-
-.aura{position:absolute;inset:-8px;border-radius:50%;border:1.5px dashed rgba(201,169,110,.25);animation:auraSpin 12s linear infinite;pointer-events:none}
-.aura.inner{inset:-4px;border:1px dotted rgba(201,169,110,.2);animation-duration:8s;animation-direction:reverse}
-.character.monster .aura{border-color:rgba(196,30,58,.25)}
-.character.monster .aura.inner{border-color:rgba(196,30,58,.2)}
-.aura.boss-danger{inset:-10px;border:2px solid rgba(196,30,58,.4);animation:bossPulse 2s ease-in-out infinite,auraSpin 8s linear infinite}
-.char-pet{font-size:clamp(1rem, 2.5vw, 1.2rem);position:absolute;bottom:-4px;right:4px;animation:petBounce 2s ease-in-out infinite}
-.char-shadow{width:60%;height:8px;margin:2px auto 0;background:radial-gradient(ellipse,rgba(0,0,0,.15) 0%,transparent 70%);border-radius:50%}
-
-.char-equip{display:flex;justify-content:center;gap:clamp(2px, 0.6vw, 4px);margin-bottom:6px;position:relative;z-index:1;width:100%}
-.char-equip span{background:var(--b50);border:1px solid var(--b200);border-radius:4px;padding:1px clamp(2px, 0.6vw, 4px);font-size:clamp(.52rem, 1.5vw, .66rem);white-space:nowrap;line-height:1.2}
-
-/* 血条与护盾 */
-.hp-bar-container{margin:4px auto;width:100%;max-width:130px}
-.hp-label{display:flex;justify-content:space-between;font-size:clamp(.56rem, 1.6vw, .66rem);font-weight:700;margin-bottom:2px}
-.hp-bar{height:clamp(7px, 1.6vw, 10px);background:rgba(0,0,0,.06);border-radius:10px;overflow:hidden;position:relative}
-body.dark .hp-bar{background:rgba(255,255,255,.08)}
-.hp-fill{height:100%;border-radius:10px;transition:width .4s ease}
-.hp-fill.green{background:linear-gradient(90deg,var(--jade),#7dba7a)}
-.hp-fill.yellow{background:linear-gradient(90deg,#d4a04a,var(--gold))}
-.hp-fill.red{background:linear-gradient(90deg,var(--cinnabar),#e85d6a)}
-.shield-bar{height:clamp(4px, 1vw, 6px);background:rgba(75,166,247,.1);border-radius:6px;overflow:hidden;margin-top:2px}
+/* ===== 战斗角色样式 (移植自battle-demo) ===== */
+.character{width:160px;text-align:center;position:relative;transition:transform .15s}
+.char-body{width:clamp(60px,12vw,110px);height:clamp(60px,12vw,110px);margin:0 auto 8px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;font-size:clamp(1.5rem,4vw,2.8rem);transition:all .3s}
+.character.player .char-body{background:linear-gradient(135deg,var(--white),var(--b50));box-shadow:0 8px 32px rgba(45,34,24,.1),inset 0 0 20px rgba(201,169,110,.1);border:3px solid var(--b200)}
+.character.monster .char-body{background:linear-gradient(135deg,rgba(196,30,58,.08),rgba(196,30,58,.15));box-shadow:0 8px 32px rgba(196,30,58,.15),inset 0 0 20px rgba(196,30,58,.08);border:3px solid rgba(196,30,58,.25)}
+body.dark .character.player .char-body{background:linear-gradient(135deg,#2d2218,#4a3f2f);box-shadow:0 8px 32px rgba(45,34,24,.4),inset 0 0 20px rgba(201,169,110,.1);border:3px solid rgba(201,169,110,.3)}
+body.dark .character.monster .char-body{background:linear-gradient(135deg,#3a1515,#5a1a1a);box-shadow:0 8px 32px rgba(196,30,58,.3),inset 0 0 20px rgba(196,30,58,.1);border:3px solid rgba(196,30,58,.3)}
+.aura{position:absolute;inset:-12px;border-radius:50%;border:2px dashed rgba(201,169,110,.2);animation:auraSpin 12s linear infinite;pointer-events:none}
+.aura.inner{inset:-6px;border:1.5px dotted rgba(201,169,110,.15);animation-duration:8s;animation-direction:reverse}
+.character.monster .aura{border-color:rgba(196,30,58,.2)}
+.character.monster .aura.inner{border-color:rgba(196,30,58,.15)}
+.aura.boss-danger{inset:-16px;border:3px solid rgba(196,30,58,.4);animation:bossPulse 2s ease-in-out infinite,auraSpin 8s linear infinite}
+.char-name{font-weight:800;font-size:.92rem;margin-bottom:2px}
+.char-level{font-size:.72rem;color:var(--txm);margin-bottom:6px}
+.char-equip{display:flex;justify-content:center;gap:6px;margin-bottom:6px;font-size:.85rem;position:relative;z-index:1}
+.char-equip span{background:var(--b50);border:1px solid var(--b200);border-radius:6px;padding:2px 6px;font-size:.72rem}
+.char-pet{font-size:1.2rem;position:absolute;bottom:-5px;right:10px;animation:petBounce 2s ease-in-out infinite}
+.char-shadow{width:80px;height:12px;margin:4px auto 0;background:radial-gradient(ellipse,rgba(0,0,0,.15) 0%,transparent 70%);border-radius:50%}
+.poison-pips{display:flex;gap:3px;justify-content:center;margin-top:4px}
+.poison-pip{width:8px;height:8px;border-radius:50%;background:radial-gradient(circle,#ab47bc,#7b1fa2);animation:poisonGlow 1.5s ease-in-out infinite}
+.poison-pip.empty{background:rgba(150,80,255,.15);animation:none}
+.hp-bar-container{margin:6px auto;width:120px}
+.hp-label{display:flex;justify-content:space-between;font-size:.68rem;font-weight:700;margin-bottom:2px}
+.hp-bar{height:10px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;position:relative}
+.hp-fill{height:100%;border-radius:10px;transition:width .5s ease}
+.hp-fill.green{background:linear-gradient(90deg,#4caf50,#81c784)}
+.hp-fill.red{background:linear-gradient(90deg,#ff6b6b,#ff9800)}
+.hp-fill.yellow{background:linear-gradient(90deg,#ffc107,#ff9800)}
+.shield-bar{height:6px;background:rgba(75,166,247,.1);border-radius:6px;overflow:hidden;margin-top:3px}
 .shield-fill{height:100%;background:linear-gradient(90deg,#42a5f5,#90caf9);border-radius:6px;transition:width .4s}
-
-/* 状态与BUFF */
-.status-row{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:4px;min-height:16px}
-.status-tag,.xg-buff-tag{display:inline-flex;align-items:center;gap:2px;padding:1px 5px;border-radius:99px;font-size:clamp(.52rem, 1.5vw, .62rem);font-weight:700;line-height:1.2;white-space:nowrap}
+.status-row{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:8px}
+.status-tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:.62rem;font-weight:700;line-height:1}
 .status-tag.poison{background:rgba(150,80,255,.15);color:#ab47bc;border:1px solid rgba(150,80,255,.2)}
 .status-tag.shield{background:rgba(75,166,247,.15);color:#42a5f5;border:1px solid rgba(75,166,247,.2)}
 .status-tag.berserk{background:rgba(255,71,87,.15);color:#ff4757;border:1px solid rgba(255,71,87,.2)}
 .status-tag.summon-tag{background:rgba(100,181,246,.15);color:#64b5f6;border:1px solid rgba(100,181,246,.2)}
-
-.xg-info-bar{display:flex;justify-content:center;gap:3px;flex-wrap:wrap;margin:4px 0 0}
-.xg-info-tag{padding:1px 5px;border-radius:var(--rf);font-size:clamp(.54rem, 1.5vw, .64rem);font-weight:700;background:var(--b50);color:var(--txb);border:1px solid var(--b100);white-space:nowrap}
-
-/* 召唤物区域 */
-.summons-area{display:flex;gap:6px;justify-content:center;margin:6px 0;min-height:36px;flex-wrap:wrap}
-.summon-unit{background:rgba(100,181,246,.08);border:1.5px solid rgba(100,181,246,.25);border-radius:8px;padding:3px 8px;text-align:center;font-size:clamp(.62rem, 1.8vw, .72rem);position:relative;animation:summonFloat 3s ease-in-out infinite}
-.summon-unit .s-emoji{font-size:1.2rem;display:block;margin-bottom:1px}
-
-/* 战斗日志与操作按钮 */
-.xg-log{background:var(--b50);border-radius:var(--rs);padding:clamp(6px, 1.5vw, 10px) clamp(8px, 2vw, 12px);max-height:clamp(70px, 15vh, 130px);overflow-y:auto;font-size:clamp(.64rem, 1.6vw, .75rem);line-height:1.6;color:var(--txb);margin-bottom:8px;border:1px solid var(--b100)}
-.xg-log .dmg{color:var(--cinnabar);font-weight:800}.xg-log .heal{color:var(--jade);font-weight:800}.xg-log .info{color:var(--gold);font-weight:700}
-
-.skill-bar,.xg-actions{display:flex;gap:clamp(4px, 1vw, 8px);flex-wrap:wrap;justify-content:center;margin-top:8px;position:relative;z-index:2}
-.skill-bar button,.skill-btn,.xg-btn{padding:clamp(6px, 1.5vw, 9px) clamp(10px, 2vw, 18px);border-radius:var(--rf);border:2px solid var(--b200);background:var(--white);color:var(--tx);font-family:'Nunito',sans-serif;font-size:clamp(.7rem, 2vw, .82rem);font-weight:700;cursor:pointer;transition:all .25s var(--sp)}
-.xg-btn.primary{background:linear-gradient(135deg,var(--ink),var(--b400));color:#faf7f0;border-color:var(--b500);box-shadow:0 3px 14px rgba(45,34,24,.2)}
-.xg-btn.danger{background:var(--cinnabar);color:#fff;border-color:var(--cinnabar)}
-.xg-btn.gold{background:linear-gradient(135deg,var(--gold),#b8944a);color:#fff;border-color:var(--gold)}
-.xg-btn:disabled{opacity:.4;cursor:not-allowed}
-
-/* 基地与其它页面栅格 */
-.xg-hub-grid{display:grid;grid-template-columns:1fr 280px;gap:18px;align-items:start}
-.xg-action-col{display:flex;flex-direction:column;gap:14px}
-.xg-action-group,.xg-save-group{background:var(--white);border:1px solid var(--bd);border-radius:var(--r);padding:14px;box-shadow:var(--ss)}
-.xg-action-group h4,.xg-save-group h4{font-family:'Ma Shan Zheng',cursive;font-size:1.05rem;font-weight:800;margin-bottom:8px;color:var(--tx);letter-spacing:1px}
-.xg-action-group .xg-btn,.xg-save-group .xg-btn{width:100%;justify-content:center;margin-bottom:6px;text-align:center}
-
-.xg-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rs);background:var(--b50);border:1px solid var(--b100);margin-bottom:6px}
-.it-icon{width:36px;height:36px;border-radius:8px;background:var(--b50);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
-.it-info{flex:1;min-width:0}
-.it-name{font-weight:800;font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.it-desc{font-size:.7rem;color:var(--txm);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-/* 技能选择卡片 */
-.xg-choices{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
-.xg-choices .xg-skill-card{flex:1;min-width:130px;max-width:240px;padding:12px;border-radius:var(--rs);border:2px solid var(--b100);background:var(--white);cursor:pointer;text-align:center;animation:cardReveal .5s var(--ss2) both}
-.xg-skill-card .sk-name{font-weight:800;font-size:.88rem;margin-bottom:2px}
-.xg-skill-card .sk-desc{font-size:.7rem;color:var(--txb);line-height:1.4}
-.xg-skill-card .sk-type{display:inline-block;padding:2px 8px;border-radius:var(--rf);font-size:.62rem;font-weight:700;margin-bottom:4px}
-.xg-skill-card .sk-type.active{background:rgba(196,30,58,.1);color:var(--cinnabar);border:1px solid rgba(196,30,58,.2)}
-.xg-skill-card .sk-type.passive{background:rgba(123,104,174,.1);color:var(--lv);border:1px solid rgba(123,104,174,.2)}
-.xg-skill-card.rarity-epic{border-color:var(--lv);background:linear-gradient(135deg,rgba(123,104,174,.04),rgba(123,104,174,.08));animation:cardReveal .5s var(--ss2) both,epicPulse 2s ease-in-out infinite}
-.xg-skill-card.rarity-legendary{border-color:var(--gold);background:linear-gradient(135deg,rgba(201,169,110,.06),rgba(201,169,110,.12));animation:cardReveal .5s var(--ss2) both,legendaryPulse 2s ease-in-out infinite}
-
-/* 浮动伤害与弹窗 */
-.xg-import-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;opacity:0;pointer-events:none;transition:opacity .3s}.xg-import-mask.show{opacity:1;pointer-events:all}
-.xg-import-popup,.xg-export-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.85);z-index:9999;background:var(--white);border-radius:var(--rl);box-shadow:var(--sl);border:2px solid var(--b200);padding:24px;text-align:center;opacity:0;pointer-events:none;transition:all .3s var(--sp);max-width:440px;width:90%}.xg-import-popup.show,.xg-export-popup.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:all}
-.xg-import-btns{display:flex;gap:10px;justify-content:center}
-.xg-save-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);z-index:10000;background:var(--white);border-radius:var(--r);box-shadow:var(--sl);border:2px solid var(--b200);padding:16px 24px;text-align:center;opacity:0;pointer-events:none;transition:all .3s var(--sp)}.xg-save-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:all}
-
-/* 响应式媒体查询：移动端适配 */
-@media(max-width:768px){
-  .xg-hub-grid{grid-template-columns:1fr}
-  .xg-action-col{order:0}
-}
+.summons-area{display:flex;gap:12px;justify-content:center;margin:16px 0;min-height:60px;flex-wrap:wrap}
+.summon-unit{background:rgba(100,181,246,.08);border:1.5px solid rgba(100,181,246,.25);border-radius:12px;padding:8px 14px;text-align:center;font-size:.75rem;position:relative;animation:summonFloat 3s ease-in-out infinite}
+.summon-unit .s-emoji{font-size:1.6rem;display:block;margin-bottom:2px}
+.summon-unit .s-name{font-weight:700;font-size:.72rem}
+.summon-unit .s-hp{font-size:.62rem;color:#64b5f6}
+.summon-unit .s-dur{font-size:.58rem;color:var(--txm)}
+.float-dmg{position:absolute;pointer-events:none;z-index:99;font-weight:900;white-space:nowrap;font-style:italic;text-shadow:0 2px 12px rgba(0,0,0,.3)}
+.float-dmg.crit{font-size:2rem;animation:dmgPopCrit 1s ease forwards}
+.float-dmg.heal{color:#4caf50}
+.float-dmg.summon{color:#64b5f6}
+.float-dmg.poison{color:#ab47bc}
+.screen-flash{position:fixed;inset:0;z-index:99;pointer-events:none;animation:screenFlashDemo .3s ease forwards}
+@keyframes screenFlashDemo{0%{opacity:.2}100%{opacity:0}}
+@keyframes auraSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes bossPulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}
+@keyframes petBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes summonFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes poisonGlow{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+@keyframes charAttack{0%{transform:translateX(0) scale(1)}15%{transform:translateX(-10px) scale(.93)}45%{transform:translateX(55px) scale(1.12) rotate(-4deg)}65%{transform:translateX(55px) scale(1.12)}100%{transform:translateX(0) scale(1) rotate(0)}}
+@keyframes charHit{0%{transform:translateX(0);filter:brightness(1)}15%{transform:translateX(18px) rotate(4deg);filter:brightness(2.5) saturate(3)}30%{transform:translateX(-12px) rotate(-2deg);filter:brightness(1.8)}50%{transform:translateX(8px);filter:brightness(1.3)}70%{transform:translateX(-4px);filter:brightness(1.1)}100%{transform:translateX(0);filter:brightness(1)}}
+@keyframes charDie{0%{opacity:1;transform:scale(1) rotate(0);filter:brightness(1) saturate(1)}20%{opacity:.85;transform:scale(1.25) rotate(-8deg);filter:brightness(2) saturate(2)}50%{opacity:.4;transform:scale(.9) rotate(15deg);filter:brightness(.6) saturate(.5)}100%{opacity:0;transform:scale(.15) rotate(40deg);filter:brightness(.2) saturate(0)}}
+@keyframes vsPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.shake-light{animation:shakeLight .2s ease}
+.shake-medium{animation:shakeMedium .3s ease}
+.shake-heavy{animation:shakeHeavy .4s ease}
+@keyframes shakeLight{0%,100%{transform:translateX(0)}50%{transform:translateX(-3px)}}
+@keyframes shakeMedium{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes shakeHeavy{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.character.hit-common{animation:hitCommonAnim .3s ease}
+.character.hit-rare{animation:hitRareAnim .4s ease}
+.character.hit-epic{animation:hitEpicAnim .5s ease}
+.character.hit-mythic{animation:hitMythicAnim .7s ease}
+@keyframes hitCommonAnim{0%{transform:translateX(0);filter:brightness(1)}30%{transform:translateX(8px);filter:brightness(1.5)}100%{transform:translateX(0);filter:brightness(1)}}
+@keyframes hitRareAnim{0%{transform:translateX(0);filter:brightness(1)}25%{transform:translateX(15px);filter:brightness(2)}50%{transform:translateX(-5px);filter:brightness(1.3)}100%{transform:translateX(0);filter:brightness(1)}}
+@keyframes hitEpicAnim{0%{transform:translateX(0) rotate(0);filter:brightness(1)}20%{transform:translateX(20px) rotate(5deg);filter:brightness(2.5)}40%{transform:translateX(-10px) rotate(-3deg);filter:brightness(1.5)}60%{transform:translateX(5px);filter:brightness(1.2)}100%{transform:translateX(0) rotate(0);filter:brightness(1)}}
+@keyframes hitMythicAnim{0%{transform:translateX(0) scale(1);filter:brightness(1)}15%{transform:translateX(25px) scale(1.05);filter:brightness(3)}30%{transform:translateX(-15px) scale(.98);filter:brightness(2)}50%{transform:translateX(10px);filter:brightness(1.5)}70%{transform:translateX(-5px);filter:brightness(1.2)}100%{transform:translateX(0) scale(1);filter:brightness(1)}}
+@keyframes rareGlow{0%{opacity:0;transform:scale(0)}50%{opacity:1;transform:scale(1.3)}100%{opacity:0;transform:scale(1.8)}}
+@keyframes epicRing{0%{opacity:0;transform:scale(0)}40%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(2)}}
+@keyframes epicCore{0%{opacity:0;transform:scale(0)}30%{opacity:1;transform:scale(1.5)}100%{opacity:0;transform:scale(0)}}
+@keyframes mythicShock{0%{opacity:0;transform:scale(0)}30%{opacity:1;transform:scale(.8)}100%{opacity:0;transform:scale(3)}}
+@keyframes mythicFlash{0%{opacity:0;transform:scale(0)}30%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(2)}}
+@keyframes projCommon{0%{opacity:1;transform:translateX(0) translateY(0)}100%{opacity:0;transform:translateX(200px) translateY(-20px)}}
+@keyframes projRare{0%{opacity:1;transform:translateX(0) translateY(0) scale(1)}50%{transform:translateX(100px) translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateX(200px) translateY(-20px) scale(.8)}}
+@keyframes projEpic{0%{opacity:1;transform:translateX(0) translateY(0) scale(1)}30%{transform:translateX(60px) translateY(-40px) scale(1.5)}60%{transform:translateX(140px) translateY(-20px) scale(1.2)}100%{opacity:0;transform:translateX(200px) translateY(-10px) scale(.5)}}
+@keyframes projMythic{0%{opacity:1;transform:translateX(0) translateY(0) scale(.8)}20%{transform:translateX(40px) translateY(-50px) scale(2)}50%{transform:translateX(100px) translateY(-30px) scale(1.5)}100%{opacity:0;transform:translateX(200px) translateY(0) scale(.3)}}
+@keyframes hitCommon{0%{opacity:0;transform:scale(0)}40%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
+@keyframes hitRare{0%{opacity:0;transform:scale(0)}30%{opacity:1;transform:scale(1.2)}100%{opacity:0;transform:scale(2)}}
+@keyframes hitEpic{0%{opacity:0;transform:scale(0)}25%{opacity:1;transform:scale(1.5)}100%{opacity:0;transform:scale(2.5)}}
+@keyframes hitMythic{0%{opacity:0;transform:scale(0)}20%{opacity:1;transform:scale(2)}100%{opacity:0;transform:scale(3.5)}}
+.summon-projectile{position:absolute;pointer-events:none;font-size:1.4rem;z-index:10}
+.summon-projectile.common{animation:projCommon .4s ease forwards}
+.summon-projectile.rare{animation:projRare .5s ease forwards;filter:drop-shadow(0 0 6px #42a5f5)}
+.summon-projectile.epic{animation:projEpic .6s ease forwards;filter:drop-shadow(0 0 10px #ab47bc)}
+.summon-projectile.mythic{animation:projMythic .7s ease forwards;filter:drop-shadow(0 0 15px #ffd740)}
+.hit-burst{position:absolute;pointer-events:none;border-radius:50%}
+.hit-burst.common{width:30px;height:30px;background:radial-gradient(circle,rgba(158,158,158,.6),transparent);animation:hitCommon .4s ease forwards}
+.hit-burst.rare{width:50px;height:50px;background:radial-gradient(circle,rgba(66,165,245,.6),transparent);animation:hitRare .5s ease forwards}
+.hit-burst.epic{width:70px;height:70px;background:radial-gradient(circle,rgba(171,71,188,.6),transparent);animation:hitEpic .6s ease forwards}
+.hit-burst.mythic{width:100px;height:100px;background:radial-gradient(circle,rgba(255,215,64,.6),transparent);animation:hitMythic .8s ease forwards}
+.rarity-glow-common{text-shadow:0 0 4px rgba(158,158,158,.3)}
+.rarity-glow-rare{text-shadow:0 0 8px rgba(66,165,245,.4)}
+.rarity-glow-epic{text-shadow:0 0 12px rgba(171,71,188,.5);animation:epicPulse 2s ease-in-out infinite}
+.rarity-glow-mythic{text-shadow:0 0 16px rgba(255,215,64,.6);animation:mythicPulse 1.5s ease-in-out infinite}
 </style>
 </head>
 <body>
@@ -645,8 +726,8 @@ var SUMMON_POOL=[
 var SUMMON_RARITY_COLOR={common:'#9e9e9e',rare:'#42a5f5',epic:'#ab47bc',mythic:'#ffd740'};
 
 var SHOP=[
-    {n:'✨ 经验增幅石',ic:'✨',d:'永久EXP获取+1%',p:1000,maxCount:100,countKey:'expBonusCount',f:function(p){p.expBonus=Math.min((p.expBonus||0)+1,100);p.expBonusCount=(p.expBonusCount||0)+1}},
-    {n:'攻击药水',ic:'⚔️',d:'攻击力永久 +2',p:100,countKey:'atkBuyCount',f:function(p){p.pAtk+=2;p.atkBuyCount=(p.atkBuyCount||0)+1}},
+    {n:'✨ 经验增幅石',ic:'✨',d:'永久EXP获取+1%',p:1000,maxCount:30,countKey:'expBonusCount',f:function(p){p.expBonus=Math.min((p.expBonus||0)+1,130);p.expBonusCount=(p.expBonusCount||0)+1}},
+    {n:'攻击药水',ic:'⚔️',d:'攻击力永久 +1',p:100,countKey:'atkBuyCount',f:function(p){p.pAtk+=1;p.atkBuyCount=(p.atkBuyCount||0)+1}},
 {n:'防御药水',ic:'🛡️',d:'防御力永久 +1',p:100,countKey:'defBuyCount',f:function(p){p.pDef+=1;p.defBuyCount=(p.defBuyCount||0)+1}},
 {n:'生命药水',ic:'❤️',d:'最大HP永久 +5',p:100,countKey:'hpBuyCount',f:function(p){p.pHp+=5;p.hpBuyCount=(p.hpBuyCount||0)+1}},
     {n:'透视卷轴',ic:'🔮',d:'永久显示怪物属性',p:600,maxCount:1,countKey:'scans',f:function(p){p.scans++}},
@@ -919,13 +1000,9 @@ function calcCritD(p){
 function calcDodge(p){var baseCap=0.18;var baseVal=(p.pDodge||0);var base=Math.min(baseVal/100,baseCap);if(p.pSkl.indexOf('P4')>=0)base+=0.10;if(G.cmb&&G.cmb.summons){for(var wi=0;wi<G.cmb.summons.length;wi++){if(G.cmb.summons[wi].special==='wisdom'){base+=0.10;break}}}var equipBonus=Math.min(getEquipFlat('dodge')/100,0.02);return Math.min(base+equipBonus,0.20)}
 function calcLifeSteal(p){var baseCap=8;var baseVal=(p.pLife||0);if(p.pSkl.indexOf('P5')>=0)baseVal+=5;var base=Math.min(baseVal,baseCap);var equipBonus=Math.min(getEquipFlat('life'),2);return base+equipBonus;
 }
-function maxActiveSlots(p){
-    var base = (p && p.lv >= 30) ? 4 : 3;
-    return (p && p.summonLocked) ? 1 : base;
-}
-function maxPassiveSlots(p){
-    return (p && p.lv >= 30) ? 5 : 4;
-}
+function maxActiveSlots(p){return (p&&p.summonLocked)?1:3;} // 召唤锁定时仅1个主动槽
+function maxPassiveSlots(p){return 4;} // 死锁4个
+
 /* 动画与表现 */
 function animAfterRender(elId,cls,delay){setTimeout(function(){var e=$(elId);if(!e)return;e.classList.remove('atk-fwd','atk-combo','hit','hit-impact','die','heal-flash','skill-glow','skill-charge','poison-burst','shield-flash','summon-glow','coin-burst');void e.offsetWidth;e.classList.add(cls);setTimeout(function(){if(e)e.classList.remove(cls)},700)},delay||0)}
 function shakeBattle(){var el=document.querySelector('.xg-battle');if(!el)return;el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');setTimeout(function(){el.classList.remove('shake')},300)}
@@ -1817,137 +1894,125 @@ function summonAttackFx(rarity,emoji,dmg){
 }
 function shakeBattle(cls){var el=document.querySelector('.xg-battle');if(!el)return;el.classList.remove('shake','shake-light','shake-medium','shake-heavy');void el.offsetWidth;el.classList.add(cls||'shake');setTimeout(function(){el.classList.remove(cls||'shake')},400)}
 
-function autoLoop(){
-    if(!G.cmb||G.cmb.result)return;
-    var spd=1000;
-    var p=G.p,c=G.cmb,m=c.m;
-    var petStrike=false;
+function autoLoop(){if(!G.cmb||G.cmb.result)return;var spd=1000;var p=G.p,c=G.cmb,m=c.m;var petStrike=false;
 
-    /* 1. 结算 DoT 毒伤 */
-    if(m.hp>0) processDoT();
-    if(m.hp<=0){m.hp=0;setTimeout(function(){animAfterRender('xgME','die',10);sfx('win');render();setTimeout(battleWin,900)},400);return}
-    if(p.hp<=0){p.hp=0;sfx('die');stopBGM();stopAuto();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return}
+/* 🌟 阶段1: DoT毒伤先结算（回合开始时） */
+if(m.hp>0) processDoT();
+if(m.hp<=0){m.hp=0;setTimeout(function(){animAfterRender('xgME','die',10);sfx('win');render();setTimeout(battleWin,900)},400);return}
+/* 毒伤/召唤物自伤可能导致玩家死亡 */
+if(p.hp<=0){p.hp=0;sfx('die');stopBGM();stopAuto();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return}
 
-    /* 2. 套装与灵兽秒杀判定 */
-    var _setBonus=getSetBonus();
-    if(_setBonus.instakill>0&&!m.isBoss&&!petStrike&&m.hp>0&&Math.random()<_setBonus.instakill){
-        m.hp=0;petStrike=true;
-        addLog('<span style="color:var(--gold);font-weight:800">⚡ 神级光环！30%秒杀！</span>');
-        sfx('skill');render();
+/* 套装秒杀 */
+var _setBonus=getSetBonus();
+if(_setBonus.instakill>0&&!m.isBoss&&!petStrike&&m.hp>0&&Math.random()<_setBonus.instakill){
+    m.hp=0;petStrike=true;
+    addLog('<span style="color:var(--gold);font-weight:800">⚡ 神级光环！30%秒杀！</span>');
+    sfx('skill');render();
+}
+if(p.pet&&p.pet.owned&&p.pet.level>=10&&!m.isBoss&&m.hp>0){
+    var pq=PET_QUAL[p.pet.quality];
+    if(Math.random()<0.03*pq.skillMul){
+        m.hp=0;petStrike=true;c.petBonusGold=(c.petBonusGold||0)+10;
+        addLog('<span style="color:var(--lv);font-weight:800">'+petForm(p.pet.level).emoji+' 灵兽发动【咸鱼突刺】！+10金币</span>');
+        sfx('skill');render()
     }
-    if(p.pet&&p.pet.owned&&p.pet.level>=10&&!m.isBoss&&m.hp>0){
-        var pq=PET_QUAL[p.pet.quality];
-        if(Math.random()<0.03*pq.skillMul){
-            m.hp=0;petStrike=true;c.petBonusGold=(c.petBonusGold||0)+10;
-            addLog('<span style="color:var(--lv);font-weight:800">'+petForm(p.pet.level).emoji+' 灵兽发动【咸鱼突刺】！+10金币</span>');
-            sfx('skill');render();
-        }
-    }
-
-    /* 3. 玩家攻击与技能施放 */
-    var sk=null,_crit=false;
-    if(!petStrike){
-        sk=chooseAutoSkill();
-        if(sk){
-            c.basicAtkCount=0;
-            doSkillUse(sk);
-            if(p.summonLocked && m.hp>0){
-                c.basicAtkCount=(c.basicAtkCount||0)+1;
-                _crit=doNormalAtk();
-            }
-        }else{
+}
+var sk=null,_crit=false;
+if(!petStrike){
+    sk=chooseAutoSkill();
+    if(sk){
+        c.basicAtkCount=0;
+        doSkillUse(sk);
+        /* 召唤锁定时，使用召唤技能后仍执行普攻 */
+        if(p.summonLocked && m.hp>0){
             c.basicAtkCount=(c.basicAtkCount||0)+1;
-            if(p.pSkl.indexOf('P19')>=0&&c.basicAtkCount>=5&&!c.godOfWarReady){
-                c.godOfWarReady=true;c.basicAtkCount=0;addLog('<span class="info">【战神附体】蓄力完成！必定暴击×1.5倍！</span>');
-            }
             _crit=doNormalAtk();
         }
-    }
-
-    /* 4. 分身与额外被动 */
-    if(p.pSkl.indexOf('P22')>=0 && m.hp>0){
-        if(c.cloneActive && !c.cloneDead && m.hp>0){
-            var rawCloneAtk = getPAtk(p,c)*0.25;
-            var mDefForClone = c.m.def;
-            if(p.pSkl.indexOf('P12')>=0) mDefForClone = Math.floor(mDefForClone * (c.m.isBoss ? 0.95 : 0.90));
-            var mDefMulForClone = 500 / (500 + mDefForClone);
-            var suppForClone = getSuppression(c.floor, p.lv);
-            var cloneDmg = Math.max(1, Math.floor(rawCloneAtk * mDefMulForClone * suppForClone.pDmg));
-            m.hp=Math.max(0,m.hp-cloneDmg);
-            addLog('🎭 分身攻击 <span class="dmg">'+cloneDmg+'</span>');
-            floatDmg('xgME','🎭'+cloneDmg,'#9650ff'); applyOnHitHeal(p,cloneDmg);
+    }else{
+        c.basicAtkCount=(c.basicAtkCount||0)+1;
+        if(p.pSkl.indexOf('P19')>=0&&c.basicAtkCount>=5&&!c.godOfWarReady){
+            c.godOfWarReady=true;c.basicAtkCount=0;addLog('<span class="info">【战神附体】蓄力完成！必定暴击×1.5倍！</span>')
         }
+        _crit=doNormalAtk();
     }
+}
 
-    if(!petStrike&&p.pet&&p.pet.owned&&p.pet.level>=20&&m.hp>0&&m.hp<m.mhp*0.10&&!m.isBoss){
-        m.hp=0;addLog('<span style="color:var(--lv);font-weight:800">'+petForm(p.pet.level).emoji+' 灵兽发动【饿犬扑食】！秒杀残血！</span>');sfx('skill');render();
+// 🌟 P22 分身系统（永久，死后4回合重生）
+if(p.pSkl.indexOf('P22')>=0 && m.hp>0){
+    if(c.cloneActive && !c.cloneDead && m.hp>0){
+        var rawCloneAtk = getPAtk(p,c)*0.25;
+        var mDefForClone = c.m.def;
+        if(p.pSkl.indexOf('P12')>=0) mDefForClone = Math.floor(mDefForClone * (c.m.isBoss ? 0.95 : 0.90));
+        var mDefMulForClone = 500 / (500 + mDefForClone);
+        var suppForClone = getSuppression(c.floor, p.lv);
+        var cloneDmg = Math.max(1, Math.floor(rawCloneAtk * mDefMulForClone * suppForClone.pDmg));
+        m.hp=Math.max(0,m.hp-cloneDmg);
+        addLog('🎭 分身攻击 <span class="dmg">'+cloneDmg+'</span>');
+        floatDmg('xgME','🎭'+cloneDmg,'#9650ff'); applyOnHitHeal(p,cloneDmg);
     }
-    if(p.pSkl.indexOf('P21')>=0&&m.hp>0&&Math.random()<0.10){
-        var rawStormDmg = getPAtk(p,c)*1.5;
-        var stormMDef = c.m.def;
-        if(p.pSkl.indexOf('P12')>=0) stormMDef = Math.floor(stormMDef * (c.m.isBoss ? 0.95 : 0.90));
-        var stormDmg = Math.max(1, Math.floor(rawStormDmg * (500 / (500 + stormMDef)) * getSuppression(c.floor, p.lv).pDmg));
-        m.hp=Math.max(0,m.hp-stormDmg);
-        addLog('🌪️ 风暴之心！<span class="dmg">'+stormDmg+'</span>');floatDmg('xgME','🌪'+stormDmg,'#4ba6f7');applyOnHitHeal(p,stormDmg);
-    }
-    if(hasEquipPassive('burn')&&m.hp>0&&!petStrike){
-        var burnVal=getEquipPct('burn');
-        var burnDmg=Math.max(1,Math.floor(m.mhp*burnVal/100));
-        m.hp=Math.max(0,m.hp-burnDmg);
-        addLog('🔥 装备灼烧 <span class="dmg">'+burnDmg+'</span>');
-        floatDmg('xgME','-'+burnDmg,'#ff6b6b');
-    }
+}
 
-    /* 5. 召唤物攻击 */
-    if(m.hp>0) processSummons();
-    if(p.hp<=0){p.hp=0;sfx('die');stopBGM();stopAuto();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return}
+if(!petStrike&&p.pet&&p.pet.owned&&p.pet.level>=20&&m.hp>0&&m.hp<m.mhp*0.10&&!m.isBoss){
+    m.hp=0;addLog('<span style="color:var(--lv);font-weight:800">'+petForm(p.pet.level).emoji+' 灵兽发动【饿犬扑食】！秒杀残血！</span>');sfx('skill');render()
+}
+if(p.pSkl.indexOf('P21')>=0&&m.hp>0&&Math.random()<0.10){
+    var rawStormDmg = getPAtk(p,c)*1.5;
+    var stormMDef = c.m.def;
+    if(p.pSkl.indexOf('P12')>=0) stormMDef = Math.floor(stormMDef * (c.m.isBoss ? 0.95 : 0.90));
+    var stormDmg = Math.max(1, Math.floor(rawStormDmg * (500 / (500 + stormMDef)) * getSuppression(c.floor, p.lv).pDmg));
+    m.hp=Math.max(0,m.hp-stormDmg);
+    addLog('🌪️ 风暴之心！<span class="dmg">'+stormDmg+'</span>');floatDmg('xgME','🌪'+stormDmg,'#4ba6f7');applyOnHitHeal(p,stormDmg)
+}
+/* 装备被动：灼烧 */
+if(hasEquipPassive('burn')&&m.hp>0&&!petStrike){
+    var burnVal=getEquipPct('burn');
+    var burnDmg=Math.max(1,Math.floor(m.mhp*burnVal/100));
+    m.hp=Math.max(0,m.hp-burnDmg);
+    addLog('🔥 装备灼烧 <span class="dmg">'+burnDmg+'</span>');
+    floatDmg('xgME','-'+burnDmg,'#ff6b6b');
+}
 
-    /* 🌟 核心修复：确保每次普攻、暴击、技能都必然触发完整的全套攻击特效与动画 */
+/* 🌟 阶段1: 召唤物攻击（玩家行动后） */
+if(m.hp>0) processSummons();
+/* 召唤物自伤(P24)可能导致玩家死亡 */
+if(p.hp<=0){p.hp=0;sfx('die');stopBGM();stopAuto();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return}
+
+/* 播放攻击动画/音效 */
+if(sk||petStrike||_crit!==false){
     sfx(petStrike||sk?'skill':'atk');
     render();
-    if(!petStrike){
-        animAfterRender('xgPE','atk-combo',10);          // 玩家突进连招
-        animAfterRender('xgME','hit-impact',100);         // 怪物受击震动与闪光
-        if(sk) animAfterRender('xgPE','skill-charge',50); // 技能蓄力流光
-        atkTrail();                                      // 飞剑轨迹
-        slashTrails();                                   // 全屏剑气横扫
-        spawnSlashTrails('xgME');                        // 怪物身上的金色斩击痕迹
-        if(_crit) critLine();                            // 暴击全屏闪光
-    }
-
-    if(m.is魔王&&m.hp>0){
-        var t=TAUNTS[Math.floor(Math.random()*TAUNTS.length)];
-        addLog('<span style="color:var(--pk);font-weight:800">林深大魔王: "'+t+'"</span>');
-        G.cmb.taunt=t;sfx('taunt');render();
-    }
-    if(m.hp<=0){m.hp=0;setTimeout(function(){animAfterRender('xgME','die',10);sfx('win');render();setTimeout(battleWin,900)},400);return}
-
-    /* 6. 怪物回合 */
-    _abt=setTimeout(function(){
-        if(!G.cmb||G.cmb.result)return;
-        var hit=doMonsterAtk();render();
-        if(hit!==false){animAfterRender('xgME','atk-combo',10);if(hit)animAfterRender('xgPE','hit-impact',100);sfx('hit')}
-        if(p.hp<=0){p.hp=0;sfx('die');stopBGM();stopAuto();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return;}
-        for(var i=c.buffs.length-1;i>=0;i--){c.buffs[i].dur--;if(c.buffs[i].dur<=0)c.buffs.splice(i,1)}
-        for(var k in c.cd){if(c.cd[k]>0)c.cd[k]--}
-        if(c.berserkTurns>0){c.berserkTurns--;if(c.berserkTurns<=0)addLog('<span class="info">狂暴化结束</span>')}
-        if(p.pSkl.indexOf('P9')>=0){applyHeal(p, calcMaxHp(p)*0.025, false);if(Math.random()<0.2)addLog('<span class="info">【修罗之体】回复'+Math.floor(calcMaxHp(p)*0.025)+'HP</span>');}
-        if(p.pSkl.indexOf('P29')>=0 && p.hp>0){applyHeal(p, Math.floor(calcMaxHp(p)*0.015), false);if(Math.random()<0.2)addLog('<span class="info">【龟息术】回复'+Math.floor(calcMaxHp(p)*0.015)+'HP</span>');}
-        if(p.pet&&p.pet.owned&&p.pet.level>=1&&p.hp>0){applyHeal(p, Math.floor(calcMaxHp(p)*0.05), false);}
-        if(p.pet&&p.pet.owned&&p.pet.level>=55&&p.hp>0){var _petHealRate=0.01;if(p.pet.quality==='god')_petHealRate=0.05;else if(p.pet.quality==='fairy')_petHealRate=0.03;else if(p.pet.quality==='spirit')_petHealRate=0.02;applyHeal(p, Math.floor(calcMaxHp(p)*_petHealRate), false);}
-        if(hasEquipPassive('regen')&&p.hp>0){var regenVal=getEquipPct('regen');applyHeal(p,Math.floor(calcMaxHp(p)*regenVal/100),false)}
-        if((m.ab===1||m.ab===6||m.ab===7)&&c.turnCount%3===0&&c.turnCount>0){m.hp=Math.min(m.mhp,m.hp+Math.floor(m.mhp*0.05));addLog('<span class="info">怪物回血</span>')}
-
-        processShield();
-
-        c.turnCount++;c.round++;render();
-        if(p.pSkl.indexOf('P18')>=0&&Math.random()<0.1&&m.hp>0){
-            addLog('<span class="info">【时间守护者】额外行动！</span>');
-            setTimeout(function(){if(!G.cmb||G.cmb.result||m.hp<=0)return;var sk2=chooseAutoSkill(),_crit2=false;if(sk2){doSkillUse(sk2);if(p.summonLocked)_crit2=doNormalAtk()}else{_crit2=doNormalAtk()};sfx(sk2?'skill':'atk');render();animAfterRender('xgPE','atk-combo',10);animAfterRender('xgME','hit-impact',100);atkTrail();slashTrails();if(_crit2)critLine()},200);
-        }
-        _abt=setTimeout(autoLoop,spd);
-    },spd);
+    if(!petStrike){animAfterRender('xgPE','atk-combo',10);if(sk)animAfterRender('xgPE','skill-charge',50);atkTrail();slashTrails();spawnSlashTrails('xgME');if(_crit)critLine()}
+} else {
+    render(); /* 只渲染，不播放动画 */
 }
+if(m.is魔王&&m.hp>0){var t=TAUNTS[Math.floor(Math.random()*TAUNTS.length)];addLog('<span style="color:var(--pk);font-weight:800">林深大魔王: "'+t+'"</span>');G.cmb.taunt=t;sfx('taunt');render()}
+if(m.hp<=0){m.hp=0;setTimeout(function(){animAfterRender('xgME','die',10);sfx('win');render();setTimeout(battleWin,900)},400);return}
+
+_abt=setTimeout(function(){
+    if(!G.cmb||G.cmb.result)return;
+    var hit=doMonsterAtk();render();
+    if(hit!==false){animAfterRender('xgME','atk-combo',10);if(hit)animAfterRender('xgPE','hit-impact',100);sfx('hit')}
+    if(p.hp<=0){p.hp=0;sfx('die');stopBGM();stopAuto();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return;}
+    for(var i=c.buffs.length-1;i>=0;i--){c.buffs[i].dur--;if(c.buffs[i].dur<=0)c.buffs.splice(i,1)}
+    for(var k in c.cd){if(c.cd[k]>0)c.cd[k]--}
+    if(c.berserkTurns>0){c.berserkTurns--;if(c.berserkTurns<=0)addLog('<span class="info">狂暴化结束</span>')}
+    if(p.pSkl.indexOf('P9')>=0){applyHeal(p, calcMaxHp(p)*0.025, false);if(Math.random()<0.2)addLog('<span class="info">【修罗之体】回复'+Math.floor(calcMaxHp(p)*0.025)+'HP</span>');}
+    if(p.pSkl.indexOf('P29')>=0 && p.hp>0){applyHeal(p, Math.floor(calcMaxHp(p)*0.015), false);if(Math.random()<0.2)addLog('<span class="info">【龟息术】回复'+Math.floor(calcMaxHp(p)*0.015)+'HP</span>');}
+    if(p.pet&&p.pet.owned&&p.pet.level>=1&&p.hp>0){applyHeal(p, Math.floor(calcMaxHp(p)*0.05), false);}
+    if(p.pet&&p.pet.owned&&p.pet.level>=55&&p.hp>0){var _petHealRate=0.01;if(p.pet.quality==='god')_petHealRate=0.05;else if(p.pet.quality==='fairy')_petHealRate=0.03;else if(p.pet.quality==='spirit')_petHealRate=0.02;applyHeal(p, Math.floor(calcMaxHp(p)*_petHealRate), false);}
+    if(hasEquipPassive('regen')&&p.hp>0){var regenVal=getEquipPct('regen');applyHeal(p,Math.floor(calcMaxHp(p)*regenVal/100),false)}
+    if((m.ab===1||m.ab===6||m.ab===7)&&c.turnCount%3===0&&c.turnCount>0){m.hp=Math.min(m.mhp,m.hp+Math.floor(m.mhp*0.05));addLog('<span class="info">怪物回血</span>')}
+
+    /* 🌟 阶段1: 护盾持续时间递减 */
+    processShield();
+
+    c.turnCount++;c.round++;render();
+    if(p.pSkl.indexOf('P18')>=0&&Math.random()<0.1&&m.hp>0){
+        addLog('<span class="info">【时间守护者】额外行动！</span>');
+        setTimeout(function(){if(!G.cmb||G.cmb.result||m.hp<=0)return;var sk2=chooseAutoSkill(),_crit2=false;if(sk2){doSkillUse(sk2);if(p.summonLocked)_crit2=doNormalAtk()}else{_crit2=doNormalAtk()};sfx(sk2?'skill':'atk');render();animAfterRender('xgPE','atk-combo',10);atkTrail();slashTrails();if(_crit2)critLine()},200)
+    }
+    _abt=setTimeout(autoLoop,spd)
+},spd)}
 
 function battleWin(){stopAuto();stopBGM();saveXiuxianProg();var p=G.p,c=G.cmb;if(!c)return;
 p.hp=calcMaxHp(p);
@@ -2081,13 +2146,6 @@ function checkLvlUp(){
         p.exp-=expNeed(p.lv);
         p.lv++;
         p.statPts+=ptsPerLv(p.lv);
-
-        // 🌟 新增：达到 30 级时仅提醒一次
-        if(p.lv >= 30 && !p._slotNotified30){
-            p._slotNotified30 = true;
-            showSaveToast('✨', '境界突破！已解锁第4个主动法术槽与第5个被动法术槽！');
-        }
-
         G._refreshed=false;
         genStatCh();
         G.scr='lattr';
@@ -2686,7 +2744,7 @@ h+='</div>';
 h+='<button class="'+stoneBtnCls+'" style="'+stoneBtnStyle+'" '+(p.gold>=6666&&!stoneFull?'onclick="xxBuyStone()"':'disabled')+'>💰6,666</button>';
 h+='</div>';
 for(var i=0;i<SHOP.length;i++){var it=SHOP[i];var price=getShopPrice(it.p);var canBuy=p.gold>=price;var isExpStone=(i===0);
-var atLimit=isExpStone&&((p.expBonus||0)>=100||(p.expBonusCount||0)>=100);if(it.maxCount){var cc=p[it.countKey]||0;if(cc>=it.maxCount)atLimit=true}if(atLimit)canBuy=false;var countInfo='';if(isExpStone){countInfo=(p.expBonusCount||0)+'次 · +'+(p.expBonus||0)+'%'}else if(it.maxCount){var cc2=p[it.countKey]||0;countInfo=cc2+'/'+it.maxCount+'次'}else if(it.countKey){var cc3=p[it.countKey]||0;if(cc3>0)countInfo='已购'+cc3+'次'}var buyLabel=atLimit?'🔒 已满':'💰'+price+(price<it.p?' <s style="font-size:.6rem;opacity:.6">'+it.p+'</s>':'');var btnCls=canBuy?'xg-btn gold':'xg-btn';var btnStyle='padding:6px 12px;font-size:.75rem;'+(canBuy?'':'opacity:.5;cursor:not-allowed;');var btnAttr=canBuy?'onclick="xxBuy('+i+')"':'disabled';h+='<div class="xg-item"><span class="it-icon">'+it.ic+'</span><div class="it-info"><div class="it-name">'+it.n+(countInfo?' <span style="font-size:.7rem;color:var(--txm)">('+countInfo+')</span>':'')+'</div><div class="it-desc">'+it.d+(atLimit?' <span style="color:var(--cinnabar);font-weight:700">已达到上限</span>':'')+'</div></div><button class="'+btnCls+'" style="'+btnStyle+'" '+btnAttr+'>'+buyLabel+'</button></div>'}
+var atLimit=isExpStone&&(p.expBonus||0)>=130;if(it.maxCount){var cc=p[it.countKey]||0;if(cc>=it.maxCount)atLimit=true}if(atLimit)canBuy=false;var countInfo='';if(isExpStone){countInfo=(p.expBonusCount||0)+'次 · +'+(p.expBonus||0)+'%'}else if(it.maxCount){var cc2=p[it.countKey]||0;countInfo=cc2+'/'+it.maxCount+'次'}else if(it.countKey){var cc3=p[it.countKey]||0;if(cc3>0)countInfo='已购'+cc3+'次'}var buyLabel=atLimit?'🔒 已满':'💰'+price+(price<it.p?' <s style="font-size:.6rem;opacity:.6">'+it.p+'</s>':'');var btnCls=canBuy?'xg-btn gold':'xg-btn';var btnStyle='padding:6px 12px;font-size:.75rem;'+(canBuy?'':'opacity:.5;cursor:not-allowed;');var btnAttr=canBuy?'onclick="xxBuy('+i+')"':'disabled';h+='<div class="xg-item"><span class="it-icon">'+it.ic+'</span><div class="it-info"><div class="it-name">'+it.n+(countInfo?' <span style="font-size:.7rem;color:var(--txm)">('+countInfo+')</span>':'')+'</div><div class="it-desc">'+it.d+(atLimit?' <span style="color:var(--cinnabar);font-weight:700">已达到上限</span>':'')+'</div></div><button class="'+btnCls+'" style="'+btnStyle+'" '+btnAttr+'>'+buyLabel+'</button></div>'}
 
 if(p.pet&&p.pet.owned){
     var washPrice=getShopPrice(5000);var canWash=p.gold>=washPrice;
