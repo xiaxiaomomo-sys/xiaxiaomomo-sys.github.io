@@ -3150,6 +3150,26 @@ window.xxGmDeductGold = async function() {
         alert('扣除失败：' + e.message);
     }
 };
+
+// 🌟【加在这里】📢 GM 发布全服弹窗公告
+window.xxGmAnnounce = async function() {
+    if (!_gmUnlocked) return;
+    var msg = prompt('输入全服公告内容（支持换行）：');
+    if (!msg || !msg.trim()) return;
+    try {
+        var now = Date.now();
+        await _sb.from('announcements').upsert({
+            id: 'ann_' + now,
+            message: msg.trim(),
+            type: 'notice',
+            created_at: now
+        });
+        alert('✅ 全服公告已发布！所有玩家上线都会收到弹窗。');
+    } catch(e) {
+        alert('发布失败：' + e.message);
+    }
+};
+
 window.xxClear=function(){localStorage.removeItem(SK);G.p=null;G.prog=null;G.scr='start';rc();alert('存档已清除！')};
 /* === 商城主动技能自选弹窗控制 === */
 window.openShopSkillModal = function() {
