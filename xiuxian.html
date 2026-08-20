@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>修仙之路</title>
-<meta name="game-version" content="v1.3.8">
+<meta name="game-version" content="v1.3.9">
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -1835,19 +1835,24 @@ function autoLoop(){
     if(m.hp<=0){m.hp=0;setTimeout(function(){animAfterRender('xgME','die',10);sfx('win');render();setTimeout(battleWin,900)},400);return}
     if(p.hp<=0){p.hp=0;sfx('die');stopBGM();stopAuto();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return}
 
-    /* 2. 套装与灵兽秒杀判定 */
-    var _setBonus=getSetBonus();
-    if(_setBonus.instakill>0&&!m.isBoss&&!petStrike&&m.hp>0&&Math.random()<_setBonus.instakill){
-        m.hp=0;petStrike=true;
-        addLog('<span style="color:var(--gold);font-weight:800">⚡ 神级光环！30%秒杀！</span>');
-        sfx('skill');render();
+   /* 2. 套装与灵兽秒杀判定（怪物HP < 30% 才能触发秒杀） */
+    var _setBonus = getSetBonus();
+    if (_setBonus.instakill > 0 && !m.isBoss && !petStrike && m.hp > 0 && m.hp < m.mhp * 0.30 && Math.random() < _setBonus.instakill) {
+        m.hp = 0;
+        petStrike = true;
+        addLog('<span style="color:var(--gold);font-weight:800">⚡ 神级光环！残血秒杀！</span>');
+        sfx('skill');
+        render();
     }
-    if(p.pet&&p.pet.owned&&p.pet.level>=10&&!m.isBoss&&m.hp>0){
-        var pq=PET_QUAL[p.pet.quality];
-        if(Math.random()<0.03*pq.skillMul){
-            m.hp=0;petStrike=true;c.petBonusGold=(c.petBonusGold||0)+10;
-            addLog('<span style="color:var(--lv);font-weight:800">'+petForm(p.pet.level).emoji+' 灵兽发动【咸鱼突刺】！+10金币</span>');
-            sfx('skill');render();
+    if (p.pet && p.pet.owned && p.pet.level >= 10 && !m.isBoss && m.hp > 0 && m.hp < m.mhp * 0.30) {
+        var pq = PET_QUAL[p.pet.quality];
+        if (Math.random() < 0.03 * pq.skillMul) {
+            m.hp = 0;
+            petStrike = true;
+            c.petBonusGold = (c.petBonusGold || 0) + 10;
+            addLog('<span style="color:var(--lv);font-weight:800">' + petForm(p.pet.level).emoji + ' 灵兽发动【咸鱼突刺】！残血秒杀 +10金币</span>');
+            sfx('skill');
+            render();
         }
     }
 
@@ -2433,7 +2438,7 @@ h+='<div style="padding:4px 8px;background:var(--b50);border-radius:6px;font-siz
         h+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:3px"><span>⭐ 经验</span><span>'+p.pet.exp+'/'+pNeed+'</span></div>';
         h+='<div class="xg-exp-bar"><div class="xg-exp-fill" style="width:'+Math.floor(p.pet.exp/pNeed*100)+'%"></div></div></div>';
         
-           var ps=[{lv:10,n:'⚔️ 咸鱼突刺',d:'3%概率直接秒杀非BOSS怪物+10金币'},{lv:1,n:'🌿 灵兽庇佑',d:'攻击+10/防御+10/生命+30，每回合回复5%HP，20%减伤50%(1次/战)'},{lv:20,n:'🍖 饿犬扑食',d:'瞬间斩杀血量低于10%的普通怪'},{lv:30,n:'🛡️ 忠犬护主',d:'致死时保留1血并回复15%生命(限1次)'},{lv:40,n:'💊 大郎吃药了',d:'胜利后2%概率随机获得1点属性'},{lv:50,n:'🦊 狐假虎威',d:'面对BOSS时削弱其5%攻击与防御'},{lv: 55, n: '✨ 终极化形', d: '受击后按品级额外回血(1%/2%/3%/5%)，主人攻击+10%'},{lv:100,n:'👑 神兽之力',d:'仅神兽·全伤害+5%'}];
+           var ps=[{lv:10, n:'⚔️ 咸鱼突刺', d:'怪物HP<30%时，3%概率秒杀非BOSS怪+10金币'},{lv:1,n:'🌿 灵兽庇佑',d:'攻击+10/防御+10/生命+30，每回合回复5%HP，20%减伤50%(1次/战)'},{lv:20,n:'🍖 饿犬扑食',d:'瞬间斩杀血量低于10%的普通怪'},{lv:30,n:'🛡️ 忠犬护主',d:'致死时保留1血并回复15%生命(限1次)'},{lv:40,n:'💊 大郎吃药了',d:'胜利后2%概率随机获得1点属性'},{lv:50,n:'🦊 狐假虎威',d:'面对BOSS时削弱其5%攻击与防御'},{lv: 55, n: '✨ 终极化形', d: '受击后按品级额外回血(1%/2%/3%/5%)，主人攻击+10%'},{lv:100,n:'👑 神兽之力',d:'仅神兽·全伤害+5%'}];
         h += '<div style="font-size:.75rem;margin-bottom:10px;display:flex;flex-direction:column;gap:5px;">';
         ps.forEach(function(ps) {
             var isUnlk = p.pet.level >= ps.lv;
@@ -2483,7 +2488,7 @@ h+='</div>';
 var _hubSet=getSetBonus();
 if(_hubSet.gold>0){
     h+='<div style="text-align:center;font-size:.78rem;padding:8px;background:rgba(201,169,110,.08);border-radius:8px;border:1px solid rgba(201,169,110,.2)">';
-    if(_hubSet.instakill>0)h+='<span style="color:var(--gold);font-weight:800">⚡ 神级光环：击杀金币+'+_hubSet.gold+' · 30%秒杀普通怪</span>';
+    if(_hubSet.instakill>0)h+='<span style="color:var(--gold);font-weight:800">⚡ 神级光环：击杀金币+'+_hubSet.gold+' · 怪物HP<30%时30%秒杀普通怪</span>';
     else h+='<span style="color:var(--gold);font-weight:700">✨ 套装效果：击杀金币+'+_hubSet.gold+'</span>';
     h+='</div>';
 }
