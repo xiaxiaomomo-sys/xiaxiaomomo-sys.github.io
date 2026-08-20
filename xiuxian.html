@@ -103,8 +103,8 @@ body.dark::after{opacity:.06}
 .xg-stat-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--b100);font-size:.88rem;font-weight:700}.xg-stat-row:last-child{border:none}
 .xg-hp-bar{height:14px;background:var(--b50);border-radius:10px;overflow:hidden;margin:8px 0;position:relative}.xg-hp-fill{height:100%;border-radius:10px;transition:width .4s ease;background:linear-gradient(90deg,#4caf50,#81c784)}.xg-hp-fill.low{background:linear-gradient(90deg,#ff6b6b,#ff9800)}.xg-hp-fill.mid{background:linear-gradient(90deg,#ff9800,#ffc107)}
 .xg-exp-bar{height:8px;background:var(--b50);border-radius:8px;overflow:hidden;margin:6px 0}.xg-exp-fill{height:100%;background:linear-gradient(90deg,var(--b300),var(--lv));border-radius:8px;transition:width .4s}
-.xg-battle{display:flex;gap:16px;align-items:stretch;margin-bottom:16px;position:relative;transition:transform .1s;width:100%}.xg-battle.shake{animation:shake .3s ease}
-.xg-bp{flex:1;background:var(--white);border-radius:var(--r);padding:18px 14px;text-align:center;border:2px solid var(--b100);transition:all .3s;position:relative;overflow:visible}.xg-bp.monster{border-color:var(--pk)}.xg-bp .emoji{font-size:3rem;display:block;margin:4px 0;position:relative;z-index:1}.xg-bp .bname{font-size:.95rem;font-weight:800;margin-bottom:2px}.xg-bp .blv{font-size:.72rem;color:var(--txm);font-weight:600;margin-bottom:6px}
+.xg-battle{display:flex;gap:clamp(8px,2vw,16px);align-items:stretch;margin-bottom:16px;position:relative;transition:transform .1s;width:100%}.xg-battle.shake{animation:shake .3s ease}
+.xg-bp{flex:1;min-width:0;background:var(--white);border-radius:var(--r);padding:clamp(10px,2vw,18px) clamp(8px,1.5vw,14px);text-align:center;border:2px solid var(--b100);transition:all .3s;position:relative;overflow:visible}.xg-bp.monster{border-color:var(--pk)}.xg-bp .emoji{font-size:3rem;display:block;margin:4px 0;position:relative;z-index:1}.xg-bp .bname{font-size:.95rem;font-weight:800;margin-bottom:2px}.xg-bp .blv{font-size:.72rem;color:var(--txm);font-weight:600;margin-bottom:6px}
 .xg-bp .buff-row{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin:4px 0;min-height:20px}
 .xg-buff-tag{display:inline-flex;align-items:center;gap:2px;padding:2px 6px;border-radius:var(--rf);font-size:.6rem;font-weight:700;line-height:1;white-space:nowrap}
 .xg-buff-tag.atk-up{background:rgba(255,107,107,.15);color:#ff4757}
@@ -120,10 +120,10 @@ body.dark::after{opacity:.06}
 .xg-bp.berserk-active{animation:berserkPulse 1.2s infinite}
 .xg-bp.clone-active{animation:cloneGlow 1.5s infinite}
 .xg-bp.crit-hit{animation:critGlow .5s ease}
-.xg-log{background:var(--b50);border-radius:var(--rs);padding:14px 16px;max-height:180px;overflow-y:auto;font-size:.78rem;line-height:1.9;color:var(--txb);margin-bottom:12px;border:1px solid var(--b100)}
+.xg-log{background:var(--b50);border-radius:var(--rs);padding:clamp(8px,1.5vw,14px) clamp(10px,2vw,16px);max-height:clamp(100px,20vh,180px);overflow-y:auto;font-size:clamp(.65rem,1.2vw,.78rem);line-height:1.9;color:var(--txb);margin-bottom:12px;border:1px solid var(--b100)}
 .xg-log .dmg{color:var(--cinnabar);font-weight:800}.xg-log .heal{color:var(--jade);font-weight:800}.xg-log .info{color:var(--gold);font-weight:700}
 .xg-vs{display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:900;color:var(--gold);flex-shrink:0;padding:0 4px;text-shadow:0 2px 8px rgba(201,169,110,.3)}
-.xg-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+.skill-bar,.xg-actions{display:flex;gap:clamp(4px,1vw,8px);flex-wrap:wrap;justify-content:center;margin-top:16px;position:relative;z-index:2}
 .xg-btn{padding:10px 20px;border-radius:var(--rf);border:2px solid var(--b200);background:var(--white);color:var(--tx);font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .25s var(--sp)}.xg-btn:hover{transform:translateY(-2px) scale(1.04);box-shadow:var(--sm);border-color:var(--b400)}.xg-btn:active{transform:scale(.96)}.xg-btn.primary{background:linear-gradient(135deg,var(--ink),var(--b400));color:#faf7f0;border-color:var(--b500);box-shadow:0 3px 14px rgba(45,34,24,.25)}.xg-btn.primary:hover{background:linear-gradient(135deg,var(--cinnabar),var(--ink));box-shadow:0 4px 20px rgba(196,30,58,.25)}.xg-btn.danger{background:var(--cinnabar);color:#fff;border-color:var(--cinnabar)}.xg-btn.danger:hover{opacity:.9}.xg-btn.gold{background:linear-gradient(135deg,var(--gold),#b8944a);color:#fff;border-color:var(--gold)}.xg-btn.gold:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(201,169,110,.4)}.xg-btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;box-shadow:none!important}
 .xg-chbtn{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:var(--rs);background:var(--white);border:2px solid var(--b100);cursor:pointer;transition:all .3s var(--sp);margin-bottom:8px}.xg-chbtn:hover{border-color:var(--b400);transform:translateY(-2px);box-shadow:var(--ss)}.xg-chbtn.boss{border-color:var(--yw);background:linear-gradient(135deg,#fff9e6,#fff3cc)}
 .xg-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--rs);background:var(--b50);transition:background .15s;border:1px solid var(--b100);margin-bottom:8px}.xg-item:hover{background:var(--b100);border-color:var(--gold)}
@@ -198,7 +198,7 @@ body.dark::after{opacity:.06}
 .xg-save-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);z-index:10000;background:var(--white);border-radius:var(--r);box-shadow:var(--sl);border:2px solid var(--b200);padding:20px 28px;text-align:center;opacity:0;pointer-events:none;transition:all .3s var(--sp)}.xg-save-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:all}
 .xg-save-toast .toast-icon{font-size:2.5rem;margin-bottom:8px;display:block}
 .xg-save-toast .toast-text{font-size:.9rem;font-weight:700;color:var(--tx)}
-@media(max-width:768px){.xg-hub-grid{grid-template-columns:1fr}.xg-action-col{order:-1}.xg-battle{flex-direction:column}.xg-vs{padding:4px 0}.xg-choices .xg-skill-card{min-width:140px}.xg-log{max-height:120px;font-size:.7rem}.xg-btn{padding:8px 14px;font-size:.78rem}.xg-skill-card{padding:12px}.xg-skill-card .sk-name{font-size:.85rem}.char-body{width:80px;height:80px;font-size:2rem}.xg-hdr h2{font-size:1.4rem}.xg-card{padding:16px}}
+@media(max-width:768px){.xg-hub-grid{grid-template-columns:1fr}.xg-action-col{order:-1}.xg-battle{flex-direction:column}.xg-vs{padding:4px 0}.xg-choices .xg-skill-card{min-width:140px}.xg-log{max-height:120px;font-size:.7rem}.xg-btn{padding:8px 14px;font-size:.78rem}.xg-skill-card{padding:12px}.xg-skill-card .sk-name{font-size:.85rem}.char-body{width:70px;height:70px;font-size:1.8rem}.xg-hdr h2{font-size:1.4rem}.xg-card{padding:14px}}
 
 @media(min-width:1200px){.xg{max-width:min(80vw,900px)}}
 
@@ -246,7 +246,7 @@ body.dark::after{opacity:.06}
 
 /* ===== 战斗角色样式 (移植自battle-demo) ===== */
 .character{width:160px;text-align:center;position:relative;transition:transform .15s}
-.char-body{width:clamp(70px,12vw,110px);height:clamp(70px,12vw,110px);margin:0 auto 8px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;font-size:clamp(1.8rem,4vw,3rem);transition:all .3s}
+.char-body{width:clamp(60px,12vw,110px);height:clamp(60px,12vw,110px);margin:0 auto 8px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;font-size:clamp(1.5rem,4vw,2.8rem);transition:all .3s}
 .character.player .char-body{background:linear-gradient(135deg,var(--white),var(--b50));box-shadow:0 8px 32px rgba(45,34,24,.1),inset 0 0 20px rgba(201,169,110,.1);border:3px solid var(--b200)}
 .character.monster .char-body{background:linear-gradient(135deg,rgba(196,30,58,.08),rgba(196,30,58,.15));box-shadow:0 8px 32px rgba(196,30,58,.15),inset 0 0 20px rgba(196,30,58,.08);border:3px solid rgba(196,30,58,.25)}
 body.dark .character.player .char-body{background:linear-gradient(135deg,#2d2218,#4a3f2f);box-shadow:0 8px 32px rgba(45,34,24,.4),inset 0 0 20px rgba(201,169,110,.1);border:3px solid rgba(201,169,110,.3)}
@@ -649,7 +649,7 @@ var ASKILLS=[
     {id:'A17',n:'以命换命',lv:35,cd:6,d:'消耗50%当前HP，造成1.5倍攻击+消耗血量伤害'},
     {id:'A18',n:'召唤灵兵',lv:10,cd:1,d:'每回合召唤1~3只灵兽助战，锁定其他主动技能，玩家与召唤物同回合攻击'},
     {id:'A19',n:'万灵归一',lv:35,cd:6,d:'所有召唤物自爆，造成各自剩余HP的总和伤害'},
-    {id:'A20',n:'撒币',lv:999,cd:2,d:'[已禁用] 技能存在BUG，暂时移除'},
+    {id:'A20',n:'撒币',lv:5,cd:2,d:'消耗10金币，造成ATK×2.5伤害，击杀额外+2金币'},
     {id:'A21',n:'有钱能使鬼推磨',lv:25,cd:5,d:'消耗大量金币，造成巨额真实伤害并眩晕1回合'},
     {id:'A22',n:'蛊毒术',lv:15,cd:3,d:'对怪物施加3层中毒，每层每回合造成攻击力×0.1伤害'},
     {id:'A23',n:'毒爆',lv:30,cd:5,d:'引爆中毒层数，造成层数×攻击力×0.5的伤害'},
@@ -688,38 +688,38 @@ var PSKILLS=[
 ];
 /* ===== 召唤物系统 ===== */
 var SUMMON_POOL=[
-    {name:'小青青',emoji:'🐉',rarity:'common',weight:11,hpMul:0.15,atkMul:0.35,dur:3,
+    {name:'小青青',emoji:'🐉',rarity:'common',weight:11,hpMul:0.30,atkMul:0.35,dur:3,
      quotes:['你是人类啊？','就这？我上我也行','别怕，本龙罩你','今天天气不错，适合打怪']},
-    {name:'小愧愧',emoji:'👻',rarity:'common',weight:11,hpMul:0.12,atkMul:0.40,dur:3,
+    {name:'小愧愧',emoji:'👻',rarity:'common',weight:11,hpMul:0.25,atkMul:0.40,dur:3,
      quotes:['打什么打什么？','我又来了嘿嘿','别看我小，打人可疼了','鬼鬼祟祟就是我']},
-    {name:'小抚云',emoji:'🌬️',rarity:'common',weight:9,hpMul:0.18,atkMul:0.32,dur:3,
+    {name:'小抚云',emoji:'🌬️',rarity:'common',weight:9,hpMul:0.30,atkMul:0.32,dur:3,
      quotes:['师父我来啦~','风起~云涌~','今天的风儿甚是喧嚣','我吹一口气你就倒了']},
-    {name:'小芸芸',emoji:'🌸',rarity:'common',weight:9,hpMul:0.20,atkMul:0.32,dur:3,
+    {name:'小芸芸',emoji:'🌸',rarity:'common',weight:9,hpMul:0.30,atkMul:0.32,dur:3,
      quotes:['花开富贵，锤你没商量','本姑娘心情好，轻点打','哎呀手滑了~','花落知多少，打你知多少']},
-    {name:'小瓜瓜',emoji:'🍈',rarity:'common',weight:7,hpMul:0.14,atkMul:0.38,dur:3,
+    {name:'小瓜瓜',emoji:'🍈',rarity:'common',weight:7,hpMul:0.28,atkMul:0.38,dur:3,
      quotes:['瓜来了瓜来了！','吃瓜不如打怪','我虽然圆但我不菜','别小看瓜的力量']},
-    {name:'小当当',emoji:'🔔',rarity:'rare',weight:12,hpMul:0.22,atkMul:0.48,dur:3,
+    {name:'小当当',emoji:'🔔',rarity:'rare',weight:12,hpMul:0.35,atkMul:0.48,dur:3,
      quotes:['哈哈哈哈我来啦','叮叮当当打怪忙','金币金币都是我的','铛铛铛~送你上路'],
      special:'gold5',specialDesc:'击杀额外+5金'},
-    {name:'小月光',emoji:'🌙',rarity:'rare',weight:10,hpMul:0.25,atkMul:0.45,dur:3,
+    {name:'小月光',emoji:'🌙',rarity:'rare',weight:10,hpMul:0.38,atkMul:0.45,dur:3,
      quotes:['月光光~照地上~','今晚月色真美','安静，我来治愈你','月之精华，疗伤~'],
      special:'heal5',specialDesc:'每回合回复自身5%HP'},
-    {name:'小萌新',emoji:'🌱',rarity:'rare',weight:8,hpMul:0.30,atkMul:0.42,dur:3,
+    {name:'小萌新',emoji:'🌱',rarity:'rare',weight:8,hpMul:0.40,atkMul:0.42,dur:3,
      quotes:['什么？今日周三了偷跑偷跑！','等等我还没准备好！','啊啊啊好可怕我先走了','我我我只是路过！'],
      special:'flee40',specialDesc:'40%概率召唤时跑路'},
-    {name:'小酸菜',emoji:'🥬',rarity:'rare',weight:6,hpMul:0.18,atkMul:0.50,dur:3,
+    {name:'小酸菜',emoji:'🥬',rarity:'rare',weight:6,hpMul:0.30,atkMul:0.50,dur:3,
      quotes:['院长，我们打什么？','酸菜鱼~又酸又菜又多余~','闻到了吗？毒的味道','我酸了你也得酸'],
      special:'poison',specialDesc:'攻击附带1层毒(20%ATK/层，上限10层，毒不因消失清除)'},
-    {name:'小南局',emoji:'🎲',rarity:'epic',weight:8,hpMul:0.35,atkMul:0.60,dur:3,
+    {name:'小南局',emoji:'🎲',rarity:'epic',weight:8,hpMul:0.45,atkMul:0.60,dur:3,
      quotes:['别叫了，在弹钢琴了！','命运的骰子已经掷出','赌一把？这波必赢','弹完了，该打人了','今天手气不错~'],
      special:'crit20',specialDesc:'20%概率暴击×1.5；每回合随机buff'},
-    {name:'歌姬不梦',emoji:'🎤',rarity:'epic',weight:5,hpMul:0.40,atkMul:0.65,dur:5,
+    {name:'歌姬不梦',emoji:'🎤',rarity:'epic',weight:5,hpMul:0.50,atkMul:0.65,dur:5,
      quotes:['看我美妙歌声~沉沦了没？','这首歌叫《你死了》','高音上不去？用拳头','安可安可~再打一轮~','让我用歌声送你一程'],
      special:'buffAll',specialDesc:'全体召唤物ATK+5%/回合；击杀金币+8'},
-    {name:'小睿睿',emoji:'🧠',rarity:'epic',weight:3,hpMul:0.38,atkMul:0.65,dur:3,
+    {name:'小睿睿',emoji:'🧠',rarity:'epic',weight:3,hpMul:0.48,atkMul:0.65,dur:3,
      quotes:['院长帮我挂一下吧呗','我在思考...你为什么要送死','智商碾压你','我已经算出你什么时候死了'],
      special:'wisdom',specialDesc:'全体召唤物ATK+10%；每回合回复玩家maxHP×3%；存在时闪避率+10%'},
-    {name:'林深大大',emoji:'👑',rarity:'mythic',weight:1,hpMul:0.55,atkMul:1.20,dur:5,
+    {name:'林深大大',emoji:'👑',rarity:'mythic',weight:1,hpMul:0.65,atkMul:1.20,dur:5,
      quotes:['什么？还需要我GM登场？你也太菜了','我来我见我征服','给我个面子，你去死好不好？','菜就多练练，算了我帮你打吧','这BOSS？我一根手指的事','叫我来？行吧，速战速决'],
      special:'gm',specialDesc:'秒杀普通怪；BOSS+5%真伤(限1次)；击杀+20金+1属性点；召唤时+30%HP护盾(2回合)'}
 ]
@@ -906,8 +906,8 @@ function formatEquip(eq){
 }
 /* 🌟 S1 怪物指数级生成与金币模型 */
 function genMon(floor,isBoss){
-    var hp=Math.floor(80 + floor * 20 * Math.pow(1.05, floor));
-    var atk=Math.floor(10 + floor * 3.0 * Math.pow(1.04, floor));
+    var hp=Math.floor((80 + floor * 20 * Math.pow(1.05, floor)) * 0.9);
+    var atk=Math.floor((10 + floor * 3.0 * Math.pow(1.04, floor)) * 0.9);
     var df=Math.floor(5 + floor * 1.5 * Math.pow(1.03, floor));
     var ge=floor*18+Math.floor(floor*floor*0.3);
     var gd= 2 + Math.floor((floor - 1) / 20); 
@@ -915,16 +915,16 @@ function genMon(floor,isBoss){
 
    if(isBoss){
     if(floor===100){
-        var hp100=Math.floor((80+100*20*Math.pow(1.05,100))*1.8);
-        var atk100=Math.floor((10+100*3.0*Math.pow(1.04,100))*1.3);
+        var hp100=Math.floor((80+100*20*Math.pow(1.05,100))*1.62);
+        var atk100=Math.floor((10+100*3.0*Math.pow(1.04,100))*1.17);
         var def100=Math.floor((5+100*1.5*Math.pow(1.03,100))*1.2);
         var exp100=Math.floor((100*18+Math.floor(100*100*0.3))*3);
         var gold100=Math.floor((Math.floor(100/10)+3)*3);
         return {name:'林深大魔王',emoji:'😈',hp:hp100,mhp:hp100,atk:atk100,def:def100,exp:exp100,gold:gold100,isBoss:true,floor:100,ab:7,is魔王:true,invTimer:30};
     }
         var bi=Math.min(Math.floor(floor/10)-1,7);
-        hp=Math.floor(hp*1.8);
-        atk=Math.floor(atk*1.3);
+        hp=Math.floor(hp*1.62);
+        atk=Math.floor(atk*1.17);
         df=Math.floor(df*1.2);
         ge=Math.floor(ge*3);
         gd=gd*2; // BOSS金币双倍
@@ -1595,9 +1595,9 @@ function doSkillUse(sid){
             c.summons=[]; trueDmg=totalExplode;
             addLog('万灵归一！引爆总伤害 <span class="dmg">'+totalExplode+'</span>'); break;
         case 'A20':
-            if(p.gold<50){addLog('金币不足！');c.cd[sid]=sk.cd;return}
-            p.gold-=50; rawDmg=getPAtk(p,c)*2.0;
-            addLog('消耗 <span style="color:var(--gold)">50</span> 金币'); break;
+            if(p.gold<10){addLog('金币不足！');c.cd[sid]=sk.cd;return}
+            p.gold-=10; rawDmg=getPAtk(p,c)*2.5;
+            addLog('消耗 <span style="color:var(--gold)">10</span> 金币'); break;
         case 'A21':
             var bigCost=Math.max(10,Math.floor(p.gold*0.20));
             spawnGoldExplosion();p.gold-=bigCost; trueDmg=bigCost*3;
@@ -1681,7 +1681,7 @@ function doMonsterAtk(){
         if(c.summons){
             for(var si=c.summons.length-1;si>=0;si--){
                 var sq=c.summons[si];
-                var sqDmg=Math.floor(aoeDmg*1.4);
+                var sqDmg=Math.floor(aoeDmg*1.0);
                 sq.hp-=sqDmg;
                 if(sq.hp<=0){
                     addLog(sq.emoji+' '+sq.name+'被AOE击杀！');
@@ -1744,7 +1744,7 @@ if(p.pet&&p.pet.owned&&p.pet.level>=1&&!c.auraReduced&&Math.random()<0.20){
         return false;
     }
     if(targetSum){
-        var sumDmg=Math.max(1, Math.floor(atk * 1.4));
+        var sumDmg=Math.max(1, Math.floor(atk * 1.0));
         targetSum.hp-=sumDmg;
         addLog('怪物攻击'+targetSum.emoji+targetSum.name+' <span class="dmg">'+sumDmg+'</span>');
         if(targetSum.hp<=0){
@@ -2018,6 +2018,8 @@ function battleWin(){stopAuto();stopBGM();saveXiuxianProg();var p=G.p,c=G.cmb;if
 p.hp=calcMaxHp(p);
 var ge=Math.floor(c.m.exp*(1+(p.expBonus||0)/100)),gd=c.m.gold;
 p.exp+=ge;p.gold+=gd;p.kills++;p.consecutiveKills=(p.consecutiveKills||0)+1;
+// A20 撒币击杀奖励
+if(G.p.aSkl.indexOf('A20')>=0) p.gold+=2;
 if (p.kills % 100 === 0 && p.pSkl.indexOf('P14') >= 0) { p.pAtk += 1; addLog('<span class="info">【嗜血本能】永久攻击+1！</span>'); }
 var bonusGold=petGoldBonus()+(c.petBonusGold||0);p.gold+=bonusGold;
 if(p.pSkl.indexOf('P27')>=0){var p27bonus=Math.floor((gd+bonusGold)*0.3);p.gold+=p27bonus;addLog('<span class="info">【财运亨通】额外金币+'+p27bonus+'</span>');}
@@ -2257,6 +2259,22 @@ function forceSaveCloud(){
 }
 function autoSave(){saveLocal();saveCloud()}
 setInterval(autoSave,30000);
+// 检查并领取礼包
+async function checkGifts(){
+    try{
+        var r=await _sb.from('gifts').select('*').order('created_at',{ascending:false}).limit(5);
+        if(!r.data)return;
+        var claimed=JSON.parse(localStorage.getItem('xx_gifts_claimed')||'[]');
+        r.data.forEach(function(gift){
+            if(claimed.indexOf(gift.id)>=0)return;
+            G.p.gold+=gift.gold;
+            claimed.push(gift.id);
+            showSaveToast('🎁','林深大大发了 '+gift.gold+' 金币！');
+        });
+        localStorage.setItem('xx_gifts_claimed',JSON.stringify(claimed));
+    }catch(e){}
+}
+setTimeout(checkGifts,3000);
 window.addEventListener('beforeunload',function(){if(_importMode)return;saveLocal();forceSaveCloud()});
 /* 渲染总调度 */
 function rStart(c){
@@ -2414,6 +2432,7 @@ h+='</div>';
     h+='<button class="xg-btn danger" onclick="xxGmAxe(\'lv5\')" style="font-size:.78rem">⬆️等级+5</button>';
     h+='<button class="xg-btn primary" onclick="xxGoto(\'gmPickActive\')" style="font-size:.78rem">⚔️自选主动</button>';
     h+='<button class="xg-btn primary" onclick="xxGoto(\'gmPickPassive\')" style="font-size:.78rem">🔮自选被动</button>';
+    h+='<button class="xg-btn gold" onclick="xxGmSendGold()" style="font-size:.78rem">🎁发金币</button>';
     h+='</div></div>';}
     h+='</div></div>';
 
@@ -3058,6 +3077,29 @@ window.showExportModal=showExportModal;window.showImportModal=showImportModal;wi
 var _gmClicks=0,_gmTimer=null,_gmUnlocked=false;
 window.xxGmClick=function(){_gmClicks++;if(_gmClicks===1)_gmTimer=setTimeout(function(){_gmClicks=0},5000);if(_gmClicks>=10){clearTimeout(_gmTimer);_gmClicks=0;var code=prompt('请输入GM密码：');if(code==='83266121'){_gmUnlocked=true;alert('GM权限已解锁！');rc()}else{alert('密码错误！')}}};
 window.xxGmAxe=function(t){if(!_gmUnlocked)return;if(t==='gold1w'){G.p.gold+=10000;rc();autoSave()}else if(t==='hp'){G.p.hp=calcMaxHp(G.p);rc();autoSave()}else if(t==='lv5'){for(var i=0;i<5;i++){G.p.lv++;G.p.statPts+=ptsPerLv(G.p.lv)}G.p.hp=calcMaxHp(G.p);autoSave();if(G.p.exp>=expNeed(G.p.lv)){checkLvlUp()}else{G.scr='assign';rc()}}};
+window.xxGmSendGold=function(){
+    if(!_gmUnlocked)return;
+    var amount=prompt('输入发放金币数量：');
+    if(!amount||isNaN(amount))return;
+    amount=parseInt(amount);
+    if(amount<=0||amount>100000)return;
+    try{
+        _sb.from('gifts').upsert({
+            id:'gift_'+Date.now(),
+            gold:amount,
+            created_at:Date.now(),
+            claimed_by:''
+        }).then(function(r){
+            if(r.error){
+                alert('发放失败：可能需要先创建gifts表。金额：'+amount);
+            }else{
+                alert('已发放 '+amount+' 金币礼包！所有玩家登录时自动领取。');
+            }
+        });
+    }catch(e){
+        alert('发放失败：'+e.message);
+    }
+};
 window.xxClear=function(){localStorage.removeItem(SK);G.p=null;G.prog=null;G.scr='start';rc();alert('存档已清除！')};
 /* === 商城主动技能自选弹窗控制 === */
 window.openShopSkillModal = function() {
