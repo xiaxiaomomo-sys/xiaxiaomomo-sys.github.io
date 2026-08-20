@@ -1813,125 +1813,137 @@ function summonAttackFx(rarity,emoji,dmg){
 }
 function shakeBattle(cls){var el=document.querySelector('.xg-battle');if(!el)return;el.classList.remove('shake','shake-light','shake-medium','shake-heavy');void el.offsetWidth;el.classList.add(cls||'shake');setTimeout(function(){el.classList.remove(cls||'shake')},400)}
 
-function autoLoop(){if(!G.cmb||G.cmb.result)return;var spd=1000;var p=G.p,c=G.cmb,m=c.m;var petStrike=false;
+function autoLoop(){
+    if(!G.cmb||G.cmb.result)return;
+    var spd=1000;
+    var p=G.p,c=G.cmb,m=c.m;
+    var petStrike=false;
 
-/* 🌟 阶段1: DoT毒伤先结算（回合开始时） */
-if(m.hp>0) processDoT();
-if(m.hp<=0){m.hp=0;setTimeout(function(){animAfterRender('xgME','die',10);sfx('win');render();setTimeout(battleWin,900)},400);return}
-/* 毒伤/召唤物自伤可能导致玩家死亡 */
-if(p.hp<=0){p.hp=0;sfx('die');stopBGM();stopAuto();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return}
+    /* 1. 结算 DoT 毒伤 */
+    if(m.hp>0) processDoT();
+    if(m.hp<=0){m.hp=0;setTimeout(function(){animAfterRender('xgME','die',10);sfx('win');render();setTimeout(battleWin,900)},400);return}
+    if(p.hp<=0){p.hp=0;sfx('die');stopBGM();stopAuto();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return}
 
-/* 套装秒杀 */
-var _setBonus=getSetBonus();
-if(_setBonus.instakill>0&&!m.isBoss&&!petStrike&&m.hp>0&&Math.random()<_setBonus.instakill){
-    m.hp=0;petStrike=true;
-    addLog('<span style="color:var(--gold);font-weight:800">⚡ 神级光环！30%秒杀！</span>');
-    sfx('skill');render();
-}
-if(p.pet&&p.pet.owned&&p.pet.level>=10&&!m.isBoss&&m.hp>0){
-    var pq=PET_QUAL[p.pet.quality];
-    if(Math.random()<0.03*pq.skillMul){
-        m.hp=0;petStrike=true;c.petBonusGold=(c.petBonusGold||0)+10;
-        addLog('<span style="color:var(--lv);font-weight:800">'+petForm(p.pet.level).emoji+' 灵兽发动【咸鱼突刺】！+10金币</span>');
-        sfx('skill');render()
+    /* 2. 套装与灵兽秒杀判定 */
+    var _setBonus=getSetBonus();
+    if(_setBonus.instakill>0&&!m.isBoss&&!petStrike&&m.hp>0&&Math.random()<_setBonus.instakill){
+        m.hp=0;petStrike=true;
+        addLog('<span style="color:var(--gold);font-weight:800">⚡ 神级光环！30%秒杀！</span>');
+        sfx('skill');render();
     }
-}
-var sk=null,_crit=false;
-if(!petStrike){
-    sk=chooseAutoSkill();
-    if(sk){
-        c.basicAtkCount=0;
-        doSkillUse(sk);
-        /* 召唤锁定时，使用召唤技能后仍执行普攻 */
-        if(p.summonLocked && m.hp>0){
+    if(p.pet&&p.pet.owned&&p.pet.level>=10&&!m.isBoss&&m.hp>0){
+        var pq=PET_QUAL[p.pet.quality];
+        if(Math.random()<0.03*pq.skillMul){
+            m.hp=0;petStrike=true;c.petBonusGold=(c.petBonusGold||0)+10;
+            addLog('<span style="color:var(--lv);font-weight:800">'+petForm(p.pet.level).emoji+' 灵兽发动【咸鱼突刺】！+10金币</span>');
+            sfx('skill');render();
+        }
+    }
+
+    /* 3. 玩家攻击与技能施放 */
+    var sk=null,_crit=false;
+    if(!petStrike){
+        sk=chooseAutoSkill();
+        if(sk){
+            c.basicAtkCount=0;
+            doSkillUse(sk);
+            if(p.summonLocked && m.hp>0){
+                c.basicAtkCount=(c.basicAtkCount||0)+1;
+                _crit=doNormalAtk();
+            }
+        }else{
             c.basicAtkCount=(c.basicAtkCount||0)+1;
+            if(p.pSkl.indexOf('P19')>=0&&c.basicAtkCount>=5&&!c.godOfWarReady){
+                c.godOfWarReady=true;c.basicAtkCount=0;addLog('<span class="info">【战神附体】蓄力完成！必定暴击×1.5倍！</span>');
+            }
             _crit=doNormalAtk();
         }
-    }else{
-        c.basicAtkCount=(c.basicAtkCount||0)+1;
-        if(p.pSkl.indexOf('P19')>=0&&c.basicAtkCount>=5&&!c.godOfWarReady){
-            c.godOfWarReady=true;c.basicAtkCount=0;addLog('<span class="info">【战神附体】蓄力完成！必定暴击×1.5倍！</span>')
+    }
+
+    /* 4. 分身与额外被动 */
+    if(p.pSkl.indexOf('P22')>=0 && m.hp>0){
+        if(c.cloneActive && !c.cloneDead && m.hp>0){
+            var rawCloneAtk = getPAtk(p,c)*0.25;
+            var mDefForClone = c.m.def;
+            if(p.pSkl.indexOf('P12')>=0) mDefForClone = Math.floor(mDefForClone * (c.m.isBoss ? 0.95 : 0.90));
+            var mDefMulForClone = 500 / (500 + mDefForClone);
+            var suppForClone = getSuppression(c.floor, p.lv);
+            var cloneDmg = Math.max(1, Math.floor(rawCloneAtk * mDefMulForClone * suppForClone.pDmg));
+            m.hp=Math.max(0,m.hp-cloneDmg);
+            addLog('🎭 分身攻击 <span class="dmg">'+cloneDmg+'</span>');
+            floatDmg('xgME','🎭'+cloneDmg,'#9650ff'); applyOnHitHeal(p,cloneDmg);
         }
-        _crit=doNormalAtk();
     }
-}
 
-// 🌟 P22 分身系统（永久，死后4回合重生）
-if(p.pSkl.indexOf('P22')>=0 && m.hp>0){
-    if(c.cloneActive && !c.cloneDead && m.hp>0){
-        var rawCloneAtk = getPAtk(p,c)*0.25;
-        var mDefForClone = c.m.def;
-        if(p.pSkl.indexOf('P12')>=0) mDefForClone = Math.floor(mDefForClone * (c.m.isBoss ? 0.95 : 0.90));
-        var mDefMulForClone = 500 / (500 + mDefForClone);
-        var suppForClone = getSuppression(c.floor, p.lv);
-        var cloneDmg = Math.max(1, Math.floor(rawCloneAtk * mDefMulForClone * suppForClone.pDmg));
-        m.hp=Math.max(0,m.hp-cloneDmg);
-        addLog('🎭 分身攻击 <span class="dmg">'+cloneDmg+'</span>');
-        floatDmg('xgME','🎭'+cloneDmg,'#9650ff'); applyOnHitHeal(p,cloneDmg);
+    if(!petStrike&&p.pet&&p.pet.owned&&p.pet.level>=20&&m.hp>0&&m.hp<m.mhp*0.10&&!m.isBoss){
+        m.hp=0;addLog('<span style="color:var(--lv);font-weight:800">'+petForm(p.pet.level).emoji+' 灵兽发动【饿犬扑食】！秒杀残血！</span>');sfx('skill');render();
     }
-}
+    if(p.pSkl.indexOf('P21')>=0&&m.hp>0&&Math.random()<0.10){
+        var rawStormDmg = getPAtk(p,c)*1.5;
+        var stormMDef = c.m.def;
+        if(p.pSkl.indexOf('P12')>=0) stormMDef = Math.floor(stormMDef * (c.m.isBoss ? 0.95 : 0.90));
+        var stormDmg = Math.max(1, Math.floor(rawStormDmg * (500 / (500 + stormMDef)) * getSuppression(c.floor, p.lv).pDmg));
+        m.hp=Math.max(0,m.hp-stormDmg);
+        addLog('🌪️ 风暴之心！<span class="dmg">'+stormDmg+'</span>');floatDmg('xgME','🌪'+stormDmg,'#4ba6f7');applyOnHitHeal(p,stormDmg);
+    }
+    if(hasEquipPassive('burn')&&m.hp>0&&!petStrike){
+        var burnVal=getEquipPct('burn');
+        var burnDmg=Math.max(1,Math.floor(m.mhp*burnVal/100));
+        m.hp=Math.max(0,m.hp-burnDmg);
+        addLog('🔥 装备灼烧 <span class="dmg">'+burnDmg+'</span>');
+        floatDmg('xgME','-'+burnDmg,'#ff6b6b');
+    }
 
-if(!petStrike&&p.pet&&p.pet.owned&&p.pet.level>=20&&m.hp>0&&m.hp<m.mhp*0.10&&!m.isBoss){
-    m.hp=0;addLog('<span style="color:var(--lv);font-weight:800">'+petForm(p.pet.level).emoji+' 灵兽发动【饿犬扑食】！秒杀残血！</span>');sfx('skill');render()
-}
-if(p.pSkl.indexOf('P21')>=0&&m.hp>0&&Math.random()<0.10){
-    var rawStormDmg = getPAtk(p,c)*1.5;
-    var stormMDef = c.m.def;
-    if(p.pSkl.indexOf('P12')>=0) stormMDef = Math.floor(stormMDef * (c.m.isBoss ? 0.95 : 0.90));
-    var stormDmg = Math.max(1, Math.floor(rawStormDmg * (500 / (500 + stormMDef)) * getSuppression(c.floor, p.lv).pDmg));
-    m.hp=Math.max(0,m.hp-stormDmg);
-    addLog('🌪️ 风暴之心！<span class="dmg">'+stormDmg+'</span>');floatDmg('xgME','🌪'+stormDmg,'#4ba6f7');applyOnHitHeal(p,stormDmg)
-}
-/* 装备被动：灼烧 */
-if(hasEquipPassive('burn')&&m.hp>0&&!petStrike){
-    var burnVal=getEquipPct('burn');
-    var burnDmg=Math.max(1,Math.floor(m.mhp*burnVal/100));
-    m.hp=Math.max(0,m.hp-burnDmg);
-    addLog('🔥 装备灼烧 <span class="dmg">'+burnDmg+'</span>');
-    floatDmg('xgME','-'+burnDmg,'#ff6b6b');
-}
+    /* 5. 召唤物攻击 */
+    if(m.hp>0) processSummons();
+    if(p.hp<=0){p.hp=0;sfx('die');stopBGM();stopAuto();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return}
 
-/* 🌟 阶段1: 召唤物攻击（玩家行动后） */
-if(m.hp>0) processSummons();
-/* 召唤物自伤(P24)可能导致玩家死亡 */
-if(p.hp<=0){p.hp=0;sfx('die');stopBGM();stopAuto();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return}
-
-/* 播放攻击动画/音效 */
-if(sk||petStrike||_crit!==false){
+    /* 🌟 核心修复：确保每次普攻、暴击、技能都必然触发完整的全套攻击特效与动画 */
     sfx(petStrike||sk?'skill':'atk');
     render();
-    if(!petStrike){animAfterRender('xgPE','atk-combo',10);if(sk)animAfterRender('xgPE','skill-charge',50);atkTrail();slashTrails();spawnSlashTrails('xgME');if(_crit)critLine()}
-} else {
-    render(); /* 只渲染，不播放动画 */
-}
-if(m.is魔王&&m.hp>0){var t=TAUNTS[Math.floor(Math.random()*TAUNTS.length)];addLog('<span style="color:var(--pk);font-weight:800">林深大魔王: "'+t+'"</span>');G.cmb.taunt=t;sfx('taunt');render()}
-if(m.hp<=0){m.hp=0;setTimeout(function(){animAfterRender('xgME','die',10);sfx('win');render();setTimeout(battleWin,900)},400);return}
-
-_abt=setTimeout(function(){
-    if(!G.cmb||G.cmb.result)return;
-    var hit=doMonsterAtk();render();
-    if(hit!==false){animAfterRender('xgME','atk-combo',10);if(hit)animAfterRender('xgPE','hit-impact',100);sfx('hit')}
-    if(p.hp<=0){p.hp=0;sfx('die');stopBGM();stopAuto();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return;}
-    for(var i=c.buffs.length-1;i>=0;i--){c.buffs[i].dur--;if(c.buffs[i].dur<=0)c.buffs.splice(i,1)}
-    for(var k in c.cd){if(c.cd[k]>0)c.cd[k]--}
-    if(c.berserkTurns>0){c.berserkTurns--;if(c.berserkTurns<=0)addLog('<span class="info">狂暴化结束</span>')}
-    if(p.pSkl.indexOf('P9')>=0){applyHeal(p, calcMaxHp(p)*0.025, false);if(Math.random()<0.2)addLog('<span class="info">【修罗之体】回复'+Math.floor(calcMaxHp(p)*0.025)+'HP</span>');}
-    if(p.pSkl.indexOf('P29')>=0 && p.hp>0){applyHeal(p, Math.floor(calcMaxHp(p)*0.015), false);if(Math.random()<0.2)addLog('<span class="info">【龟息术】回复'+Math.floor(calcMaxHp(p)*0.015)+'HP</span>');}
-    if(p.pet&&p.pet.owned&&p.pet.level>=1&&p.hp>0){applyHeal(p, Math.floor(calcMaxHp(p)*0.05), false);}
-    if(p.pet&&p.pet.owned&&p.pet.level>=55&&p.hp>0){var _petHealRate=0.01;if(p.pet.quality==='god')_petHealRate=0.05;else if(p.pet.quality==='fairy')_petHealRate=0.03;else if(p.pet.quality==='spirit')_petHealRate=0.02;applyHeal(p, Math.floor(calcMaxHp(p)*_petHealRate), false);}
-    if(hasEquipPassive('regen')&&p.hp>0){var regenVal=getEquipPct('regen');applyHeal(p,Math.floor(calcMaxHp(p)*regenVal/100),false)}
-    if((m.ab===1||m.ab===6||m.ab===7)&&c.turnCount%3===0&&c.turnCount>0){m.hp=Math.min(m.mhp,m.hp+Math.floor(m.mhp*0.05));addLog('<span class="info">怪物回血</span>')}
-
-    /* 🌟 阶段1: 护盾持续时间递减 */
-    processShield();
-
-    c.turnCount++;c.round++;render();
-    if(p.pSkl.indexOf('P18')>=0&&Math.random()<0.1&&m.hp>0){
-        addLog('<span class="info">【时间守护者】额外行动！</span>');
-        setTimeout(function(){if(!G.cmb||G.cmb.result||m.hp<=0)return;var sk2=chooseAutoSkill(),_crit2=false;if(sk2){doSkillUse(sk2);if(p.summonLocked)_crit2=doNormalAtk()}else{_crit2=doNormalAtk()};sfx(sk2?'skill':'atk');render();animAfterRender('xgPE','atk-combo',10);atkTrail();slashTrails();if(_crit2)critLine()},200)
+    if(!petStrike){
+        animAfterRender('xgPE','atk-combo',10);          // 玩家突进连招
+        animAfterRender('xgME','hit-impact',100);         // 怪物受击震动与闪光
+        if(sk) animAfterRender('xgPE','skill-charge',50); // 技能蓄力流光
+        atkTrail();                                      // 飞剑轨迹
+        slashTrails();                                   // 全屏剑气横扫
+        spawnSlashTrails('xgME');                        // 怪物身上的金色斩击痕迹
+        if(_crit) critLine();                            // 暴击全屏闪光
     }
-    _abt=setTimeout(autoLoop,spd)
-},spd)}
+
+    if(m.is魔王&&m.hp>0){
+        var t=TAUNTS[Math.floor(Math.random()*TAUNTS.length)];
+        addLog('<span style="color:var(--pk);font-weight:800">林深大魔王: "'+t+'"</span>');
+        G.cmb.taunt=t;sfx('taunt');render();
+    }
+    if(m.hp<=0){m.hp=0;setTimeout(function(){animAfterRender('xgME','die',10);sfx('win');render();setTimeout(battleWin,900)},400);return}
+
+    /* 6. 怪物回合 */
+    _abt=setTimeout(function(){
+        if(!G.cmb||G.cmb.result)return;
+        var hit=doMonsterAtk();render();
+        if(hit!==false){animAfterRender('xgME','atk-combo',10);if(hit)animAfterRender('xgPE','hit-impact',100);sfx('hit')}
+        if(p.hp<=0){p.hp=0;sfx('die');stopBGM();stopAuto();render();animAfterRender('xgPE','die',10);setTimeout(battleLose,900);return;}
+        for(var i=c.buffs.length-1;i>=0;i--){c.buffs[i].dur--;if(c.buffs[i].dur<=0)c.buffs.splice(i,1)}
+        for(var k in c.cd){if(c.cd[k]>0)c.cd[k]--}
+        if(c.berserkTurns>0){c.berserkTurns--;if(c.berserkTurns<=0)addLog('<span class="info">狂暴化结束</span>')}
+        if(p.pSkl.indexOf('P9')>=0){applyHeal(p, calcMaxHp(p)*0.025, false);if(Math.random()<0.2)addLog('<span class="info">【修罗之体】回复'+Math.floor(calcMaxHp(p)*0.025)+'HP</span>');}
+        if(p.pSkl.indexOf('P29')>=0 && p.hp>0){applyHeal(p, Math.floor(calcMaxHp(p)*0.015), false);if(Math.random()<0.2)addLog('<span class="info">【龟息术】回复'+Math.floor(calcMaxHp(p)*0.015)+'HP</span>');}
+        if(p.pet&&p.pet.owned&&p.pet.level>=1&&p.hp>0){applyHeal(p, Math.floor(calcMaxHp(p)*0.05), false);}
+        if(p.pet&&p.pet.owned&&p.pet.level>=55&&p.hp>0){var _petHealRate=0.01;if(p.pet.quality==='god')_petHealRate=0.05;else if(p.pet.quality==='fairy')_petHealRate=0.03;else if(p.pet.quality==='spirit')_petHealRate=0.02;applyHeal(p, Math.floor(calcMaxHp(p)*_petHealRate), false);}
+        if(hasEquipPassive('regen')&&p.hp>0){var regenVal=getEquipPct('regen');applyHeal(p,Math.floor(calcMaxHp(p)*regenVal/100),false)}
+        if((m.ab===1||m.ab===6||m.ab===7)&&c.turnCount%3===0&&c.turnCount>0){m.hp=Math.min(m.mhp,m.hp+Math.floor(m.mhp*0.05));addLog('<span class="info">怪物回血</span>')}
+
+        processShield();
+
+        c.turnCount++;c.round++;render();
+        if(p.pSkl.indexOf('P18')>=0&&Math.random()<0.1&&m.hp>0){
+            addLog('<span class="info">【时间守护者】额外行动！</span>');
+            setTimeout(function(){if(!G.cmb||G.cmb.result||m.hp<=0)return;var sk2=chooseAutoSkill(),_crit2=false;if(sk2){doSkillUse(sk2);if(p.summonLocked)_crit2=doNormalAtk()}else{_crit2=doNormalAtk()};sfx(sk2?'skill':'atk');render();animAfterRender('xgPE','atk-combo',10);animAfterRender('xgME','hit-impact',100);atkTrail();slashTrails();if(_crit2)critLine()},200);
+        }
+        _abt=setTimeout(autoLoop,spd);
+    },spd);
+}
 
 function battleWin(){stopAuto();stopBGM();saveXiuxianProg();var p=G.p,c=G.cmb;if(!c)return;
 p.hp=calcMaxHp(p);
