@@ -2679,7 +2679,10 @@ function rBattle(c){
     }
     h+='</div>';
   }
-
+/* 🎒 战斗中的背包快捷按钮 */
+  h+='<div style="display:flex;justify-content:center;margin-top:8px">';
+  h+='<button class="xg-btn" style="font-size:.75rem;padding:4px 12px" onclick="xxGoto(\'bag\')">🎒 背包 ('+p.bag.length+'/30)</button>';
+  h+='</div>';
   c.innerHTML=h;
 }
 function rWin(c){var cm=G.cmb;var pbg=cm.petBonusGold||0;var peG=cm.petExpGained||0;
