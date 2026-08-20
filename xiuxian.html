@@ -2181,103 +2181,95 @@ async function loadCloud(){
     } catch(e){}
     return false;
 }
-/* ===== 存档系统（优化版） ===== */
-function saveLocal(){
-    try{localStorage.setItem(SK,JSON.stringify({v:VER,p:G.p,pr:G.prog,ts:Date.now()}))}catch(e){}
-}
-var _cloudTimer=null;
-function saveCloud(){
-    if(_cloudTimer)clearTimeout(_cloudTimer);
-    _cloudTimer=setTimeout(function(){
-        try{_sb.from('save').upsert({id:getCloudKey(),game_data:{v:VER,p:G.p,pr:G.prog},updated_at:Date.now()}).then(function(r){if(r.error)console.error('Cloud save error:',r.error)}).catch(function(e){console.error('Cloud save failed:',e)})}catch(e){console.error('Cloud save exception:',e)}
-    },10000);
-}
-function saveLB(){
-    if(!G.p)return;
-    try{_sb.from('xiuxian_leaderboard').upsert({id:'s1_'+getCloudKey(),name:G.p.name,max_floor:G.prog?G.prog.maxFloor||1:1,level:G.p.lv,title:G.p._title||titleFor(G.p.lv),kills:G.p.kills||0,updated_at:Date.now()})}catch(e){}
-}
-function forceSaveCloud(){
-    if(_cloudTimer){clearTimeout(_cloudTimer);_cloudTimer=null}
-    saveLocal();
-    try{_sb.from('save').upsert({id:getCloudKey(),game_data:{v:VER,p:G.p,pr:G.prog},updated_at:Date.now()}).then(function(r){if(r.error)console.error('Force cloud save error:',r.error);else console.log('Force cloud save OK, key:',getCloudKey())}).catch(function(e){console.error('Force cloud save failed:',e)})}catch(e){console.error('Force cloud save exception:',e)}
-}
-function autoSave(){saveLocal();saveCloud()}
-setInterval(autoSave,30000);
+/* ===== 🌟 弹窗与公告/奖励结算系统 ===== */
 
-// 🌟 检查并领取/扣除 GM 账单（防 autoSave 覆盖）
+// 统一大弹窗函数（必须点击确认才会关闭）
+function showNoticeModal(icon, title, msg, onConfirm) {
+    var mask = document.createElement('div');
+    mask.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+    mask.innerHTML = '<div style="background:var(--white);border-radius:20px;padding:32px 24px;max-width:380px;width:90%;text-align:center;box-shadow:var(--sl);border:2px solid var(--gold);animation:cardFlipIn .4s cubic-bezier(0.22,1.2,0.36,1) both">' +
+        '<div style="font-size:3rem;margin-bottom:10px">' + (icon || '📢') + '</div>' +
+        '<h3 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.4rem;margin-bottom:12px;color:var(--tx)">' + (title || '天道传音') + '</h3>' +
+        '<p style="color:var(--txb);font-size:.9rem;line-height:1.8;white-space:pre-line;margin-bottom:20px">' + msg + '</p>' +
+        '<button id="noticeModalConfirmBtn" style="padding:10px 36px;border-radius:99px;border:none;background:linear-gradient(135deg,var(--b400),var(--b500));color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;box-shadow:0 4px 14px rgba(45,34,24,.2)">确认</button>' +
+    '</div>';
+    document.body.appendChild(mask);
+    document.getElementById('noticeModalConfirmBtn').onclick = function() {
+        mask.remove();
+        if (typeof onConfirm === 'function') onConfirm();
+    };
+}
+
+// 🎁 检查并领取/扣除 GM 账单（带确认弹窗，防 autoSave 覆盖）
 async function checkRewards() {
     try {
-        if (!G.p) return; // 未登录时不执行
+        if (!G.p) return;
         var r = await _sb.from('rewards').select('*').order('created_at', { ascending: false }).limit(20);
         if (!r.data) return;
-        
+
         var claimed = JSON.parse(localStorage.getItem('xx_rewards_claimed') || '[]');
         var changed = false;
 
-        r.data.forEach(function(item) {
-            if (claimed.indexOf(item.id) >= 0) return; // 已处理过则跳过
-            
-            // 判定是否发给全服或发给当前玩家
+        for (var i = 0; i < r.data.length; i++) {
+            var item = r.data[i];
+            if (claimed.indexOf(item.id) >= 0) continue;
+
             var target = item.target || 'ALL';
             if (target === 'ALL' || target === G.p.name) {
                 if (item.gold > 0) {
                     G.p.gold += item.gold;
-                    showSaveToast('🎁', item.message || ('获得金币 +' + item.gold));
+                    showNoticeModal('🎁', '天道福泽', item.message || ('获得金币 +' + item.gold));
                 } else if (item.gold < 0) {
                     G.p.gold = Math.max(0, G.p.gold + item.gold);
-                    showSaveToast('⚡', item.message || ('扣除金币 ' + item.gold));
+                    showNoticeModal('⚡', '天道神罚', item.message || ('扣除金币 ' + item.gold));
                 }
                 claimed.push(item.id);
                 changed = true;
+                break; // 一次弹一个
             }
-        });
+        }
 
         if (changed) {
             localStorage.setItem('xx_rewards_claimed', JSON.stringify(claimed));
             rc();
-            autoSave(); // 玩家客户端立刻触发保存，最新金币永久写入 save 表
+            autoSave(); // 立即同步最新金币
         }
     } catch(e) {}
 }
 
+// 📢 检查全服公告（带确认弹窗，每30秒自动检测）
+async function checkAnnouncements() {
+    try {
+        var r = await _sb.from('announcements').select('*').order('created_at', { ascending: false }).limit(10);
+        if (!r.data) return;
+        var readList = JSON.parse(localStorage.getItem('xx_ann_read') || '[]');
+
+        for (var i = 0; i < r.data.length; i++) {
+            var ann = r.data[i];
+            if (readList.indexOf(ann.id) >= 0) continue;
+
+            showNoticeModal('📢', '天道公告', ann.message, function() {
+                var list = JSON.parse(localStorage.getItem('xx_ann_read') || '[]');
+                list.push(ann.id);
+                localStorage.setItem('xx_ann_read', JSON.stringify(list));
+            });
+            break; // 一次只弹一个
+        }
+    } catch(e) {}
+}
+
+// 启动检测与定时 30 秒轮询
 setTimeout(checkRewards, 3000);
 setInterval(checkRewards, 30000);
 
-async function checkAnnouncements(){
-    try{
-        var r=await _sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(10);
-        if(!r.data)return;
-        var readList=JSON.parse(localStorage.getItem('xx_ann_read')||'[]');
-        for(var i=0;i<r.data.length;i++){
-            var ann=r.data[i];
-            if(readList.indexOf(ann.id)>=0)continue;
-            // 显示公告弹窗
-            showAnnouncement(ann.message, ann.id);
-            break; // 一次只显示一个
-        }
-    }catch(e){}
-}
+setTimeout(checkAnnouncements, 4000);
+setInterval(checkAnnouncements, 30000);
 
-function showAnnouncement(msg, annId){
-    var mask=document.createElement('div');
-    mask.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px)';
-    mask.innerHTML='<div style="background:var(--white);border-radius:20px;padding:32px;max-width:400px;width:90%;text-align:center;box-shadow:var(--sl);border:2px solid var(--gold)">'+
-        '<div style="font-size:2.5rem;margin-bottom:12px">📢</div>'+
-        '<h3 style="font-family:Ma Shan Zheng,cursive;font-size:1.3rem;margin-bottom:12px">天道传音</h3>'+
-        '<p style="color:var(--txb);font-size:.9rem;line-height:1.8;white-space:pre-line">'+msg+'</p>'+
-        '<button id="annConfirmBtn" style="margin-top:16px;padding:10px 32px;border-radius:99px;border:none;background:linear-gradient(135deg,var(--b400),var(--b500));color:#fff;font-family:Nunito,sans-serif;font-weight:700;font-size:.9rem;cursor:pointer">确认</button>'+
-    '</div>';
-    document.body.appendChild(mask);
-    document.getElementById('annConfirmBtn').onclick=function(){
-        var readList=JSON.parse(localStorage.getItem('xx_ann_read')||'[]');
-        readList.push(annId);
-        localStorage.setItem('xx_ann_read',JSON.stringify(readList));
-        mask.remove();
-    };
-}
-
-setTimeout(checkAnnouncements,4000);
-window.addEventListener('beforeunload',function(){if(_importMode)return;saveLocal();forceSaveCloud()});
+window.addEventListener('beforeunload', function() {
+    if (_importMode) return;
+    saveLocal();
+    forceSaveCloud();
+});
 /* 渲染总调度 */
 function rStart(c){
     var hasSave = false;
@@ -3091,24 +3083,14 @@ window.xxGmSendGold = async function() {
     
     try {
         var now = Date.now();
-        // 1. 写入 rewards 账单表（全服 target: 'ALL'）
         await _sb.from('rewards').upsert({
             id: 'rew_' + now,
             gold: amount,
             target: 'ALL',
-            message: '🎁 天降福泽！林深大大向全服修士发放了 ' + amount + ' 金币！',
-            created_at: now
-        });
-        
-        // 2. 写入 announcements 全服大弹窗公告
-        await _sb.from('announcements').upsert({
-            id: 'ann_' + now,
             message: '🎁 【天道福利】\n林深大大向全服发放福泽！\n所有修士获得 ' + amount + ' 金币！',
-            type: 'gift',
             created_at: now
         });
-
-        alert('✅ 全服 ' + amount + ' 金币账单已发布！\n所有在线及离线玩家上线均会自动到账。');
+        alert('✅ 全服 ' + amount + ' 金币账单已发布！\n玩家将收到带【确认】按钮的弹窗到账。');
     } catch(e) {
         alert('发放失败：' + e.message);
     }
@@ -3128,30 +3110,30 @@ window.xxGmDeductGold = async function() {
 
     try {
         var now = Date.now();
-        // 1. 写入针对该玩家的扣款账单（gold 为负数）
+        // 1. 写入针对该玩家的扣款账单
         await _sb.from('rewards').upsert({
             id: 'pen_' + now,
             gold: -amount,
             target: name,
-            message: '⚠️ 天道神罚！\n你因冒犯天道，被剥夺 ' + amount + ' 金币！',
+            message: '⚡ 【天道神罚】\n你因冒犯天道，天道降下神罚：\n扣除金币 -' + amount,
             created_at: now
         });
 
-        // 2. 写入全服通报大弹窗
+        // 2. 写入全服通报公告（其他玩家也会看到通报弹窗）
         await _sb.from('announcements').upsert({
             id: 'ann_' + now,
-            message: '⚡ 【天道神罚】\n修士【' + name + '】冒犯天道，天道降下神罚：\n扣除金币 -' + amount,
+            message: '⚡ 【天道神罚通报】\n修士【' + name + '】冒犯天道，天道降下神罚：\n扣除金币 -' + amount,
             type: 'punish',
             created_at: now
         });
 
-        alert('✅ 已对【' + name + '】下达扣除 ' + amount + ' 金币的神罚！\n该玩家上线或在游戏中会自动扣款。');
+        alert('✅ 已对【' + name + '】下达扣除 ' + amount + ' 金币的神罚并全服通报！');
     } catch(e) {
         alert('扣除失败：' + e.message);
     }
 };
 
-// 🌟【加在这里】📢 GM 发布全服弹窗公告
+// 📢 GM 发布全服公告
 window.xxGmAnnounce = async function() {
     if (!_gmUnlocked) return;
     var msg = prompt('输入全服公告内容（支持换行）：');
@@ -3164,12 +3146,11 @@ window.xxGmAnnounce = async function() {
             type: 'notice',
             created_at: now
         });
-        alert('✅ 全服公告已发布！所有玩家上线都会收到弹窗。');
+        alert('✅ 全服公告已发布！所有在线与离线玩家都会弹出带【确认】按钮的弹窗。');
     } catch(e) {
         alert('发布失败：' + e.message);
     }
 };
-
 window.xxClear=function(){localStorage.removeItem(SK);G.p=null;G.prog=null;G.scr='start';rc();alert('存档已清除！')};
 /* === 商城主动技能自选弹窗控制 === */
 window.openShopSkillModal = function() {
