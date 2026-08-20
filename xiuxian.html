@@ -2239,7 +2239,8 @@ async function checkRewards() {
         var r = await _sb.from('rewards').select('*').order('created_at', { ascending: false }).limit(20);
         if (!r.data) return;
 
-        var claimed = JSON.parse(localStorage.getItem('xx_rewards_claimed') || '[]');
+        var claimKey = 'xx_rewards_claimed_' + (G.p ? G.p.name : 'unknown');
+var claimed = JSON.parse(localStorage.getItem(claimKey) || '[]');
         var changed = false;
 
         for (var i = 0; i < r.data.length; i++) {
@@ -2262,7 +2263,7 @@ async function checkRewards() {
         }
 
         if (changed) {
-            localStorage.setItem('xx_rewards_claimed', JSON.stringify(claimed));
+            localStorage.setItem(claimKey, JSON.stringify(claimed));
             rc();
             autoSave();
         }
