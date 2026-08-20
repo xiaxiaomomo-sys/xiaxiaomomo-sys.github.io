@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>修仙之路</title>
-<meta name="game-version" content="v1.3.7">
+<meta name="game-version" content="v1.3.8">
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -17,10 +17,12 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);line-h
 :root{--bg:#f5f0e6;--white:#faf7f0;--gs:rgba(250,247,240,.95);--b50:#f0ebe0;--b100:#e0d8c8;--b200:#c9bfaa;--b300:#8b7e6a;--b400:#6b5c47;--b500:#4a3f2f;--b600:#3a2f1f;--pk:#c41e3a;--pks:#fce4ec;--mt:#5b8c5a;--lv:#7b68ae;--yw:#c9a96e;--tx:#2d2218;--txb:#5a4e3e;--txm:#8b7e6a;--txl:#b5a996;--bd:rgba(45,34,24,.1);--r:16px;--rs:10px;--rl:24px;--rf:9999px;--ss:0 2px 10px rgba(45,34,24,.06);--sd:0 4px 20px rgba(45,34,24,.08);--sm:0 8px 32px rgba(45,34,24,.10);--sl:0 16px 48px rgba(45,34,24,.14);--sp:cubic-bezier(0.34,1.56,0.64,1);--ss2:cubic-bezier(0.22,1.2,0.36,1);--sn:cubic-bezier(0.4,0,0.2,1);--ink:#2d2218;--ink-lt:rgba(45,34,24,.04);--cinnabar:#c41e3a;--jade:#5b8c5a;--gold:#c9a96e;--gold-lt:#e8d5a0}
 body.dark{--bg:#1a1714;--white:#252018;--gs:rgba(37,32,24,.95);--b50:#2e2820;--b100:#3d3628;--b200:#4d4638;--b300:#8b7e6a;--b400:#c9a96e;--b500:#e8d5a0;--b600:#f0e8d0;--tx:#e8e0d0;--txb:#b5a996;--txm:#8b7e6a;--txl:#5a4e3e;--bd:rgba(201,169,110,.15);--pk:#ff6b6b;--pks:#3a2020;--mt:#7dba7a;--lv:#a990d0;--yw:#e8d5a0;--ink:#e8e0d0;--ink-lt:rgba(232,224,208,.04);--cinnabar:#ff6b6b;--jade:#7dba7a;--gold:#e8d5a0;--gold-lt:#f0e8d0}
 
-/* 全屏游戏容器：最大宽度 860px 居中 */
-#xgRoot{width:100%;max-width:860px;margin:0 auto;height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:50px 8px 65px}
-@media(min-width:769px){#xgRoot{padding:56px 16px 24px}}
+/* 全屏游戏容器：自适应宽度与居中 */
+#xgRoot{width:100%;max-width:980px;margin:0 auto;height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:50px 8px 65px}
+@media(min-width:769px){#xgRoot{max-width:980px;padding:56px 16px 24px}}
 
+/* 基地栅格自适应：使用 minmax 防止溢出 */
+.xg-hub-grid{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:16px;align-items:start;width:100%;box-sizing:border-box}
 /* 顶部栏与导航 */
 .game-topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);box-shadow:var(--ss);transition:background .4s}
 .game-bottombar{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--white);border-top:1px solid var(--bd);display:flex;justify-content:space-around;padding:8px 4px;box-shadow:0 -2px 10px rgba(0,0,0,.05);transition:background .4s}
@@ -559,7 +561,7 @@ var ASKILLS=[
     {id:'A7',n:'剑气纵横',lv:25,cd:5,d:'连续攻击3次，每次造成×0.6伤害'},
     {id:'A8',n:'九天神雷',lv:35,cd:8,d:'攻击力×2.5，20%概率眩晕1回合'},
     {id:'A9',n:'逆天改命',lv:40,cd:8,d:'回复40%最大HP，绝对无敌1回合'},
-   {id:'A10',n:'湮灭',lv:50,cd:6,d:'造成自身当前HP×0.5的真实伤害'},
+    {id:'A10',n:'湮灭',lv:50,cd:6,d:'造成自身当前HP×0.5的真实伤害'},
     {id:'A11',n:'命运轮盘',lv:1,cd:3,d:'55%概率攻击×3.0，45%反噬扣除自身40%当前HP'},
     {id:'A12',n:'连斩',lv:12,cd:3,d:'连续攻击5次，每次造成×0.3伤害'},
     {id:'A13',n:'噬魂',lv:25,cd:5,d:'吸取怪物15%当前HP(BOSS仅8%)'},
@@ -571,7 +573,7 @@ var ASKILLS=[
     {id:'A20',n:'撒币',lv:5,cd:2,d:'消耗10金币，造成ATK×2.5伤害，击杀额外+2金币'},
     {id:'A21',n:'有钱能使鬼推磨',lv:25,cd:5,d:'消耗大量金币，造成巨额真实伤害并眩晕1回合'},
     {id:'A22',n:'蛊毒术',lv:15,cd:4,d:'施加3层毒，每层每回合ATK×1.0伤害，上限10层，BOSS≤7.5%maxHP'},
-    {id:'A23',n:'毒爆',lv:30,cd:5,d:'引爆≥3层毒，造成层数×ATK×0.5伤害，BOSS≤7.5%maxHP'},
+    {id:'A23',n:'毒爆',lv:30,cd:5,d:'引爆≥5层毒，消耗一半毒层造成引爆层数×ATK×0.5伤害，BOSS≤7.5%maxHP'},
     {id:'A24',n:'灵龟护盾',lv:10,cd:4,d:'获得最大HP×25%的护盾，持续3回合'},
     {id:'A25',n:'以守为攻',lv:30,cd:5,d:'本回合防御×2，下回合攻击×3'}
 ];
@@ -1532,13 +1534,16 @@ function doSkillUse(sid){
             addLog('蛊毒术！中毒层数+'+dotStacks+' (共'+c.poison.stacks+'/10层)');
             c.cd[sid]=sk.cd; return;
         case 'A23':
-            if(!c.poison||c.poison.stacks<3){addLog('毒层不足！需要≥3层');c.cd[sid]=sk.cd;return}
-            skillChargeGlow('#ab47bc',500);spawnPoisonClouds();
-            var _stk=c.poison.stacks; var poisonDmg=_stk*getPAtk(p,c)*0.5;
+            if(!c.poison || c.poison.stacks < 5){ addLog('毒层不足！需要≥5层'); c.cd[sid]=sk.cd; return; }
+            skillChargeGlow('#ab47bc', 500); spawnPoisonClouds();
+            var _stk = c.poison.stacks;
+            var poisonDmg = _stk * getPAtk(p, c) * 0.5;
             // BOSS上限7.5%
-            if(m.isBoss) poisonDmg=Math.min(poisonDmg, Math.floor(m.mhp*0.075));
-            c.poison.stacks=0;
-            rawDmg=poisonDmg; addLog('毒爆！引爆 '+_stk+' 层中毒'); break;
+            if(m.isBoss) poisonDmg = Math.min(poisonDmg, Math.floor(m.mhp * 0.075));
+            var remainStacks = Math.floor(_stk / 2); // 消耗一半，保留剩余一半
+            c.poison.stacks = remainStacks;
+            rawDmg = poisonDmg;
+            addLog('毒爆！引爆 ' + _stk + ' 层中毒(消耗' + (_stk - remainStacks) + '层，保留' + remainStacks + '层)'); break;
         case 'A24':
             var shieldAmt=Math.floor(calcMaxHp(p)*0.25);
             applyShield(shieldAmt,3);
@@ -1585,7 +1590,7 @@ function doSkillUse(sid){
     c.cd[sid] = sk.cd;
 }
 
-function chooseAutoSkill(){var p=G.p,c=G.cmb;if(!p.aSkl.length)return null;var hp=p.hp/calcMaxHp(p),available=[];for(var i=0;i<p.aSkl.length;i++){var sid=p.aSkl[i];/* 召唤锁定时，只有A18/A19可触发，其余主动失效 */if(p.summonLocked&&sid!=='A18'&&sid!=='A19')continue;if((c.cd[sid]||0)>0)continue;if(sid==='A5'&&hp<=.5)continue;if(sid==='A9'&&hp>.45)continue;if(sid==='A10'&&hp<=.3)continue;if(sid==='A11'&&hp<=.5)continue;if(sid==='A14'&&hp<=.6)continue;if(sid==='A17'&&hp<=.5)continue;if(sid==='A20'&&p.gold<10)continue;if(sid==='A21'&&p.gold<50)continue;if(sid==='A23' && (!c.poison || c.poison.stacks < 3)) continue;available.push(sid)}if(!available.length)return null;/* 召唤锁定时，召唤技能100%触发 */if(p.summonLocked && available.length>0) return available[Math.floor(Math.random()*available.length)];if(Math.random()<.6)return available[Math.floor(Math.random()*available.length)];return null}
+function chooseAutoSkill(){var p=G.p,c=G.cmb;if(!p.aSkl.length)return null;var hp=p.hp/calcMaxHp(p),available=[];for(var i=0;i<p.aSkl.length;i++){var sid=p.aSkl[i];/* 召唤锁定时，只有A18/A19可触发，其余主动失效 */if(p.summonLocked&&sid!=='A18'&&sid!=='A19')continue;if((c.cd[sid]||0)>0)continue;if(sid==='A5'&&hp<=.5)continue;if(sid==='A9'&&hp>.45)continue;if(sid==='A10'&&hp<=.3)continue;if(sid==='A11'&&hp<=.5)continue;if(sid==='A14'&&hp<=.6)continue;if(sid==='A17'&&hp<=.5)continue;if(sid==='A20'&&p.gold<10)continue;if(sid==='A21'&&p.gold<50)continue;if(sid==='A23' && (!c.poison || c.poison.stacks < 5)) continue;available.push(sid)}if(!available.length)return null;/* 召唤锁定时，召唤技能100%触发 */if(p.summonLocked && available.length>0) return available[Math.floor(Math.random()*available.length)];if(Math.random()<.6)return available[Math.floor(Math.random()*available.length)];return null}
 
 function doMonsterAtk(){
     var p=G.p, c=G.cmb, m=c.m;
@@ -2509,18 +2514,17 @@ h+='</div>';
     h+='<div class="xg-action-group"><h4>🛒 商店</h4>';
     h+='<button class="xg-btn gold" onclick="xxGoto(\'shop\')">进入商店</button>';
     h+='<div style="text-align:center;font-size:.75rem;color:var(--txm);margin-top:4px">💰 持有 '+p.gold+' 金币</div></div>';
-    if(_gmUnlocked){h+='<div class="xg-action-group" style="border:2px dashed var(--cinnabar)"><h4>🛠️ GM后台</h4><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
-    h+='<button class="xg-btn gold" onclick="xxGmAxe(\'gold1w\')" style="font-size:.78rem">💰+1万</button>';
-    h+='<button class="xg-btn primary" onclick="xxGmAxe(\'hp\')" style="font-size:.78rem">❤️满血</button>';
-    h+='<button class="xg-btn danger" onclick="xxGmAxe(\'lv5\')" style="font-size:.78rem">⬆️等级+5</button>';
-    h+='<button class="xg-btn primary" onclick="xxGoto(\'gmPickActive\')" style="font-size:.78rem">⚔️自选主动</button>';
-    h+='<button class="xg-btn primary" onclick="xxGoto(\'gmPickPassive\')" style="font-size:.78rem">🔮自选被动</button>';
-    h+='<button class="xg-btn gold" onclick="xxGmSendGold()" style="font-size:.78rem">🎁发金币</button>';
-    h+='<button class="xg-btn danger" onclick="xxGmDeductGold()" style="font-size:.78rem">⚡扣金币</button>';
-    h+='<button class="xg-btn" onclick="xxGmAnnounce()" style="font-size:.78rem">📢发公告</button>';
+    if(_gmUnlocked){h+='<div class="xg-action-group" style="border:2px dashed var(--cinnabar)"><h4>🛠️ GM后台</h4><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px">';
+    h+='<button class="xg-btn gold" onclick="xxGmAxe(\'gold1w\')" style="font-size:.75rem;padding:6px 2px">💰+1万</button>';
+    h+='<button class="xg-btn primary" onclick="xxGmAxe(\'hp\')" style="font-size:.75rem;padding:6px 2px">❤️满血</button>';
+    h+='<button class="xg-btn danger" onclick="xxGmAxe(\'lv5\')" style="font-size:.75rem;padding:6px 2px">⬆️等级+5</button>';
+    h+='<button class="xg-btn primary" onclick="xxGoto(\'gmPickActive\')" style="font-size:.75rem;padding:6px 2px">⚔️自选主动</button>';
+    h+='<button class="xg-btn primary" onclick="xxGoto(\'gmPickPassive\')" style="font-size:.75rem;padding:6px 2px">🔮自选被动</button>';
+    h+='<button class="xg-btn gold" onclick="xxGmSendGold()" style="font-size:.75rem;padding:6px 2px">🎁全服发金</button>';
+    h+='<button class="xg-btn gold" onclick="xxGmSendTargetGold()" style="font-size:.75rem;padding:6px 2px">🎁定向发金</button>';
+    h+='<button class="xg-btn danger" onclick="xxGmDeductGold()" style="font-size:.75rem;padding:6px 2px">⚡定向扣金</button>';
+    h+='<button class="xg-btn" onclick="xxGmAnnounce()" style="font-size:.75rem;padding:6px 2px;grid-column:span 2">📢发布全服公告</button>';
     h+='</div></div>';}
-    h+='</div></div>';
-
     /* 🌟 S1 修仙排行榜 */
     h+='<div class="xg-card" style="margin-top:16px">';
     h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.1rem;margin-bottom:16px">🏆 修仙排行榜 (S1赛季)</h4>';
@@ -3226,6 +3230,33 @@ window.xxGmDeductGold = async function() {
         alert('扣除失败：' + e.message);
     }
 };
+// 🎁 GM 定向给指定玩家发放金币（无全服公告，仅目标玩家可见）
+window.xxGmSendTargetGold = async function() {
+    if (!_gmUnlocked) return;
+    var name = prompt('输入目标玩家道号（如：南笙一梦、荒天帝）：');
+    if (!name || !name.trim()) return;
+    name = name.trim();
+
+    var amount = prompt('输入给【' + name + '】发放的金币数量：');
+    if (!amount || isNaN(amount)) return;
+    amount = parseInt(amount);
+    if (amount <= 0 || amount > 10000000) { alert('金额无效'); return; }
+
+    try {
+        var now = Date.now();
+        var result = await _sb.from('rewards').upsert({
+            id: 'rew_' + now,
+            gold: amount,
+            target: name,
+            message: '🎁 【天道福泽】\n林深大大赐予你 ' + amount + ' 金币！',
+            created_at: now
+        });
+        if (result.error) { alert('❌ 写入失败: ' + result.error.message); return; }
+        alert('✅ 已向【' + name + '】发放 ' + amount + ' 金币（仅该玩家可见）！');
+    } catch(e) {
+        alert('发放失败：' + e.message);
+    }
+};
 // 📢 GM 发布全服公告
 window.xxGmAnnounce = async function() {
     if (!_gmUnlocked) return;
@@ -3244,7 +3275,7 @@ window.xxGmAnnounce = async function() {
     } catch(e) {
         alert('发布失败：' + e.message);
     }
-};
+}; 
 /* === 商城主动技能自选弹窗控制 === */
 window.openShopSkillModal = function() {
     var p = G.p;
