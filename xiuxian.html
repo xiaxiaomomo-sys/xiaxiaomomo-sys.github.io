@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>修仙之路</title>
-<meta name="game-version" content="v1.5.0">
+<meta name="game-version" content="v1.5.1">
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -596,6 +596,16 @@ function render() {
     else if (G.scr.indexOf('enhance-')===0) rEnhance(c,G.scr.replace('enhance-',''));
     else if (G.scr === 'gmPickActive') rGmPick(c, false);
     else if (G.scr === 'gmPickPassive') rGmPick(c, true);
+      /* 🌟 S3 新页面路由 */
+    else if(G.scr==='alchemy') rAlchemy(c);
+    else if(G.scr==='treasure') rTreasure(c);
+    else if(G.scr==='breakthrough') rBreakthrough(c);
+    else if(G.scr==='rebirth') rRebirth(c);
+    else if(G.scr==='celestAlloc') rCelestAlloc(c);
+    else if(G.scr==='xianShuPick') rXianShuPick(c);
+    else if(G.scr==='rebirthResult') rRebirthResult(c);
+    else if(G.scr==='trialWin') rTrialWin(c);
+    else if(G.scr==='trialLose') rTrialLose(c);
 }
 /* ===== 🐾 宠物系统常量 ===== */
 var PET_QUAL={
@@ -863,6 +873,151 @@ var ME=['🐍','🦊','🗿','🕷️','👿','👻','🐒','🦂','🦇','💀'
 var BN=['炼气妖兽','筑基魔修','金丹鬼王','元婴邪尊','化神天魔','合体妖皇','大乘真仙','渡劫雷兽'];
 var BE=['🐲','🧙','👑','😈','👹','🐉','✨','⚡'];
 /* ===== 装备系统常量 ===== */
+/* ===== 🌟 S3 炼丹系统常量 ===== */
+var MATERIAL_NAMES={grass:'灵草',lotus:'血莲花',stone:'天青石',core:'妖丹',spirit:'灵材',heavenly:'天材地宝',key:'造化之钥',treasureEssence:'法宝精魄'};
+var MATERIAL_EMOJI={grass:'🌿',lotus:'🌺',stone:'💎',core:'🔮',spirit:'✨',heavenly:'🌟',key:'🔑',treasureEssence:'🔶'};
+var FURNACE_TIERS=[{name:'凡品炉',bonus:0,cost:0},{name:'良品炉',bonus:10,cost:5000,lv:15},{name:'灵品炉',bonus:20,cost:15000,lv:30},{name:'仙品炉',bonus:30,cost:40000,lv:50},{name:'神品炉',bonus:40,cost:100000,lv:70}];
+var ALCHEMY_RECIPES=[
+    {id:'R1',name:'灵石精华',emoji:'💎',desc:'获得10灵石',cost:{grass:5,stone:2},baseRate:23,result:'spiritStone',resultAmt:10},
+    {id:'R2',name:'破境丹',emoji:'💫',desc:'永久+1属性点',cost:{lotus:3,stone:2},baseRate:25,result:'statPt',resultAmt:1},
+    {id:'R3',name:'洗髓丹',emoji:'💊',desc:'重新随机宠物资质',cost:{core:1,lotus:2},baseRate:30,result:'petWash',resultAmt:1},
+    {id:'R4',name:'造化丹',emoji:'🔑',desc:'获得1个造化之钥',cost:{heavenly:3,core:5,spirit:5},baseRate:8,result:'key',resultAmt:1},
+    {id:'R5',name:'法宝精魄丹',emoji:'🔶',desc:'获得1个法宝精魄',cost:{stone:3,spirit:2,core:1},baseRate:18,result:'treasureEssence',resultAmt:1},
+    {id:'R6',name:'聚灵丹',emoji:'⭐',desc:'获得1500经验',cost:{spirit:1,stone:3},baseRate:28,result:'exp',resultAmt:1500}
+];
+
+/* ===== 🌟 S3 境界突破试炼常量 ===== */
+var BREAKTHROUGH_TRIALS=[
+    {lv:20,name:'炼气→筑基',title:'筑基期·圆满',rewards:{atk:3,def:3,hp:30,gold:3000,spiritStone:10}},
+    {lv:30,name:'筑基→金丹',title:'金丹期·圆满',rewards:{atk:5,def:5,hp:50,gold:5000,spiritStone:15}},
+    {lv:40,name:'金丹→元婴',title:'元婴期·圆满',rewards:{atk:8,def:8,hp:80,gold:8000,heavenly:1}},
+    {lv:50,name:'元婴→化神',title:'化神期·圆满',rewards:{atk:10,def:10,hp:100,gold:12000,heavenly:1,spiritStone:20}},
+    {lv:60,name:'化神→合体',title:'合体期·圆满',rewards:{atk:15,def:15,hp:150,gold:18000,heavenly:2}},
+    {lv:70,name:'合体→大乘',title:'大乘期·圆满',rewards:{atk:20,def:20,hp:200,gold:25000,heavenly:2,spiritStone:30,passiveSlot:1}},
+    {lv:80,name:'大乘→渡劫',title:'渡劫期·圆满',rewards:{atk:25,def:25,hp:250,gold:35000,heavenly:3}},
+    {lv:90,name:'渡劫→飞升',title:'飞升期·圆满',rewards:{atk:30,def:30,hp:300,gold:50000,heavenly:3,spiritStone:50,activeSlot:1}},
+    {lv:100,name:'飞升→天道',title:'天道至尊',rewards:{atk:50,def:50,hp:500,gold:100000,key:1}}
+];
+var TRIAL_MONSTERS=[
+    [{name:'炼气守卫',emoji:'🛡️',hpMul:1,atkMul:1,defMul:1},{name:'炼气精英',emoji:'⚔️',hpMul:1.5,atkMul:1.3,defMul:1.2,heal:true},{name:'试炼之主·炼气',emoji:'👹',hpMul:2.5,atkMul:1.5,defMul:1.3,aoe:true}],
+    [{name:'筑基守卫',emoji:'🛡️',hpMul:1,atkMul:1,defMul:1},{name:'筑基精英',emoji:'⚔️',hpMul:1.8,atkMul:1.5,defMul:1.3,poison:true},{name:'试炼之主·筑基',emoji:'👹',hpMul:3,atkMul:1.8,defMul:1.5,stunImmune:true,berserk:true}],
+    [{name:'金丹守卫',emoji:'🛡️',hpMul:1.2,atkMul:1.2,defMul:1},{name:'金丹精英',emoji:'⚔️',hpMul:2,atkMul:1.6,defMul:1.4,thorns:30},{name:'试炼之主·金丹',emoji:'👹',hpMul:3.5,atkMul:2,defMul:1.5,heal:true,poisonImmune:true}],
+    [{name:'元婴守卫',emoji:'🛡️',hpMul:1.5,atkMul:1.3,defMul:1.2,limitTurns:10},{name:'元婴精英',emoji:'⚔️',hpMul:2.5,atkMul:1.8,defMul:1.5,aoe:true},{name:'试炼之主·元婴',emoji:'👹',hpMul:4,atkMul:2.2,defMul:1.8,controlImmune:true,dmgBoost:true}],
+    [{name:'化神守卫',emoji:'🛡️',hpMul:1.5,atkMul:1.5,defMul:1.3,heal:true},{name:'化神精英',emoji:'⚔️',hpMul:2.5,atkMul:2,defMul:1.6,stun:true},{name:'试炼之主·化神',emoji:'👹',hpMul:5,atkMul:2.5,defMul:2,limitTurns:15,truthResist:50}],
+    [{name:'合体守卫',emoji:'🛡️',hpMul:2,atkMul:1.8,defMul:1.5,dodge:20},{name:'合体精英',emoji:'⚔️',hpMul:3,atkMul:2.2,defMul:1.8,poison:true,lifesteal:30},{name:'试炼之主·合体',emoji:'👹',hpMul:6,atkMul:3,defMul:2.2,limitTurns:12,heal:true}],
+    [{name:'大乘守卫',emoji:'🛡️',hpMul:2.5,atkMul:2,defMul:1.8,thorns:50},{name:'大乘精英',emoji:'⚔️',hpMul:3.5,atkMul:2.5,defMul:2,controlImmune:true,aoe:true},{name:'试炼之主·大乘',emoji:'👹',hpMul:8,atkMul:3.5,defMul:2.5,limitTurns:10,poisonImmune:true,heal:true}],
+    [{name:'渡劫守卫',emoji:'🛡️',hpMul:3,atkMul:2.5,defMul:2,critImmune:true},{name:'渡劫精英',emoji:'⚔️',hpMul:4,atkMul:3,defMul:2.5,lifesteal:20,thorns:40},{name:'试炼之主·渡劫',emoji:'👹',hpMul:10,atkMul:4,defMul:3,limitTurns:8,fullImmune:true}],
+    [{name:'天道守卫',emoji:'🛡️',hpMul:4,atkMul:3,defMul:2.5,heal:true,thorns:50},{name:'天道精英',emoji:'⚔️',hpMul:5,atkMul:3.5,defMul:3,controlImmune:true,aoe:true},{name:'天道审判者',emoji:'💀',hpMul:15,atkMul:5,defMul:4,limitTurns:5,fullImmune:true,aoe:true}]
+];
+
+/* ===== 🌟 S3 法宝系统常量 ===== */
+var TREASURES=[
+    {id:'zhuxian_sword',name:'诛仙剑',emoji:'⚔️',type:'atk',desc:'每5回合释放ATK×3.0真伤(BOSS≤5%HP)，全技能CD-1',
+     base:{atk:30},growth:{atk:[6,8,10,12,16]},passive:'全主动技能CD-1',
+     active:'每5回合ATK×3.0真伤',activeCD:5,
+     source:'100层魔王首杀',dropRate:1.0,bossFloor:100},
+    {id:'blood_bead',name:'噬血珠',emoji:'🔴',type:'atk',desc:'吸收怪物当前HP8%为护盾(BOSS4%)，吸血率+3%',
+     base:{atk:15,special:'lifeSteal+2'},growth:{atk:[3,4,5,6,8]},passive:'吸血率+3%',
+     active:'每4回合吸收HP8%为护盾',activeCD:4,
+     source:'70层BOSS击杀',dropRate:0.20,bossFloor:70,guarantee:10},
+    {id:'luxian_sword',name:'戮仙剑',emoji:'🗡️',type:'atk',desc:'每3回合连击5次×0.8，暴伤+15%',
+     base:{atk:25,special:'critD+10'},growth:{atk:[5,6,7,8,10]},passive:'暴击伤害+15%',
+     active:'每3回合连击5次×0.8',activeCD:3,
+     source:'80层BOSS击杀',dropRate:0.15,bossFloor:80,guarantee:14},
+    {id:'linglong_tower',name:'天地玄黄玲珑塔',emoji:'🏯',type:'def',desc:'每8回合获得30%HP护盾(3回合)，受大伤15%概率减40%',
+     base:{def:20,hp:100},growth:{def:[4,6,8,10,12],hp:[20,30,40,50,60]},passive:'受大伤15%概率减40%',
+     active:'每8回合获得30%HP护盾',activeCD:8,
+     source:'60层BOSS击杀',dropRate:0.25,bossFloor:60,guarantee:8},
+    {id:'taiji_map',name:'太极图',emoji:'☯️',type:'def',desc:'每6回合反弹下次攻击100%(BOSS50%)，每回合回复1%HP',
+     base:{def:25,hp:150},growth:{def:[5,6,8,10,12],hp:[30,40,50,60,70]},passive:'每回合回复1%最大HP',
+     active:'每6回合反弹下次攻击100%',activeCD:6,
+     source:'90层BOSS击杀',dropRate:0.10,bossFloor:90,guarantee:20},
+    {id:'xuanwu_armor',name:'玄武甲',emoji:'🐢',type:'def',desc:'每10回合无敌1回合，防御+15%',
+     base:{def:18,hp:80},growth:{def:[3.6,4,6,8,10],hp:[16,24,32,40,50]},passive:'防御力+15%',
+     active:'每10回合无敌1回合',activeCD:10,
+     source:'50层BOSS击杀',dropRate:0.30,bossFloor:50,guarantee:7},
+    {id:'tianshu_book',name:'天书·诛仙',emoji:'📜',type:'support',desc:'每7回合下个技能伤害翻倍，全技能伤害+8%',
+     base:{atk:10,def:10,hp:50},growth:{atk:[2,3,4,5,6],def:[2,3,4,5,6],hp:[10,16,20,24,30]},passive:'全技能伤害+8%',
+     active:'每7回合下个技能伤害×2',activeCD:7,
+     source:'千人斩成就',dropRate:1.0,bossFloor:0},
+    {id:'fuxi_qin',name:'伏羲琴',emoji:'🎵',type:'support',desc:'每5回合驱散负面+回血10%，负面时间-50%',
+     base:{hp:200,def:10},growth:{hp:[40,60,80,100,120],def:[2,3,4,5,6]},passive:'负面状态持续时间-50%',
+     active:'每5回合驱散负面+回血10%',activeCD:5,
+     source:'40层BOSS击杀',dropRate:0.40,bossFloor:40,guarantee:5},
+    {id:'kunlun_mirror',name:'昆仑镜',emoji:'🪞',type:'support',desc:'每12回合复制释放上一次主动技能，经验+15%',
+     base:{atk:8,def:8,hp:80},growth:{atk:[1.6,2,3,4,5],def:[1.6,2,3,4,5],hp:[16,24,32,40,50]},passive:'经验获取+15%',
+     active:'每12回合复制上一次技能',activeCD:12,
+     source:'造化丹炼制',dropRate:0.10,bossFloor:0}
+];
+var TREASURE_BREAKTHROUGH=[
+    {lv:10,cost:{treasureEssence:1,spiritStone:20},desc:'解锁主动技能'},
+    {lv:20,cost:{treasureEssence:3,spiritStone:50},desc:'被动光环翻倍'},
+    {lv:30,cost:{heavenly:1,spiritStone:100},desc:'解锁第二被动'},
+    {lv:40,cost:{heavenly:3,spiritStone:200},desc:'主动效果增强'},
+    {lv:50,cost:{key:1,spiritStone:500},desc:'终极觉醒'}
+];
+
+/* ===== 🌟 S3 转生系统常量 ===== */
+var CELEST_PROPS=[
+    {key:'atk',name:'仙攻',desc:'ATK +2%/点',emoji:'⚔️'},
+    {key:'def',name:'仙防',desc:'DEF +2%/点',emoji:'🛡️'},
+    {key:'hp',name:'仙体',desc:'HP +2%/点',emoji:'❤️'},
+    {key:'crit',name:'仙暴',desc:'暴击率 +0.5%/点',emoji:'💥'},
+    {key:'exp',name:'仙速',desc:'经验 +3%/点',emoji:'⭐'},
+    {key:'gold',name:'仙财',desc:'金币 +3%/点',emoji:'💰'}
+];
+var REBIRTH_POINTS=[0,3,5,7,9,12,15,18,22,28];
+var REBIRTH_REWARDS=[
+    null,
+    {gold:2000,spiritStone:20},
+    {gold:5000,spiritStone:40,materials:{grass:10}},
+    {gold:10000,spiritStone:60,materials:{lotus:10,stone:10}},
+    {gold:20000,spiritStone:100,materials:{core:5,spirit:5}},
+    {gold:35000,spiritStone:150,materials:{heavenly:1}},
+    {gold:50000,spiritStone:200,materials:{treasureEssence:3,heavenly:2}},
+    {gold:80000,spiritStone:300,materials:{heavenly:3,key:1}},
+    {gold:120000,spiritStone:500,materials:{heavenly:5,key:1}},
+    {gold:200000,spiritStone:999,materials:{heavenly:10,key:1}}
+];
+var REBIRTH_DIFFICULTY=[
+    {hp:0,atk:0,def:0,exp:0,gold:0,drop:0},
+    {hp:10,atk:5,def:5,exp:10,gold:10,drop:2},
+    {hp:20,atk:10,def:10,exp:20,gold:20,drop:4},
+    {hp:35,atk:15,def:15,exp:35,gold:35,drop:7},
+    {hp:50,atk:20,def:20,exp:50,gold:50,drop:10},
+    {hp:70,atk:30,def:25,exp:70,gold:70,drop:13},
+    {hp:100,atk:40,def:35,exp:100,gold:100,drop:16},
+    {hp:140,atk:55,def:45,exp:140,gold:140,drop:20},
+    {hp:200,atk:75,def:60,exp:200,gold:200,drop:25},
+    {hp:300,atk:100,def:80,exp:300,gold:300,drop:30}
+];
+var XIAN_SHU=[
+    {id:'X1',name:'仙体初成',minRebirth:2,desc:'永久+5%所有属性'},
+    {id:'X2',name:'先天剑骨',minRebirth:2,desc:'普攻伤害+10%'},
+    {id:'X3',name:'金刚法体',minRebirth:2,desc:'受到伤害-5%'},
+    {id:'X4',name:'聚灵之体',minRebirth:2,desc:'经验获取+10%'},
+    {id:'X5',name:'点石成金',minRebirth:3,desc:'金币获取+15%'},
+    {id:'X6',name:'万毒不侵',minRebirth:3,desc:'毒伤害-50%，毒持续时间-50%'},
+    {id:'X7',name:'天眼通',minRebirth:4,desc:'永久显示怪物属性'},
+    {id:'X8',name:'神行百变',minRebirth:4,desc:'闪避率+5%（突破上限）'},
+    {id:'X9',name:'剑仙之体',minRebirth:5,desc:'剑系技能伤害+20%'},
+    {id:'X10',name:'雷帝之体',minRebirth:5,desc:'雷系技能伤害+20%'},
+    {id:'X11',name:'九阳神功',minRebirth:6,desc:'每回合回复3%最大HP'},
+    {id:'X12',name:'不灭仙体',minRebirth:6,desc:'致死时20%概率保留1HP(1次/战)'},
+    {id:'X13',name:'天道法则',minRebirth:7,desc:'全技能CD-1'},
+    {id:'X14',name:'造化之力',minRebirth:8,desc:'全伤害+10%'},
+    {id:'X15',name:'九转天尊',minRebirth:9,desc:'全属性+10%，CD-1，伤害+10%'}
+];
+var REBIRTH_SHOP=[
+    {id:'immortal_pill',name:'仙缘丹',emoji:'✨',cost:50,desc:'+1仙缘点数',limit:99,result:'celestPt',amt:1},
+    {id:'spirit_bag',name:'灵石袋',emoji:'💎',cost:100,desc:'获得200灵石',limit:5,perRebirth:true,result:'spiritStone',amt:200},
+    {id:'xian_page',name:'仙术残页',emoji:'📜',cost:80,desc:'+1仙术学习机会',limit:3,result:'xianSlot',amt:1},
+    {id:'tEssence',name:'法宝精魄',emoji:'🔶',cost:60,desc:'获得1个法宝精魄',limit:10,perRebirth:true,result:'treasureEssence',amt:1},
+    {id:'tHeavenly',name:'天材地宝',emoji:'🌟',cost:150,desc:'获得1个天材地宝',limit:3,perRebirth:true,result:'heavenly',amt:1},
+    {id:'tKey',name:'造化之钥',emoji:'🔑',cost:500,desc:'获得1个造化之钥',limit:1,perRebirth:true,result:'key',amt:1},
+    {id:'petDan',name:'仙兽丹',emoji:'🐾',cost:200,desc:'宠物经验+5000',limit:5,perRebirth:true,result:'petExp',amt:5000},
+    {id:'eternal_stone',name:'永恒之石',emoji:'🗿',cost:300,desc:'永久ATK/DEF/HP+10',limit:3,result:'permStat',amt:10}
+];
 var RARITY_TAG={white:{label:'白',color:'#9e9e9e'},green:{label:'绿',color:'#4caf50'},blue:{label:'蓝',color:'#2196f3'},purple:{label:'紫',color:'#ab47bc'},orange:{label:'金',color:'#ff9800'}};
 var RARITY_ORDER={white:4,green:3,blue:2,purple:1,orange:0};
 var RARITY_NAME={white:'凡品',green:'良品',blue:'灵品',purple:'仙品',orange:'神品'};
@@ -1032,83 +1187,47 @@ function genMon(floor,isBoss){
     var atk=Math.floor((10 + floor * 3.0 * Math.pow(1.04, floor)) * 0.9);
     var df=Math.floor(5 + floor * 1.5 * Math.pow(1.03, floor));
     var ge=floor*18+Math.floor(floor*floor*0.3);
-    var gd= 2 + Math.floor((floor - 1) / 20); 
+    var gd= 2 + Math.floor((floor - 1) / 20);
     if(gd < 2) gd = 2;
+
+    /* 🌟 S3 转生难度倍率 */
+    var _rb=getRebirthDif();
+    var _rbHpMul=1+_rb.hp/100;
+    var _rbAtkMul=1+_rb.atk/100;
+    var _rbDefMul=1+_rb.def/100;
 
    if(isBoss){
     if(floor===100){
-        var hp100=Math.floor((80+100*20*Math.pow(1.05,100))*1.62);
-        var atk100=Math.floor((10+100*3.0*Math.pow(1.04,100))*1.17);
-        var def100=Math.floor((5+100*1.5*Math.pow(1.03,100))*1.2);
-        var exp100=Math.floor((100*18+Math.floor(100*100*0.3))*3);
-        var gold100=Math.floor((Math.floor(100/10)+3)*3);
+        var hp100=Math.floor((80+100*20*Math.pow(1.05,100))*1.62*_rbHpMul);
+        var atk100=Math.floor((10+100*3.0*Math.pow(1.04,100))*1.17*_rbAtkMul);
+        var def100=Math.floor((5+100*1.5*Math.pow(1.03,100))*1.2*_rbDefMul);
+        var exp100=Math.floor((100*18+Math.floor(100*100*0.3))*3*(1+_rb.exp/100));
+        var gold100=Math.floor((Math.floor(100/10)+3)*3*(1+_rb.gold/100));
         return {name:'林深大魔王',emoji:'😈',hp:hp100,mhp:hp100,atk:atk100,def:def100,exp:exp100,gold:gold100,isBoss:true,floor:100,ab:7,is魔王:true,invTimer:30};
     }
         var bi=Math.min(Math.floor(floor/10)-1,7);
-        hp=Math.floor(hp*1.62);
-        atk=Math.floor(atk*1.17);
-        df=Math.floor(df*1.2);
-        ge=Math.floor(ge*3);
-        gd=gd*2; // BOSS金币双倍
+        hp=Math.floor(hp*1.62*_rbHpMul);
+        atk=Math.floor(atk*1.17*_rbAtkMul);
+        df=Math.floor(df*1.2*_rbDefMul);
+        ge=Math.floor(ge*3*(1+_rb.exp/100));
+        gd=Math.floor(gd*2*(1+_rb.gold/100));
         return{name:BN[bi],emoji:BE[bi],hp:hp,mhp:hp,atk:atk,def:df,exp:ge,gold:gd,isBoss:true,floor:floor,ab:bi}
     }
+    hp=Math.floor(hp*_rbHpMul);
+    atk=Math.floor(atk*_rbAtkMul);
+    df=Math.floor(df*_rbDefMul);
+    ge=Math.floor(ge*(1+_rb.exp/100));
+    gd=Math.floor(gd*(1+_rb.gold/100));
     return{name:MN[floor%MN.length],emoji:ME[floor%ME.length],hp:hp,mhp:hp,atk:atk,def:df,exp:ge,gold:gd,isBoss:false,floor:floor,ab:-1}
 }
 
-function mkP(nm){return{uid:myDevice,name:nm,lv:1,exp:0,gold:700,hp:100,atkPts:2,defPts:1,conPts:2,statPts:5,pAtk:0,pDef:0,pHp:0,pCritR:0,pCritD:0,pDodge:0,pLife:0,healPct:0,lowAtk:0,firstCrit:false,survive:false,aSkl:[],pSkl:[],revives:0,scans:0,kills:0,hitsTaken:0,expBonus:0,expBonusCount:0,consecutiveKills:0,p8RemainingBattles:0,pet:{owned:false,quality:null,level:1,exp:0},equip:{weapon:null,armor:null,trinket:null},bag:[],enhance:{weapon:0,armor:0,trinket:0},stones:[],_totalCrits:0,_maxHealInBattle:0,_achCritCapBreak:false,_achDodgeCapBreak:false,_achLifeCapBreak:false,_achPetExpBonus:0,_shopDiscount:1.0,_title:'',hasSelectedActiveSkill:false,cloudPwd:''}}
-function expNeed(lv){if(lv<=10)return lv*lv*50;if(lv<=20)return lv*lv*80;if(lv<=30)return lv*lv*120;if(lv<=40)return lv*lv*180;if(lv<=50)return lv*lv*250;if(lv<=60)return lv*lv*350;if(lv<=80)return lv*lv*500;return lv*lv*700}
+function mkP(nm){return{uid:myDevice,name:nm,lv:1,exp:0,gold:700,hp:100,atkPts:2,defPts:1,conPts:2,statPts:5,pAtk:0,pDef:0,pHp:0,pCritR:0,pCritD:0,pDodge:0,pLife:0,healPct:0,lowAtk:0,firstCrit:false,survive:false,aSkl:[],pSkl:[],revives:0,scans:0,kills:0,hitsTaken:0,expBonus:0,expBonusCount:0,consecutiveKills:0,p8RemainingBattles:0,pet:{owned:false,quality:null,level:1,exp:0},equip:{weapon:null,armor:null,trinket:null},bag:[],enhance:{weapon:0,armor:0,trinket:0},stones:[],_totalCrits:0,_maxHealInBattle:0,_achCritCapBreak:false,_achDodgeCapBreak:false,_achLifeCapBreak:false,_achPetExpBonus:0,_shopDiscount:1.0,_title:'',hasSelectedActiveSkill:false,cloudPwd:'',alchemy:{grass:0,lotus:0,stone:0,core:0,spirit:0,heavenly:0,key:0,treasureEssence:0},furnaceTier:0,treasure:{equipped:null,owned:{},spiritStones:0},breakthroughCleared:{},rebirth:{count:0,celestPoints:0,celestAlloc:{atk:0,def:0,hp:0,crit:0,exp:0,gold:0},xianShu:[],xianShuSlots:0,shopPurchases:{},permStats:0}}}function expNeed(lv){if(lv<=10)return lv*lv*50;if(lv<=20)return lv*lv*80;if(lv<=30)return lv*lv*120;if(lv<=40)return lv*lv*180;if(lv<=50)return lv*lv*250;if(lv<=60)return lv*lv*350;if(lv<=80)return lv*lv*500;return lv*lv*700}
 function ptsPerLv(lv){return 1;} // 每次升级1点
 function titleFor(lv){if(lv>=81)return'渡劫期';if(lv>=61)return'大乘期';if(lv>=51)return'合体期';if(lv>=41)return'化神期';if(lv>=31)return'元婴期';if(lv>=21)return'金丹期';if(lv>=11)return'筑基期';if(lv>=1)return'炼气期';return'凡人'}
 /* 装备属性计算 */
-function getEquipPassives(){
-    var p=G.p;if(!p||!p.equip)return{};
-    var passives=[];
-    ['weapon','armor','trinket'].forEach(function(slot){
-        var eq=p.equip[slot];if(eq&&eq.passive)passives.push(eq.passive)
-    });
-    var result={};
-    var groupMap={atkPct:'atkPct',defPct:'defPct',hpPct:'hpPct',critR:'critR',burn:'burn',regen:'regen',thorns:'thorns'};
-    passives.forEach(function(pa){
-        var group=groupMap[pa.key]||pa.key;
-        if(!result[group]||pa.value>result[group].value)result[group]=pa
-    });
-    return result;
-}
-
-function getEquipFlat(stat){
-    var p=G.p;if(!p)return 0;
-    var total=0;
-    if(p.equip){
-        ['weapon','armor','trinket'].forEach(function(slot){
-            var eq=p.equip[slot];if(!eq)return;
-            if(eq.baseStatKey===stat)total+=eq.baseStatVal;
-            if(eq.affixes)eq.affixes.forEach(function(a){if(a.stat===stat)total+=a.value})
-        })
-    }
-    if(p.enhance){
-        var slotStatMap={weapon:'atk',armor:'def',trinket:'hp'};
-        ['weapon','armor','trinket'].forEach(function(slot){
-            var lv=p.enhance[slot]||0;
-            if(lv>0&&slotStatMap[slot]===stat&&p.equip&&p.equip[slot])
-                total+=getEnhanceBonus(slot,lv)
-        })
-    }
-    return total;
-}
-
-function getEquipPct(group){
-    var passives=getEquipPassives();
-    return passives[group]?passives[group].value||0:0;
-}
-
-function hasEquipPassive(key){
-    var passives=getEquipPassives();
-    var groupMap={atkPct:'atkPct',defPct:'defPct',hpPct:'hpPct',critR:'critR',burn:'burn',regen:'regen',thorns:'thorns'};
-    return!!passives[groupMap[key]||key];
-}
-function calcAtk(p){var base=Math.floor(10+p.atkPts*2.0+(p.pAtk||0)+getEquipFlat('atk'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=1)result+=10;var eqPct=getEquipPct('atkPct');if(eqPct>0)result=Math.floor(result*(1+eqPct/100));return result}
-function calcDef(p){var base=Math.floor(5+p.defPts*2.0+(p.pDef||0)+getEquipFlat('def'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=1)result+=10;var eqPct=getEquipPct('defPct');if(eqPct>0)result=Math.floor(result*(1+eqPct/100));return result}
-function calcMaxHp(p){var base=Math.floor(100+p.conPts*10+(p.pHp||0)+getEquipFlat('hp'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=1)result+=30;var eqPct=getEquipPct('hpPct');if(eqPct>0)result=Math.floor(result*(1+eqPct/100));return result}function calcCritR(p){var baseCap=0.20;var baseVal=(p.pCritR||0)+(getEquipPct('critR')||0);var base=Math.min(baseVal/100,baseCap);var equipBonus=Math.min(getEquipFlat('critR')/100,0.05);return base+equipBonus}
+function calcDef(p){var base=Math.floor(5+p.defPts*2.0+(p.pDef||0)+getEquipFlat('def'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=1)result+=10;var eqPct=getEquipPct('defPct');if(eqPct>0)result=Math.floor(result*(1+eqPct/100));var _s3=result;result+=getTreasureStat('def');result+=Math.floor(_s3*getCelestPct('def')/100);result+=(p.rebirth?p.rebirth.permStats||0:0);if(hasXianShu('X1'))result=Math.floor(result*1.05);if(hasXianShu('X15'))result=Math.floor(result*1.10);var tEff=getTreasurePassiveEffects();if(tEff.defPct)result=Math.floor(result*(1+tEff.defPct/100));return result}
+function calcMaxHp(p){var base=Math.floor(100+p.conPts*10+(p.pHp||0)+getEquipFlat('hp'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=1)result+=30;var eqPct=getEquipPct('hpPct');if(eqPct>0)result=Math.floor(result*(1+eqPct/100));var _s3=result;result+=getTreasureStat('hp');result+=Math.floor(_s3*getCelestPct('hp')/100);result+=(p.rebirth?p.rebirth.permStats||0:0)*3;if(hasXianShu('X1'))result=Math.floor(result*1.05);if(hasXianShu('X15'))result=Math.floor(result*1.10);return result}
+function calcCritR(p){var baseCap=0.20;var baseVal=(p.pCritR||0)+(getEquipPct('critR')||0);var base=Math.min(baseVal/100,baseCap);var equipBonus=Math.min(getEquipFlat('critR')/100,0.05);var result=base+equipBonus;result+=getCelestPct('crit')/100;var tEff2=getTreasurePassiveEffects();if(tEff2.critRBonus)result+=tEff2.critRBonus/100;return result}
 function calcCritD(p){
     var kills = p.kills||0;
     var bonus = 0;
@@ -1117,17 +1236,26 @@ function calcCritD(p){
     else if(kills >= 1500) bonus = 30;
     else if(kills >= 500) bonus = 20;
     else if(kills >= 200) bonus = 10;
-    return 1.00 + bonus / 100;
+    var result = 1.00 + bonus / 100;
+    var tEff3=getTreasureSpecialBonus();
+    if(tEff3.critD) result+=tEff3.critD/100;
+    return result;
 }
-function calcDodge(p){var baseCap=0.18;var baseVal=(p.pDodge||0);var base=Math.min(baseVal/100,baseCap);if(p.pSkl.indexOf('P4')>=0)base+=0.10;if(G.cmb&&G.cmb.summons){for(var wi=0;wi<G.cmb.summons.length;wi++){if(G.cmb.summons[wi].special==='wisdom'){base+=0.10;break}}}var equipBonus=Math.min(getEquipFlat('dodge')/100,0.02);return Math.min(base+equipBonus,0.20)}
-function calcLifeSteal(p){var baseCap=8;var baseVal=(p.pLife||0);if(p.pSkl.indexOf('P5')>=0)baseVal+=5;var base=Math.min(baseVal,baseCap);var equipBonus=Math.min(getEquipFlat('life'),2);return base+equipBonus;
-}
+function calcDodge(p){var baseCap=0.18;var baseVal=(p.pDodge||0);var base=Math.min(baseVal/100,baseCap);if(p.pSkl.indexOf('P4')>=0)base+=0.10;if(G.cmb&&G.cmb.summons){for(var wi=0;wi<G.cmb.summons.length;wi++){if(G.cmb.summons[wi].special==='wisdom'){base+=0.10;break}}}var equipBonus=Math.min(getEquipFlat('dodge')/100,0.02);var result=Math.min(base+equipBonus,0.20);if(hasXianShu('X8'))result+=0.05;var tEff4=getTreasurePassiveEffects();if(tEff4.dodgeBonus)result+=tEff4.dodgeBonus/100;return result}
+function calcLifeSteal(p){var baseCap=8;var baseVal=(p.pLife||0);if(p.pSkl.indexOf('P5')>=0)baseVal+=5;var base=Math.min(baseVal,baseCap);var equipBonus=Math.min(getEquipFlat('life'),2);var result=base+equipBonus;var tEff5=getTreasurePassiveEffects();if(tEff5.lifeStealBonus)result+=tEff5.lifeStealBonus;var tSp=getTreasureSpecialBonus();if(tSp.lifeSteal)result+=tSp.lifeSteal;return result}
 function maxActiveSlots(p){
     var base = (p && p.lv >= 30) ? 4 : 3;
+    if(p&&p.breakthroughCleared){
+        if(p.breakthroughCleared[90]) base++;
+    }
     return (p && p.summonLocked) ? 1 : base;
 }
 function maxPassiveSlots(p){
-    return (p && p.lv >= 30) ? 5 : 4;
+    var base = (p && p.lv >= 30) ? 5 : 4;
+    if(p&&p.breakthroughCleared){
+        if(p.breakthroughCleared[70]) base++;
+    }
+    return base;
 }
 /* 动画与表现 */
 function animAfterRender(elId,cls,delay){setTimeout(function(){var e=$(elId);if(!e)return;e.classList.remove('atk-fwd','atk-combo','hit','hit-impact','die','heal-flash','skill-glow','skill-charge','poison-burst','shield-flash','summon-glow','coin-burst');void e.offsetWidth;e.classList.add(cls);setTimeout(function(){if(e)e.classList.remove(cls)},700)},delay||0)}
@@ -1164,8 +1292,15 @@ function getPAtk(p, c){
     }
     if(c.berserkTurns>0) bonus += 0.25;
 
-    /* P29 龟息术：攻击力-10% */
+       /* P29 龟息术：攻击力-10% */
     if(p.pSkl.indexOf('P29')>=0) bonus -= 0.10;
+
+    /* P35 九转金丹·狂力丹：攻击力+20% */
+    if(c.buffs){
+        for(var _bi=0; _bi<c.buffs.length; _bi++){
+            if(c.buffs[_bi].t === '狂力丹ATK+20%'){ bonus += 0.20; break; }
+        }
+    }
 
     /* 🌟 P23 灵兽之心：召唤物存在时攻击力+8%/只(最高24%) */
     if(p.pSkl.indexOf('P23')>=0 && c.summons && c.summons.length>0){
@@ -1288,7 +1423,9 @@ function processSummons(){
         if(Math.random()<critR){isCrit=true;rawAtk=Math.floor(rawAtk*calcCritD(p));}
         // P20 死亡凝视
         if(p.pSkl.indexOf('P20')>=0 && m.hp/m.mhp<0.3){ rawAtk=Math.floor(rawAtk*1.5); addLog('<span class="info">【死亡凝视】HP<30%，伤害+50%！</span>'); }
-        var sDmg=Math.max(1, Math.floor(rawAtk*mDefMul*supp.pDmg));
+                var sDmg=Math.max(1, Math.floor(rawAtk*mDefMul*supp.pDmg));
+        /* 封印：怪物受全伤害+15% */
+        if(c.sealed > 0) sDmg = Math.floor(sDmg * 1.15);
         // BOSS单次上限3%
         if(m.isBoss) sDmg=Math.min(sDmg, Math.floor(m.mhp*0.03));
         m.hp=Math.max(0, m.hp-sDmg);
@@ -1358,7 +1495,10 @@ function processDoT(){
         var bossCap=Math.floor(m.mhp*0.075);
         dmg=Math.min(dmg, bossCap);
     }
-    dmg=Math.max(1, dmg);
+        dmg=Math.max(1, dmg);
+
+    /* 🌟 S3 仙术：万毒不侵 毒伤-50% */
+    if(hasXianShu('X6')) dmg=Math.floor(dmg*0.5);
 
     m.hp=Math.max(0, m.hp-dmg);
     addLog('🟣 毒伤 <span class="dmg">'+dmg+'</span> ('+c.poison.stacks+'层)');
@@ -1980,7 +2120,832 @@ function spawnLotusShield() {
         setTimeout(function (el) { if (el.parentNode) el.remove(); }, 700, petal);
     }
 }
-/* 战斗循环逻辑 */
+/* ===== 🌟 S3 炼丹系统 ===== */
+function doAlchemy(recipeIdx){
+    var p=G.p;
+    var recipe=ALCHEMY_RECIPES[recipeIdx];
+    if(!recipe){showSaveToast('❌','配方不存在');return}
+    /* 检查材料 */
+    for(var mat in recipe.cost){
+        if((p.alchemy[mat]||0)<recipe.cost[mat]){
+            showSaveToast('❌','材料不足！'+MATERIAL_NAMES[mat]+'需要'+recipe.cost[mat]+'个，当前'+(p.alchemy[mat]||0)+'个');
+            return;
+        }
+    }
+    /* 扣材料 */
+    for(var mat in recipe.cost){
+        p.alchemy[mat]-=recipe.cost[mat];
+    }
+    /* 成功率判定 */
+    var furnace=FURNACE_TIERS[p.furnaceTier||0];
+    var rate=Math.min(95,recipe.baseRate+(furnace?furnace.bonus:0));
+    var roll=Math.random()*100;
+    if(roll<rate){
+        /* 成功 */
+        applyAlchemyResult(recipe.result,recipe.resultAmt);
+        showSaveToast(recipe.emoji,'炼丹成功！获得 '+recipe.name);
+    }else{
+        showSaveToast('💨','炼丹失败...材料已消耗');
+    }
+    rc();autoSave();
+}
+
+function applyAlchemyResult(type,amt){
+    var p=G.p;
+    switch(type){
+        case 'spiritStone':
+            p.treasure.spiritStones=(p.treasure.spiritStones||0)+amt;
+            addLog('💎 灵石 +'+amt);
+            break;
+        case 'statPt':
+            p.statPts+=amt;
+            addLog('💫 属性点 +'+amt);
+            break;
+        case 'petWash':
+            /* 触发宠物洗髓（和商店洗髓共用逻辑） */
+            if(p.pet&&p.pet.owned){
+                var oldQ=p.pet.quality;
+                var newQ=rollPetQuality();
+                var tiers={'common':1,'spirit':2,'fairy':3,'god':4};
+                if(tiers[newQ]<tiers[oldQ]) newQ=oldQ;
+                p.pet.quality=newQ;
+                var info=PET_QUAL[newQ];
+                showSaveToast(info.emoji,'洗髓成功！新资质：'+info.name);
+            }
+            break;
+        case 'key':
+            p.alchemy.key=(p.alchemy.key||0)+amt;
+            addLog('🔑 造化之钥 +'+amt);
+            /* 10%额外获得昆仑镜 */
+            if(Math.random()<0.10){
+                if(!p.treasure.owned['kunlun_mirror']){
+                    p.treasure.owned['kunlun_mirror']={level:1,breakthrough:0,killCount:0};
+                    showSaveToast('🪞','炼制造化丹时意外获得了【昆仑镜】！');
+                }
+            }
+            break;
+        case 'treasureEssence':
+            p.alchemy.treasureEssence=(p.alchemy.treasureEssence||0)+amt;
+            addLog('🔶 法宝精魄 +'+amt);
+            break;
+        case 'exp':
+            p.exp+=amt;
+            addLog('⭐ 经验 +'+amt);
+            break;
+    }
+}
+
+function upgradeFurnace(){
+    var p=G.p;
+    var nextTier=(p.furnaceTier||0)+1;
+    if(nextTier>=FURNACE_TIERS.length){showSaveToast('❌','已是最高品级炼丹炉');return}
+    var next=FURNACE_TIERS[nextTier];
+    if(p.lv<next.lv){showSaveToast('❌','需要等级 Lv.'+next.lv);return}
+    if(p.gold<next.cost){showSaveToast('❌','金币不足！需要'+next.cost+'金币');return}
+    p.gold-=next.cost;
+    p.furnaceTier=nextTier;
+    showSaveToast('🏺','炼丹炉升级成功！'+next.name+' (成功率+'+next.bonus+'%)');
+    rc();autoSave();
+}
+
+function dropMaterials(floor,isBoss){
+    var p=G.p;
+    var drops=[];
+    var rebirthBonus=p.rebirth?p.rebirth.count:0;
+    var dropAdd=0;
+    if(rebirthBonus>0&&REBIRTH_DIFFICULTY[rebirthBonus]) dropAdd=REBIRTH_DIFFICULTY[rebirthBonus].drop||0;
+    /* 灵草 15% */
+    if(Math.random()<(15+dropAdd)/100){
+        p.alchemy.grass=(p.alchemy.grass||0)+1;
+        drops.push('🌿灵草');
+    }
+    /* 血莲花 8% (20层+) */
+    if(floor>=20&&Math.random()<(8+dropAdd/2)/100){
+        p.alchemy.lotus=(p.alchemy.lotus||0)+1;
+        drops.push('🌺血莲花');
+    }
+    /* 天青石 5% (40层+) */
+    if(floor>=40&&Math.random()<(5+dropAdd/3)/100){
+        p.alchemy.stone=(p.alchemy.stone||0)+1;
+        drops.push('💎天青石');
+    }
+    /* 妖丹 10% (40层+BOSS) */
+    if(isBoss&&floor>=40&&Math.random()<(10+dropAdd/2)/100){
+        p.alchemy.core=(p.alchemy.core||0)+1;
+        drops.push('🔮妖丹');
+    }
+    /* 灵材 10% (30层+BOSS) */
+    if(isBoss&&floor>=30&&Math.random()<(10+dropAdd/2)/100){
+        p.alchemy.spirit=(p.alchemy.spirit||0)+1;
+        drops.push('✨灵材');
+    }
+    /* 天材地宝 100% (100层魔王) */
+    if(isBoss&&floor===100){
+        p.alchemy.heavenly=(p.alchemy.heavenly||0)+1;
+        drops.push('🌟天材地宝');
+    }
+    if(drops.length>0){
+        addLog('<span class="info">📦 材料掉落：'+drops.join(' ')+'</span>');
+    }
+    return drops;
+}
+/* ===== 🌟 S3 法宝系统 ===== */
+function getTreasureById(id){
+    for(var i=0;i<TREASURES.length;i++){if(TREASURES[i].id===id) return TREASURES[i]}
+    return null;
+}
+
+function getTreasureGrowth(lv,growthArr){
+    /* 根据等级计算累计成长值 */
+    if(lv<=0) return 0;
+    var total=0;
+    for(var tier=0;tier<5;tier++){
+        var perLv=growthArr[tier]||0;
+        var tierMin=tier*10+1;
+        var tierMax=(tier+1)*10;
+        var count=Math.max(0,Math.min(lv,tierMax)-Math.max(tierMin-1,0));
+        total+=perLv*count;
+    }
+    return Math.floor(total);
+}
+
+function getTreasureStat(stat){
+    /* 计算法宝提供的某项属性加成 */
+    var p=G.p;if(!p||!p.treasure||!p.treasure.equipped) return 0;
+    var eqId=p.treasure.equipped;
+    var owned=p.treasure.owned[eqId];
+    if(!owned) return 0;
+    var tDef=getTreasureById(eqId);
+    if(!tDef) return 0;
+    var lv=owned.level||1;
+    var base=tDef.base[stat]||0;
+    var growth=tDef.growth[stat]?getTreasureGrowth(lv,tDef.growth[stat]):0;
+    return base+growth;
+}
+
+function getTreasureSpecialBonus(){
+    /* 读取法宝特殊属性（吸血/暴伤等） */
+    var p=G.p;if(!p||!p.treasure||!p.treasure.equipped) return{};
+    var eqId=p.treasure.equipped;
+    var owned=p.treasure.owned[eqId];
+    if(!owned) return{};
+    var tDef=getTreasureById(eqId);
+    if(!tDef) return{};
+    var result={};
+    if(tDef.base.special){
+        var sp=tDef.base.special;
+        if(sp.indexOf('lifeSteal')>=0) result.lifeSteal=parseInt(sp.split('+')[1])||0;
+        if(sp.indexOf('critD')>=0) result.critD=parseInt(sp.split('+')[1])||0;
+    }
+    /* 突破20级被动翻倍 */
+    if(owned.breakthrough>=2){
+        if(tDef.id==='blood_bead') result.lifeSteal=(result.lifeSteal||2)*2;
+        if(tDef.id==='luxian_sword') result.critD=(result.critD||10)*2;
+    }
+    return result;
+}
+
+function getTreasurePassiveEffects(){
+    /* 读取法宝被动效果集合 */
+    var p=G.p;if(!p||!p.treasure||!p.treasure.equipped) return{};
+    var eqId=p.treasure.equipped;
+    var owned=p.treasure.owned[eqId];
+    if(!owned) return{};
+    var tDef=getTreasureById(eqId);
+    if(!tDef) return{};
+    var eff={};
+    var bt=owned.breakthrough||0;
+    switch(tDef.id){
+        case 'zhuxian_sword':
+            eff.cdReduce=bt>=2?2:1;
+            if(bt>=3) eff.critRBonus=5;
+            break;
+        case 'blood_bead':
+            eff.lifeStealBonus=bt>=2?6:3;
+            if(bt>=3) eff.lowHpLifeStealDbl=true;
+            break;
+        case 'luxian_sword':
+            eff.critDBonus=bt>=2?30:15;
+            if(bt>=3) eff.critFollowUp=true;
+            break;
+        case 'linglong_tower':
+            eff.bigHitReduce=true;
+            if(bt>=3) eff.shieldBoost=20;
+            break;
+        case 'taiji_map':
+            eff.regenPct=bt>=2?2:1;
+            if(bt>=3) eff.lowHpDef=true;
+            break;
+        case 'xuanwu_armor':
+            eff.defPct=bt>=2?25:15;
+            if(bt>=3) eff.hitReflect=true;
+            break;
+        case 'tianshu_book':
+            eff.skillDmgBonus=bt>=2?15:8;
+            if(bt>=3) eff.skillResetChance=20;
+            break;
+        case 'fuxi_qin':
+            eff.debuffReduce=bt>=2?75:50;
+            if(bt>=3) eff.summonHeal=true;
+            break;
+        case 'kunlun_mirror':
+            eff.expBonus=bt>=2?25:15;
+            if(bt>=3) eff.dodgeBonus=5;
+            break;
+    }
+    return eff;
+}
+
+function getTreasureLevelUpCost(lv){
+    return lv*5;
+}
+
+function upgradeTreasure(){
+    var p=G.p;
+    if(!p.treasure||!p.treasure.equipped){showSaveToast('❌','没有装备法宝');return}
+    var eqId=p.treasure.equipped;
+    var owned=p.treasure.owned[eqId];
+    if(!owned){showSaveToast('❌','数据异常');return}
+    if(owned.level>=50){showSaveToast('❌','法宝已达最高等级');return}
+    var cost=getTreasureLevelUpCost(owned.level);
+    if((p.treasure.spiritStones||0)<cost){showSaveToast('❌','灵石不足！需要'+cost+'灵石，当前'+(p.treasure.spiritStones||0));return}
+    p.treasure.spiritStones-=cost;
+    owned.level++;
+    var tDef=getTreasureById(eqId);
+    showSaveToast('⬆️',tDef.emoji+' '+tDef.name+' 升级到 Lv.'+owned.level+' (消耗'+cost+'灵石)');
+    rc();autoSave();
+}
+
+function breakthroughTreasure(){
+    var p=G.p;
+    if(!p.treasure||!p.treasure.equipped){showSaveToast('❌','没有装备法宝');return}
+    var eqId=p.treasure.equipped;
+    var owned=p.treasure.owned[eqId];
+    if(!owned){showSaveToast('❌','数据异常');return}
+    var currentBt=owned.breakthrough||0;
+    if(currentBt>=5){showSaveToast('❌','法宝已满阶觉醒');return}
+    var btDef=TREASURE_BREAKTHROUGH[currentBt];
+    if(owned.level<btDef.lv){showSaveToast('❌','需要法宝等级达到'+btDef.lv+'级');return}
+    /* 检查材料 */
+    for(var mat in btDef.cost){
+        var need=btDef.cost[mat];
+        if(mat==='spiritStone'){
+            if((p.treasure.spiritStones||0)<need){showSaveToast('❌','灵石不足！需要'+need);return}
+        }else{
+            if((p.alchemy[mat]||0)<need){showSaveToast('❌',MATERIAL_NAMES[mat]+'不足！需要'+need);return}
+        }
+    }
+    /* 扣材料 */
+    for(var mat in btDef.cost){
+        var need=btDef.cost[mat];
+        if(mat==='spiritStone') p.treasure.spiritStones-=need;
+        else p.alchemy[mat]-=need;
+    }
+    owned.breakthrough=currentBt+1;
+    var tDef=getTreasureById(eqId);
+    showSaveToast('✨',tDef.emoji+' '+tDef.name+' 突破到 '+(currentBt+1)+'阶！'+btDef.desc);
+    sfx('win');rc();autoSave();
+}
+
+function equipTreasure(id){
+    var p=G.p;
+    if(!p.treasure.owned[id]){showSaveToast('❌','未拥有此法宝');return}
+    p.treasure.equipped=id;
+    var tDef=getTreasureById(id);
+    showSaveToast(tDef.emoji,'已装备法宝：'+tDef.name);
+    rc();autoSave();
+}
+
+function unequipTreasure(){
+    var p=G.p;
+    if(!p.treasure.equipped){showSaveToast('❌','没有装备法宝');return}
+    var tDef=getTreasureById(p.treasure.equipped);
+    p.treasure.equipped=null;
+    showSaveToast(tDef?tDef.emoji:'❓','已卸下法宝');
+    rc();autoSave();
+}
+
+function tryDropTreasure(floor,isBoss){
+    if(!isBoss) return null;
+    var p=G.p;
+    /* 100层魔王首杀特殊处理 */
+    if(floor===100&&!p.treasure.owned['zhuxian_sword']){
+        p.treasure.owned['zhuxian_sword']={level:1,breakthrough:0,killCount:0};
+        return{action:'get',treasure:getTreasureById('zhuxian_sword')};
+    }
+    /* 查找对应楼层的法宝 */
+    var matched=null;
+    for(var i=0;i<TREASURES.length;i++){
+        if(TREASURES[i].bossFloor===floor&&TREASURES[i].dropRate<1.0){
+            matched=TREASURES[i];break;
+        }
+    }
+    if(!matched) return null;
+    /* 已拥有则转化为法宝精魄 */
+    if(p.treasure.owned[matched.id]){
+        p.alchemy.treasureEssence=(p.alchemy.treasureEssence||0)+3;
+        return{action:'convert',treasure:matched,amount:3};
+    }
+    /* 掉落判定（带保底） */
+    var key='drop_'+matched.id;
+    if(!p.treasure.owned[matched.id]){
+        var count=p.treasure['_bt_'+matched.id]||0;
+        count++;
+        p.treasure['_bt_'+matched.id]=count;
+        if(Math.random()<matched.dropRate||count>=matched.guarantee){
+            p.treasure.owned[matched.id]={level:1,breakthrough:0,killCount:0};
+            p.treasure['_bt_'+matched.id]=0;
+            return{action:'get',treasure:matched};
+        }
+    }
+    return null;
+}
+
+/* 法宝主动技能战斗处理 */
+function processTreasureActive(){
+    var p=G.p,c=G.cmb,m=c.m;
+    if(!p.treasure||!p.treasure.equipped) return;
+    var eqId=p.treasure.equipped;
+    var owned=p.treasure.owned[eqId];
+    if(!owned) return;
+    var tDef=getTreasureById(eqId);
+    if(!tDef) return;
+    var bt=owned.breakthrough||0;
+    /* CD管理 */
+    if(c.treasureCD===undefined) c.treasureCD=0;
+    c.treasureCD--;
+    if(c.treasureCD>0) return;
+    /* 重置CD */
+    var cd=tDef.activeCD;
+    if(bt>=4){
+        /* 40级突破CD缩减 */
+        if(tDef.id==='linglong_tower') cd=5;
+        if(tDef.id==='kunlun_mirror') cd=8;
+    }
+    c.treasureCD=cd;
+
+    switch(tDef.id){
+        case 'zhuxian_sword':
+            var dmg=Math.floor(getPAtk(p,c)*3.0);
+            if(bt>=4) dmg=Math.floor(getPAtk(p,c)*4.0);
+            if(bt>=5) dmg=Math.floor(getPAtk(p,c)*4.5);
+            if(m.isBoss) dmg=Math.min(dmg,Math.floor(m.mhp*0.05));
+            m.hp=Math.max(0,m.hp-dmg);
+            addLog('<span style="color:#ffd740;font-weight:800">⚔️ 【诛仙剑】剑意爆发 <span class="dmg">'+dmg+'</span></span>');
+            floatDmg('xgME','⚔️'+dmg,'#ffd740');
+            screenFlash('rgba(255,215,64,.15)');
+            break;
+        case 'blood_bead':
+            var absorb=Math.floor(m.hp*(m.isBoss?0.04:0.08));
+            if(bt>=4) absorb=Math.floor(m.hp*(m.isBoss?0.06:0.12));
+            absorb=Math.max(1,absorb);
+            applyShield(absorb,3);
+            addLog('<span style="color:#ff6b6b;font-weight:800">🔴 【噬血珠】吸收 <span class="dmg">'+absorb+'</span> 为护盾</span>');
+            floatDmg('xgME','-'+absorb,'#ff6b6b');
+            break;
+        case 'luxian_sword':
+            var hits=bt>=4?7:5;
+            var totalD=0;
+            for(var h=0;h<hits;h++){
+                var hd=Math.max(1,Math.floor(getPAtk(p,c)*0.8));
+                m.hp=Math.max(0,m.hp-hd);
+                totalD+=hd;
+            }
+            addLog('<span style="color:#ff6b6b;font-weight:800">🗡️ 【戮仙剑】连击'+hits+'次 <span class="dmg">'+totalD+'</span></span>');
+            floatDmg('xgME','🗡️'+totalD,'#ff6b6b');
+            shakeBattle('shake-heavy');
+            break;
+        case 'linglong_tower':
+            var shieldAmt=Math.floor(calcMaxHp(p)*(bt>=2?0.45:0.30));
+            applyShield(shieldAmt,3);
+            addLog('<span style="color:#42a5f5;font-weight:800">🏯 【玲珑塔】护盾展开 <span class="heal">'+shieldAmt+'</span></span>');
+            break;
+        case 'taiji_map':
+            c.taijiReflect=true;
+            c.taijiReflectMul=bt>=4?1.5:1.0;
+            addLog('<span style="color:#c9a96e;font-weight:800">☯️ 【太极图】太极架势！反弹下次攻击'+(bt>=4?'150%':'100%')+'</span>');
+            break;
+        case 'xuanwu_armor':
+            c.invTurns=1;
+            if(bt>=5) applyHeal(p,Math.floor(calcMaxHp(p)*0.20),false);
+            addLog('<span style="color:#4caf50;font-weight:800">🐢 【玄武甲】无敌1回合！'+(bt>=5?'回复20%HP！':'')+'</span>');
+            break;
+        case 'tianshu_book':
+            c.tianshuDblNext=true;
+            c.tianshuMul=bt>=4?3:2;
+            addLog('<span style="color:#ffd740;font-weight:800">📜 【天书】下个技能伤害×'+c.tianshuMul+'！</span>');
+            break;
+        case 'fuxi_qin':
+            /* 驱散全部负面 */
+            if(c.buffs){c.buffs=[];}
+            applyHeal(p,Math.floor(calcMaxHp(p)*(bt>=4?0.20:0.10)),false);
+            addLog('<span style="color:#ab47bc;font-weight:800">🎵 【伏羲琴】清心涤魂！驱散负面+回血'+(bt>=4?'20%':'10%')+'</span>');
+            break;
+        case 'kunlun_mirror':
+            /* 复制上一次使用的技能 */
+            if(c._lastUsedSkill){
+                var skClone=ASKILLS.find(function(s){return s.id===c._lastUsedSkill});
+                if(skClone){
+                    var prevMul=c.tianshuMul;
+                    if(bt>=5){c.tianshuMul=(c.tianshuMul||1)*1.5;}
+                    doSkillUse(c._lastUsedSkill);
+                    c.tianshuMul=prevMul;
+                    addLog('<span style="color:#42a5f5;font-weight:800">🪞 【昆仑镜】复制技能：'+skClone.n+'！</span>');
+                }else{
+                    addLog('<span style="color:var(--txm)">🪞 【昆仑镜】无可用技能可复制</span>');
+                }
+            }else{
+                addLog('<span style="color:var(--txm)">🪞 【昆仑镜】尚未使用过技能</span>');
+            }
+            break;
+    }
+}
+/* ===== 🌟 S3 境界突破试炼系统 ===== */
+function startBreakthrough(trialIdx){
+    var p=G.p;
+    var trial=BREAKTHROUGH_TRIALS[trialIdx];
+    if(!trial){showSaveToast('❌','试炼不存在');return}
+    if(p.breakthroughCleared[trial.lv]){showSaveToast('❌','该试炼已完成');return}
+    if(p.lv<trial.lv){showSaveToast('❌','需要达到 Lv.'+trial.lv);return}
+
+    /* 初始化试炼状态 */
+    G._trialMode=true;
+    G._trialData={
+        idx:trialIdx,
+        floor:trial.lv,
+        currentLayer:0,
+        totalLayers:3,
+        playerHp:calcMaxHp(p),
+        monsters:TRIAL_MONSTERS[trialIdx]
+    };
+
+    p.hp=calcMaxHp(p);
+    startTrialLayer();
+}
+
+function startTrialLayer(){
+    var p=G.p;
+    var td=G._trialData;
+    var layerData=td.monsters[td.currentLayer];
+
+    /* 根据试炼层数据生成怪物 */
+    var baseFloor=td.floor;
+    var baseMon=genMon(baseFloor,td.currentLayer===2);
+    var m={
+        name:layerData.name,
+        emoji:layerData.emoji,
+        hp:Math.floor(baseMon.hp*layerData.hpMul),
+        mhp:Math.floor(baseMon.hp*layerData.hpMul),
+        atk:Math.floor(baseMon.atk*layerData.atkMul),
+        def:Math.floor(baseMon.def*layerData.defMul),
+        exp:0,gold:0,
+        isBoss:td.currentLayer===2,
+        floor:baseFloor,
+        ab:-1
+    };
+    /* 特殊机制标记 */
+    if(layerData.stunImmune) m._stunImmune=true;
+    if(layerData.poisonImmune) m._poisonImmune=true;
+    if(layerData.controlImmune) m._controlImmune=true;
+    if(layerData.critImmune) m._critImmune=true;
+    if(layerData.fullImmune) m._fullImmune=true;
+    if(layerData.heal) m._trialHeal=true;
+    if(layerData.aoe) m._trialAoe=true;
+    if(layerData.berserk) m._trialBerserk=true;
+    if(layerData.thorns) m._trialThorns=layerData.thorns;
+    if(layerData.dodge) m._trialDodge=layerData.dodge;
+    if(layerData.poison) m._trialPoison=true;
+    if(layerData.stun) m._trialStun=true;
+    if(layerData.lifesteal) m._trialLifesteal=layerData.lifesteal;
+    if(layerData.limitTurns) m._limitTurns=layerData.limitTurns;
+    if(layerData.dmgBoost) m._dmgBoost=true;
+    if(layerData.truthResist) m._truthResist=layerData.truthResist;
+
+    /* 继承玩家HP */
+    p.hp=td.playerHp;
+
+    /* 初始化战斗 */
+    G.cmb={m:m,floor:baseFloor,isBoss:m.isBoss,round:0,log:[],locked:true,cd:{},buffs:[],defending:false,stunM:0,invTurns:0,firstCritUsed:false,prevCrit:false,kPow:0,turnCount:0,reviveUsed:false,surviveUsed:false,result:null,taunt:'',berserkTurns:0,cloneActive:false,cloneDead:false,basicAtkCount:0,godOfWarReady:false,p8Active:false,p8IsBoss:false,petGuardUsed:false,petBonusGold:0,auraReduced:false,summons:[],poison:{stacks:0,dmgPerStack:0,dur:0},shield:{hp:0,maxHp:0,dur:0},swordIntent:0,blockNext:false,blockDmg:0,tripleForm:0,postUltStrike:false,dodgeReady:false,p35UsedHeal:false,p35UsedRage:false,p35UsedShield:false,p39FirstHeal:false,p41WeakApplied:false,thunderMark:0,weakTurns:0,brokenArmor:0,sealed:0};
+
+    G.scr='battle';rc();startBGM();
+
+    addLog('<span style="color:var(--gold);font-weight:900">⚡ 境界突破试炼 · 第'+(td.currentLayer+1)+'层</span>');
+    addLog('<span style="color:var(--cinnabar);font-weight:800">⚔️ '+m.emoji+' '+m.name+' 出现！</span>');
+    if(m._limitTurns) addLog('<span style="color:var(--cinnabar)">⏰ 限时 '+m._limitTurns+' 回合！</span>');
+
+    setTimeout(function(){G.cmb.locked=false;rc();autoLoop()},1000);
+}
+
+/* 试炼中覆盖战斗胜利逻辑 */
+function trialBattleWin(){
+    var p=G.p, c=G.cmb, td=G._trialData;
+    if(!td) return;
+
+    /* 保存当前HP */
+    td.playerHp=p.hp;
+    td.currentLayer++;
+
+    stopAuto();stopBGM();
+
+    if(td.currentLayer>=td.totalLayers){
+        /* 全部通关 */
+        trialComplete(td.idx);
+    }else{
+        /* 进入下一层 */
+        var trial=BREAKTHROUGH_TRIALS[td.idx];
+        showSaveToast('⚡','第'+td.currentLayer+'层通关！准备进入第'+(td.currentLayer+1)+'层...');
+        setTimeout(function(){startTrialLayer()},1500);
+    }
+}
+
+function trialComplete(trialIdx){
+    var p=G.p, td=G._trialData;
+    var trial=BREAKTHROUGH_TRIALS[trialIdx];
+    G._trialMode=false;
+    G._trialData=null;
+
+    /* 标记完成 */
+    p.breakthroughCleared[trial.lv]=true;
+
+    /* 发放奖励 */
+    var rw=trial.rewards;
+    if(rw.atk) p.pAtk+=rw.atk;
+    if(rw.def) p.pDef+=rw.def;
+    if(rw.hp) p.pHp+=rw.hp;
+    if(rw.gold) p.gold+=rw.gold;
+    if(rw.spiritStone) p.treasure.spiritStones=(p.treasure.spiritStones||0)+rw.spiritStone;
+    if(rw.heavenly) p.alchemy.heavenly=(p.alchemy.heavenly||0)+rw.heavenly;
+    if(rw.key) p.alchemy.key=(p.alchemy.key||0)+rw.key;
+    if(rw.passiveSlot){
+        /* 通过调整 maxPassiveSlots 实现，在后续批次接入 */
+        addLog('<span class="info">🔮 被动技能槽 +1！</span>');
+    }
+    if(rw.activeSlot){
+        addLog('<span class="info">⚔️ 主动技能槽 +1！</span>');
+    }
+
+    p.hp=calcMaxHp(p);
+
+    /* 弹窗展示 */
+    var rwText=[];
+    if(rw.atk) rwText.push('ATK+'+rw.atk);
+    if(rw.def) rwText.push('DEF+'+rw.def);
+    if(rw.hp) rwText.push('HP+'+rw.hp);
+    if(rw.gold) rwText.push('金币+'+rw.gold);
+    if(rw.spiritStone) rwText.push('灵石+'+rw.spiritStone);
+    if(rw.heavenly) rwText.push('天材地宝×'+rw.heavenly);
+    if(rw.key) rwText.push('造化之钥×'+rw.key);
+
+    showSaveToast('🌟','境界突破成功！'+trial.title+'\n'+rwText.join(' · '));
+    sfx('win');
+
+    /* 保存进度 */
+    saveXiuxianProg();autoSave();
+
+    /* 进入奖励页面 */
+    G._trialReward={trial:trial,rewards:rwText,title:trial.title};
+    G.scr='trialWin';rc();
+}
+
+function trialBattleLose(){
+    var p=G.p;
+    G._trialMode=false;
+    G._trialData=null;
+    stopAuto();stopBGM();
+    p.hp=calcMaxHp(p);
+    G.scr='trialLose';rc();autoSave();
+}
+/* ===== 🌟 S3 转生系统 ===== */
+function canRebirth(){
+    var p=G.p;
+    /* 条件1：通关100层魔王 */
+    if(!p.breakthroughCleared[100]) return false;
+    /* 条件2：完成Lv.100突破试炼（飞升→天道） */
+    if(!p.breakthroughCleared[100]) return false;
+    /* 简化：两个条件合并，breakthroughCleared[100] 即Lv.100试炼 */
+    return true;
+}
+
+function getNextRebirthPoints(){
+    var p=G.p;
+    var nextCount=(p.rebirth.count||0)+1;
+    if(nextCount>=REBIRTH_POINTS.length) return REBIRTH_POINTS[REBIRTH_POINTS.length-1];
+    return REBIRTH_POINTS[nextCount];
+}
+
+function doRebirth(){
+    var p=G.p;
+    if(!canRebirth()){showSaveToast('❌','未满足飞升条件');return}
+    var nextCount=(p.rebirth.count||0)+1;
+    if(nextCount>9){showSaveToast('❌','已达最高转生次数（九转天尊）');return}
+
+    /* 确认弹窗 */
+    if(!confirm('确定飞升？\n\n所有修为将归零（等级/属性/技能/装备/金币/楼层）\n\n但以下内容将永久保留：\n· 宠物（等级/品质）\n· 法宝（等级/突破）\n· 灵石\n· 成就\n· 仙缘永久加成\n\n本次飞升将获得 '+REBIRTH_POINTS[nextCount]+' 点仙缘')) return;
+
+    /* 保存永久数据 */
+    var keepPet=JSON.parse(JSON.stringify(p.pet));
+    var keepTreasure=JSON.parse(JSON.stringify(p.treasure));
+    var keepStones=p.stones;
+    var keepKills=p.kills;
+    var keepRebirthCount=nextCount;
+    var keepCleared=p.breakthroughCleared;
+    var keepSpiritStones=p.treasure.spiritStones||0;
+    var keepCelestAlloc=p.rebirth.celestAlloc;
+    var keepXianShu=p.rebirth.xianShu;
+    var keepXianShuSlots=p.rebirth.xianShuSlots;
+    var keepShopPurchases=p.rebirth.shopPurchases;
+    var keepPermStats=p.rebirth.permStats||0;
+    var oldUid=p.uid;
+    var oldName=p.name;
+    var oldPwd=p.cloudPwd;
+    var oldAch=A.ach||{};
+    var oldTits=A.titles||[];
+    var oldLog=G.log;
+    var oldFloor=parseInt(localStorage.getItem('xx_maxFloor')||'1');
+
+    /* 计算仙缘点 */
+    var pointsGain=REBIRTH_POINTS[nextCount];
+
+    /* 重置角色 */
+    var newP=mkP(oldName);
+    newP.uid=oldUid;
+    newP.cloudPwd=oldPwd;
+    G.p=newP;
+    p=G.p;
+
+    /* 恢复永久数据 */
+    p.pet=keepPet;
+    p.treasure=keepTreasure;
+    p.treasure.spiritStones=keepSpiritStones;
+    p.stones=keepStones;
+    p.kills=keepKills;
+    p.breakthroughCleared=keepCleared;
+    G.log=oldLog;
+    A.ach=oldAch;
+    A.titles=oldTits;
+
+    /* 设置转生数据 */
+    p.rebirth.count=keepRebirthCount;
+    p.rebirth.celestPoints=keepCleared[100]?REBIRTH_POINTS.slice(1,keepRebirthCount+1).reduce(function(a,b){return a+b},0):pointsGain;
+    p.rebirth.celestPoints=REBIRTH_POINTS.slice(1,keepRebirthCount+1).reduce(function(a,b){return a+b},0);
+    p.rebirth.celestAlloc=keepCelestAlloc;
+    p.rebirth.xianShu=keepXianShu;
+    p.rebirth.xianShuSlots=keepXianShuSlots+1;
+    p.rebirth.shopPurchases=keepShopPurchases;
+    p.rebirth.permStats=keepPermStats;
+
+    /* 发放转生礼包 */
+    var rw=REBIRTH_REWARDS[keepRebirthCount];
+    if(rw){
+        if(rw.gold) p.gold+=rw.gold;
+        if(rw.spiritStone) p.treasure.spiritStones=(p.treasure.spiritStones||0)+rw.spiritStone;
+        if(rw.materials){
+            for(var m in rw.materials){
+                p.alchemy[m]=(p.alchemy[m]||0)+rw.materials[m];
+            }
+        }
+    }
+
+    /* 重置楼层 */
+    localStorage.setItem('xx_maxFloor','1');
+    p.lv=1;
+    p.exp=0;
+
+    /* 九转解锁特殊称号 */
+    if(keepRebirthCount===9){
+        var hasTit=false;
+        for(var t=0;t<A.titles.length;t++){if(A.titles[t]==='九转天尊') hasTit=true;}
+        if(!hasTit) A.titles.push('九转天尊');
+        p.rebirth.xianShu.push('X15');
+    }
+
+    /* 保存并展示 */
+    saveXiuxianProg();autoSave();saveAch();
+
+    G._rebirthReward={count:keepRebirthCount,points:pointsGain,rw:rw};
+    G.scr='rebirthResult';rc();sfx('win');
+}
+
+function allocateCelestPoint(key){
+    var p=G.p;
+    var totalEarned=p.rebirth.celestPoints||0;
+    var totalUsed=0;
+    var alloc=p.rebirth.celestAlloc;
+    for(var k in alloc) totalUsed+=(alloc[k]||0);
+    if(totalEarned<=totalUsed){showSaveToast('❌','仙缘点数不足');return}
+    alloc[key]=(alloc[key]||0)+1;
+    showSaveToast('✨',CELEST_PROPS.find(function(c){return c.key===key}).name+' +1');
+    rc();autoSave();
+}
+
+function resetCelestAlloc(){
+    var p=G.p;
+    p.rebirth.celestAlloc={atk:0,def:0,hp:0,crit:0,exp:0,gold:0};
+    showSaveToast('🔄','仙缘点已全部归还，可重新分配');
+    rc();autoSave();
+}
+
+function getCelestPct(key){
+    var p=G.p;
+    var pts=(p.rebirth&&p.rebirth.celestAlloc)?(p.rebirth.celestAlloc[key]||0):0;
+    switch(key){
+        case 'atk': return pts*2;
+        case 'def': return pts*2;
+        case 'hp': return pts*2;
+        case 'crit': return pts*0.5;
+        case 'exp': return pts*3;
+        case 'gold': return pts*3;
+    }
+    return 0;
+}
+
+function getRebirthDif(){
+    var p=G.p;
+    var cnt=p.rebirth?p.rebirth.count:0;
+    if(cnt<0||cnt>=REBIRTH_DIFFICULTY.length) return{hp:0,atk:0,def:0,exp:0,gold:0,drop:0};
+    return REBIRTH_DIFFICULTY[cnt];
+}
+
+function learnXianShu(id){
+    var p=G.p;
+    if(!p.rebirth){showSaveToast('❌','未转生');return}
+    var xs=null;
+    for(var i=0;i<XIAN_SHU.length;i++){if(XIAN_SHU[i].id===id) xs=XIAN_SHU[i];}
+    if(!xs){showSaveToast('❌','仙术不存在');return}
+    if(p.rebirth.count<xs.minRebirth){showSaveToast('❌','需要'+xs.minRebirth+'转后才能学习');return}
+    if(p.rebirth.xianShu.indexOf(id)>=0){showSaveToast('❌','已学习此仙术');return}
+    var slots=p.rebirth.xianShuSlots||0;
+    var used=p.rebirth.xianShu.length;
+    if(used>=slots+2){showSaveToast('❌','仙术槽位已满');return}
+    p.rebirth.xianShu.push(id);
+    showSaveToast('📖','学会仙术：'+xs.name+'！'+xs.desc);
+    sfx('win');rc();autoSave();
+}
+
+function hasXianShu(id){
+    var p=G.p;
+    return p.rebirth&&p.rebirth.xianShu&&p.rebirth.xianShu.indexOf(id)>=0;
+}
+
+function buyRebirthShop(shopIdx){
+    var p=G.p;
+    var item=REBIRTH_SHOP[shopIdx];
+    if(!item){showSaveToast('❌','商品不存在');return}
+    var key=item.id;
+    var used=p.rebirth.shopPurchases[key]||0;
+    var limit=item.limit||99;
+    if(item.perRebirth){
+        /* 每次转生重置的限购，用 转生次数_商品id 作为key */
+        key=key+'_'+p.rebirth.count;
+        used=p.rebirth.shopPurchases[key]||0;
+    }
+    if(used>=limit){showSaveToast('❌','已达购买上限');return}
+    if(p.treasure.spiritStones<item.cost){showSaveToast('❌','灵石不足！需要'+item.cost+'灵石，当前'+(p.treasure.spiritStones||0));return}
+    p.treasure.spiritStones-=item.cost;
+    p.rebirth.shopPurchases[key]=used+1;
+
+    /* 发放商品 */
+    switch(item.result){
+        case 'celestPt':
+            p.rebirth.celestPoints=(p.rebirth.celestPoints||0)+item.amt;
+            break;
+        case 'spiritStone':
+            p.treasure.spiritStones=(p.treasure.spiritStones||0)+item.amt;
+            break;
+        case 'xianSlot':
+            p.rebirth.xianShuSlots=(p.rebirth.xianShuSlots||0)+item.amt;
+            break;
+        case 'treasureEssence':
+            p.alchemy.treasureEssence=(p.alchemy.treasureEssence||0)+item.amt;
+            break;
+        case 'heavenly':
+            p.alchemy.heavenly=(p.alchemy.heavenly||0)+item.amt;
+            break;
+        case 'key':
+            p.alchemy.key=(p.alchemy.key||0)+item.amt;
+            break;
+        case 'petExp':
+            if(p.pet&&p.pet.owned) p.pet.exp=(p.pet.exp||0)+item.amt;
+            break;
+        case 'permStat':
+            p.rebirth.permStats=(p.rebirth.permStats||0)+item.amt;
+            p.pAtk+=item.amt;
+            p.pDef+=item.amt;
+            p.pHp+=item.amt;
+            break;
+    }
+    showSaveToast(item.emoji,'购买成功：'+item.name);
+    rc();autoSave();
+}
+
+function getRebirthShopUsed(item){
+    var p=G.p;
+    var key=item.id;
+    if(item.perRebirth) key=key+'_'+p.rebirth.count;
+    return(p.rebirth.shopPurchases[key]||0);
+}
+
+  /* 战斗循环逻辑 */
 var _abt=null;function stopAuto(){if(_abt){clearTimeout(_abt);_abt=null}}
 /* 装备掉落处理 */
 function tryDropAndStore(floor){
@@ -2165,7 +3130,9 @@ function doNormalAtk(){
     var dmg = Math.max(1, Math.floor(rawDmg * mDefMul * supp.pDmg));
     if(p.pSkl.indexOf('P20')>=0 && m.hp/m.mhp < 0.3){ dmg = Math.floor(dmg * 1.5); addLog('<span class="info">【死亡凝视】HP<30%，伤害+50%！</span>'); }
     if(p.pet&&p.pet.owned&&p.pet.level>=100&&p.pet.quality==='god') dmg = Math.floor(dmg*1.05);
-
+        if(hasXianShu('X2')) dmg=Math.floor(dmg*1.10);
+    /* 封印：怪物受全伤害+15% */
+    if(c.sealed > 0) dmg = Math.floor(dmg * 1.15);
     m.hp = Math.max(0, m.hp-dmg);
     addLog('造成 <span class="dmg">'+dmg+'</span> 伤害'+(isCrit?' <span class="info">(暴击!)</span>':''));
     floatDmg('xgME',(isCrit?'暴击! ':'')+dmg,isCrit?'#ffd740':'#ff6b6b');
@@ -2288,7 +3255,6 @@ function doSkillUse(sid){
             addLog('<span class="info">以守为攻！本回合防御×2，下回合攻击×3</span>');
             c.cd[sid]=sk.cd; return;
         case 'A26':
-                    case 'A26':
             if(c.swordIntent<4){addLog('剑意不足(需≥4层)，当前'+c.swordIntent+'层');c.cd[sid]=sk.cd;return}
             var _si=c.swordIntent;
             var swordDmg=_si*getPAtk(p,c)*0.6;
@@ -2357,7 +3323,9 @@ function doSkillUse(sid){
     if(p.pSkl.indexOf('P20')>=0 && m.hp/m.mhp < 0.3){ dmg = Math.floor(dmg * 1.5); addLog('<span class="info">【死亡凝视】HP<30%，伤害+50%！</span>'); }
     if(p.pet&&p.pet.owned&&p.pet.level>=100&&p.pet.quality==='god') dmg = Math.floor(dmg*1.05);
 
-    if(dmg > 0){
+        if(dmg > 0){
+        /* 封印：怪物受全伤害+15% */
+        if(c.sealed > 0) dmg = Math.floor(dmg * 1.15);
         dmg = Math.max(1, dmg); m.hp = Math.max(0, m.hp-dmg);
         addLog(sk.n+' → <span class="dmg">'+dmg+'</span>');
         floatDmg('xgME',sk.n+' '+dmg,'#ff6b6b'); applyOnHitHeal(p, dmg);
@@ -2471,10 +3439,7 @@ function doMonsterAtk(){
             applyMonsterDebuff('weak',2);
         }
     }
-    /* 🌟 S2 封印：怪物受全伤害+15% */
-    if(c.sealed>0){
-        dmg=Math.floor(dmg*1.15);
-    }
+   
 
     if(m.invTimer>0){
         dmg=1; m.invTimer--; addLog('🛡️ 魔王无敌！只受 <span class="dmg">1</span> 伤害 <span class="info">(剩余'+m.invTimer+'秒)</span>');
@@ -2521,7 +3486,8 @@ if(p.pet&&p.pet.owned&&p.pet.level>=1&&!c.auraReduced&&Math.random()<0.20){
     if(shieldAbsorbed>0) addLog('<span class="info">🛡️ 护盾吸收 '+shieldAbsorbed+' 伤害</span>');
 
     /* P28 散财消灾 - 移到致死判定中处理 */
-
+    /* 🌟 S3 仙术：金刚法体 减伤5% */
+    if(hasXianShu('X3')) actualDmg=Math.floor(actualDmg*0.95);
     p.hp = Math.max(0, p.hp-actualDmg);
     floatDmg('xgPE','-'+dmg,'#ff6b6b'); shakeBattle(); screenFlash('rgba(196,30,58,.12)');
     if(m.ab===3||m.ab===6||m.ab===7) m.hp=Math.min(m.mhp,m.hp+Math.floor(dmg*0.1));
@@ -2581,7 +3547,13 @@ if(p.pSkl.indexOf('P30')>=0 && c.shield && c.shield.hp>0 && dmg>0){
             addLog('<span style="color:var(--lv)">🛡️ '+petForm(p.pet.level).emoji+' 【忠犬护主】强制保留1点生命！</span>');
             render(); animAfterRender('xgPE','heal-flash',200); sfx('heal');
         }
-        if(!revived){
+                /* 🌟 S3 仙术：不灭仙体 保命 */
+        if(!revived && hasXianShu('X12') && !c._xianShu12Used && Math.random()<0.20){
+            c._xianShu12Used=true; p.hp=1; applyHeal(p, calcMaxHp(p)*0.10, false); revived=true;
+            addLog('<span style="color:var(--gold)">💀 不灭仙体发动！保留1HP！</span>');
+            render(); animAfterRender('xgPE','heal-flash',200); sfx('heal');
+        }
+      if(!revived){
             p.hp=0; sfx('die'); stopBGM(); render(); animAfterRender('xgPE','die',10);
             setTimeout(battleLose,900); return false;
         }
@@ -2712,7 +3684,8 @@ function autoLoop(){
             if(p.pSkl.indexOf('P12')>=0) mDefForClone = Math.floor(mDefForClone * (c.m.isBoss ? 0.95 : 0.90));
             var mDefMulForClone = 500 / (500 + mDefForClone);
             var suppForClone = getSuppression(c.floor, p.lv);
-            var cloneDmg = Math.max(1, Math.floor(rawCloneAtk * mDefMulForClone * suppForClone.pDmg));
+                        var cloneDmg = Math.max(1, Math.floor(rawCloneAtk * mDefMulForClone * suppForClone.pDmg));
+            if(c.sealed > 0) cloneDmg = Math.floor(cloneDmg * 1.15);
             m.hp=Math.max(0,m.hp-cloneDmg);
             addLog('🎭 分身攻击 <span class="dmg">'+cloneDmg+'</span>');
             floatDmg('xgME','🎭'+cloneDmg,'#9650ff'); applyOnHitHeal(p,cloneDmg);
@@ -2729,7 +3702,8 @@ function autoLoop(){
             var cloneRaw=Math.floor(getPAtk(p,c)*0.25);
             var cloneMDef=c.m.def;
             if(p.pSkl.indexOf('P12')>=0) cloneMDef=Math.floor(cloneMDef*(c.m.isBoss?0.95:0.90));
-            var cloneDmg=Math.max(1,Math.floor(cloneRaw*(500/(500+cloneMDef))*getSuppression(c.floor,p.lv).pDmg));
+                        var cloneDmg=Math.max(1,Math.floor(cloneRaw*(500/(500+cloneMDef))*getSuppression(c.floor,p.lv).pDmg));
+            if(c.sealed > 0) cloneDmg = Math.floor(cloneDmg * 1.15);
             if(c.m.isBoss) cloneDmg=Math.min(cloneDmg,Math.floor(c.m.mhp*0.03));
             m.hp=Math.max(0,m.hp-cloneDmg);
             addLog('🎭 法身追击 <span class="dmg">'+cloneDmg+'</span>');
@@ -2856,6 +3830,7 @@ function autoLoop(){
         if(p.aSkl.indexOf('A26')>=0){spawnSwordChargeVisual(c.swordIntent||0)}
 
         c.turnCount++;c.round++;render();
+      processTreasureActive();if(hasXianShu('X11')){var _h11=Math.floor(calcMaxHp(G.p)*0.03);applyHeal(G.p,_h11,false);addLog('<span style="color:var(--lv)">☀️ 九阳神功 回复 <span class="heal">'+_h11+'</span></span>');}
         if(p.pSkl.indexOf('P18')>=0&&Math.random()<0.1&&m.hp>0){
             addLog('<span class="info">【时间守护者】额外行动！</span>');
             setTimeout(function(){if(!G.cmb||G.cmb.result||m.hp<=0)return;var sk2=chooseAutoSkill(),_crit2=false;if(sk2){doSkillUse(sk2);if(p.summonLocked)_crit2=doNormalAtk()}else{_crit2=doNormalAtk()};sfx(sk2?'skill':'atk');render();animAfterRender('xgPE','atk-combo',10);animAfterRender('xgME','hit-impact',100);atkTrail();slashTrails();if(_crit2)critLine()},200);
@@ -2889,13 +3864,25 @@ if(_isOnlineBattle&&c.isBoss){
 var setBonus=getSetBonus();
 if(setBonus.gold>0){p.gold+=setBonus.gold}
 
+    /* 🌟 S3 试炼胜利+材料法宝掉落+经验金币加成 */
+    if(G._trialMode){trialBattleWin();return;}
+        dropMaterials(c.floor,c.isBoss);
+    var _td=tryDropTreasure(c.floor,c.isBoss);
+    if(_td){
+        if(_td.action==='get') addLog('<span style="color:var(--gold);font-weight:900">🌟 获得法宝：'+_td.treasure.emoji+' '+_td.treasure.name+'！</span>');
+        if(_td.action==='convert') addLog('<span style="color:var(--txm)">已拥有'+_td.treasure.name+'，转化为法宝精魄×'+_td.amount+'</span>');
+    }
+    var _eb=0;if(p.rebirth&&p.rebirth.count>0)_eb+=getRebirthDif().exp||0;_eb+=getCelestPct('exp');if(hasXianShu('X4'))_eb+=10;if(_eb>0){var _ee=Math.floor(ge*_eb/100);p.exp+=_ee;ge+=_ee;}
+    var _gb=0;if(p.rebirth&&p.rebirth.count>0)_gb+=getRebirthDif().gold||0;_gb+=getCelestPct('gold');if(_gb>0){var _eg=Math.floor(gd*_gb/100);p.gold+=_eg;gd+=_eg;}
+
 G.cmb={result:'win',exp:ge,gold:gd,petBonusGold:bonusGold,petExpGained:petExpGained,petLeveled:petLeveled,petNewLv:petNewLv,equipDrop:dropResult,stoneDrop:stoneResult,setBonusGold:setBonus.gold};
 G.scr='win';rc();if(G._autoNextTimer)clearTimeout(G._autoNextTimer);G._autoNextTimer=setTimeout(function(){G._autoNextTimer=null;G._autoContinue=true;checkLvlUp()},2000);autoSave()}
 
 function battleLose(){
     stopAuto();stopBGM();var p=G.p;if(!G.cmb)return;
     p.consecutiveKills=0;p.p8RemainingBattles=0;
-    // 🌟 如果已经是负债状态，死亡不扣钱（防止负数扣除变加钱）
+    /* 🌟 S3 试炼失败处理 */
+    if(G._trialMode){trialBattleLose();return;}
     var lost = p.gold > 0 ? Math.floor(p.gold * 0.5) : 0;
     p.gold -= lost;
     p.hp=calcMaxHp(p);G.cmb={result:'lose',lost:lost};G.scr='death';rc();autoSave();checkAchievements()
@@ -3111,7 +4098,18 @@ function migrate(d){
     // 🌟 加上这行，防止老存档报错
     if(d.p.hasSelectedActiveSkill===undefined) d.p.hasSelectedActiveSkill=false;
     if(!d.p.cloudPwd) d.p.cloudPwd='';
-
+    /* 🌟 S3 新系统迁移 */
+    if(!d.p.alchemy) d.p.alchemy={grass:0,lotus:0,stone:0,core:0,spirit:0,heavenly:0,key:0,treasureEssence:0};
+    if(d.p.furnaceTier===undefined) d.p.furnaceTier=0;
+    if(!d.p.treasure) d.p.treasure={equipped:null,owned:{},spiritStones:0};
+    if(!d.p.treasure.owned) d.p.treasure.owned={};
+    if(!d.p.breakthroughCleared) d.p.breakthroughCleared={};
+    if(!d.p.rebirth) d.p.rebirth={count:0,celestPoints:0,celestAlloc:{atk:0,def:0,hp:0,crit:0,exp:0,gold:0},xianShu:[],xianShuSlots:0,shopPurchases:{},permStats:0};
+    if(!d.p.rebirth.celestAlloc) d.p.rebirth.celestAlloc={atk:0,def:0,hp:0,crit:0,exp:0,gold:0};
+    if(!d.p.rebirth.xianShu) d.p.rebirth.xianShu=[];
+    if(!d.p.rebirth.shopPurchases) d.p.rebirth.shopPurchases={};
+    if(d.p.rebirth.permStats===undefined) d.p.rebirth.permStats=0;
+  
     if(!d.pr) d.pr={};
     if(!d.pr.ach) d.pr.ach={};
     if(!d.pr.cleared) d.pr.cleared={};
@@ -3163,30 +4161,7 @@ async function loadCloud(){
     return false;
 }
  
-async function loadCloud(){
-    try {
-        var r = await _sb.from('save').select('game_data').eq('id',getCloudKey()).single();
-        if(r.data && r.data.game_data){
-            var gd = r.data.game_data;
-            if(gd.v && gd.v <= VER && gd.p){
-                gd = migrate(gd);
-                G.p = gd.p; G.prog = gd.pr;
-                if(!G.p.pet) G.p.pet={owned:false,quality:null,level:1,exp:0};
-                if(!G.prog.cleared) G.prog.cleared={};
-                if(!G.prog.bossCleared) G.prog.bossCleared={};
-                if(!G.prog.curFloor) G.prog.curFloor=G.prog.maxFloor||1;
-                // 用本地旧ts计算离线时长（如果有的话）
-                var localData = null;
-                try { localData = JSON.parse(localStorage.getItem(SK)); } catch(e){}
-                var offlineTs = (localData && localData.ts) ? localData.ts : gd.ts;
-                localStorage.setItem(SK, JSON.stringify({v:VER,p:G.p,pr:G.prog,ts:Date.now()}));
-                var rw=calcOfflineReward(offlineTs);if(rw&&(rw.gold>0||rw.exp>0))setTimeout(function(){showOfflineReward(rw)},1500);
-                return true;
-            }
-        }
-    } catch(e){}
-    return false;
-}
+
 /* ===== 🌟 弹窗与公告/奖励结算系统（队列+轻提示+0点防重复版） ===== */
 
 var _modalQueue = [];
@@ -3404,7 +4379,7 @@ h+='<div style="padding:4px 8px;background:var(--b50);border-radius:6px;font-siz
            var ps=[{lv:10, n:'⚔️ 咸鱼突刺', d:'怪物HP<30%时，3%概率秒杀非BOSS怪+10金币'},{lv:1,n:'🌿 灵兽庇佑',d:'攻击+10/防御+10/生命+30，每回合回复5%HP，20%减伤50%(1次/战)'},{lv:20,n:'🍖 饿犬扑食',d:'瞬间斩杀血量低于10%的普通怪'},{lv:30,n:'🛡️ 忠犬护主',d:'致死时保留1血并回复15%生命(限1次)'},{lv:40,n:'💊 大郎吃药了',d:'胜利后2%概率随机获得1点属性'},{lv:50,n:'🦊 狐假虎威',d:'面对BOSS时削弱其5%攻击与防御'},{lv: 55, n: '✨ 终极化形', d: '受击后按品级额外回血(1%/2%/3%/5%)，主人攻击+10%'},{lv:100,n:'👑 神兽之力',d:'仅神兽·全伤害+5%'}];
         h += '<div style="font-size:.75rem;margin-bottom:10px;display:flex;flex-direction:column;gap:5px;">';
         ps.forEach(function(ps) {
-            var isUnlk = p.pet.level >= ps.lv;
+            var isUnlk = p.pet.level >= skill.lv;
             var cColor = isUnlk ? 'var(--tx)' : 'var(--txm)';
             var op = isUnlk ? '1' : '0.4';
             h += '<div style="color:'+cColor+';opacity:'+op+';display:flex;justify-content:space-between;border-bottom:1px dashed var(--b100);padding-bottom:2px;">';
@@ -3457,6 +4432,31 @@ if(_hubSet.gold>0){
 }
 h+='<div style="text-align:center;margin-top:10px"><button class="xg-btn" style="font-size:.82rem" onclick="xxGoto(\'bag\')">🎒 背包 ('+p.bag.length+'/30)</button></div>';
 h+='</div>';
+      /* 🌟 S3 法宝面板 */
+    h+='<div class="xg-card" style="padding:16px;margin-bottom:16px;border-left:3px solid var(--gold)">';
+    h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.1rem;margin-bottom:10px">🗡️ 法宝位</h4>';
+    if(p.treasure&&p.treasure.equipped){
+        var eqId=p.treasure.equipped;
+        var tOwned=p.treasure.owned[eqId];
+        var tDef=null;
+        for(var ti=0;ti<TREASURES.length;ti++){if(TREASURES[ti].id===eqId){tDef=TREASURES[ti];break;}}
+        if(tDef&&tOwned){
+            h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">';
+            h+='<span style="font-size:1.6rem">'+tDef.emoji+'</span>';
+            h+='<div><div style="font-weight:800">'+tDef.name+' <span style="color:var(--gold)">Lv.'+tOwned.level+'</span>';
+            if(tOwned.breakthrough>0) h+=' <span style="color:#ab47bc">· '+tOwned.breakthrough+'阶</span>';
+            if(tOwned.breakthrough>=5) h+=' <span style="color:#ffd740">· 觉醒</span>';
+            h+='</div><div style="font-size:.72rem;color:var(--txm)">';
+            if(tDef.base.atk) h+='ATK+'+getTreasureStat('atk')+' ';
+            if(tDef.base.def) h+='DEF+'+getTreasureStat('def')+' ';
+            if(tDef.base.hp) h+='HP+'+getTreasureStat('hp')+' ';
+            h+='</div><div style="font-size:.72rem;color:var(--lv);margin-top:2px">被动：'+tDef.passive+'</div></div></div>';
+        }
+    }else{
+        h+='<div style="color:var(--txm);font-size:.82rem;padding:6px 0">未装备法宝</div>';
+    }
+    h+='<button class="xg-btn" style="font-size:.78rem;width:100%" onclick="xxGoto(\'treasure\')">🗡️ 法宝管理</button>';
+    h+='</div>';
     h+='<div class="xg-card" style="padding:20px">';
     h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.1rem;margin-bottom:12px">⚔️ 主动 ('+p.aSkl.length+'/'+maxActiveSlots(p)+')</h4>';
     if(p.aSkl.length===0)h+='<div style="color:var(--txm);font-size:.82rem;padding:8px 0">尚未习得</div>';
@@ -3476,7 +4476,46 @@ h+='<button class="xg-btn" onclick="xxGoto(\'bag\')">🎒 背包 ('+p.bag.length
 h+='<button class="xg-btn" onclick="xxGoto(\'achievements\')">🏆 成就 ('+function(){var c=0;var a=G.prog.ach||{};for(var k in a)if(a[k])c++;return c}()+'/'+ACHIEVEMENTS.length+')</button>';
 h+='<button class="xg-btn" onclick="xxGoto(\'skills\')">📋 技能列表</button>';
 h+='<button class="xg-btn" onclick="xxGoto(\'save\')">💾 存档管理</button></div>';
-    h+='<div class="xg-action-group"><h4>⚙️ 设置</h4>';
+    /* 🌟 S3 炼丹房 */
+    h+='<div class="xg-action-group"><h4>⚗️ 炼丹</h4>';
+    var furnace=FURNACE_TIERS[p.furnaceTier||0];
+    h+='<div style="font-size:.72rem;color:var(--txm);margin-bottom:4px">'+furnace.name+' (成功率+'+furnace.bonus+'%)</div>';
+    h+='<div style="font-size:.72rem;color:var(--txm);line-height:1.6">';
+    h+='🌿'+(p.alchemy.grass||0)+' 🌺'+(p.alchemy.lotus||0)+' 💎'+(p.alchemy.stone||0)+' 🔮'+(p.alchemy.core||0)+' ✨'+(p.alchemy.spirit||0)+' 🌟'+(p.alchemy.heavenly||0)+' 🔑'+(p.alchemy.key||0)+' 🔶'+(p.alchemy.treasureEssence||0);
+    h+='</div>';
+    h+='<button class="xg-btn" onclick="xxGoto(\'alchemy\')" style="width:100%;margin-top:6px">⚗️ 进入炼丹房</button>';
+    h+='</div>';
+
+    /* 🌟 S3 境界突破 */
+    h+='<div class="xg-action-group"><h4>⚡ 境界突破</h4>';
+    var nextTrial=null;
+    for(var bi=0;bi<BREAKTHROUGH_TRIALS.length;bi++){
+        var bt=BREAKTHROUGH_TRIALS[bi];
+        if(!p.breakthroughCleared[bt.lv]&&p.lv>=bt.lv){nextTrial=bt;break;}
+    }
+    if(nextTrial) h+='<div style="font-size:.78rem;color:var(--gold);margin-bottom:4px">可挑战：'+nextTrial.name+'</div>';
+    else h+='<div style="font-size:.72rem;color:var(--txm);margin-bottom:4px">暂无可挑战试炼</div>';
+    h+='<button class="xg-btn" onclick="xxGoto(\'breakthrough\')" style="width:100%">⚡ 突破试炼面板</button>';
+    h+='</div>';
+
+    /* 🌟 S3 飞升转生 */
+    var rebCount=p.rebirth?p.rebirth.count:0;
+    h+='<div class="xg-action-group" style="border:1px solid var(--gold)"><h4>🌟 飞升 · 转生</h4>';
+    h+='<div style="font-size:.72rem;color:var(--txm);margin-bottom:4px">'+(rebCount>0?(toCN(rebCount)+'转修仙者'):'未转生')+'</div>';
+    if(rebCount>0){
+        var totalPts=p.rebirth.celestPoints||0;
+        var usedPts=0;
+        var alloc=p.rebirth.celestAlloc;
+        for(var ck in alloc) usedPts+=(alloc[ck]||0);
+        h+='<div style="font-size:.72rem;color:var(--txm)">仙缘点 '+usedPts+'/'+totalPts+' · 仙术 '+(p.rebirth.xianShu?p.rebirth.xianShu.length:0)+'个</div>';
+    }
+    h+='<div style="display:flex;gap:6px;margin-top:4px">';
+    h+='<button class="xg-btn" onclick="xxGoto(\'rebirth\')" style="flex:1;font-size:.78rem">🌟 飞升面板</button>';
+    if(canRebirth()) h+='<button class="xg-btn gold" onclick="doRebirth()" style="flex:1;font-size:.78rem">✨ 再次飞升</button>';
+    h+='</div>';
+    if(!canRebirth()) h+='<div style="font-size:.65rem;color:var(--txm);margin-top:3px">条件：通关100层魔王 + Lv.100突破试炼</div>';
+    h+='</div>';
+h+='<div class="xg-action-group"><h4>⚙️ 设置</h4>';
 h+='<label style="display:flex;align-items:center;gap:8px;font-size:.82rem;cursor:pointer"><input type="checkbox" id="dmgToggle" onchange="toggleDmgFloat()" '+(localStorage.getItem('xx_showDmg')!=='0'?'checked':'')+'> 显示浮动伤害数字</label>';
 h+='</div>';
     h+='<div class="xg-action-group"><h4>🛒 商店</h4>';
@@ -3741,8 +4780,7 @@ function rLskill(c){var p=G.p;var h='<div class="xg-title"><div class="big-emoji
 
 function rReplace(c){var info=G.ce._rp,p=G.p;var arr=info.isP?p.pSkl:p.aSkl;var src=info.isP?PSKILLS:ASKILLS;var newSk=src.find(function(s){return s.id===info.id});var h='<div class="xg-title"><div class="big-emoji">🔄</div><h3>技能栏已满</h3><p style="color:var(--txm)">选择一个替换为 ['+(newSk.n||'未知技能')+']，或直接跳过保持原样</p><div class="xg-choices">';for(var i=0;i<arr.length;i++){var oldSk=src.find(function(s){return s.id===arr[i]});if(!oldSk)continue;h+='<div class="xg-skill-card" style="animation-delay:'+((i+1)*.12)+'s" onclick="xxReplPick('+i+')"><div class="sk-name">'+(oldSk.n||'未知技能')+'</div><div class="sk-desc">'+(oldSk.d||'')+'</div></div>'}h+='</div><div class="xg-actions" style="margin-top:20px"><button class="xg-btn danger" onclick="xxReplSkip()">🛑 跳过 (放弃学习此技能)</button></div></div>';c.innerHTML=h;}
 /* 更新公告栏 */
-/* 更新公告栏 */
-var UPDATE_NOTICE='<div id="xxUpdateNotice" style="margin-bottom:16px"><div style="background:linear-gradient(135deg,rgba(150,80,255,.06),rgba(201,169,110,.06));border:2px solid rgba(150,80,255,.2);border-radius:16px;overflow:hidden"><div onclick="toggleNotice()" style="cursor:pointer;padding:14px 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.4rem">🆕</span><div><div style="font-weight:900;font-size:1rem;color:var(--lv)">天道法则更新 (V1.4.0)</div><div style="font-size:.72rem;color:var(--txm)">点击查看修仙界最新变化</div></div></div><span id="noticeArrow" style="font-size:.85rem;color:var(--txm);transition:transform .3s">▼</span></div><div id="noticeBody" style="display:none;padding:0 20px 20px"><div style="font-size:.82rem;color:var(--txb);line-height:1.7"><p style="font-weight:700;color:var(--lv);margin-bottom:8px">🆕 V1.4.0 更新内容：</p><p>• <b>全技能特效上线</b>：25个主动技能全部拥有专属视觉特效（剑气/雷电/血雾/毒雾/召唤阵/金币雨/护盾等）</p><p>• <b>被动技能文案提醒</b>：所有被动技能触发时显示文字提示（怒气爆发/铁壁/不灭之火/死亡凝视等）</p><p>• <b>召唤物属性可见</b>：召唤物现在显示HP条和ATK数值</p><p>• <b>宠物品级标识</b>：宠物面板显示品级颜色（凡骨灰/灵兽蓝/仙宠紫/神兽金）</p><p>• <b>召唤流派上线</b>：13只召唤物各有专属台词和特殊效果</p><p>• <b>四大新流派</b>：毒流/召唤流/金钱流/龟壳流</p><p>• <b>属性上限重做</b>：暴击率20%+装备5%/吸血率8%+装备2%/闪避率18%+装备2%</p><p>• <b>定时关服</b>：每天00:30-08:00为维护时间，请早点休息</p><p>• <b>离线经验修复</b>：云端恢复时正确计算离线收益</p><p style="color:var(--cinnabar);font-weight:bold;margin-top:8px">⚠️ 存档完全兼容，无需重新开始！</p></div></div></div></div>';
+var UPDATE_NOTICE='<div id="xxUpdateNotice" style="margin-bottom:16px"><div style="background:linear-gradient(135deg,rgba(150,80,255,.06),rgba(201,169,110,.06));border:2px solid rgba(150,80,255,.2);border-radius:16px;overflow:hidden"><div onclick="toggleNotice()" style="cursor:pointer;padding:14px 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.4rem">🆕</span><div><div style="font-weight:900;font-size:1rem;color:var(--lv)">天道法则更新 (V1.5.0)</div><div style="font-size:.72rem;color:var(--txm)">点击查看修仙界最新变化</div></div></div><span id="noticeArrow" style="font-size:.85rem;color:var(--txm);transition:transform .3s">▼</span></div><div id="noticeBody" style="display:none;padding:0 20px 20px"><div style="font-size:.82rem;color:var(--txb);line-height:1.7"><p style="font-weight:700;color:var(--lv);margin-bottom:8px">🆕 V1.5.0 四大系统更新：</p><p>• <b>⚗️ 炼丹系统</b>：击杀BOSS掉落妖丹/灵材/天材地宝等8种材料，6种配方炼制（灵石精华/破境丹/洗髓丹/造化丹/法宝精魄丹/聚灵丹），炼丹炉5级升级</p><p>• <b>⚡ 境界突破试炼</b>：Lv.20~Lv.100共9个试炼，3层连续战斗不可回血，通关获永久ATK/DEF/HP/金币/灵石/天材地宝，Lv.70通关+1被动槽，Lv.90通关+1主动槽</p><p>• <b>🗡️ 法宝系统</b>：9大法宝（诛仙剑/噬血珠/戮仙剑/玲珑塔/太极图/玄武甲/天书/伏羲琴/昆仑镜），50级升级+5阶突破+觉醒，战斗中触发主动技能</p><p>• <b>🌟 转生（飞升）系统</b>：通关100层魔王后可飞升，最多九转，获得仙缘点永久加成，15种仙术学习，转生商店，怪物难度递增奖励递增</p><p style="color:var(--cinnabar);font-weight:bold;margin-top:8px">⚠️ 存档完全兼容，无需重新开始！老存档自动迁移新数据。</p></div></div></div></div>';
 
 function toggleNotice(){
     var body=document.getElementById('noticeBody');
@@ -3913,6 +4951,307 @@ window.xxCancelShopReplace = function() {
     G.scr = 'shop';
     rc();
 };
+/* ===== 🌟 S3 新页面渲染 ===== */
+
+function rAlchemy(c){
+    var p=G.p;
+    var h='<div class="xg-hdr"><h2>⚗️ 炼丹房</h2><p>材料炼制 · 丹药系统</p></div>';
+    h+='<div class="xg-card" style="padding:16px">';
+    var furnace=FURNACE_TIERS[p.furnaceTier||0];
+    var nextFurnace=p.furnaceTier<FURNACE_TIERS.length-1?FURNACE_TIERS[(p.furnaceTier||0)+1]:null;
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
+    h+='<div><span style="font-size:1.3rem">🏺</span> <span style="font-weight:800;font-size:1rem">'+furnace.name+'</span> <span style="font-size:.78rem;color:var(--gold)">(成功率+'+furnace.bonus+'%)</span></div>';
+    if(nextFurnace) h+='<button class="xg-btn gold" style="font-size:.72rem;padding:4px 10px" onclick="upgradeFurnace()">升级 → '+nextFurnace.name+' (💰'+nextFurnace.cost+')</button>';
+    else h+='<span style="font-size:.72rem;color:var(--gold)">已满级</span>';
+    h+='</div>';
+    h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;margin-bottom:8px">📦 材料库存</h4>';
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:.78rem;margin-bottom:16px">';
+    var mats=['grass','lotus','stone','core','spirit','heavenly','key','treasureEssence'];
+    mats.forEach(function(mk){
+        h+='<div style="text-align:center;padding:6px;background:var(--b50);border-radius:6px">';
+        h+='<div style="font-size:1.2rem">'+MATERIAL_EMOJI[mk]+'</div>';
+        h+='<div style="font-weight:700">'+(p.alchemy[mk]||0)+'</div>';
+        h+='<div style="font-size:.65rem;color:var(--txm)">'+MATERIAL_NAMES[mk]+'</div>';
+        h+='</div>';
+    });
+    h+='</div>';
+    h+='<div style="text-align:center;font-size:.82rem;color:var(--txm);margin-bottom:8px">💎 灵石: <span style="color:var(--gold);font-weight:800">'+(p.treasure.spiritStones||0)+'</span></div>';
+    h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;margin-bottom:10px">📜 炼丹配方</h4>';
+    ALCHEMY_RECIPES.forEach(function(r,idx){
+        var rate=Math.min(95,r.baseRate+(furnace?furnace.bonus:0));
+        var canCraft=true;
+        var costText=[];
+        for(var mk in r.cost){
+            var have=p.alchemy[mk]||0;
+            if(have<r.cost[mk]) canCraft=false;
+            costText.push(MATERIAL_EMOJI[mk]+MATERIAL_NAMES[mk]+'×'+r.cost[mk]);
+        }
+        h+='<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--b50);border-radius:8px;margin-bottom:6px">';
+        h+='<span style="font-size:1.3rem">'+r.emoji+'</span>';
+        h+='<div style="flex:1"><div style="font-weight:700;font-size:.88rem">'+r.name+'</div>';
+        h+='<div style="font-size:.72rem;color:var(--txm)">'+r.desc+'</div>';
+        h+='<div style="font-size:.68rem;color:var(--txl);margin-top:2px">'+costText.join(' ')+'</div>';
+        h+='</div>';
+        h+='<div style="text-align:right"><div style="font-size:.78rem;font-weight:700;color:'+(rate>=50?'var(--lv)':'var(--cinnabar)')+'">'+rate+'%</div>';
+        h+='<button class="xg-btn'+(canCraft?' gold':'')+'" style="font-size:.72rem;padding:4px 10px;'+(canCraft?'':'opacity:.5')+'" '+(canCraft?'onclick="doAlchemy('+idx+')"':'disabled')+'>炼制</button>';
+        h+='</div></div>';
+    });
+    h+='</div>';
+    h+='<div class="xg-actions"><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 返回基地</button></div>';
+    c.innerHTML=h;
+}
+
+function rTreasure(c){
+    var p=G.p;
+    var h='<div class="xg-hdr"><h2>🗡️ 法宝</h2><p>法宝管理 · 升级 · 突破</p></div>';
+    if(p.treasure&&p.treasure.equipped){
+        var eqId=p.treasure.equipped;
+        var tOwned=p.treasure.owned[eqId];
+        var tDef=getTreasureById(eqId);
+        if(tDef&&tOwned){
+            h+='<div class="xg-card" style="padding:20px;border-left:3px solid var(--gold)">';
+            h+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">';
+            h+='<span style="font-size:2.5rem">'+tDef.emoji+'</span>';
+            h+='<div><div style="font-weight:900;font-size:1.1rem">'+tDef.name+' <span style="color:var(--gold)">Lv.'+tOwned.level+'</span>';
+            if(tOwned.breakthrough>0) h+=' <span style="color:#ab47bc">· '+tOwned.breakthrough+'阶</span>';
+            if(tOwned.breakthrough>=5) h+=' <span style="color:#ffd740">· 觉醒</span>';
+            h+='</div><div style="font-size:.78rem;color:var(--txm)">'+tDef.desc+'</div></div></div>';
+            h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;font-size:.82rem;text-align:center">';
+            if(tDef.base.atk){h+='<div style="padding:8px;background:var(--b50);border-radius:6px"><div style="font-weight:800;color:var(--cinnabar)">ATK+'+getTreasureStat('atk')+'</div><div style="font-size:.65rem;color:var(--txm)">基础'+tDef.base.atk+'+成长</div></div>';}
+            if(tDef.base.def){h+='<div style="padding:8px;background:var(--b50);border-radius:6px"><div style="font-weight:800;color:var(--jade)">DEF+'+getTreasureStat('def')+'</div><div style="font-size:.65rem;color:var(--txm)">基础'+tDef.base.def+'+成长</div></div>';}
+            if(tDef.base.hp){h+='<div style="padding:8px;background:var(--b50);border-radius:6px"><div style="font-weight:800;color:var(--lv)">HP+'+getTreasureStat('hp')+'</div><div style="font-size:.65rem;color:var(--txm)">基础'+(tDef.base.hp||0)+'+成长</div></div>';}
+            if(!tDef.base.atk&&!tDef.base.def){h+='<div style="padding:8px;background:var(--b50);border-radius:6px"><div style="font-weight:800">综合型</div><div style="font-size:.65rem;color:var(--txm)">均衡属性</div></div>';}
+            h+='</div>';
+            h+='<div style="font-size:.78rem;color:var(--lv);margin-bottom:10px">被动：'+tDef.passive+'</div>';
+            if(tOwned.breakthrough>=1) h+='<div style="font-size:.78rem;color:var(--gold);margin-bottom:10px">主动：'+tDef.active+' (CD:'+tDef.activeCD+'回合)</div>';
+            h+='<div style="display:flex;gap:6px">';
+            var upgCost=getTreasureLevelUpCost(tOwned.level);
+            h+='<button class="xg-btn gold" style="flex:1;font-size:.78rem" onclick="upgradeTreasure()">⬆️ 升级 (💎'+upgCost+'灵石)</button>';
+            if(tOwned.breakthrough<5){
+                var btDef=TREASURE_BREAKTHROUGH[tOwned.breakthrough];
+                var canBt=tOwned.level>=btDef.lv;
+                var btText=btDef.desc;
+                h+='<button class="xg-btn'+(canBt?' primary':'')+'" style="flex:1;font-size:.78rem;'+(canBt?'':'opacity:.5')+'" '+(canBt?'onclick="breakthroughTreasure()"':'disabled')+'>✨ 突破 '+btText+'</button>';
+            }
+            h+='<button class="xg-btn danger" style="font-size:.78rem" onclick="unequipTreasure()">卸下</button>';
+            h+='</div></div>';
+        }
+    }else{
+        h+='<div class="xg-card" style="padding:20px;text-align:center"><div style="font-size:2rem;margin-bottom:8px">🗡️</div><div style="color:var(--txm)">未装备法宝</div></div>';
+    }
+    h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;margin:16px 0 10px">📦 法宝背包</h4>';
+    var ownedKeys=Object.keys(p.treasure?p.treasure.owned:{});
+    if(ownedKeys.length===0) h+='<div class="xg-card" style="text-align:center;color:var(--txm);padding:16px">暂无法宝，击杀BOSS或炼丹获取</div>';
+    else{ownedKeys.forEach(function(id){
+        var td=getTreasureById(id);if(!td)return;
+        var ow=p.treasure.owned[id];
+        var isEquipped=p.treasure.equipped===id;
+        h+='<div style="display:flex;align-items:center;gap:10px;padding:10px;background:'+(isEquipped?'rgba(201,169,110,.08)':'var(--b50)')+';border-radius:8px;margin-bottom:6px;'+(isEquipped?'border:1px solid var(--gold)':'')+'">';
+        h+='<span style="font-size:1.3rem">'+td.emoji+'</span>';
+        h+='<div style="flex:1"><div style="font-weight:700;font-size:.88rem">'+td.name+' <span style="color:var(--gold)">Lv.'+ow.level+'</span>';
+        if(ow.breakthrough>0) h+=' <span style="color:#ab47bc">'+ow.breakthrough+'阶</span>';
+        if(isEquipped) h+=' <span style="color:var(--lv)">(已装备)</span>';
+        h+='</div><div style="font-size:.68rem;color:var(--txm)">'+td.type==='atk'?'攻击型':td.type==='def'?'防御型':'辅助型'+' · '+td.source+'</div></div>';
+        if(!isEquipped) h+='<button class="xg-btn" style="font-size:.72rem;padding:4px 10px" onclick="equipTreasure(\''+id+'\')">装备</button>';
+        h+='</div>';
+    });}
+    h+='<div class="xg-actions"><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 返回基地</button></div>';
+    c.innerHTML=h;
+}
+
+function rBreakthrough(c){
+    var p=G.p;
+    var h='<div class="xg-hdr"><h2>⚡ 境界突破试炼</h2><p>3层连续战斗 · 通关获永久属性</p></div>';
+    h+='<div class="xg-card" style="padding:16px">';
+    BREAKTHROUGH_TRIALS.forEach(function(trial,idx){
+        var cleared=p.breakthroughCleared[trial.lv];
+        var canChallenge=!cleared&&p.lv>=trial.lv;
+        var locked=p.lv<trial.lv;
+        var rwText=[];
+        if(trial.rewards.atk) rwText.push('ATK+'+trial.rewards.atk);
+        if(trial.rewards.def) rwText.push('DEF+'+trial.rewards.def);
+        if(trial.rewards.hp) rwText.push('HP+'+trial.rewards.hp);
+        if(trial.rewards.gold) rwText.push('💰'+trial.rewards.gold);
+        if(trial.rewards.spiritStone) rwText.push('💎灵石×'+trial.rewards.spiritStone);
+        if(trial.rewards.heavenly) rwText.push('🌟天材×'+trial.rewards.heavenly);
+        if(trial.rewards.key) rwText.push('🔑造化×'+trial.rewards.key);
+        if(trial.rewards.passiveSlot) rwText.push('🔮被动槽+1');
+        if(trial.rewards.activeSlot) rwText.push('⚔️主动槽+1');
+        var bgCol=cleared?'rgba(76,175,80,.08)':canChallenge?'rgba(255,112,67,.08)':'var(--b50)';
+        var borderCol=cleared?'var(--lv)':canChallenge?'#ff7043':'var(--b100)';
+        h+='<div style="display:flex;align-items:center;gap:10px;padding:12px;background:'+bgCol+';border:1px solid '+borderCol+';border-radius:8px;margin-bottom:8px">';
+        h+='<div style="font-size:1.5rem">'+(cleared?'✅':locked?'🔒':'⚡')+'</div>';
+        h+='<div style="flex:1"><div style="font-weight:700;font-size:.88rem">'+trial.name+' <span style="font-size:.72rem;color:var(--txm)">(Lv.'+trial.lv+')</span>';
+        if(cleared) h+=' <span style="color:var(--lv);font-size:.72rem">已完成 · '+trial.title+'</span>';
+        h+='</div>';
+        h+='<div style="font-size:.72rem;color:var(--txm);margin-top:2px">奖励：'+rwText.join(' · ')+'</div>';
+        h+='<div style="font-size:.68rem;color:var(--txl)">3层连续战斗 · 属性继承 · 限时挑战</div>';
+        h+='</div>';
+        if(canChallenge) h+='<button class="xg-btn primary" style="font-size:.78rem" onclick="startBreakthrough('+idx+')">挑战</button>';
+        h+='</div>';
+    });
+    h+='</div>';
+    h+='<div class="xg-actions"><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 返回基地</button></div>';
+    c.innerHTML=h;
+}
+
+function rRebirth(c){
+    var p=G.p;
+    var rebCount=p.rebirth?p.rebirth.count:0;
+    var h='<div class="xg-hdr"><h2>🌟 飞升 · 转生系统</h2><p>'+(rebCount>0?toCN(rebCount)+'转修仙者':'未转生 · 通关100层魔王后解锁')+'</p></div>';
+    if(rebCount>0){
+        var totalPts=p.rebirth.celestPoints||0;
+        var usedPts=0;
+        var alloc=p.rebirth.celestAlloc;
+        for(var k in alloc) usedPts+=(alloc[k]||0);
+        h+='<div class="xg-card" style="padding:16px;border-left:3px solid var(--gold)">';
+        h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;margin-bottom:10px">✨ 仙缘面板</h4>';
+        h+='<div style="font-size:.82rem;color:var(--txm);margin-bottom:8px">仙缘点数：'+usedPts+'/'+totalPts+' (剩余'+(totalPts-usedPts)+'点)</div>';
+        h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
+        CELEST_PROPS.forEach(function(cp){
+            var pts=alloc[cp.key]||0;
+            var pct=getCelestPct(cp.key);
+            h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--b50);border-radius:6px">';
+            h+='<div><span>'+cp.emoji+' '+cp.name+'</span> <span style="font-weight:800;color:var(--gold)">'+pts+'点</span></div>';
+            h+='<div style="display:flex;align-items:center;gap:4px"><span style="font-size:.72rem;color:var(--lv)">+'+pct+'%</span>';
+            if(totalPts-usedPts>0) h+='<button class="xg-btn" style="font-size:.65rem;padding:2px 6px" onclick="allocateCelestPoint(\''+cp.key+'\')">+</button>';
+            h+='</div></div>';
+        });
+        h+='</div>';
+        if(usedPts>0) h+='<button class="xg-btn" style="width:100%;margin-top:8px;font-size:.78rem" onclick="resetCelestAlloc()">🔄 重新分配仙缘点</button>';
+        h+='</div>';
+        h+='<div class="xg-card" style="padding:16px;margin-top:8px">';
+        h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;margin-bottom:10px">📖 仙术 ('+p.rebirth.xianShu.length+'/'+Math.max(2,p.rebirth.xianShuSlots+2)+')</h4>';
+        if(p.rebirth.xianShu.length>0){
+            p.rebirth.xianShu.forEach(function(sid){
+                var xs=null;for(var i=0;i<XIAN_SHU.length;i++){if(XIAN_SHU[i].id===sid){xs=XIAN_SHU[i];break;}}
+                if(xs) h+='<div style="padding:6px 8px;background:var(--b50);border-radius:6px;margin-bottom:4px;font-size:.78rem"><span style="font-weight:700">📖 '+xs.name+'</span> <span style="color:var(--txm)">'+xs.desc+'</span></div>';
+            });
+        }
+        h+='<button class="xg-btn" style="width:100%;margin-top:6px;font-size:.78rem" onclick="xxGoto(\'xianShuPick\')">📖 学习新仙术</button>';
+        h+='</div>';
+        h+='<div class="xg-card" style="padding:16px;margin-top:8px">';
+        h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;margin-bottom:10px">🛒 转生商店 <span style="font-size:.72rem;color:var(--txm)">💎灵石:'+(p.treasure.spiritStones||0)+'</span></h4>';
+        REBIRTH_SHOP.forEach(function(item,idx){
+            var used=getRebirthShopUsed(item);
+            var atLimit=used>=item.limit;
+            var canBuy=(p.treasure.spiritStones||0)>=item.cost&&!atLimit;
+            h+='<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--b50);border-radius:6px;margin-bottom:4px">';
+            h+='<span style="font-size:1.1rem">'+item.emoji+'</span>';
+            h+='<div style="flex:1"><div style="font-weight:700;font-size:.82rem">'+item.name+'</div><div style="font-size:.68rem;color:var(--txm)">'+item.desc+' ('+used+'/'+item.limit+')</div></div>';
+            h+='<button class="xg-btn'+(canBuy?' gold':'')+'" style="font-size:.72rem;padding:4px 10px;'+(canBuy?'':'opacity:.5')+'" '+(canBuy?'onclick="buyRebirthShop('+idx+')"':'disabled')+'>💎'+item.cost+'</button>';
+            h+='</div>';
+        });
+        h+='</div>';
+    }
+    h+='<div class="xg-card" style="padding:16px;margin-top:8px">';
+    h+='<h4 style="font-family:\'Ma Shan Zheng\',cursive;margin-bottom:10px">🌟 转生奖励预览</h4>';
+    var nextCount=Math.min(rebCount+1,9);
+    var nextPts=REBIRTH_POINTS[nextCount]||0;
+    var nextRw=REBIRTH_REWARDS[nextCount];
+    h+='<div style="font-size:.82rem;color:var(--txm)">下次飞升 ('+toCN(nextCount)+'转)：仙缘点+'+nextPts;
+    if(nextRw){
+        h+=' · 金币+'+nextRw.gold+' · 灵石+'+nextRw.spiritStone;
+        if(nextRw.materials){for(var m in nextRw.materials) h+=' · '+MATERIAL_EMOJI[m]+MATERIAL_NAMES[m]+'×'+nextRw.materials[m];}
+    }
+    h+='</div>';
+    var dif=REBIRTH_DIFFICULTY[nextCount]||{hp:0,atk:0,def:0,exp:0,gold:0};
+    h+='<div style="font-size:.72rem;color:var(--cinnabar);margin-top:4px">⚠️ 怪物难度：HP+'+dif.hp+'% ATK+'+dif.atk+'% DEF+'+dif.def+'% | 奖励：经验+'+dif.exp+'% 金币+'+dif.gold+'%</div>';
+    h+='</div>';
+    var canFly=canRebirth();
+    if(canFly) h+='<button class="xg-btn gold" style="width:100%;margin-top:12px;font-size:1rem;padding:12px" onclick="doRebirth()">✨ 再次飞升</button>';
+    else h+='<div style="text-align:center;color:var(--txm);font-size:.78rem;margin-top:12px">飞升条件：通关100层魔王 + 完成Lv.100突破试炼</div>';
+    h+='<div class="xg-actions" style="margin-top:12px"><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 返回基地</button></div>';
+    c.innerHTML=h;
+}
+
+function rCelestAlloc(c){
+    var p=G.p;
+    var totalPts=p.rebirth.celestPoints||0;
+    var usedPts=0;var alloc=p.rebirth.celestAlloc;for(var k in alloc)usedPts+=(alloc[k]||0);
+    var h='<div class="xg-hdr"><h2>✨ 仙缘分配</h2><p>剩余仙缘点：'+(totalPts-usedPts)+'</p></div>';
+    h+='<div class="xg-card" style="padding:16px">';
+    CELEST_PROPS.forEach(function(cp){
+        var pts=alloc[cp.key]||0;
+        h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--b50);border-radius:8px;margin-bottom:6px">';
+        h+='<div><span style="font-size:1.2rem">'+cp.emoji+'</span> <span style="font-weight:800">'+cp.name+'</span> <span style="font-size:.78rem;color:var(--txm)">'+cp.desc+'</span></div>';
+        h+='<div style="display:flex;align-items:center;gap:8px"><span style="font-weight:800;color:var(--gold)">'+pts+'点 ('+getCelestPct(cp.key)+'%)</span>';
+        if(totalPts-usedPts>0) h+='<button class="xg-btn gold" style="padding:4px 12px" onclick="allocateCelestPoint(\''+cp.key+'\');xxGoto(\'celestAlloc\')">+</button>';
+        h+='</div></div>';
+    });
+    if(usedPts>0) h+='<button class="xg-btn" style="width:100%;margin-top:10px" onclick="resetCelestAlloc();xxGoto(\'celestAlloc\')">🔄 全部重置</button>';
+    h+='</div>';
+    h+='<div class="xg-actions"><button class="xg-btn" onclick="xxGoto(\'rebirth\')">↩️ 返回飞升</button></div>';
+    c.innerHTML=h;
+}
+
+function rXianShuPick(c){
+    var p=G.p;
+    var h='<div class="xg-hdr"><h2>📖 仙术选择</h2><p>选择学习新的仙术</p></div>';
+    h+='<div class="xg-card" style="padding:16px">';
+    XIAN_SHU.forEach(function(xs){
+        var learned=p.rebirth.xianShu.indexOf(xs.id)>=0;
+        var unlocked=p.rebirth.count>=xs.minRebirth;
+        var slots=p.rebirth.xianShuSlots||0;
+        var used=p.rebirth.xianShu.length;
+        var hasSlot=used<slots+2;
+        var canLearn=!learned&&unlocked&&hasSlot;
+        var bgCol=learned?'rgba(76,175,80,.08)':canLearn?'rgba(201,169,110,.08)':'var(--b50)';
+        var borderCol=learned?'var(--lv)':canLearn?'var(--gold)':'var(--b100)';
+        h+='<div style="display:flex;align-items:center;gap:10px;padding:12px;background:'+bgCol+';border:1px solid '+borderCol+';border-radius:8px;margin-bottom:6px">';
+        h+='<div style="font-size:1.3rem">'+(learned?'✅':unlocked?'📖':'🔒')+'</div>';
+        h+='<div style="flex:1"><div style="font-weight:700;font-size:.88rem">'+xs.name;
+        if(learned) h+=' <span style="color:var(--lv);font-size:.72rem">(已学)</span>';
+        if(!unlocked) h+=' <span style="color:var(--txl);font-size:.72rem">('+xs.minRebirth+'转解锁)</span>';
+        h+='</div><div style="font-size:.72rem;color:var(--txm)">'+xs.desc+'</div></div>';
+        if(canLearn) h+='<button class="xg-btn gold" style="font-size:.78rem" onclick="learnXianShu(\''+xs.id+'\');xxGoto(\'xianShuPick\')">学习</button>';
+        h+='</div>';
+    });
+    h+='</div>';
+    h+='<div class="xg-actions"><button class="xg-btn" onclick="xxGoto(\'rebirth\')">↩️ 返回飞升</button></div>';
+    c.innerHTML=h;
+}
+
+function rRebirthResult(c){
+    var rd=G._rebirthReward;if(!rd){xxGoto('hub');return}
+    var rw=rd.rw||{};
+    var h='<div class="xg-title"><div class="big-emoji" style="animation:epicPulse 1.5s infinite">🌟</div><h3 style="color:var(--gold);font-size:1.4rem">飞升成功！</h3>';
+    h+='<p style="font-size:1rem;color:var(--lv);margin-bottom:12px">'+toCN(rd.count)+'转修仙者</p>';
+    h+='<div style="background:rgba(201,169,110,.08);border:1px solid var(--gold);border-radius:12px;padding:16px;margin-bottom:16px;text-align:left">';
+    h+='<div style="font-weight:700;margin-bottom:6px">🎁 飞升奖励</div>';
+    h+='<div style="font-size:.82rem;color:var(--txm)">✨ 仙缘点 +'+rd.points+'</div>';
+    if(rw.gold) h+='<div style="font-size:.82rem;color:var(--txm)">💰 金币 +'+rw.gold+'</div>';
+    if(rw.spiritStone) h+='<div style="font-size:.82rem;color:var(--txm)">💎 灵石 +'+rw.spiritStone+'</div>';
+    if(rw.materials){for(var m in rw.materials) h+='<div style="font-size:.82rem;color:var(--txm)">'+MATERIAL_EMOJI[m]+' '+MATERIAL_NAMES[m]+' ×'+rw.materials[m]+'</div>';}
+    h+='</div>';
+    if(rd.count>=9) h+='<div style="font-size:1rem;color:var(--gold);font-weight:900;margin-bottom:12px">👑 终极称号：九转天尊！</div>';
+    h+='<div class="xg-actions"><button class="xg-btn primary" onclick="xxGoto(\'rebirth\')">✨ 分配仙缘点</button><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 回基地</button></div></div>';
+    c.innerHTML=h;
+}
+
+function rTrialWin(c){
+    var rd=G._trialReward;if(!rd){xxGoto('hub');return}
+    var h='<div class="xg-title"><div class="big-emoji" style="animation:epicPulse 1.5s infinite">⚡</div><h3 style="color:var(--gold);font-size:1.4rem">境界突破成功！</h3>';
+    h+='<p style="font-size:1rem;color:var(--lv);margin-bottom:12px">'+rd.title+'</p>';
+    h+='<div style="background:rgba(255,112,67,.08);border:1px solid #ff7043;border-radius:12px;padding:16px;margin-bottom:16px;text-align:left">';
+    h+='<div style="font-weight:700;margin-bottom:6px">🎁 突破奖励</div>';
+    rd.rewards.forEach(function(r){h+='<div style="font-size:.82rem;color:var(--txm)">✨ '+r+'</div>';});
+    h+='</div>';
+    h+='<div class="xg-actions"><button class="xg-btn primary" onclick="xxGoto(\'hub\')">↩️ 回基地</button></div></div>';
+    c.innerHTML=h;
+}
+
+function rTrialLose(c){
+    var h='<div class="xg-title"><div class="big-emoji">💀</div><h3>突破试炼失败...</h3>';
+    h+='<p style="color:var(--txm);font-size:.85rem;margin-bottom:16px">不要气馁，提升实力后再来挑战！</p>';
+    h+='<div class="xg-actions"><button class="xg-btn primary" onclick="xxGoto(\'hub\')">↩️ 回基地</button></div></div>';
+    c.innerHTML=h;
+}
+
+function toCN(n){
+    var cn=['零','一','二','三','四','五','六','七','八','九'];
+    return n>=0&&n<=9?cn[n]:n+'';
+}
 function rFloors(c){var pr=G.prog;var h='<div class="xg-hdr"><h2>📍 选择楼层</h2><p>最高: 第'+pr.maxFloor+'层</p></div><div class="xg-card"><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">';for(var i=1;i<=Math.max(pr.curFloor,20);i++){var cleared=pr.cleared[i];var boss=pr.bossCleared[i];var locked=i>pr.curFloor;h+='<div class="xg-chbtn '+(boss?'boss':'')+'" style="justify-content:center;'+(locked?'opacity:.4;pointer-events:none':'')+'" '+(locked?'':'onclick="xxFloor('+i+')"')+'><div style="font-size:.85rem;font-weight:800;color:'+(cleared?'var(--b500)':'var(--tx)')+'">'+i+(boss?' 👑':'')+(cleared?' ✓':'')+'</div></div>'}h+='</div></div><div class="xg-actions"><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 返回</button></div>';c.innerHTML=h;}
 
 function rSkList(c){var p=G.p;var h='<div class="xg-hdr"><h2>📖 技能列表</h2><p>主动技能上限'+maxActiveSlots(p)+'个，被动技能上限'+maxPassiveSlots(p)+'个</p></div>';h+='<div class="xg-card"><h3 style="font-size:1rem;font-weight:800;margin-bottom:12px">⚔️ 主动 ('+p.aSkl.length+'/'+maxActiveSlots(p)+')</h3>';if(p.aSkl.length===0)h+='<div style="color:var(--txm);font-size:.85rem;padding:12px 0">尚未习得</div>';for(var i=0;i<p.aSkl.length;i++){var sk=ASKILLS.find(function(s){return s.id===p.aSkl[i]});if(!sk)continue;h+='<div class="xg-item"><span class="it-icon">⚔️</span><div class="it-info"><div class="it-name">'+sk.n+'</div><div class="it-desc">'+sk.d+' · CD:'+sk.cd+'</div></div></div>'}h+='</div>';h+='<div class="xg-card"><h3 style="font-size:1rem;font-weight:800;margin-bottom:12px">🔮 被动 ('+p.pSkl.length+'/'+maxPassiveSlots(p)+')</h3>';for(var i=0;i<p.pSkl.length;i++){var sk=PSKILLS.find(function(s){return s.id===p.pSkl[i]});if(!sk)continue;h+='<div class="xg-item"><span class="it-icon">🔮</span><div class="it-info"><div class="it-name">'+sk.n+'</div><div class="it-desc">'+sk.d+'</div></div></div>'}if(!p.pSkl.length)h+='<div style="color:var(--txm);font-size:.85rem;padding:12px 0">尚未习得</div>';h+='</div><div class="xg-actions"><button class="xg-btn" onclick="xxGoto(\'hub\')">↩️ 返回</button></div>';c.innerHTML=h;}
@@ -4523,11 +5862,14 @@ window.pickSkillFromPool=function(id,isPassive){
             p.pSkl.push(id);
             showSaveToast('🔮','学习了新被动技能');
         }
-    }else{
+       }else{
         if(p.aSkl.length>=maxActiveSlots(p)){
-            var oldId=p.aSkl.pop();
-            p.aSkl.push(id);
-            showSaveToast('⚔️','学习新技能，替换了 '+(ASKILLS.find(function(s){return s.id===oldId})||{name:oldId}).name);
+            /* 槽位满：弹出替换界面让玩家选择 */
+            G.shopReplaceData = { skillId: id };
+            G.scr = 'shopReplace';
+            closeShopSkillModal();
+            rc();
+            return;
         }else{
             p.aSkl.push(id);
             showSaveToast('⚔️','学习了新主动技能');
