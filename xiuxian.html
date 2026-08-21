@@ -2233,6 +2233,13 @@ function doAlchemy(recipeIdx){
     var p=G.p;
     var recipe=ALCHEMY_RECIPES[recipeIdx];
     if(!recipe){showSaveToast('❌','配方不存在');return}
+    
+    /* 🌟 破境丹终身 200 颗上限拦截 */
+    if(recipe.id==='R2' && (p.alchemy.poJingCount||0)>=200){
+        showSaveToast('❌','体内丹毒已达极限！破境丹终身最多服用 200 颗');
+        return;
+    }
+
     /* 检查材料 */
     for(var mat in recipe.cost){
         if((p.alchemy[mat]||0)<recipe.cost[mat]){
@@ -2266,9 +2273,10 @@ function applyAlchemyResult(type,amt){
             addLog('💎 灵石 +'+amt);
             break;
         case 'statPt':
-            p.statPts+=amt;
-            addLog('💫 属性点 +'+amt);
-            break;
+        p.statPts+=amt;
+        p.alchemy.poJingCount=(p.alchemy.poJingCount||0)+amt;
+        addLog('💫 破境丹生效！属性点 +'+amt+' (终身已用: '+(p.alchemy.poJingCount)+'/200)');
+        break;
         case 'petWash':
             /* 触发宠物洗髓（和商店洗髓共用逻辑） */
             if(p.pet&&p.pet.owned){
@@ -5096,20 +5104,31 @@ function rAlchemy(c){
     ALCHEMY_RECIPES.forEach(function(r,idx){
         var rate=Math.min(95,r.baseRate+(furnace?furnace.bonus:0));
         var canCraft=true;
+        
+        /* 破境丹 200 颗满额检测 */
+        var isPoJing = (r.id==='R2');
+        var poJingUsed = (p.alchemy.poJingCount||0);
+        var isPoJingFull = isPoJing && poJingUsed >= 200;
+        if(isPoJingFull) canCraft = false;
+
         var costText=[];
         for(var mk in r.cost){
             var have=p.alchemy[mk]||0;
             if(have<r.cost[mk]) canCraft=false;
             costText.push(MATERIAL_EMOJI[mk]+MATERIAL_NAMES[mk]+'×'+r.cost[mk]);
         }
+        
+        var extraDesc = isPoJing ? ' <span style="font-size:.72rem;color:'+(isPoJingFull?'var(--cinnabar)':'var(--gold)')+'">('+poJingUsed+'/200颗'+(isPoJingFull?' · 已满':'')+')</span>' : '';
+        
         h+='<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--b50);border-radius:8px;margin-bottom:6px">';
         h+='<span style="font-size:1.3rem">'+r.emoji+'</span>';
-        h+='<div style="flex:1"><div style="font-weight:700;font-size:.88rem">'+r.name+'</div>';
+        h+='<div style="flex:1"><div style="font-weight:700;font-size:.88rem">'+r.name+extraDesc+'</div>';
         h+='<div style="font-size:.72rem;color:var(--txm)">'+r.desc+'</div>';
         h+='<div style="font-size:.68rem;color:var(--txl);margin-top:2px">'+costText.join(' ')+'</div>';
         h+='</div>';
         h+='<div style="text-align:right"><div style="font-size:.78rem;font-weight:700;color:'+(rate>=50?'var(--lv)':'var(--cinnabar)')+'">'+rate+'%</div>';
-        h+='<button class="xg-btn'+(canCraft?' gold':'')+'" style="font-size:.72rem;padding:4px 10px;'+(canCraft?'':'opacity:.5')+'" '+(canCraft?'onclick="doAlchemy('+idx+')"':'disabled')+'>炼制</button>';
+        var btnLabel = isPoJingFull ? '🔒 已满' : '炼制';
+        h+='<button class="xg-btn'+(canCraft?' gold':'')+'" style="font-size:.72rem;padding:4px 10px;'+(canCraft?'':'opacity:.5')+'" '+(canCraft?'onclick="doAlchemy('+idx+')"':'disabled')+'>'+btnLabel+'</button>';
         h+='</div></div>';
     });
     h+='</div>';
