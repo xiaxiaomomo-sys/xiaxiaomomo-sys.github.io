@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>修仙之路</title>
-<meta name="game-version" content="v1.4.2">
+<meta name="game-version" content="v1.4.3">
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -79,7 +79,144 @@ body.dark::after{opacity:.06}
 @keyframes petBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @keyframes summonFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 @keyframes vsPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+/* ===== 🌟 S2 新技能动画：雷系 ===== */
+@keyframes thunderColumn {
+  0%   { opacity:0; transform:scaleY(0); transform-origin:top }
+  20%  { opacity:1; transform:scaleY(1.2) }
+  40%  { opacity:1; transform:scaleY(1) }
+  100% { opacity:0; transform:scaleY(0.3) }
+}
+@keyframes thunderExpand {
+  0%   { opacity:1; transform:scale(0.3) rotate(0deg) }
+  50%  { opacity:0.8; transform:scale(1.5) rotate(180deg) }
+  100% { opacity:0; transform:scale(2.5) rotate(360deg) }
+}
+@keyframes electricArc {
+  0%   { opacity:0; filter:brightness(1) }
+  15%  { opacity:1; filter:brightness(2.5) }
+  30%  { opacity:0.6; filter:brightness(1.3) }
+  50%  { opacity:1; filter:brightness(2) }
+  70%  { opacity:0.5; filter:brightness(1.2) }
+  100% { opacity:0; filter:brightness(1) }
+}
+@keyframes thunderFireSlash {
+  0%   { opacity:1; transform:translateX(0) scaleX(1) }
+  100% { opacity:0; transform:translateX(80px) scaleX(0.3) }
+}
 
+/* ===== 🌟 S2 新技能动画：剑系 ===== */
+@keyframes swordOrbit {
+  from { transform:rotate(0deg) translateX(40px) rotate(0deg) }
+  to   { transform:rotate(360deg) translateX(40px) rotate(-360deg) }
+}
+@keyframes swordCross {
+  0%   { opacity:0; transform:scale(0) rotate(0deg) }
+  30%  { opacity:1; transform:scale(1.2) rotate(45deg) }
+  100% { opacity:0; transform:scale(0.5) rotate(90deg) }
+}
+@keyframes swordArrayPulse {
+  0%,100% { opacity:0.6; filter:drop-shadow(0 0 2px rgba(255,215,64,.3)) }
+  50%     { opacity:1;   filter:drop-shadow(0 0 8px rgba(255,215,64,.6)) }
+}
+
+/* ===== 🌟 S2 新技能动画：太极 ===== */
+@keyframes taijiSpin {
+  from { transform:rotate(0deg) }
+  to   { transform:rotate(360deg) }
+}
+@keyframes taijiShatter {
+  0%   { opacity:1; transform:translate(0,0) rotate(0) scale(1) }
+  100% { opacity:0; transform:translate(var(--dx,40px),var(--dy,-40px)) rotate(720deg) scale(0.2) }
+}
+@keyframes taijiAbsorb {
+  0%   { transform:scale(1); filter:brightness(1) }
+  50%  { transform:scale(1.3); filter:brightness(3) }
+  100% { transform:scale(0); filter:brightness(0) }
+}
+
+/* ===== 🌟 S2 新技能动画：化身 ===== */
+@keyframes cloneStrike {
+  0%   { transform:translateX(0) }
+  30%  { transform:translateX(60px) scale(1.1) }
+  100% { transform:translateX(0) }
+}
+@keyframes cloneFadeIn {
+  0%   { opacity:0; transform:scale(0.3) translateY(20px) }
+  100% { opacity:0.6; transform:scale(0.6) translateY(0) }
+}
+
+/* ===== 🌟 S2 新技能动画：封印 ===== */
+@keyframes sealRune {
+  0%   { opacity:0; transform:translate(var(--sx,20px),var(--sy,-20px)) rotate(0) scale(0.5) }
+  50%  { opacity:1; transform:translate(0,0) rotate(180deg) scale(1) }
+  100% { opacity:0; transform:translate(0,0) rotate(360deg) scale(0.3) }
+}
+@keyframes sealCage {
+  0%,100% { box-shadow:inset 0 0 10px rgba(196,30,58,.1) }
+  50%     { box-shadow:inset 0 0 25px rgba(196,30,58,.25) }
+}
+
+/* ===== 🌟 S2 新技能动画：雪梅 ===== */
+@keyframes snowDrift {
+  0%   { opacity:1; transform:translate(0,0) }
+  100% { opacity:0; transform:translate(var(--dx,30px),var(--dy,-40px)) scale(0.3) }
+}
+@keyframes plumBloom {
+  0%   { opacity:0; transform:scale(0) rotate(0) }
+  60%  { opacity:0.8; transform:scale(1.2) rotate(72deg) }
+  100% { opacity:0; transform:scale(1) rotate(144deg) }
+}
+
+/* ===== 🌟 S2 新技能动画：丹药 ===== */
+@keyframes pillPulse {
+  0%   { opacity:0; transform:scale(0.3) }
+  40%  { opacity:1; transform:scale(1.3) }
+  100% { opacity:0; transform:scale(2) }
+}
+
+/* ===== 🌟 S2 新技能动画：佛莲 ===== */
+@keyframes lotusBloom {
+  0%   { opacity:0; transform:rotate(var(--lr,0deg)) scale(0) }
+  60%  { opacity:0.8; transform:rotate(var(--lr,0deg)) scale(1.1) }
+  100% { opacity:0; transform:rotate(var(--lr,0deg)) scale(0.8) }
+}
+
+/* ===== 🌟 S2 怪物 Debuff 视觉样式 ===== */
+.debuff-thunder-glow {
+  box-shadow:inset 0 0 15px rgba(124,77,255,.35), 0 0 10px rgba(124,77,255,.2) !important;
+  animation:electricArc 0.8s ease-in-out infinite !important;
+}
+.debuff-weak .char-body {
+  filter:saturate(0.4) brightness(0.85);
+  transition:filter .3s;
+}
+.debuff-broken .char-body::after {
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:linear-gradient(135deg,transparent 30%,rgba(196,30,58,.15) 50%,transparent 70%);
+  pointer-events:none;
+}
+.debuff-sealed .char-body {
+  box-shadow:inset 0 0 20px rgba(196,30,58,.2);
+  animation:sealCage 1.5s ease-in-out infinite;
+}
+.debuff-stun .emoji {
+  animation:shakeLight 0.3s ease infinite;
+}
+.sword-intent-dot {
+  position:absolute;width:6px;height:6px;border-radius:50%;
+  background:#ffd740;box-shadow:0 0 6px #ffd740;
+  animation:swordOrbit 3s linear infinite;
+}
+.triple-form-clone {
+  position:absolute;top:15%;font-size:1.4rem;opacity:0.6;
+  animation:summonFloat 2.5s ease-in-out infinite;
+  filter:drop-shadow(0 0 8px rgba(150,80,255,.3));
+  pointer-events:none;z-index:5;
+}
+.sword-array-sword {
+  position:absolute;font-size:0.9rem;animation:swordArrayPulse 2s ease-in-out infinite;
+  pointer-events:none;z-index:5;
+}
 /* ===== 修复1：页面居中与标题居中 ===== */
 .xg{max-width:100%;width:100%;margin:0 auto}
 .xg-title{text-align:center;padding:24px 10px}
@@ -575,7 +712,13 @@ var ASKILLS=[
     {id:'A22',n:'蛊毒术',lv:15,cd:4,d:'施加3层毒，每层每回合ATK×1.0伤害，上限10层，BOSS≤7.5%maxHP'},
     {id:'A23',n:'毒爆',lv:30,cd:5,d:'引爆≥5层毒，消耗一半毒层造成引爆层数×ATK×0.5伤害，BOSS≤7.5%maxHP'},
     {id:'A24',n:'灵龟护盾',lv:10,cd:4,d:'获得最大HP×25%的护盾，持续3回合'},
-    {id:'A25',n:'以守为攻',lv:30,cd:5,d:'本回合防御×2，下回合攻击×3'}
+    {id:'A25',n:'以守为攻',lv:30,cd:5,d:'本回合防御×2，下回合攻击×3'},
+    {id:'A26',n:'养剑术·出鞘',lv:35,cd:5,d:'每回合自动积攒1层剑意(上限5层)，出鞘造成层数×ATK×0.6真实伤害，满层高达ATK×3.0'},
+    {id:'A27',n:'掌心雷·过载',lv:15,cd:4,d:'随机1.2~3.6倍波动伤害，倍率≥3.0时(25%)附带眩晕1回合'},
+    {id:'A28',n:'太极化劲',lv:25,cd:6,d:'本回合格挡下1次攻击(伤害归0)，下回合将格挡伤害100%反弹(BOSS 50%，上限6%HP)'},
+    {id:'A29',n:'一气化三清',lv:45,cd:6,d:'开启2回合，期间所有攻击两尊法身各追击25%伤害(合计+50%)'},
+    {id:'A31',n:'封天禁术',lv:25,cd:5,d:'造成ATK×1.2伤害并封印怪物2回合(BOSS 1回合)：禁用怪物暴击/回血/AOE，受全伤害+15%'},
+    {id:'A32',n:'神剑御雷真诀',lv:50,cd:7,d:'造成ATK×2.8雷霆巨伤，100%眩晕1回合，挂雷痕2回合(受击额外ATK×25%真伤，BOSS≤3%HP)'}
 ];
 var PSKILLS=[
     {id:'P1',n:'怒气爆发',lv:5,d:'HP<50%时攻击力+15%'},
@@ -605,7 +748,14 @@ var PSKILLS=[
     {id:'P27',n:'财运亨通',lv:10,d:'战斗胜利金币+30%'},
     {id:'P28',n:'散财消灾',lv:30,d:'致死时若金币≥500，消耗500金币回复30%maxHP(限1次/战)'},
     {id:'P29',n:'龟息术',lv:15,d:'每回合回复maxHP×1.5%，但攻击力-10%'},
-    {id:'P30',n:'坚壁清野',lv:35,d:'护盾存在时，受击反弹护盾值×20%伤害(BOSS×0.5)'}
+    {id:'P30',n:'坚壁清野',lv:35,d:'护盾存在时，受击反弹护盾值×20%伤害(BOSS×0.5)'},
+    {id:'P31',n:'剑心通明',lv:40,d:'普通攻击有20%概率飞出灵剑，追加ATK×40%真实伤害'},
+    {id:'P33',n:'踏雪寻梅',lv:30,d:'成功闪避后，下一次普攻必定暴击且暴击伤害+20%'},
+    {id:'P35',n:'九转金丹',lv:30,d:'HP<70%自动回15%血，<45%自动攻击+20%两回合，<20%自动获得20%HP护盾(每颗每战限1次)'},
+    {id:'P38',n:'诛仙剑阵',lv:35,d:'回合递增真伤：第1回合25%→第2回合50%→第3回合75%→第4回合起每回合100%ATK真伤(BOSS≤3.5%HP)'},
+    {id:'P39',n:'太极玄清道',lv:30,d:'每回合驱散1个负面状态，HP≥70%时剑/雷技能+15%伤害，HP首次<30%回复15%HP(1次/战)'},
+    {id:'P40',n:'天琊剑意',lv:40,d:'施放剑/雷大招后CD-1，下一次普攻追加ATK×50%雷火剑芒真伤'},
+    {id:'P41',n:'大梵般若',lv:35,d:'单次受击>15%HP时减免30%伤害，并给怪物挂虚弱2回合(攻击-15%，BOSS-8%)'}
 ];
 /* ===== 召唤物系统 ===== */
 var SUMMON_POOL=[
@@ -1291,7 +1441,494 @@ function showFleePopup(){
     document.body.appendChild(el);
     setTimeout(function(){if(el.parentNode)el.remove()},1000);
 }
+/* ===== 🌟 S2 怪物 Debuff 工具函数 ===== */
+function applyMonsterDebuff(type, dur, m) {
+    if (!m) m = G.cmb.m;
+    switch (type) {
+        case 'thunder':
+            G.cmb.thunderMark = Math.max(G.cmb.thunderMark || 0, dur);
+            addLog('<span style="color:#7c4dff;font-weight:800">⚡ 施加雷痕 ' + dur + ' 回合！</span>');
+            break;
+        case 'weak':
+            G.cmb.weakTurns = Math.max(G.cmb.weakTurns || 0, dur);
+            addLog('<span style="color:#9e9e9e;font-weight:800">📉 施加虚弱 ' + dur + ' 回合！(攻击-' + (m.isBoss ? '8%' : '15%') + ')</span>');
+            break;
+        case 'broken':
+            G.cmb.brokenArmor = Math.max(G.cmb.brokenArmor || 0, dur);
+            addLog('<span style="color:#ff6b6b;font-weight:800">💔 施加破甲 ' + dur + ' 回合！(防御-25%)</span>');
+            break;
+        case 'sealed':
+            G.cmb.sealed = Math.max(G.cmb.sealed || 0, dur);
+            addLog('<span style="color:#c41e3a;font-weight:800">🔒 施加封印 ' + dur + ' 回合！(禁用特殊能力)</span>');
+            break;
+    }
+}
 
+function processMonsterDebuffs() {
+    var c = G.cmb, m = c.m;
+    if (c.thunderMark > 0) {
+        c.thunderMark--;
+        if (c.thunderMark <= 0) addLog('<span style="color:var(--txm)">⚡ 雷痕消散</span>');
+    }
+    if (c.weakTurns > 0) {
+        c.weakTurns--;
+        if (c.weakTurns <= 0) addLog('<span style="color:var(--txm)">📉 虚弱消散</span>');
+    }
+    if (c.brokenArmor > 0) {
+        c.brokenArmor--;
+        if (c.brokenArmor <= 0) addLog('<span style="color:var(--txm)">💔 破甲消散</span>');
+    }
+    if (c.sealed > 0) {
+        c.sealed--;
+        if (c.sealed <= 0) addLog('<span style="color:var(--txm)">🔒 封印消散</span>');
+    }
+}
+
+/* 雷痕追击：每次攻击命中后调用 */
+function triggerThunderMark() {
+    var p = G.p, c = G.cmb, m = c.m;
+    if (!c.thunderMark || c.thunderMark <= 0 || m.hp <= 0) return;
+    var tDmg = Math.floor(calcAtk(p) * 0.25);
+    if (m.isBoss) tDmg = Math.min(tDmg, Math.floor(m.mhp * 0.03));
+    tDmg = Math.max(1, tDmg);
+    m.hp = Math.max(0, m.hp - tDmg);
+    addLog('⚡ 雷痕追击 <span class="dmg">' + tDmg + '</span>');
+    floatDmg('xgME', '⚡' + tDmg, '#7c4dff');
+    spawnThunderMarkFx();
+}
+
+function spawnThunderMarkFx() {
+    var me = document.getElementById('xgME');
+    if (!me) return;
+    var rect = me.getBoundingClientRect(), sr = document.querySelector('.xg-battle').getBoundingClientRect();
+    for (var i = 0; i < 4; i++) {
+        (function (j) {
+            setTimeout(function () {
+                var l = document.createElement('div');
+                l.style.cssText = 'position:absolute;width:2px;background:linear-gradient(180deg,#7c4dff,transparent);pointer-events:none;z-index:20;animation:lightningBolt .3s ease forwards;';
+                l.style.height = (30 + Math.random() * 30) + 'px';
+                l.style.left = (rect.left - sr.left + rect.width * Math.random()) + 'px';
+                l.style.top = (rect.top - sr.top - 20) + 'px';
+                document.querySelector('.xg-battle').appendChild(l);
+                setTimeout(function () { if (l.parentNode) l.remove(); }, 400);
+            }, j * 50);
+        })(i);
+    }
+}
+
+/* ===== 🌟 S2 主动技能特效函数 ===== */
+
+/* A32 神剑御雷真诀 */
+function spawnDivineThunder() {
+    var me = document.getElementById('xgME');
+    if (!me) return;
+    var rect = me.getBoundingClientRect(), sr = document.querySelector('.xg-battle').getBoundingClientRect();
+    var cx = rect.left - sr.left + rect.width / 2, cy = rect.top - sr.top + rect.height / 2;
+    /* 雷柱 */
+    for (var i = 0; i < 3; i++) {
+        (function (j) {
+            setTimeout(function () {
+                var col = document.createElement('div');
+                col.style.cssText = 'position:absolute;width:8px;height:200px;background:linear-gradient(180deg,#ffd740,#7c4dff,transparent);pointer-events:none;z-index:20;animation:thunderColumn .5s ease forwards;transform-origin:top;border-radius:4px;';
+                col.style.left = (cx - 4 + (j - 1) * 20) + 'px';
+                col.style.top = (cy - 200) + 'px';
+                document.querySelector('.xg-battle').appendChild(col);
+                setTimeout(function () { if (col.parentNode) col.remove(); }, 700);
+            }, j * 80);
+        })(i);
+    }
+    /* 剑气横扫 */
+    setTimeout(function () {
+        var slash = document.createElement('div');
+        slash.style.cssText = 'position:absolute;width:100%;height:4px;background:linear-gradient(90deg,transparent,#ffd740,#7c4dff,transparent);pointer-events:none;z-index:20;animation:slashTrail .4s ease forwards;border-radius:2px;';
+        slash.style.left = '0px';
+        slash.style.top = cy + 'px';
+        document.querySelector('.xg-battle').appendChild(slash);
+        setTimeout(function () { if (slash.parentNode) slash.remove(); }, 500);
+    }, 200);
+    /* 爆炸粒子 */
+    setTimeout(function () {
+        var colors = ['#ffd740', '#7c4dff', '#e040fb', '#ff9800'];
+        for (var i = 0; i < 12; i++) {
+            var pt = document.createElement('div');
+            pt.style.cssText = 'position:absolute;width:5px;height:5px;border-radius:50%;pointer-events:none;z-index:20;transition:all .5s ease-out;';
+            pt.style.background = colors[i % 4];
+            pt.style.boxShadow = '0 0 6px ' + colors[i % 4];
+            pt.style.left = cx + 'px';
+            pt.style.top = cy + 'px';
+            document.querySelector('.xg-battle').appendChild(pt);
+            var angle = Math.random() * Math.PI * 2, dist = 30 + Math.random() * 50;
+            (function (el, a, d) {
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(function () {
+                        el.style.transform = 'translate(' + Math.cos(a) * d + 'px,' + Math.sin(a) * d + 'px)';
+                        el.style.opacity = '0';
+                    });
+                });
+            })(pt, angle, dist);
+            setTimeout(function (el) { if (el.parentNode) el.remove(); }, 700, pt);
+        }
+    }, 300);
+    screenFlash('rgba(255,215,64,.2)');
+    shakeBattle('shake-heavy');
+}
+
+/* A26 养剑术·剑意蓄力视觉 */
+function spawnSwordChargeVisual(count) {
+    var pe = document.getElementById('xgPE');
+    if (!pe) return;
+    /* 清除旧的剑意点 */
+    var old = pe.querySelectorAll('.sword-intent-dot');
+    for (var i = 0; i < old.length; i++) old[i].remove();
+    if (count <= 0) return;
+    var body = pe.querySelector('.char-body');
+    if (!body) return;
+    for (var i = 0; i < count; i++) {
+        var dot = document.createElement('div');
+        dot.className = 'sword-intent-dot';
+        var angle = (360 / count) * i;
+        dot.style.cssText = 'position:absolute;width:6px;height:6px;border-radius:50%;background:#ffd740;box-shadow:0 0 6px #ffd740;pointer-events:none;z-index:10;animation:swordOrbit 3s linear infinite;';
+        dot.style.left = '50%';
+        dot.style.top = '50%';
+        dot.style.transform = 'rotate(' + angle + 'deg) translateX(40px)';
+        body.appendChild(dot);
+    }
+    if (count >= 5) {
+        body.style.filter = 'drop-shadow(0 0 10px rgba(255,215,64,.5))';
+        setTimeout(function () { body.style.filter = ''; }, 500);
+    }
+}
+
+/* A26 养剑术·出鞘爆发 */
+function spawnSwordRelease(count) {
+    var me = document.getElementById('xgME');
+    var pe = document.getElementById('xgPE');
+    if (!me || !pe) return;
+    var pr = pe.getBoundingClientRect(), mr = me.getBoundingClientRect(), sr = document.querySelector('.xg-battle').getBoundingClientRect();
+    /* 清除剑意点 */
+    var old = pe.querySelectorAll('.sword-intent-dot');
+    for (var i = 0; i < old.length; i++) old[i].remove();
+    /* 十字斩 */
+    var cx = mr.left - sr.left + mr.width / 2, cy = mr.top - sr.top + mr.height / 2;
+    for (var i = 0; i < 2; i++) {
+        var cross = document.createElement('div');
+        cross.style.cssText = 'position:absolute;width:100px;height:3px;background:linear-gradient(90deg,transparent,#ffd740,transparent);pointer-events:none;z-index:20;animation:swordCross .5s ease forwards;border-radius:2px;';
+        cross.style.left = (cx - 50) + 'px';
+        cross.style.top = cy + 'px';
+        cross.style.transform = 'rotate(' + (i * 90) + 'deg)';
+        document.querySelector('.xg-battle').appendChild(cross);
+        setTimeout(function (el) { if (el.parentNode) el.remove(); }, 600, cross);
+    }
+    /* 满层额外剑雨 */
+    if (count >= 5) {
+        for (var i = 0; i < 8; i++) {
+            (function (j) {
+                setTimeout(function () {
+                    var s = document.createElement('div');
+                    s.style.cssText = 'position:absolute;width:80px;height:3px;background:linear-gradient(90deg,transparent,#ffd740,transparent);pointer-events:none;z-index:20;animation:slashTrail .3s ease forwards;';
+                    s.style.left = (cx - 40 + Math.random() * 20) + 'px';
+                    s.style.top = (cy - 20 + j * 10) + 'px';
+                    s.style.transform = 'rotate(' + (-30 + j * 10) + 'deg)';
+                    document.querySelector('.xg-battle').appendChild(s);
+                    setTimeout(function () { if (s.parentNode) s.remove(); }, 400);
+                }, j * 50);
+            })(i);
+        }
+        screenFlash('rgba(255,215,64,.2)');
+    }
+    shakeBattle(count >= 5 ? 'shake-heavy' : 'shake-medium');
+}
+
+/* A27 掌心雷·过载 */
+function spawnPalmThunder(multiplier) {
+    var me = document.getElementById('xgME');
+    if (!me) return;
+    var rect = me.getBoundingClientRect(), sr = document.querySelector('.xg-battle').getBoundingClientRect();
+    var cx = rect.left - sr.left + rect.width / 2, cy = rect.top - sr.top + rect.height / 2;
+    var tier = multiplier >= 3.0 ? 'high' : multiplier >= 2.0 ? 'mid' : 'low';
+    var boltCount = tier === 'high' ? 7 : tier === 'mid' ? 5 : 3;
+    var boltHeight = tier === 'high' ? 140 : tier === 'mid' ? 80 : 50;
+    for (var i = 0; i < boltCount; i++) {
+        (function (j) {
+            setTimeout(function () {
+                var l = document.createElement('div');
+                l.style.cssText = 'position:absolute;width:3px;background:linear-gradient(180deg,#7c4dff,#42a5f5,transparent);pointer-events:none;z-index:20;animation:lightningBolt .3s ease forwards;';
+                l.style.height = boltHeight + 'px';
+                l.style.left = (cx - boltCount * 6 + j * 12) + 'px';
+                l.style.top = (cy - boltHeight) + 'px';
+                document.querySelector('.xg-battle').appendChild(l);
+                setTimeout(function () { if (l.parentNode) l.remove(); }, 400);
+            }, j * 40);
+        })(i);
+    }
+    var particleCount = tier === 'high' ? 16 : tier === 'mid' ? 8 : 4;
+    var colors = tier === 'high' ? ['#ffd740', '#7c4dff'] : ['#7c4dff', '#42a5f5'];
+    for (var i = 0; i < particleCount; i++) {
+        var pt = document.createElement('div');
+        pt.style.cssText = 'position:absolute;width:4px;height:4px;border-radius:50%;pointer-events:none;z-index:20;transition:all .5s ease-out;';
+        pt.style.background = colors[i % 2];
+        pt.style.left = cx + 'px';
+        pt.style.top = cy + 'px';
+        document.querySelector('.xg-battle').appendChild(pt);
+        var angle = Math.random() * Math.PI * 2, dist = 20 + Math.random() * 40;
+        (function (el, a, d) {
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    el.style.transform = 'translate(' + Math.cos(a) * d + 'px,' + Math.sin(a) * d + 'px)';
+                    el.style.opacity = '0';
+                });
+            });
+        })(pt, angle, dist);
+        setTimeout(function (el) { if (el.parentNode) el.remove(); }, 600, pt);
+    }
+    if (tier === 'high') {
+        screenFlash('rgba(124,77,255,.2)');
+        shakeBattle('shake-heavy');
+    } else if (tier === 'mid') {
+        shakeBattle('shake-medium');
+    } else {
+        shakeBattle('shake-light');
+    }
+}
+
+/* A28 太极化劲·太极护盾 */
+function spawnTaijiShield() {
+    var pe = document.getElementById('xgPE');
+    if (!pe) return;
+    var body = pe.querySelector('.char-body');
+    if (!body) return;
+    var taiji = document.createElement('div');
+    taiji.id = 'taijiShield';
+    taiji.style.cssText = 'position:absolute;width:80px;height:80px;left:50%;top:50%;transform:translate(-50%,-50%);z-index:15;pointer-events:none;animation:taijiSpin 3s linear infinite;';
+    taiji.innerHTML = '<div style="position:absolute;inset:0;border-radius:50%;border:2px solid rgba(201,169,110,.5);overflow:hidden"><div style="position:absolute;left:0;top:0;width:50%;height:100%;background:rgba(250,247,240,.8);border-radius:50% 0 0 50%"></div><div style="position:absolute;right:0;top:0;width:50%;height:100%;background:rgba(45,34,24,.8);border-radius:0 50% 50% 0"></div><div style="position:absolute;left:15px;top:15px;width:12px;height:12px;border-radius:50%;background:rgba(45,34,24,.8)"></div><div style="position:absolute;right:15px;bottom:15px;width:12px;height:12px;border-radius:50%;background:rgba(250,247,240,.8)"></div></div>';
+    body.appendChild(taiji);
+    pe.style.position = 'relative';
+}
+
+/* A28 太极化劲·格挡吸收 */
+function spawnTaijiAbsorb() {
+    var pe = document.getElementById('xgPE');
+    if (!pe) return;
+    var tj = pe.querySelector('#taijiShield');
+    if (tj) {
+        tj.style.animation = 'taijiAbsorb .4s ease forwards';
+        setTimeout(function () { if (tj.parentNode) tj.remove(); }, 500);
+    }
+}
+
+/* A28 太极化劲·反弹碎裂 */
+function spawnTaijiShatter() {
+    var me = document.getElementById('xgME');
+    if (!me) return;
+    var rect = me.getBoundingClientRect(), sr = document.querySelector('.xg-battle').getBoundingClientRect();
+    var cx = rect.left - sr.left + rect.width / 2, cy = rect.top - sr.top + rect.height / 2;
+    for (var i = 0; i < 8; i++) {
+        var frag = document.createElement('div');
+        var angle = (Math.PI * 2 / 8) * i;
+        frag.style.cssText = 'position:absolute;width:15px;height:15px;border-radius:50%;pointer-events:none;z-index:20;background:linear-gradient(135deg,rgba(250,247,240,.8),rgba(45,34,24,.8));transition:all .5s ease-out;';
+        frag.style.left = cx + 'px';
+        frag.style.top = cy + 'px';
+        document.querySelector('.xg-battle').appendChild(frag);
+        var dist = 40 + Math.random() * 30;
+        (function (el, a, d) {
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    el.style.transform = 'translate(' + Math.cos(a) * d + 'px,' + Math.sin(a) * d + 'px) rotate(720deg) scale(0.2)';
+                    el.style.opacity = '0';
+                });
+            });
+        })(frag, angle, dist);
+        setTimeout(function (el) { if (el.parentNode) el.remove(); }, 600, frag);
+    }
+    screenFlash('rgba(201,169,110,.15)');
+    shakeBattle('shake-medium');
+}
+
+/* A29 一气化三清·法身显化 */
+function spawnTripleForm() {
+    var pe = document.getElementById('xgPE');
+    if (!pe) return;
+    pe.style.position = 'relative';
+    var leftClone = document.createElement('div');
+    leftClone.className = 'triple-form-clone';
+    leftClone.textContent = '🗡️';
+    leftClone.style.left = '-10px';
+    leftClone.style.animationDelay = '0s';
+    var rightClone = document.createElement('div');
+    rightClone.className = 'triple-form-clone';
+    rightClone.textContent = '🗡️';
+    rightClone.style.right = '-10px';
+    rightClone.style.left = 'auto';
+    rightClone.style.animationDelay = '0.5s';
+    pe.appendChild(leftClone);
+    pe.appendChild(rightClone);
+}
+
+/* A29 一气化三清·法身追击 */
+function spawnCloneStrike() {
+    var clones = document.querySelectorAll('.triple-form-clone');
+    for (var i = 0; i < clones.length; i++) {
+        clones[i].style.animation = 'cloneStrike .3s ease';
+        (function (el) {
+            setTimeout(function () { el.style.animation = 'summonFloat 2.5s ease-in-out infinite'; }, 300);
+        })(clones[i]);
+    }
+}
+
+/* A31 封天禁术·封印法阵 */
+function spawnSealFormation() {
+    var me = document.getElementById('xgME');
+    if (!me) return;
+    me.style.position = 'relative';
+    var rect = me.getBoundingClientRect();
+    var body = me.querySelector('.char-body');
+    if (!body) return;
+    /* 六芒法阵 */
+    var seal = document.createElement('div');
+    seal.id = 'sealFormation';
+    seal.style.cssText = 'position:absolute;width:100px;height:100px;left:50%;top:50%;transform:translate(-50%,-50%);z-index:10;pointer-events:none;animation:taijiSpin 4s linear infinite;opacity:0;transition:opacity .5s;';
+    var chars = ['封', '禁', '锢', '锁'];
+    for (var i = 0; i < 4; i++) {
+        var r = document.createElement('div');
+        r.style.cssText = 'position:absolute;font-family:"Ma Shan Zheng",cursive;font-size:1rem;color:#c41e3a;font-weight:800;pointer-events:none;';
+        r.style.left = (40 + 30 * Math.cos(Math.PI * 2 / 4 * i)) + 'px';
+        r.style.top = (40 + 30 * Math.sin(Math.PI * 2 / 4 * i)) + 'px';
+        r.textContent = chars[i];
+        seal.appendChild(r);
+    }
+    body.appendChild(seal);
+    requestAnimationFrame(function () { seal.style.opacity = '1'; });
+    /* 封印光罩 */
+    var cage = document.createElement('div');
+    cage.id = 'sealCageEffect';
+    cage.style.cssText = 'position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(196,30,58,.3);box-shadow:inset 0 0 15px rgba(196,30,58,.15);pointer-events:none;z-index:9;animation:sealCage 1.5s ease-in-out infinite;';
+    body.appendChild(cage);
+}
+
+/* ===== 🌟 S2 被动技能特效函数 ===== */
+
+/* P31 剑心通明·飞剑穿刺 */
+function spawnFlyingSword() {
+    var pe = document.getElementById('xgPE');
+    var me = document.getElementById('xgME');
+    if (!pe || !me) return;
+    var pr = pe.getBoundingClientRect(), mr = me.getBoundingClientRect(), sr = document.querySelector('.xg-battle').getBoundingClientRect();
+    for (var i = 0; i < 3; i++) {
+        (function (j) {
+            setTimeout(function () {
+                var s = document.createElement('div');
+                s.textContent = '⚔️';
+                s.style.cssText = 'position:absolute;font-size:1rem;pointer-events:none;z-index:20;filter:drop-shadow(0 0 6px #ffd740);transition:all .35s ease-in;';
+                s.style.left = (pr.left - sr.left + pr.width / 2) + 'px';
+                s.style.top = (pr.top - sr.top + pr.height / 3) + 'px';
+                document.querySelector('.xg-battle').appendChild(s);
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(function () {
+                        s.style.left = (mr.left - sr.left + mr.width / 2) + 'px';
+                        s.style.top = (mr.top - sr.top + mr.height / 2) + 'px';
+                        s.style.opacity = '0';
+                        s.style.transform = 'rotate(-15deg) scale(0.5)';
+                    });
+                });
+                setTimeout(function () { if (s.parentNode) s.remove(); }, 400);
+            }, j * 100);
+        })(i);
+    }
+}
+
+/* P33 踏雪寻梅·雪梅绽放 */
+function spawnSnowPlum() {
+    var pe = document.getElementById('xgPE');
+    var me = document.getElementById('xgME');
+    if (!pe || !me) return;
+    var pr = pe.getBoundingClientRect(), mr = me.getBoundingClientRect(), sr = document.querySelector('.xg-battle').getBoundingClientRect();
+    /* 雪花 */
+    for (var i = 0; i < 6; i++) {
+        var flake = document.createElement('div');
+        flake.style.cssText = 'position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;pointer-events:none;z-index:20;transition:all .6s ease-out;';
+        flake.style.left = (pr.left - sr.left + pr.width / 2) + 'px';
+        flake.style.top = (pr.top - sr.top + pr.height / 2) + 'px';
+        document.querySelector('.xg-battle').appendChild(flake);
+        var dx = -50 + Math.random() * 100, dy = -60 + Math.random() * -20;
+        (function (el, x, y) {
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    el.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(0.3)';
+                    el.style.opacity = '0';
+                });
+            });
+        })(flake, dx, dy);
+        setTimeout(function (el) { if (el.parentNode) el.remove(); }, 700, flake);
+    }
+    /* 梅花 */
+    var cx = mr.left - sr.left + mr.width / 2, cy = mr.top - sr.top + mr.height / 2;
+    for (var i = 0; i < 5; i++) {
+        var petal = document.createElement('div');
+        var angle = (360 / 5) * i;
+        petal.style.cssText = 'position:absolute;width:16px;height:10px;border-radius:50%;background:rgba(255,182,193,.6);pointer-events:none;z-index:20;transform-origin:center;';
+        petal.style.left = cx + 'px';
+        petal.style.top = cy + 'px';
+        petal.style.setProperty('--lr', angle + 'deg');
+        petal.style.animation = 'lotusBloom .5s ease forwards';
+        petal.style.animationDelay = (i * 0.05) + 's';
+        document.querySelector('.xg-battle').appendChild(petal);
+        setTimeout(function (el) { if (el.parentNode) el.remove(); }, 700, petal);
+    }
+}
+
+/* P35 九转金丹·丹药灵光 */
+function spawnPillGlow(type) {
+    var pe = document.getElementById('xgPE');
+    if (!pe) return;
+    var body = pe.querySelector('.char-body');
+    if (!body) return;
+    var colors = { heal: '#4caf50', rage: '#ff4757', shield: '#ffd740' };
+    var emoji = { heal: '💊', rage: '⚔️', shield: '🛡️' };
+    var glow = document.createElement('div');
+    glow.style.cssText = 'position:absolute;width:60px;height:60px;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;z-index:20;animation:pillPulse .6s ease forwards;';
+    glow.style.background = 'radial-gradient(circle,' + colors[type] + ',transparent)';
+    glow.innerHTML = '<span style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:1.2rem">' + emoji[type] + '</span>';
+    body.appendChild(glow);
+    setTimeout(function () { if (glow.parentNode) glow.remove(); }, 700);
+}
+
+/* P40 天琊剑意·雷火剑芒 */
+function spawnThunderFireSlash() {
+    var me = document.getElementById('xgME');
+    if (!me) return;
+    var rect = me.getBoundingClientRect(), sr = document.querySelector('.xg-battle').getBoundingClientRect();
+    var cx = rect.left - sr.left + rect.width / 2, cy = rect.top - sr.top + rect.height / 2;
+    for (var i = 0; i < 3; i++) {
+        (function (j) {
+            setTimeout(function () {
+                var slash = document.createElement('div');
+                slash.style.cssText = 'position:absolute;width:80px;height:3px;background:linear-gradient(90deg,#ffd740,#7c4dff,#ff6b6b);pointer-events:none;z-index:20;animation:thunderFireSlash .3s ease-out forwards;border-radius:2px;opacity:.6;';
+                slash.style.left = (cx - 40) + 'px';
+                slash.style.top = (cy - 5 + j * 8) + 'px';
+                document.querySelector('.xg-battle').appendChild(slash);
+                setTimeout(function () { if (slash.parentNode) slash.remove(); }, 400);
+            }, j * 60);
+        })(i);
+    }
+}
+
+/* P41 大梵般若·佛莲护体 */
+function spawnLotusShield() {
+    var pe = document.getElementById('xgPE');
+    if (!pe) return;
+    var body = pe.querySelector('.char-body');
+    if (!body) return;
+    for (var i = 0; i < 6; i++) {
+        var petal = document.createElement('div');
+        var angle = (360 / 6) * i;
+        petal.style.cssText = 'position:absolute;width:20px;height:12px;border-radius:50%;background:rgba(255,215,64,.4);pointer-events:none;z-index:20;left:50%;top:50%;transform-origin:center;';
+        petal.style.setProperty('--lr', angle + 'deg');
+        petal.style.animation = 'lotusBloom .5s ease forwards';
+        petal.style.animationDelay = (i * 0.05) + 's';
+        body.appendChild(petal);
+        setTimeout(function (el) { if (el.parentNode) el.remove(); }, 700, petal);
+    }
+}
 /* 战斗循环逻辑 */
 var _abt=null;function stopAuto(){if(_abt){clearTimeout(_abt);_abt=null}}
 /* 装备掉落处理 */
@@ -1427,6 +2064,22 @@ function toggleBattleDetail(){
 window.toggleBattleDetail=toggleBattleDetail;
 var _isOnlineBattle=false;
 function startBattle(floor,isBoss){stopAuto();_isOnlineBattle=true;var m=genMon(floor,isBoss);G.p.hp=calcMaxHp(G.p);var p8Active=false,p8IsBoss=false;if(G.p.pSkl.indexOf('P8')>=0){if((G.p.consecutiveKills||0)>=5){p8Active=true;p8IsBoss=isBoss;G.p.consecutiveKills=0;G.p.p8RemainingBattles=3}else if((G.p.p8RemainingBattles||0)>0){p8Active=true;p8IsBoss=isBoss}}G.cmb={m:m,floor:floor,isBoss:isBoss,round:0,log:[],locked:true,cd:{},buffs:[],defending:false,stunM:0,invTurns:0,firstCritUsed:false,prevCrit:false,kPow:0,turnCount:0,reviveUsed:false,surviveUsed:false,result:null,taunt:'',berserkTurns:0,cloneActive:false,cloneDead:false,basicAtkCount:0,godOfWarReady:false,p8Active:p8Active,p8IsBoss:p8IsBoss,petGuardUsed:false,petBonusGold:0,auraReduced:false,summons:[],poison:{stacks:0,dmgPerStack:0,dur:0},shield:{hp:0,maxHp:0,dur:0}};
+/* 🌟 S2 新技能战斗状态初始化 */
+G.cmb.swordIntent=0;
+G.cmb.blockNext=false;
+G.cmb.blockDmg=0;
+G.cmb.tripleForm=0;
+G.cmb.postUltStrike=false;
+G.cmb.dodgeReady=false;
+G.cmb.p35UsedHeal=false;
+G.cmb.p35UsedRage=false;
+G.cmb.p35UsedShield=false;
+G.cmb.p39FirstHeal=false;
+G.cmb.p41WeakApplied=false;
+G.cmb.thunderMark=0;
+G.cmb.weakTurns=0;
+G.cmb.brokenArmor=0;
+G.cmb.sealed=0;
 if(G.p.pSkl.indexOf('P22')>=0){G.cmb.cloneActive=true;G.cmb.cloneDead=false;}
 G.scr='battle';rc();startBGM();if(G.p.pSkl.indexOf('P12')>=0){addLog('<span class="info">【破甲之力】怪物护甲已减弱！</span>')}if(p8Active)addLog('<span class="info">【战意昂扬】连杀加成！攻击'+(isBoss?'+10%':'+30%')+'！</span>');if(G.p.pet&&G.p.pet.owned&&G.p.pet.level>=50&&isBoss){m.atk=Math.floor(m.atk*.95);m.def=Math.floor(m.def*.95);addLog('<span style="color:var(--lv)">'+petForm(G.p.pet.level).emoji+' 【狐假虎威】BOSS攻防降低5%！</span>')}setTimeout(function(){G.cmb.locked=false;rc();autoLoop()},1000)}
 
@@ -1438,11 +2091,14 @@ function doNormalAtk(){
     if(m.ab===5||m.ab===6){if(Math.random()<0.15){addLog('怪物闪避！');return false} atk=Math.floor(atk*0.8)}
     var isCrit = Math.random() < calcCritR(p);
     if(p.firstCrit && !c.firstCritUsed){isCrit=true; c.firstCritUsed=true; addLog('<span class="info">首次暴击触发！</span>')}
-    if(p.pSkl.indexOf('P19')>=0 && c.godOfWarReady) isCrit=true;
-    
+        if(p.pSkl.indexOf('P19')>=0 && c.godOfWarReady) isCrit=true;
+    if(c.dodgeReady) isCrit=true;
+
     var rawDmg = atk;
     if(isCrit){
-        rawDmg *= (p.pSkl.indexOf('P19')>=0 && c.godOfWarReady ? 1.5 : calcCritD(p));
+        var critMul=(p.pSkl.indexOf('P19')>=0 && c.godOfWarReady ? 1.5 : calcCritD(p));
+        if(c.dodgeReady){critMul+=0.20;addLog('<span class="info">❄️ 踏雪寻梅！暴伤+20%</span>');spawnSnowPlum();c.dodgeReady=false}
+        rawDmg *= critMul;
     }
     /* A25 以守为攻：下回合攻击×3 */
     if(c._nextAtkTriple){rawDmg*=3;c._nextAtkTriple=false;addLog('<span class="info">【以守为攻】攻击×3！</span>');}
@@ -1470,15 +2126,42 @@ function doNormalAtk(){
         var stacks=Math.random()<0.5?1:2;
         addPoison(stacks, 1.0, 3);
     }
+        /* 🌟 S2 被动追加效果 */
+    /* P31 剑心通明：20%概率飞出灵剑 ATK×40%真伤 */
+    if(p.pSkl.indexOf('P31')>=0 && m.hp>0 && Math.random()<0.20){
+        var flyDmg=Math.floor(calcAtk(p)*0.40);
+        if(m.isBoss) flyDmg=Math.min(flyDmg,Math.floor(m.mhp*0.03));
+        m.hp=Math.max(0,m.hp-flyDmg);
+        addLog('<span class="info">【剑心通明】灵剑穿刺 <span class="dmg">'+flyDmg+'</span></span>');
+        floatDmg('xgME','⚔️'+flyDmg,'#ffd740');
+        spawnFlyingSword();
+    }
+    /* P40 天琊剑意：大招后普攻追加 ATK×50%雷火剑芒 */
+    if(p.pSkl.indexOf('P40')>=0 && c.postUltStrike && m.hp>0){
+        var ultDmg=Math.floor(calcAtk(p)*0.50);
+        if(m.isBoss) ultDmg=Math.min(ultDmg,Math.floor(m.mhp*0.03));
+        m.hp=Math.max(0,m.hp-ultDmg);
+        addLog('<span class="info">【天琊剑意】雷火剑芒 <span class="dmg">'+ultDmg+'</span></span>');
+        floatDmg('xgME','⚡🔥'+ultDmg,'#7c4dff');
+        spawnThunderFireSlash();
+        c.postUltStrike=false;
+    }
+    /* 雷痕追击 */
+    triggerThunderMark();
     return isCrit;
 }
-
 function doSkillUse(sid){
     var p=G.p, c=G.cmb, m=c.m; p.prevCrit=false;
     var sk = ASKILLS.find(function(s){return s.id===sid});
     if(!sk) return;
 
-    var rawDmg=0, trueDmg=0;
+        var rawDmg=0, trueDmg=0;
+    var _isSwordThunder=['A1','A3','A4','A7','A8','A12','A26','A27','A32'].indexOf(sid)>=0;
+    var _p39Mul=1;
+    if(p.pSkl.indexOf('P39')>=0 && _isSwordThunder && p.hp/calcMaxHp(p)>=0.70){
+        _p39Mul=1.15;
+        addLog('<span class="info">【太极玄清道】剑雷增伤+15%</span>');
+    }
     switch(sid){
         case 'A1': skillChargeGlow('#c9a96e',500);spawnSwordSlash(5);rawDmg = getPAtk(p,c)*1.5; break;
         case 'A2': spawnSwordSlash(3);rawDmg = getPAtk(p,c)*1.2; addLog('<span class="info">御风斩必中！</span>'); break;
@@ -1553,6 +2236,47 @@ function doSkillUse(sid){
             c._nextAtkTriple=true;
             addLog('<span class="info">以守为攻！本回合防御×2，下回合攻击×3</span>');
             c.cd[sid]=sk.cd; return;
+        case 'A26':
+                    case 'A26':
+            if(c.swordIntent<4){addLog('剑意不足(需≥4层)，当前'+c.swordIntent+'层');c.cd[sid]=sk.cd;return}
+            var _si=c.swordIntent;
+            var swordDmg=_si*getPAtk(p,c)*0.6;
+            spawnSwordRelease(_si);
+            c.swordIntent=0;
+            trueDmg=Math.floor(swordDmg*_p39Mul);
+            addLog('出鞘！'+_si+'层剑意爆发');
+            c.cd[sid]=sk.cd;
+            if(p.pSkl.indexOf('P40')>=0){c.cd[sid]=Math.max(0,sk.cd-1);c.postUltStrike=true;addLog('<span class="info">【天琊剑意】CD-1</span>')}
+            return;
+        case 'A27':
+            skillChargeGlow('#7c4dff',400);
+            var palmMul=1.2+Math.random()*2.4;
+            rawDmg=Math.floor(getPAtk(p,c)*palmMul);
+            spawnPalmThunder(palmMul);
+            addLog('掌心雷倍率: <span style="color:#7c4dff;font-weight:900">×'+palmMul.toFixed(2)+'</span>');
+            if(palmMul>=3.0){c.stunM=1;addLog('<span class="info">⚡ 过载！眩晕1回合！</span>')}
+            break;
+        case 'A28':
+            spawnTaijiShield();
+            c.blockNext=true;
+            addLog('太极化劲开启！格挡下一次攻击');
+            c.cd[sid]=sk.cd; return;
+        case 'A29':
+            spawnTripleForm();
+            c.tripleForm=2;
+            addLog('一气化三清！法身显化2回合');
+            c.cd[sid]=sk.cd; return;
+        case 'A31':
+            spawnSealFormation();
+            rawDmg=getPAtk(p,c)*1.2;
+            applyMonsterDebuff('sealed',m.isBoss?1:2);
+            break;
+        case 'A32':
+            spawnDivineThunder();
+            rawDmg=getPAtk(p,c)*2.8;
+            c.stunM=1;
+            applyMonsterDebuff('thunder',2);
+            break;
     }
 
     // 🌟 计算减伤
@@ -1577,7 +2301,7 @@ function doSkillUse(sid){
         applyOnHitHeal(p, totalDmg); c.cd[sid]=sk.cd; return;
     }
 
-    if (rawDmg > 0) dmg += Math.floor(rawDmg * mDefMul * supp.pDmg);
+    if (rawDmg > 0) dmg += Math.floor(rawDmg * mDefMul * supp.pDmg * _p39Mul);
     if (trueDmg > 0) dmg += Math.floor(trueDmg);
     if(p.pSkl.indexOf('P20')>=0 && m.hp/m.mhp < 0.3){ dmg = Math.floor(dmg * 1.5); addLog('<span class="info">【死亡凝视】HP<30%，伤害+50%！</span>'); }
     if(p.pet&&p.pet.owned&&p.pet.level>=100&&p.pet.quality==='god') dmg = Math.floor(dmg*1.05);
@@ -1587,10 +2311,25 @@ function doSkillUse(sid){
         addLog(sk.n+' → <span class="dmg">'+dmg+'</span>');
         floatDmg('xgME',sk.n+' '+dmg,'#ff6b6b'); applyOnHitHeal(p, dmg);
     }
-    c.cd[sid] = sk.cd;
+        c.cd[sid] = sk.cd;
+    /* 🌟 S2 P40 天琊剑意：剑/雷技能CD-1 + 追击标记 */
+    if(p.pSkl.indexOf('P40')>=0 && _isSwordThunder){
+        c.cd[sid]=Math.max(0,(c.cd[sid]||0)-1);
+        c.postUltStrike=true;
+        addLog('<span class="info">【天琊剑意】CD-1，下次普攻追加雷火剑芒！</span>');
+    }
 }
 
-function chooseAutoSkill(){var p=G.p,c=G.cmb;if(!p.aSkl.length)return null;var hp=p.hp/calcMaxHp(p),available=[];for(var i=0;i<p.aSkl.length;i++){var sid=p.aSkl[i];/* 召唤锁定时，只有A18/A19可触发，其余主动失效 */if(p.summonLocked&&sid!=='A18'&&sid!=='A19')continue;if((c.cd[sid]||0)>0)continue;if(sid==='A5'&&hp<=.5)continue;if(sid==='A9'&&hp>.45)continue;if(sid==='A10'&&hp<=.3)continue;if(sid==='A11'&&hp<=.5)continue;if(sid==='A14'&&hp<=.6)continue;if(sid==='A17'&&hp<=.5)continue;if(sid==='A20'&&p.gold<10)continue;if(sid==='A21'&&p.gold<50)continue;if(sid==='A23' && (!c.poison || c.poison.stacks < 5)) continue;available.push(sid)}if(!available.length)return null;/* 召唤锁定时，召唤技能100%触发 */if(p.summonLocked && available.length>0) return available[Math.floor(Math.random()*available.length)];if(Math.random()<.6)return available[Math.floor(Math.random()*available.length)];return null}
+function chooseAutoSkill(){var p=G.p,c=G.cmb;if(!p.aSkl.length)return null;var hp=p.hp/calcMaxHp(p),available=[];for(var i=0;i<p.aSkl.length;i++){var sid=p.aSkl[i];/* 召唤锁定时，只有A18/A19可触发，其余主动失效 */if(p.summonLocked&&sid!=='A18'&&sid!=='A19')continue;if((c.cd[sid]||0)>0)continue;if(sid==='A5'&&hp<=.5)continue;if(sid==='A9'&&hp>.45)continue;if(sid==='A10'&&hp<=.3)continue;if(sid==='A11'&&hp<=.5)continue;if(sid==='A14'&&hp<=.6)continue;if(sid==='A17'&&hp<=.5)continue;if(sid==='A20'&&p.gold<10)continue;if(sid==='A21'&&p.gold<50)continue;if(sid==='A23' && (!c.poison || c.poison.stacks < 5)) continue;
+if(sid==='A26' && (c.swordIntent||0)<4) continue;
+if(sid==='A28' && c.blockNext) continue;
+if(sid==='A29' && c.tripleForm>0) continue;available.push(sid)}if(!available.length)return null;/* 召唤锁定时，召唤技能100%触发 */if(p.summonLocked && available.length>0) return available[Math.floor(Math.random()*available.length)];/* 🌟 S2 AI技能优先级排序 */
+available.sort(function(a,b){
+    var pri={'A32':10,'A29':9,'A31':8,'A28':7,'A26':6,'A27':5};
+    return(pri[b]||0)-(pri[a]||0);
+});
+if(Math.random()<.7)return available[0];
+return null}
 
 function doMonsterAtk(){
     var p=G.p, c=G.cmb, m=c.m;
@@ -1629,10 +2368,23 @@ function doMonsterAtk(){
         return false;
     }
     var atk=m.atk;
-    if(m.ab===7&&m.hp/m.mhp<0.3)atk=Math.floor(atk*2);
+        if(m.ab===7&&m.hp/m.mhp<0.3)atk=Math.floor(atk*2);
+    /* 🌟 S2 封印：禁用怪物暴击/回血/AOE特殊机制 */
+    if(c.sealed>0){
+        if(m.ab===7) addLog('<span style="color:#c41e3a">🔒 封印：禁用狂暴化</span>');
+    }
+    /* 🌟 S2 虚弱：怪物攻击降低 */
+    if(c.weakTurns>0){
+        atk=Math.floor(atk*(m.isBoss?0.92:0.85));
+        if(Math.random()<0.3) addLog('<span style="color:#9e9e9e">📉 虚弱生效！</span>');
+    }
     if((m.ab===4||m.ab===6||m.ab===7)&&c.turnCount%5===0&&c.turnCount>0){atk=Math.floor(atk*2);addLog('<span class="info">AOE攻击！</span>')}
     if((m.ab===2||m.ab===6||m.ab===7)&&Math.random()<0.3){atk=Math.floor(atk*1.8);addLog('<span class="info">怪物暴击！</span>')}
-    if(Math.random()<calcDodge(p)){addLog('你闪避了攻击！<span class="info">（闪避成功）</span>');return false}
+        if(Math.random()<calcDodge(p)){
+        addLog('你闪避了攻击！<span class="info">（闪避成功）</span>');
+        if(p.pSkl.indexOf('P33')>=0){c.dodgeReady=true;addLog('<span class="info">❄️ 【踏雪寻梅】下次普攻必暴+20%暴伤！</span>')}
+        return false;
+    }
     if((m.ab===5||m.ab===6||m.ab===7)&&Math.random()<0.15){addLog('攻击未命中！');return false}
 
     // 🌟 玩家双轨制护甲减免
@@ -1650,6 +2402,28 @@ function doMonsterAtk(){
     var pDefMul = 1500 / (1500 + pDef);
     var supp = getSuppression(c.floor, p.lv);
     var dmg = Math.max(1, Math.floor(atk * pDefMul * supp.mDmg));
+    /* 🌟 S2 太极化劲：格挡判定 */
+    if(c.blockNext){
+        c.blockDmg=dmg;
+        spawnTaijiAbsorb();
+        addLog('<span style="color:#c9a96e;font-weight:800">☯️ 太极化劲！伤害归0，下回合反弹！</span>');
+        c.blockNext=false;
+        return false;
+    }
+    /* 🌟 S2 大梵般若：单次受击>15%HP时减免30% */
+    if(p.pSkl.indexOf('P41')>=0 && dmg>calcMaxHp(p)*0.15){
+        dmg=Math.floor(dmg*0.7);
+        spawnLotusShield();
+        addLog('<span style="color:#ffd740">🪷 大梵般若！伤害减免30%</span>');
+        if(!c.p41WeakApplied){
+            c.p41WeakApplied=true;
+            applyMonsterDebuff('weak',2);
+        }
+    }
+    /* 🌟 S2 封印：怪物受全伤害+15% */
+    if(c.sealed>0){
+        dmg=Math.floor(dmg*1.15);
+    }
 
     if(m.invTimer>0){
         dmg=1; m.invTimer--; addLog('🛡️ 魔王无敌！只受 <span class="dmg">1</span> 伤害 <span class="info">(剩余'+m.invTimer+'秒)</span>');
@@ -1829,6 +2603,9 @@ function autoLoop(){
     var spd=1000;
     var p=G.p,c=G.cmb,m=c.m;
     var petStrike=false;
+    /* 🌟 S2 每回合开始：养剑术蓄力 + 怪物Debuff递减 + 诛仙剑阵 */
+    if(p.aSkl.indexOf('A26')>=0){c.swordIntent=Math.min(5,(c.swordIntent||0)+1);spawnSwordChargeVisual(c.swordIntent)}
+    processMonsterDebuffs();
 
     /* 1. 结算 DoT 毒伤 */
     if(m.hp>0) processDoT();
@@ -1894,7 +2671,34 @@ function autoLoop(){
     if(!petStrike&&p.pet&&p.pet.owned&&p.pet.level>=20&&m.hp>0&&m.hp<m.mhp*0.10&&!m.isBoss){
         m.hp=0;addLog('<span style="color:var(--lv);font-weight:800">'+petForm(p.pet.level).emoji+' 灵兽发动【饿犬扑食】！秒杀残血！</span>');sfx('skill');render();
     }
-    if(p.pSkl.indexOf('P21')>=0&&m.hp>0&&Math.random()<0.10){
+       /* 🌟 S2 A29 一气化三清：法身追击 */
+    if(c.tripleForm>0 && m.hp>0){
+        spawnCloneStrike();
+        for(var _ci=0;_ci<2;_ci++){
+            var cloneRaw=Math.floor(getPAtk(p,c)*0.25);
+            var cloneMDef=c.m.def;
+            if(p.pSkl.indexOf('P12')>=0) cloneMDef=Math.floor(cloneMDef*(c.m.isBoss?0.95:0.90));
+            var cloneDmg=Math.max(1,Math.floor(cloneRaw*(500/(500+cloneMDef))*getSuppression(c.floor,p.lv).pDmg));
+            if(c.m.isBoss) cloneDmg=Math.min(cloneDmg,Math.floor(c.m.mhp*0.03));
+            m.hp=Math.max(0,m.hp-cloneDmg);
+            addLog('🎭 法身追击 <span class="dmg">'+cloneDmg+'</span>');
+            floatDmg('xgME','🎭'+cloneDmg,'#9650ff');
+            applyOnHitHeal(p,cloneDmg);
+            triggerThunderMark();
+        }
+    }
+    /* 🌟 S2 A28 太极化劲·反弹 */
+    if(c.blockDmg>0){
+        var reflectDmg=c.blockDmg;
+        if(c.m.isBoss) reflectDmg=Math.min(Math.floor(reflectDmg*0.5),Math.floor(c.m.mhp*0.06));
+        c.m.hp=Math.max(0,c.m.hp-reflectDmg);
+        addLog('<span style="color:#c9a96e;font-weight:800">☯️ 太极反弹 <span class="dmg">'+reflectDmg+'</span></span>');
+        floatDmg('xgME','☯️'+reflectDmg,'#c9a96e');
+        spawnTaijiShatter();
+        c.blockDmg=0;
+    }
+
+  if(p.pSkl.indexOf('P21')>=0&&m.hp>0&&Math.random()<0.10){
         var rawStormDmg = getPAtk(p,c)*1.5;
         var stormMDef = c.m.def;
         if(p.pSkl.indexOf('P12')>=0) stormMDef = Math.floor(stormMDef * (c.m.isBoss ? 0.95 : 0.90));
@@ -1948,9 +2752,57 @@ function autoLoop(){
         if(p.pet&&p.pet.owned&&p.pet.level>=1&&p.hp>0){applyHeal(p, Math.floor(calcMaxHp(p)*0.05), false);}
         if(p.pet&&p.pet.owned&&p.pet.level>=55&&p.hp>0){var _petHealRate=0.01;if(p.pet.quality==='god')_petHealRate=0.05;else if(p.pet.quality==='fairy')_petHealRate=0.03;else if(p.pet.quality==='spirit')_petHealRate=0.02;applyHeal(p, Math.floor(calcMaxHp(p)*_petHealRate), false);}
         if(hasEquipPassive('regen')&&p.hp>0){var regenVal=getEquipPct('regen');applyHeal(p,Math.floor(calcMaxHp(p)*regenVal/100),false)}
-        if((m.ab===1||m.ab===6||m.ab===7)&&c.turnCount%3===0&&c.turnCount>0){m.hp=Math.min(m.mhp,m.hp+Math.floor(m.mhp*0.05));addLog('<span class="info">怪物回血</span>')}
+        if((m.ab===1||m.ab===6||m.ab===7)&&c.turnCount%3===0&&c.turnCount>0){
+    if(c.sealed>0){addLog('<span style="color:#c41e3a">🔒 封印：怪物回血被禁用！</span>')}
+    else{m.hp=Math.min(m.mhp,m.hp+Math.floor(m.mhp*0.05));addLog('<span class="info">怪物回血</span>')}
+}
+               processShield();
+        /* 🌟 S2 A29 三清回合递减 */
+        if(c.tripleForm>0){c.tripleForm--;if(c.tripleForm<=0){var _cf=document.querySelectorAll('.triple-form-clone');for(var _ci=0;_ci<_cf.length;_ci++)_cf[_ci].remove();addLog('<span class="info">三清化身消散</span>')}}
 
-        processShield();
+        /* 🌟 S2 P35 九转金丹：阶梯嗑药 */
+        if(p.pSkl.indexOf('P35')>=0){
+            var p35hp=p.hp/calcMaxHp(p);
+            if(p35hp<0.70 && !c.p35UsedHeal){
+                c.p35UsedHeal=true;
+                applyHeal(p,Math.floor(calcMaxHp(p)*0.15),false);
+                spawnPillGlow('heal');
+                addLog('<span class="info">💊 九转金丹·回春丹！回复15%HP</span>');
+            }
+            if(p35hp<0.45 && !c.p35UsedRage){
+                c.p35UsedRage=true;
+                c.buffs.push({t:'狂力丹ATK+20%',v:0,dur:2});
+                spawnPillGlow('rage');
+                addLog('<span class="info">⚔️ 九转金丹·狂力丹！攻击+20% (2回合)</span>');
+            }
+            if(p35hp<0.20 && !c.p35UsedShield){
+                c.p35UsedShield=true;
+                applyShield(Math.floor(calcMaxHp(p)*0.20),2);
+                spawnPillGlow('shield');
+                addLog('<span class="info">🛡️ 九转金丹·金刚丹！获得20%HP护盾</span>');
+            }
+        }
+        /* 🌟 S2 P38 诛仙剑阵：回合递增真伤 */
+        if(p.pSkl.indexOf('P38')>=0 && m.hp>0){
+            var arrPct=c.turnCount<=1?0.25:c.turnCount<=2?0.50:c.turnCount<=3?0.75:1.0;
+            var arrDmg=Math.floor(calcAtk(p)*arrPct);
+            if(m.isBoss) arrDmg=Math.min(arrDmg,Math.floor(m.mhp*0.035));
+            arrDmg=Math.max(1,arrDmg);
+            m.hp=Math.max(0,m.hp-arrDmg);
+            addLog('<span class="info">🗡️ 诛仙剑阵 '+Math.round(arrPct*100)+'% <span class="dmg">'+arrDmg+'</span></span>');
+            floatDmg('xgME','🗡️'+arrDmg,'#ffd740');
+        }
+        /* 🌟 S2 P39 太极玄清道：驱散负面 + 低血回血 */
+        if(p.pSkl.indexOf('P39')>=0){
+            if(c.buffs.length>0){for(var _bi=c.buffs.length-1;_bi>=0;_bi--){if(c.buffs[_bi].v<1){c.buffs.splice(_bi,1);addLog('<span class="info">☯️ 太极玄清道·驱散负面</span>');break}}}
+            if(p.hp/calcMaxHp(p)<0.30 && !c.p39FirstHeal){
+                c.p39FirstHeal=true;
+                applyHeal(p,Math.floor(calcMaxHp(p)*0.15),false);
+                addLog('<span class="info">☯️ 太极玄清道·首次低血回血15%</span>');
+            }
+        }
+        /* 🌟 S2 A26 养剑术·剑意视觉刷新 */
+        if(p.aSkl.indexOf('A26')>=0){spawnSwordChargeVisual(c.swordIntent||0)}
 
         c.turnCount++;c.round++;render();
         if(p.pSkl.indexOf('P18')>=0&&Math.random()<0.1&&m.hp>0){
@@ -2664,7 +3516,16 @@ function rBattle(c){
   if(cm.invTurns>0) h+='<span class="status-tag shield">🛡️ 无敌</span>';
   if(cm.shield&&cm.shield.hp>0) h+='<span class="status-tag shield">🛡️ 护盾 '+cm.shield.hp+'/'+cm.shield.maxHp+'</span>';
   if(cm.summons&&cm.summons.length>0) h+='<span class="status-tag summon-tag">🔵 召唤物×'+cm.summons.length+'</span>';
-  if(cm.poison&&cm.poison.stacks>0) h+='<span class="status-tag poison">🟣 毒 '+cm.poison.stacks+'层</span>';
+   if(cm.poison&&cm.poison.stacks>0) h+='<span class="status-tag poison">🟣 毒 '+cm.poison.stacks+'层</span>';
+  /* 🌟 S2 新技能 Buff 标签 */
+  if(p.aSkl.indexOf('A26')>=0&&(cm.swordIntent||0)>0) h+='<span class="status-tag" style="background:rgba(255,215,64,.15);color:#ffd740;border:1px solid rgba(255,215,64,.3)">⚔️ 剑意 '+(cm.swordIntent||0)+'/5</span>';
+  if(cm.blockNext) h+='<span class="status-tag" style="background:rgba(201,169,110,.15);color:#c9a96e;border:1px solid rgba(201,169,110,.3)">☯️ 太极架势</span>';
+  if(cm.tripleForm>0) h+='<span class="status-tag" style="background:rgba(150,80,255,.15);color:#ab47bc;border:1px solid rgba(150,80,255,.3)">✨ 三清化身 '+cm.tripleForm+'回合</span>';
+  if(cm.dodgeReady) h+='<span class="status-tag" style="background:rgba(255,255,255,.15);color:#90caf9;border:1px solid rgba(144,202,249,.3)">❄️ 踏雪·待发</span>';
+  if(cm.p35UsedHeal) h+='<span class="status-tag" style="background:rgba(76,175,80,.1);color:#4caf50;border:1px solid rgba(76,175,80,.2)">💊 回春</span>';
+  if(cm.p35UsedRage) h+='<span class="status-tag" style="background:rgba(255,71,87,.15);color:#ff4757;border:1px solid rgba(255,71,87,.3)">⚔️ 狂力+20%</span>';
+  if(cm.p35UsedShield) h+='<span class="status-tag" style="background:rgba(255,215,64,.1);color:#ffd740;border:1px solid rgba(255,215,64,.2)">🛡️ 金刚护盾</span>';
+  if(p.pSkl.indexOf('P38')>=0) h+='<span class="status-tag" style="background:rgba(255,215,64,.1);color:#ffd740;border:1px solid rgba(255,215,64,.2)">🗡️ 剑阵 T'+(cm.turnCount<=1?'1·25%':cm.turnCount<=2?'2·50%':cm.turnCount<=3?'3·75%':'满·100%')+'</span>';
   h+='</div>';
   h+='<div class="char-shadow"></div>';
   /* 属性详情 */
@@ -2683,7 +3544,14 @@ function rBattle(c){
   h+='<div class="xg-vs" style="font-size:2.5rem;animation:vsPulse 2s ease-in-out infinite">⚡</div>';
 
   /* 怪物面板 */
-  h+='<div class="xg-bp monster character monster" id="xgME" style="flex:1">';
+    /* 🌟 S2 怪物Debuff视觉样式 */
+  var monsterCls='xg-bp monster character monster';
+  if(cm.sealed>0) monsterCls+=' debuff-sealed';
+  if(cm.weakTurns>0) monsterCls+=' debuff-weak';
+  if(cm.brokenArmor>0) monsterCls+=' debuff-broken';
+  if(cm.stunM>0) monsterCls+=' debuff-stun';
+  if(cm.thunderMark>0) monsterCls+=' debuff-thunder-glow';
+  h+='<div class="'+monsterCls+'" id="xgME" style="flex:1">';
   h+='<div class="char-name" style="color:var(--cinnabar)">'+m.name+'</div>';
   h+='<div class="char-level">Lv.'+m.floor+(m.isBoss?' · BOSS':'')+'</div>';
   h+='<div class="char-body">';
@@ -2694,7 +3562,17 @@ function rBattle(c){
   h+='<div class="hp-bar-container"><div class="hp-label"><span>❤️ HP</span><span>'+Math.floor(m.hp)+'/'+m.mhp+'</span></div>';
   h+='<div class="hp-bar"><div class="hp-fill'+(mHpPct<30?' red':mHpPct<60?' yellow':' green')+'" style="width:'+mHpPct+'%"></div></div></div>';
   if(m.invTimer>0) h+='<div style="font-size:.75rem;color:var(--gold);font-weight:700;padding:4px 10px;background:rgba(201,169,110,.1);border-radius:6px;border:1px solid rgba(201,169,110,.3);margin-top:4px">🛡️ 无敌 '+m.invTimer+'秒</div>';
-  if(G.p&&G.p.scans>0) h+='<div class="xg-info-bar" style="margin-top:8px"><span class="xg-info-tag">⚔️ '+m.atk+'</span><span class="xg-info-tag">🛡️ '+m.def+'</span></div>';
+    if(G.p&&G.p.scans>0) h+='<div class="xg-info-bar" style="margin-top:8px"><span class="xg-info-tag">⚔️ '+m.atk+'</span><span class="xg-info-tag">🛡️ '+m.def+'</span></div>';
+  /* 🌟 S2 怪物 Debuff 状态标签 */
+  if(cm.thunderMark>0||cm.weakTurns>0||cm.brokenArmor>0||cm.sealed>0||cm.stunM>0){
+    h+='<div class="status-row" style="margin-top:4px">';
+    if(cm.stunM>0) h+='<span class="status-tag" style="background:rgba(255,215,64,.15);color:#ffd740;border:1px solid rgba(255,215,64,.3)">💫 眩晕</span>';
+    if(cm.thunderMark>0) h+='<span class="status-tag" style="background:rgba(124,77,255,.15);color:#7c4dff;border:1px solid rgba(124,77,255,.3)">⚡ 雷痕 '+cm.thunderMark+'回合</span>';
+    if(cm.weakTurns>0) h+='<span class="status-tag" style="background:rgba(158,158,158,.15);color:#9e9e9e;border:1px solid rgba(158,158,158,.3)">📉 虚弱 '+cm.weakTurns+'回合</span>';
+    if(cm.brokenArmor>0) h+='<span class="status-tag" style="background:rgba(196,30,58,.15);color:#ff6b6b;border:1px solid rgba(196,30,58,.3)">💔 破甲 '+cm.brokenArmor+'回合</span>';
+    if(cm.sealed>0) h+='<span class="status-tag" style="background:rgba(196,30,58,.2);color:#c41e3a;border:1px solid rgba(196,30,58,.4)">🔒 封印 '+cm.sealed+'回合</span>';
+    h+='</div>';
+  }
   h+='<div class="char-shadow"></div>';
   h+='</div>';
   h+='</div>';
