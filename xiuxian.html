@@ -1224,7 +1224,115 @@ function genMon(floor,isBoss){
 function mkP(nm){return{uid:myDevice,name:nm,lv:1,exp:0,gold:700,hp:100,atkPts:2,defPts:1,conPts:2,statPts:5,pAtk:0,pDef:0,pHp:0,pCritR:0,pCritD:0,pDodge:0,pLife:0,healPct:0,lowAtk:0,firstCrit:false,survive:false,aSkl:[],pSkl:[],revives:0,scans:0,kills:0,hitsTaken:0,expBonus:0,expBonusCount:0,consecutiveKills:0,p8RemainingBattles:0,pet:{owned:false,quality:null,level:1,exp:0},equip:{weapon:null,armor:null,trinket:null},bag:[],enhance:{weapon:0,armor:0,trinket:0},stones:[],_totalCrits:0,_maxHealInBattle:0,_achCritCapBreak:false,_achDodgeCapBreak:false,_achLifeCapBreak:false,_achPetExpBonus:0,_shopDiscount:1.0,_title:'',hasSelectedActiveSkill:false,cloudPwd:'',alchemy:{grass:0,lotus:0,stone:0,core:0,spirit:0,heavenly:0,key:0,treasureEssence:0},furnaceTier:0,treasure:{equipped:null,owned:{},spiritStones:0},breakthroughCleared:{},rebirth:{count:0,celestPoints:0,celestAlloc:{atk:0,def:0,hp:0,crit:0,exp:0,gold:0},xianShu:[],xianShuSlots:0,shopPurchases:{},permStats:0}}}function expNeed(lv){if(lv<=10)return lv*lv*50;if(lv<=20)return lv*lv*80;if(lv<=30)return lv*lv*120;if(lv<=40)return lv*lv*180;if(lv<=50)return lv*lv*250;if(lv<=60)return lv*lv*350;if(lv<=80)return lv*lv*500;return lv*lv*700}
 function ptsPerLv(lv){return 1;} // 每次升级1点
 function titleFor(lv){if(lv>=81)return'渡劫期';if(lv>=61)return'大乘期';if(lv>=51)return'合体期';if(lv>=41)return'化神期';if(lv>=31)return'元婴期';if(lv>=21)return'金丹期';if(lv>=11)return'筑基期';if(lv>=1)return'炼气期';return'凡人'}
-/* 装备属性计算 */
+/* ===== 装备属性工具函数（缺失的核心函数） ===== */
+function getEquipFlat(stat) {
+    var p = G.p;
+    if (!p || !p.equip) return 0;
+    var total = 0;
+    var slots = ['weapon', 'armor', 'trinket'];
+    for (var i = 0; i < slots.length; i++) {
+        var eq = p.equip[slots[i]];
+        if (!eq) continue;
+        /* 主属性 */
+        if (eq.baseStatKey === stat) {
+            var enhBonus = getEnhanceBonus(slots[i], (p.enhance && p.enhance[slots[i]]) || 0);
+            total += eq.baseStatVal + enhBonus;
+        }
+        /* 词缀 */
+        if (eq.affixes) {
+            for (var j = 0; j < eq.affixes.length; j++) {
+                if (eq.affixes[j].stat === stat) total += eq.affixes[j].value;
+            }
+        }
+    }
+    return total;
+}
+
+function getEquipPct(stat) {
+    var p = G.p;
+    if (!p || !p.equip) return 0;
+    var total = 0;
+    var slots = ['weapon', 'armor', 'trinket'];
+    for (var i = 0; i < slots.length; i++) {
+        var eq = p.equip[slots[i]];
+        if (!eq) continue;
+        if (eq.affixes) {
+            for (var j = 0; j < eq.affixes.length; j++) {
+                var a = eq.affixes[j];
+                if (a.stat === stat) total += a.value;
+                /* 百分比词缀映射 */
+                if (stat === 'critR' && a.stat === 'critR') total += a.value;
+                if (stat === 'dodge' && a.stat === 'dodge') total += a.value;
+                if (stat === 'life' && a.stat === 'life') total += a.value;
+                if (stat === 'critD' && a.stat === 'critD') total += a.value;
+            }
+        }
+        /* 仙品被动百分比加成 */
+        if (eq.passive) {
+            if (stat === 'atkPct' && eq.passive.key === 'atkPct') total += eq.passive.value;
+            if (stat === 'defPct' && eq.passive.key === 'defPct') total += eq.passive.value;
+            if (stat === 'hpPct' && eq.passive.key === 'hpPct') total += eq.passive.value;
+            if (stat === 'critR' && eq.passive.key === 'critR') total += eq.passive.value;
+            if (stat === 'burn' && eq.passive.key === 'burn') total += eq.passive.value;
+            if (stat === 'regen' && eq.passive.key === 'regen') total += eq.passive.value;
+        }
+    }
+    return total;
+}
+
+function getEquipPassives() {
+    var p = G.p;
+    if (!p || !p.equip) return {};
+    var result = {};
+    var slots = ['weapon', 'armor', 'trinket'];
+    for (var i = 0; i < slots.length; i++) {
+        var eq = p.equip[slots[i]];
+        if (!eq || !eq.passive) continue;
+        var key = eq.passive.key;
+        if (!result[key] || eq.passive.value > result[key].value) {
+            result[key] = eq.passive;
+        }
+    }
+    return result;
+}
+
+function hasEquipPassive(key) {
+    var p = G.p;
+    if (!p || !p.equip) return false;
+    var slots = ['weapon', 'armor', 'trinket'];
+    for (var i = 0; i < slots.length; i++) {
+        var eq = p.equip[slots[i]];
+        if (eq && eq.passive && eq.passive.key === key) return true;
+    }
+    return false;
+}
+
+function getEquipPassive(key) {
+    var p = G.p;
+    if (!p || !p.equip) return null;
+    var best = null;
+    var slots = ['weapon', 'armor', 'trinket'];
+    for (var i = 0; i < slots.length; i++) {
+        var eq = p.equip[slots[i]];
+        if (eq && eq.passive && eq.passive.key === key) {
+            if (!best || eq.passive.value > best.value) best = eq.passive;
+        }
+    }
+    return best;
+}
+  function calcAtk(p){
+    var base=Math.floor(10+p.atkPts*3.0+(p.pAtk||0)+getEquipFlat('atk'));
+    var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;
+    if(p.pet&&p.pet.owned&&p.pet.level>=1)result+=10;
+    var eqPct=getEquipPct('atkPct');if(eqPct>0)result=Math.floor(result*(1+eqPct/100));
+    var _s3=result;result+=getTreasureStat('atk');result+=Math.floor(_s3*getCelestPct('atk')/100);
+    result+=(p.rebirth?p.rebirth.permStats||0:0);
+    if(hasXianShu('X1'))result=Math.floor(result*1.05);
+    if(hasXianShu('X15'))result=Math.floor(result*1.10);
+    var tEff=getTreasurePassiveEffects();if(tEff.atkPct)result=Math.floor(result*(1+tEff.atkPct/100));
+    return result;
+}
+  /* 装备属性计算 */
 function calcDef(p){var base=Math.floor(5+p.defPts*2.0+(p.pDef||0)+getEquipFlat('def'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=1)result+=10;var eqPct=getEquipPct('defPct');if(eqPct>0)result=Math.floor(result*(1+eqPct/100));var _s3=result;result+=getTreasureStat('def');result+=Math.floor(_s3*getCelestPct('def')/100);result+=(p.rebirth?p.rebirth.permStats||0:0);if(hasXianShu('X1'))result=Math.floor(result*1.05);if(hasXianShu('X15'))result=Math.floor(result*1.10);var tEff=getTreasurePassiveEffects();if(tEff.defPct)result=Math.floor(result*(1+tEff.defPct/100));return result}
 function calcMaxHp(p){var base=Math.floor(100+p.conPts*10+(p.pHp||0)+getEquipFlat('hp'));var pm=petBonusMul();var result=pm>0?Math.floor(base*(1+pm)):base;if(p.pet&&p.pet.owned&&p.pet.level>=1)result+=30;var eqPct=getEquipPct('hpPct');if(eqPct>0)result=Math.floor(result*(1+eqPct/100));var _s3=result;result+=getTreasureStat('hp');result+=Math.floor(_s3*getCelestPct('hp')/100);result+=(p.rebirth?p.rebirth.permStats||0:0)*3;if(hasXianShu('X1'))result=Math.floor(result*1.05);if(hasXianShu('X15'))result=Math.floor(result*1.10);return result}
 function calcCritR(p){var baseCap=0.20;var baseVal=(p.pCritR||0)+(getEquipPct('critR')||0);var base=Math.min(baseVal/100,baseCap);var equipBonus=Math.min(getEquipFlat('critR')/100,0.05);var result=base+equipBonus;result+=getCelestPct('crit')/100;var tEff2=getTreasurePassiveEffects();if(tEff2.critRBonus)result+=tEff2.critRBonus/100;return result}
