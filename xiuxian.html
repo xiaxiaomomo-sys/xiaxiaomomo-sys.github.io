@@ -2866,10 +2866,6 @@ function doRebirth(){
     var oldUid=p.uid;
     var oldName=p.name;
     var oldPwd=p.cloudPwd;
-    var oldAch=A.ach||{};
-    var oldTits=A.titles||[];
-    var oldLog=G.log;
-    var oldFloor=parseInt(localStorage.getItem('xx_maxFloor')||'1');
 
     /* 计算仙缘点 */
     var pointsGain=REBIRTH_POINTS[nextCount];
@@ -2888,13 +2884,9 @@ function doRebirth(){
     p.stones=keepStones;
     p.kills=keepKills;
     p.breakthroughCleared=keepCleared;
-    G.log=oldLog;
-    A.ach=oldAch;
-    A.titles=oldTits;
 
     /* 设置转生数据 */
     p.rebirth.count=keepRebirthCount;
-    p.rebirth.celestPoints=keepCleared[100]?REBIRTH_POINTS.slice(1,keepRebirthCount+1).reduce(function(a,b){return a+b},0):pointsGain;
     p.rebirth.celestPoints=REBIRTH_POINTS.slice(1,keepRebirthCount+1).reduce(function(a,b){return a+b},0);
     p.rebirth.celestAlloc=keepCelestAlloc;
     p.rebirth.xianShu=keepXianShu;
@@ -2915,25 +2907,24 @@ function doRebirth(){
     }
 
     /* 重置楼层 */
-    localStorage.setItem('xx_maxFloor','1');
+    G.prog.curFloor = 1;
+    G.prog.cleared = {};
+    G.prog.bossCleared = {};
     p.lv=1;
     p.exp=0;
 
     /* 九转解锁特殊称号 */
     if(keepRebirthCount===9){
-        var hasTit=false;
-        for(var t=0;t<A.titles.length;t++){if(A.titles[t]==='九转天尊') hasTit=true;}
-        if(!hasTit) A.titles.push('九转天尊');
-        p.rebirth.xianShu.push('X15');
+        p._title = '九转天尊';
+        if(p.rebirth.xianShu.indexOf('X15')<0) p.rebirth.xianShu.push('X15');
     }
 
     /* 保存并展示 */
-    saveXiuxianProg();autoSave();saveAch();
+    saveXiuxianProg();autoSave();
 
     G._rebirthReward={count:keepRebirthCount,points:pointsGain,rw:rw};
     G.scr='rebirthResult';rc();sfx('win');
 }
-
 function allocateCelestPoint(key){
     var p=G.p;
     var totalEarned=p.rebirth.celestPoints||0;
@@ -4250,13 +4241,15 @@ function load(){
 async function loadCloud() {
     try {
         var r = await _sb.from('save').select('game_data').eq('id', getCloudKey()).single();
+        if (r.error) {
+            console.error('Supabase 数据库错误:', r.error);
+            return false;
+        }
         if (r.data && r.data.game_data) {
             var gd = r.data.game_data;
-            
             if (typeof gd === 'string') {
                 try { gd = JSON.parse(gd); } catch(e){}
             }
-
             if (gd && gd.v && gd.p) {
                 gd = migrate(gd);
                 G.p = gd.p; 
@@ -4270,7 +4263,7 @@ async function loadCloud() {
                 try { localData = JSON.parse(localStorage.getItem(SK)); } catch(e){}
                 var offlineTs = (localData && localData.ts) ? localData.ts : gd.ts;
                 
-                localStorage.setItem(SK, JSON.stringify({v: VER, p: G.p, pr: G.prog, ts: Date.now()}));
+                localStorage.setItem(SK, JSON.stringify({ v: VER, p: G.p, pr: G.prog, ts: Date.now() }));
                 
                 var rw = calcOfflineReward(offlineTs);
                 if (rw && (rw.gold > 0 || rw.exp > 0)) {
@@ -4284,11 +4277,6 @@ async function loadCloud() {
     }
     return false;
 }
-        }
-    } catch(e){}
-    return false;
-}
- 
 
 /* ===== 🌟 弹窗与公告/奖励结算系统（队列+轻提示+0点防重复版） ===== */
 
@@ -4507,7 +4495,7 @@ h+='<div style="padding:4px 8px;background:var(--b50);border-radius:6px;font-siz
            var ps=[{lv:10, n:'⚔️ 咸鱼突刺', d:'怪物HP<30%时，3%概率秒杀非BOSS怪+10金币'},{lv:1,n:'🌿 灵兽庇佑',d:'攻击+10/防御+10/生命+30，每回合回复5%HP，20%减伤50%(1次/战)'},{lv:20,n:'🍖 饿犬扑食',d:'瞬间斩杀血量低于10%的普通怪'},{lv:30,n:'🛡️ 忠犬护主',d:'致死时保留1血并回复15%生命(限1次)'},{lv:40,n:'💊 大郎吃药了',d:'胜利后2%概率随机获得1点属性'},{lv:50,n:'🦊 狐假虎威',d:'面对BOSS时削弱其5%攻击与防御'},{lv: 55, n: '✨ 终极化形', d: '受击后按品级额外回血(1%/2%/3%/5%)，主人攻击+10%'},{lv:100,n:'👑 神兽之力',d:'仅神兽·全伤害+5%'}];
         h += '<div style="font-size:.75rem;margin-bottom:10px;display:flex;flex-direction:column;gap:5px;">';
         ps.forEach(function(ps) {
-            var isUnlk = p.pet.level >= skill.lv;
+            var isUnlk = p.pet.level >= ps.lv;
             var cColor = isUnlk ? 'var(--tx)' : 'var(--txm)';
             var op = isUnlk ? '1' : '0.4';
             h += '<div style="color:'+cColor+';opacity:'+op+';display:flex;justify-content:space-between;border-bottom:1px dashed var(--b100);padding-bottom:2px;">';
