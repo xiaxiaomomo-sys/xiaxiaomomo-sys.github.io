@@ -3441,6 +3441,7 @@ h+='</div>';
     h+='<button class="xg-btn gold" onclick="xxGmSendTargetGold()" style="font-size:.75rem;padding:6px 2px">🎁定向发金</button>';
     h+='<button class="xg-btn danger" onclick="xxGmDeductGold()" style="font-size:.75rem;padding:6px 2px">⚡定向扣金</button>';
     h+='<button class="xg-btn" onclick="xxGmAnnounce()" style="font-size:.75rem;padding:6px 2px;grid-column:span 2">📢发布全服公告</button>';
+h+='<button class="xg-btn danger" onclick="xxGmDeleteSkill()" style="font-size:.75rem;padding:6px 2px;grid-column:span 2">🗑️ 删除技能</button>';
     h+='</div></div>';}
     /* 🌟 S1 修仙排行榜 */
     h+='<div class="xg-card" style="margin-top:16px">';
@@ -4257,7 +4258,58 @@ window.xxGmAnnounce = async function() {
         alert('发布失败：' + e.message);
     }
 }; 
-/* === 商城主动技能自选弹窗控制 === */
+/* === GM 删除技能 === */
+window.xxGmDeleteSkill = function() {
+    if (!_gmUnlocked) return;
+    var p = G.p;
+    var allSkills = [];
+    p.aSkl.forEach(function(id) {
+        var sk = ASKILLS.find(function(s) { return s.id === id; });
+        if (sk) allSkills.push({ id: id, name: sk.n, desc: sk.d, isPassive: false });
+    });
+    p.pSkl.forEach(function(id) {
+        var sk = PSKILLS.find(function(s) { return s.id === id; });
+        if (sk) allSkills.push({ id: id, name: sk.n, desc: sk.d, isPassive: true });
+    });
+    if (allSkills.length === 0) { alert('当前没有任何技能'); return; }
+
+    var listEl = document.getElementById('shopSkillList');
+    var mask = document.getElementById('shopSkillMask');
+    var popup = document.getElementById('shopSkillPopup');
+    if (!listEl || !mask || !popup) return;
+
+    var h = '<p style="font-size:.82rem;color:var(--cinnabar);margin-bottom:12px;font-weight:700">⚠️ GM模式：点击即可删除技能</p>';
+    allSkills.forEach(function(sk) {
+        h += '<div style="background:var(--b50);border:1px solid var(--b100);border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer" onclick="xxGmDoDeleteSkill(\'' + sk.id + '\',' + sk.isPassive + ')">';
+        h += '<div style="font-weight:800;font-size:.85rem">' + (sk.isPassive ? '🔮' : '⚔️') + ' ' + sk.name + '</div>';
+        h += '<div style="font-size:.7rem;color:var(--txm)">' + sk.desc + '</div>';
+        h += '<div style="font-size:.65rem;color:var(--cinnabar);margin-top:4px">🗑️ 点击删除此技能</div>';
+        h += '</div>';
+    });
+    listEl.innerHTML = h;
+    mask.classList.add('show');
+    popup.classList.add('show');
+};
+
+window.xxGmDoDeleteSkill = function(id, isPassive) {
+    var p = G.p;
+    if (isPassive) {
+        var idx = p.pSkl.indexOf(id);
+        if (idx >= 0) p.pSkl.splice(idx, 1);
+    } else {
+        var idx = p.aSkl.indexOf(id);
+        if (idx >= 0) p.aSkl.splice(idx, 1);
+        if ((id === 'A18' || id === 'A19') && p.aSkl.indexOf('A18') < 0 && p.aSkl.indexOf('A19') < 0) {
+            p.summonLocked = false;
+        }
+    }
+    closeShopSkillModal();
+    var sk = (isPassive ? PSKILLS : ASKILLS).find(function(s) { return s.id === id; });
+    showSaveToast('🗑️', '已删除技能：' + (sk ? sk.n : id));
+    rc();
+    autoSave();
+};
+  /* === 商城主动技能自选弹窗控制 === */
 window.openShopSkillModal = function() {
     var p = G.p;
     if (p.hasSelectedActiveSkill) return;
@@ -4299,12 +4351,23 @@ window.xxPickShopSkillModal = function(skId) {
     if (!sk) return;
 
     if (p.aSkl.length >= maxActiveSlots(p)) {
+        /* 🌟 随机替换一个已有主动技能 */
+        var replaceIdx = Math.floor(Math.random() * p.aSkl.length);
+        var oldId = p.aSkl[replaceIdx];
+        var oldSk = ASKILLS.find(function(s){ return s.id === oldId; });
+        p.aSkl[replaceIdx] = sk.id;
+        if (oldId === 'A18' || oldId === 'A19') {
+            if (p.aSkl.indexOf('A18') < 0 && p.aSkl.indexOf('A19') < 0) p.summonLocked = false;
+        }
+        if (sk.id === 'A18' || sk.id === 'A19') p.summonLocked = true;
+        p.hasSelectedActiveSkill = true;
         closeShopSkillModal();
-        G.shopReplaceData = { skillId: sk.id };
-        G.scr = 'shopReplace';
+        showSaveToast('🎲', '槽位已满！随机替换了【' + (oldSk ? oldSk.n : oldId) + '】→ 学会了【' + sk.n + '】');
         rc();
+        autoSave();
     } else {
         p.aSkl.push(sk.id);
+        if (sk.id === 'A18' || sk.id === 'A19') p.summonLocked = true;
         p.hasSelectedActiveSkill = true;
         closeShopSkillModal();
         showSaveToast('✨', '成功领悟主动技能：' + sk.n);
@@ -4398,11 +4461,13 @@ window.pickSkillFromPool=function(id,isPassive){
     var p=G.p;
     if(!isPassive && p.aSkl.indexOf(id)>=0){showSaveToast('❌','已有此主动技能');return}
     if(isPassive && p.pSkl.indexOf(id)>=0){showSaveToast('❌','已有此被动技能');return}
-    if(isPassive){
+       if(isPassive){
         if(p.pSkl.length>=maxPassiveSlots(p)){
-            p.pSkl.push(id);
-            var oldId=p.pSkl.shift();
-            showSaveToast('🔮','学习新技能，替换了 '+(PSKILLS.find(function(s){return s.id===oldId})||{name:oldId}).name);
+            var replaceIdx=Math.floor(Math.random()*p.pSkl.length);
+            var oldId=p.pSkl[replaceIdx];
+            var oldSk=PSKILLS.find(function(s){return s.id===oldId});
+            p.pSkl[replaceIdx]=id;
+            showSaveToast('🎲','槽位已满！随机替换了【'+(oldSk?oldSk.n:oldId)+'】→ 学会了【'+(PSKILLS.find(function(s){return s.id===id})||{n:id}).n+'】');
         }else{
             p.pSkl.push(id);
             showSaveToast('🔮','学习了新被动技能');
