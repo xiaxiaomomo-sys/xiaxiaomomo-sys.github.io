@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>修仙之路</title>
-<meta name="game-version" content="v1.4.0">
+<meta name="game-version" content="v1.4.1">
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -2263,7 +2263,7 @@ async function loadCloud(){
     } catch(e){}
     return false;
 }
-/* ===== 🌟 弹窗与公告/奖励结算系统（队列+轻提示修复版） ===== */
+/* ===== 🌟 弹窗与公告/奖励结算系统（队列+轻提示+0点防重复版） ===== */
 
 var _modalQueue = [];
 var _modalShowing = false;
@@ -2321,12 +2321,15 @@ async function checkRewards() {
         var r = await _sb.from('rewards').select('*').order('created_at', { ascending: false }).limit(20);
         if (!r.data) return;
 
+        var todayStart = new Date().setHours(0, 0, 0, 0); // 🌟 当天0点时间戳
         var claimKey = 'xx_rewards_claimed_' + (G.p ? G.p.name : 'unknown');
-var claimed = JSON.parse(localStorage.getItem(claimKey) || '[]');
+        var claimed = JSON.parse(localStorage.getItem(claimKey) || '[]');
         var changed = false;
 
         for (var i = 0; i < r.data.length; i++) {
             var item = r.data[i];
+            // 🌟 超过当天0点的旧奖励直接作废，换网页也不会再弹
+            if (item.created_at < todayStart) continue;
             if (claimed.indexOf(item.id) >= 0) continue;
 
             var target = item.target || 'ALL';
@@ -2356,10 +2359,14 @@ async function checkAnnouncements() {
     try {
         var r = await _sb.from('announcements').select('*').order('created_at', { ascending: false }).limit(10);
         if (!r.data) return;
+
+        var todayStart = new Date().setHours(0, 0, 0, 0); // 🌟 当天0点时间戳
         var readList = JSON.parse(localStorage.getItem('xx_ann_read') || '[]');
 
         for (var i = 0; i < r.data.length; i++) {
             var ann = r.data[i];
+            // 🌟 超过当天0点的旧公告直接作废，换网页也不会再弹
+            if (ann.created_at < todayStart) continue;
             if (readList.indexOf(ann.id) >= 0) continue;
 
             var annTarget = ann.target || 'ALL';
@@ -3979,13 +3986,19 @@ function showEggRewardModal(audioUrl) {
     document.getElementById('eggCloseBtn').onclick = function() { mask.remove(); rc(); };
 }
 
-/* === 排行榜每日重置 === */
+/* === 排行榜与每日数据 0点重置与清理 === */
 function checkLeaderboardReset(){
-    var today=new Date().toISOString().split('T')[0];
-    var lastReset=localStorage.getItem('xx_lb_reset');
-    if(lastReset!==today){
-        localStorage.setItem('xx_lb_reset',today);
-        try{_sb.from('xiuxian_leaderboard').delete().neq('id','_never_')}catch(e){}
+    var today = new Date().toISOString().split('T')[0];
+    var lastReset = localStorage.getItem('xx_lb_reset');
+    if(lastReset !== today){
+        localStorage.setItem('xx_lb_reset', today);
+        var todayStart = new Date().setHours(0, 0, 0, 0);
+        
+        try { _sb.from('xiuxian_leaderboard').delete().neq('id', '_never_'); } catch(e){}
+        // 🌟 每日0点自动清除数据库中的过期奖励和过期公告
+        try { _sb.from('rewards').delete().lt('created_at', todayStart); } catch(e){}
+        try { _sb.from('announcements').delete().lt('created_at', todayStart); } catch(e){}
+        
         if(G.p) saveXiuxianProg();
     }
 }
