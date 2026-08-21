@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>修仙之路</title>
-<meta name="game-version" content="v1.4.4">
+<meta name="game-version" content="v1.5.0">
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -470,6 +470,57 @@ body.dark .hp-bar{background:rgba(255,255,255,.08)}
 <audio id="audioEl" preload="metadata"></audio>
 
 <script>
+/* ===== 🌟 版本号（每次发布新版本改这里） ===== */
+var APP_VER = '1.5.0';
+
+/* ===== 版本检测：强制刷新弹窗 ===== */
+async function checkForUpdate() {
+    try {
+        var url = location.pathname + '?_nocache=' + Date.now();
+        var resp = await fetch(url, { cache: 'no-store' });
+        var text = await resp.text();
+        var match = text.match(/var APP_VER\s*=\s*'([^']+)'/);
+        if (match && match[1] !== APP_VER) {
+            showForceRefreshModal();
+        }
+    } catch (e) {
+        /* 离线或其他网络错误，静默忽略 */
+    }
+}
+
+function showForceRefreshModal() {
+    var mask = document.createElement('div');
+    mask.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:999999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);';
+    mask.innerHTML =
+        '<div style="background:var(--white);border-radius:20px;padding:36px 28px;max-width:400px;width:90%;text-align:center;box-shadow:0 0 60px rgba(201,169,110,.3);border:2px solid var(--gold);animation:cardFlipIn .4s cubic-bezier(0.22,1.2,0.36,1) both">' +
+            '<div style="font-size:3.5rem;margin-bottom:12px">⚔️</div>' +
+            '<h3 style="font-family:\'Ma Shan Zheng\',cursive;font-size:1.5rem;margin-bottom:10px;color:var(--tx)">天道法则更新</h3>' +
+            '<p style="color:var(--txb);font-size:.92rem;line-height:1.8;margin-bottom:20px">修仙界法则已发生重大变化<br>当前版本已过期，请刷新页面以继续修炼</p>' +
+            '<button id="forceRefreshBtn" style="width:100%;padding:14px;border-radius:99px;border:none;background:linear-gradient(135deg,var(--cinnabar),#a01830);color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:1.05rem;cursor:pointer;box-shadow:0 4px 20px rgba(196,30,58,.4);animation:vsPulse 2s ease-in-out infinite">🔄 立即刷新</button>' +
+            '<div style="font-size:.72rem;color:var(--txl);margin-top:10px">不刷新将无法继续游戏</div>' +
+        '</div>';
+    document.body.appendChild(mask);
+    /* 按钮点击刷新 */
+    document.getElementById('forceRefreshBtn').onclick = function () {
+        location.reload(true);
+    };
+    /* 也阻止点击遮罩关闭 */
+    mask.onclick = function (e) {
+        if (e.target === mask) {
+            /* 抖动提示必须刷新 */
+            var btn = document.getElementById('forceRefreshBtn');
+            if (btn) {
+                btn.style.animation = 'none';
+                void btn.offsetWidth;
+                btn.style.animation = 'vsPulse 0.5s ease-in-out 3';
+            }
+        }
+    };
+}
+
+/* 页面加载后5秒检测，之后每60秒检测一次 */
+setTimeout(checkForUpdate, 5000);
+setInterval(checkForUpdate, 60000);
 /* Supabase初始化 */
 var SB_URL='https://wmnyhzfwffotycaqitvm.supabase.co';var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtbnloemZ3ZmZvdHljYXFpdHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwNjIyNTMsImV4cCI6MjEwMTYzODI1M30.s0kwvk3uMsshgOsZQOCDErCMr3UN3VXUIhj3yo2pk9c';var _sb=supabase.createClient(SB_URL,SB_KEY);var myDevice=localStorage.getItem('fishDevice');if(!myDevice){myDevice='dev_'+Math.random().toString(36).substr(2,8)+Date.now().toString(36);localStorage.setItem('fishDevice',myDevice);}
 /* 暗色模式切换 */
