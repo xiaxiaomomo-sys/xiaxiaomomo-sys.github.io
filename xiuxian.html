@@ -6386,14 +6386,14 @@ function showOfflineReward(rw){
         }
     };
 }
-/* ===== 路由绑定 ===== */
-window.xxBagEquip=xxBagEquip;
-window.xxBagUnequip=xxBagUnequip;
-window.xxBagDiscard=xxBagDiscard;
-window.xxBagClearLow=xxBagClearLow;
-window.xxDoEnhance=xxDoEnhance;
+/* ===== 路由绑定（全系统终极无死角版） ===== */
+window.xxBagEquip = xxBagEquip;
+window.xxBagUnequip = xxBagUnequip;
+window.xxBagDiscard = xxBagDiscard;
+window.xxBagClearLow = xxBagClearLow;
+window.xxDoEnhance = xxDoEnhance;
 
-/* 🌟 核心修复：解决炼丹、突破、法宝、转生所有按键无反应 */
+/* 🌟 S3 炼丹/突破/法宝/转生全部按键响应 */
 window.doAlchemy = doAlchemy;
 window.upgradeFurnace = upgradeFurnace;
 window.startBreakthrough = startBreakthrough;
@@ -6406,12 +6406,22 @@ window.allocateCelestPoint = allocateCelestPoint;
 window.resetCelestAlloc = resetCelestAlloc;
 window.learnXianShu = learnXianShu;
 window.buyRebirthShop = buyRebirthShop;
+
+/* 🌟 战斗手动点击技能 */
 window.xxSkill = function(sid){
     if (!G.cmb || G.cmb.locked || (G.cmb.cd && G.cmb.cd[sid] > 0)) return;
     doSkillUse(sid);
     rc();
 };
 
+/* 🌟 清除存档按钮响应 */
+window.xxClear = function(){
+    localStorage.removeItem(SK);
+    showSaveToast('🗑️', '存档已清除，即将刷新...');
+    setTimeout(function(){ location.reload(); }, 800);
+};
+
+/* 🌟 语音彩蛋函数 */
 window.xxStartEasterEgg = function() {
     var btn = document.getElementById('eggBtn');
     var status = document.getElementById('eggStatus');
@@ -6429,7 +6439,6 @@ window.xxStartEasterEgg = function() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         alert("抱歉，当前浏览器不支持麦克风调用！请换用主流浏览器。"); return;
     }
-
     window._eggListening = true; window._eggForceStop = false;
     btn.innerText = "🛑 点击取消聆听"; btn.style.animation = "none"; btn.style.opacity = "0.9";
     btn.style.background = "#c41e3a"; btn.style.borderColor = "#c41e3a";
