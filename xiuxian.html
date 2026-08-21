@@ -4198,15 +4198,18 @@ function migrate(d){
     if(d.p._achCritCapBreak===undefined) d.p._achCritCapBreak=false;
     if(d.p._achDodgeCapBreak===undefined) d.p._achDodgeCapBreak=false;
     if(d.p._achLifeCapBreak===undefined) d.p._achLifeCapBreak=false;
-    // Legacy fields kept for migration compatibility, no longer used in cap calculations
     if(d.p._achPetExpBonus===undefined) d.p._achPetExpBonus=0;
     if(d.p._shopDiscount===undefined) d.p._shopDiscount=1.0;
     if(d.p._title===undefined) d.p._title='';
-    
-    // 🌟 加上这行，防止老存档报错
+
+    // 🌟 防止极旧版本存档缺少技能数组导致 rc() 渲染时崩溃
+    if(!d.p.aSkl) d.p.aSkl=[];
+    if(!d.p.pSkl) d.p.pSkl=[];
+
     if(d.p.hasSelectedActiveSkill===undefined) d.p.hasSelectedActiveSkill=false;
     if(!d.p.cloudPwd) d.p.cloudPwd='';
-    /* 🌟 S3 新系统迁移 */
+
+    /* S3 新系统迁移 */
     if(!d.p.alchemy) d.p.alchemy={grass:0,lotus:0,stone:0,core:0,spirit:0,heavenly:0,key:0,treasureEssence:0};
     if(d.p.furnaceTier===undefined) d.p.furnaceTier=0;
     if(!d.p.treasure) d.p.treasure={equipped:null,owned:{},spiritStones:0};
@@ -4217,7 +4220,7 @@ function migrate(d){
     if(!d.p.rebirth.xianShu) d.p.rebirth.xianShu=[];
     if(!d.p.rebirth.shopPurchases) d.p.rebirth.shopPurchases={};
     if(d.p.rebirth.permStats===undefined) d.p.rebirth.permStats=0;
-  
+
     if(!d.pr) d.pr={};
     if(!d.pr.ach) d.pr.ach={};
     if(!d.pr.cleared) d.pr.cleared={};
@@ -4244,26 +4247,43 @@ function load(){
     return false;
 }
  
-async function loadCloud(){
+async function loadCloud() {
     try {
-        var r = await _sb.from('save').select('game_data').eq('id',getCloudKey()).single();
-        if(r.data && r.data.game_data){
+        var r = await _sb.from('save').select('game_data').eq('id', getCloudKey()).single();
+        if (r.data && r.data.game_data) {
             var gd = r.data.game_data;
-            if(gd.v && gd.v <= VER && gd.p){
+            
+            if (typeof gd === 'string') {
+                try { gd = JSON.parse(gd); } catch(e){}
+            }
+
+            if (gd && gd.v && gd.p) {
                 gd = migrate(gd);
-                G.p = gd.p; G.prog = gd.pr;
-                if(!G.p.pet) G.p.pet={owned:false,quality:null,level:1,exp:0};
-                if(!G.prog.cleared) G.prog.cleared={};
-                if(!G.prog.bossCleared) G.prog.bossCleared={};
-                if(!G.prog.curFloor) G.prog.curFloor=G.prog.maxFloor||1;
-                // 用本地旧ts计算离线时长（如果有的话）
+                G.p = gd.p; 
+                G.prog = gd.pr;
+                if (!G.p.pet) G.p.pet = { owned: false, quality: null, level: 1, exp: 0 };
+                if (!G.prog.cleared) G.prog.cleared = {};
+                if (!G.prog.bossCleared) G.prog.bossCleared = {};
+                if (!G.prog.curFloor) G.prog.curFloor = G.prog.maxFloor || 1;
+
                 var localData = null;
                 try { localData = JSON.parse(localStorage.getItem(SK)); } catch(e){}
                 var offlineTs = (localData && localData.ts) ? localData.ts : gd.ts;
-                localStorage.setItem(SK, JSON.stringify({v:VER,p:G.p,pr:G.prog,ts:Date.now()}));
-                var rw=calcOfflineReward(offlineTs);if(rw&&(rw.gold>0||rw.exp>0))setTimeout(function(){showOfflineReward(rw)},1500);
+                
+                localStorage.setItem(SK, JSON.stringify({v: VER, p: G.p, pr: G.prog, ts: Date.now()}));
+                
+                var rw = calcOfflineReward(offlineTs);
+                if (rw && (rw.gold > 0 || rw.exp > 0)) {
+                    setTimeout(function(){ showOfflineReward(rw); }, 1500);
+                }
                 return true;
             }
+        }
+    } catch(e) {
+        console.error("自动读取云存档报错:", e);
+    }
+    return false;
+}
         }
     } catch(e){}
     return false;
@@ -5523,29 +5543,65 @@ window.xxLoad=function(){
     }
 };
 
-window.xxLoadCloud=function(){
-    var name=prompt('请输入角色名：');
-    if(!name)return;
-    var pwd=prompt('请输入6位密码：');
-    if(!pwd)return;
-    var key=name+'_'+simpleHash(pwd);
-    console.log('Cloud restore: looking for key:',key);
-    _sb.from('save').select('game_data').eq('id',key).single().then(function(r){
-        console.log('Cloud restore response:',r);
-        if(r.data&&r.data.game_data){
-            var gd=r.data.game_data;
-            if(gd.v&&gd.v<=VER&&gd.p){
-                gd=migrate(gd);
-                G.p=gd.p;G.prog=gd.pr;
-                if(!G.p.pet)G.p.pet={owned:false,quality:null,level:1,exp:0};
-                if(!G.prog.cleared)G.prog.cleared={};
-                if(!G.prog.bossCleared)G.prog.bossCleared={};
-                if(!G.prog.curFloor)G.prog.curFloor=G.prog.maxFloor||1;
-                localStorage.setItem(SK,JSON.stringify({v:VER,p:G.p,pr:G.prog,ts:Date.now()}));
-                G.scr='hub';rc();showSaveToast('✅','云端存档恢复成功！');
-            }else{showSaveToast('❌','存档版本不兼容');}
-        }else{showSaveToast('❌','未找到存档，请检查名字和密码');}
-    }).catch(function(){showSaveToast('❌','云端读取失败');});
+window.xxLoadCloud = function() {
+    var name = prompt('请输入角色名：');
+    if (!name) return;
+    var pwd = prompt('请输入6位密码：');
+    if (!pwd) return;
+    var key = name + '_' + simpleHash(pwd);
+    console.log('Cloud restore: looking for key:', key);
+
+    _sb.from('save').select('game_data').eq('id', key).single().then(function(r) {
+        console.log('Cloud restore response:', r);
+
+        if (r.error) {
+            console.error('Supabase 数据库错误:', r.error);
+            showSaveToast('❌', '未找到存档，请检查名字和密码！');
+            return;
+        }
+
+        if (r.data && r.data.game_data) {
+            var gd = r.data.game_data;
+            
+            // 🌟 容错：有些时候存入数据库会被强制转成字符串，这里尝试转回对象
+            if (typeof gd === 'string') {
+                try {
+                    gd = JSON.parse(gd);
+                } catch(e) {
+                    console.error('存档解析失败:', e);
+                    showSaveToast('❌', '存档数据损坏或解析失败');
+                    return;
+                }
+            }
+
+            if (gd && gd.v && gd.p) {
+                try {
+                    gd = migrate(gd);
+                    G.p = gd.p; 
+                    G.prog = gd.pr;
+                    if (!G.p.pet) G.p.pet = { owned: false, quality: null, level: 1, exp: 0 };
+                    if (!G.prog.cleared) G.prog.cleared = {};
+                    if (!G.prog.bossCleared) G.prog.bossCleared = {};
+                    if (!G.prog.curFloor) G.prog.curFloor = G.prog.maxFloor || 1;
+
+                    localStorage.setItem(SK, JSON.stringify({ v: VER, p: G.p, pr: G.prog, ts: Date.now() }));
+                    G.scr = 'hub'; 
+                    rc(); 
+                    showSaveToast('✅', '云端存档恢复成功！');
+                } catch (err) {
+                    console.error('渲染加载时遭遇致命错误:', err);
+                    showSaveToast('❌', '存档读取成功，但界面渲染报错！请查看F12控制台');
+                }
+            } else {
+                showSaveToast('❌', '存档版本不兼容或缺少核心数据');
+            }
+        } else {
+            showSaveToast('❌', '云端未找到该角色的存档');
+        }
+    }).catch(function(err) {
+        console.error("请求被拦截或网络错误:", err);
+        showSaveToast('❌', '网络请求失败，请检查网络设置');
+    });
 };
 window.xxFloor=function(f){G.p.hp=calcMaxHp(G.p);startBattle(f,f%10===0)};
 window.xxGoto = function(s) {
