@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>修仙之路</title>
-<meta name="game-version" content="v1.4.1">
+<meta name="game-version" content="v1.4.2">
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -2153,7 +2153,7 @@ function buyItem(idx, count){
     rc();
     autoSave();
 }
-/* 📌 补全本地存档与自动保存函数 */
+/* 📌 补全本地存档与云端强制保存函数 */
 function saveLocal(){
     try {
         if(!G.p) return;
@@ -2164,10 +2164,31 @@ function saveLocal(){
     }
 }
 
+// 🌟 补全云端同步保存函数（修复 00:25 强制上传）
+async function saveCloud(){
+    try {
+        var p = G.p;
+        if (!p || !p.name) return;
+        var key = getCloudKey();
+        var data = { v: VER, p: p, pr: G.prog, ts: Date.now() };
+        await _sb.from('save').upsert({
+            id: key,
+            game_data: data,
+            updated_at: Date.now()
+        });
+        saveXiuxianProg();
+    } catch(e) {
+        console.error('云端存档失败:', e);
+    }
+}
+
+function forceSaveCloud(){
+    saveCloud();
+}
+
 function autoSave(){
     saveLocal();
 }
-
 function migrate(d){
     if(!d||!d.p) return d;
     if(!d.p.equip) d.p.equip={weapon:null,armor:null,trinket:null};
@@ -3229,7 +3250,8 @@ window.xxResetPet=function(){
     p.pet.quality=newQ; p.hp=Math.min(p.hp,calcMaxHp(p));
     var info=PET_QUAL[newQ]; var isUp = tiers[newQ] > tiers[oldQ];
     var msg = isUp ? '洗髓突破！新资质：'+info.name+'（触发率×'+info.skillMul+'） ↑提升！' : '洗髓完毕！资质维持在：'+info.name+'（防掉段保护生效）';
-    showSaveToast(info.emoji, msg); rc(); autoSave();
+    // 🌟 就是在末尾加上了 checkAchievements();
+    showSaveToast(info.emoji, msg); rc(); autoSave(); checkAchievements();
 };
 
 window.xxRefresh=function(){var p=G.p;if(p.gold<15)return;p.gold-=15;G._refreshed=true;genStatCh();rc()};
@@ -3715,6 +3737,7 @@ function rEnhance(c,slot){
 
 /* ===== 成就界面 ===== */
 function rAchievements(c){
+    checkAchievements(); // 🌟 打开成就界面时，自动刷新检测并解锁已达成的成就
     var p=G.p,pr=G.prog;if(!pr.ach)pr.ach={};
     var total=ACHIEVEMENTS.length;
     var done=0;for(var k in pr.ach)if(pr.ach[k])done++;
@@ -3817,10 +3840,10 @@ window.xxDoEnhance=function(slot){
 };
 
 /* ===== 成就检查触发点 ===== */
-var _xxOrigBattleWin=battleWin;
-battleWin=function(){
-    _xxOrigBattleWin.apply(this,arguments);
-    saveLB();
+var _xxOrigBattleWin = battleWin;
+battleWin = function(){
+    _xxOrigBattleWin.apply(this, arguments);
+    saveXiuxianProg(); // 🌟 修复：替换掉原先不存在而报错的 saveLB()
     checkAchievements();
 };
 
@@ -4036,14 +4059,17 @@ function checkShutdown(){
         if(typeof stopAuto==='function')stopAuto();
         return true;
     }
-    // 00:25 - 00:30 提醒时间
-    if(h===0&&m>=25&&m<30){
+       // 00:25 - 00:30 提醒时间与强制云备份
+    if(h===0 && m>=25 && m<30){
         document.getElementById('shutdownWarning').style.display='block';
         var remain=30-m;
         document.getElementById('shutdownTimer').textContent=(remain-1)+':'+(60-now.getSeconds()).toString().padStart(2,'0');
-        // 自动存档
-        if(typeof autoSave==='function')autoSave();
-        if(typeof forceSaveCloud==='function')forceSaveCloud();
+        // 🌟 双重保险：本地 + 云端
+        if(typeof saveLocal==='function') saveLocal();
+        if(typeof saveCloud==='function') saveCloud();
+        // 额外兜底：如果老函数还在也调一下
+        if(typeof autoSave==='function') autoSave();
+        if(typeof forceSaveCloud==='function') forceSaveCloud();
     }
     return false;
 }
