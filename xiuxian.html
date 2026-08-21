@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>修仙之路</title>
-<meta name="game-version" content="v1.5.1">
+<meta name="game-version" content="v1.5.2">
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -4896,7 +4896,7 @@ function rLskill(c){var p=G.p;var h='<div class="xg-title"><div class="big-emoji
 
 function rReplace(c){var info=G.ce._rp,p=G.p;var arr=info.isP?p.pSkl:p.aSkl;var src=info.isP?PSKILLS:ASKILLS;var newSk=src.find(function(s){return s.id===info.id});var h='<div class="xg-title"><div class="big-emoji">🔄</div><h3>技能栏已满</h3><p style="color:var(--txm)">选择一个替换为 ['+(newSk.n||'未知技能')+']，或直接跳过保持原样</p><div class="xg-choices">';for(var i=0;i<arr.length;i++){var oldSk=src.find(function(s){return s.id===arr[i]});if(!oldSk)continue;h+='<div class="xg-skill-card" style="animation-delay:'+((i+1)*.12)+'s" onclick="xxReplPick('+i+')"><div class="sk-name">'+(oldSk.n||'未知技能')+'</div><div class="sk-desc">'+(oldSk.d||'')+'</div></div>'}h+='</div><div class="xg-actions" style="margin-top:20px"><button class="xg-btn danger" onclick="xxReplSkip()">🛑 跳过 (放弃学习此技能)</button></div></div>';c.innerHTML=h;}
 /* 更新公告栏 */
-var UPDATE_NOTICE='<div id="xxUpdateNotice" style="margin-bottom:16px"><div style="background:linear-gradient(135deg,rgba(150,80,255,.06),rgba(201,169,110,.06));border:2px solid rgba(150,80,255,.2);border-radius:16px;overflow:hidden"><div onclick="toggleNotice()" style="cursor:pointer;padding:14px 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.4rem">🆕</span><div><div style="font-weight:900;font-size:1rem;color:var(--lv)">天道法则更新 (V1.5.0)</div><div style="font-size:.72rem;color:var(--txm)">点击查看修仙界最新变化</div></div></div><span id="noticeArrow" style="font-size:.85rem;color:var(--txm);transition:transform .3s">▼</span></div><div id="noticeBody" style="display:none;padding:0 20px 20px"><div style="font-size:.82rem;color:var(--txb);line-height:1.7"><p style="font-weight:700;color:var(--lv);margin-bottom:8px">🆕 V1.5.0 四大系统更新：</p><p>• <b>⚗️ 炼丹系统</b>：击杀BOSS掉落妖丹/灵材/天材地宝等8种材料，6种配方炼制（灵石精华/破境丹/洗髓丹/造化丹/法宝精魄丹/聚灵丹），炼丹炉5级升级</p><p>• <b>⚡ 境界突破试炼</b>：Lv.20~Lv.100共9个试炼，3层连续战斗不可回血，通关获永久ATK/DEF/HP/金币/灵石/天材地宝，Lv.70通关+1被动槽，Lv.90通关+1主动槽</p><p>• <b>🗡️ 法宝系统</b>：9大法宝（诛仙剑/噬血珠/戮仙剑/玲珑塔/太极图/玄武甲/天书/伏羲琴/昆仑镜），50级升级+5阶突破+觉醒，战斗中触发主动技能</p><p>• <b>🌟 转生（飞升）系统</b>：通关100层魔王后可飞升，最多九转，获得仙缘点永久加成，15种仙术学习，转生商店，怪物难度递增奖励递增</p><p style="color:var(--cinnabar);font-weight:bold;margin-top:8px">⚠️ 存档完全兼容，无需重新开始！老存档自动迁移新数据。</p></div></div></div></div>';
+var UPDATE_NOTICE='<div id="xxUpdateNotice" style="margin-bottom:16px"><div style="background:linear-gradient(135deg,rgba(150,80,255,.06),rgba(201,169,110,.06));border:2px solid rgba(150,80,255,.2);border-radius:16px;overflow:hidden"><div onclick="toggleNotice()" style="cursor:pointer;padding:14px 20px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.4rem">🆕</span><div><div style="font-weight:900;font-size:1rem;color:var(--lv)">天道法则更新 (V1.5.2)</div><div style="font-size:.72rem;color:var(--txm)">点击查看修仙界最新变化</div></div></div><span id="noticeArrow" style="font-size:.85rem;color:var(--txm);transition:transform .3s">▼</span></div><div id="noticeBody" style="display:none;padding:0 20px 20px"><div style="font-size:.82rem;color:var(--txb);line-height:1.7"><p style="font-weight:700;color:var(--lv);margin-bottom:8px">🆕 V1.5.2 四大系统更新：</p><p>• <b>⚗️ 炼丹系统</b>：击杀BOSS掉落妖丹/灵材/天材地宝等8种材料，6种配方炼制（灵石精华/破境丹/洗髓丹/造化丹/法宝精魄丹/聚灵丹），炼丹炉5级升级</p><p>• <b>⚡ 境界突破试炼</b>：Lv.20~Lv.100共9个试炼，3层连续战斗不可回血，通关获永久ATK/DEF/HP/金币/灵石/天材地宝，Lv.70通关+1被动槽，Lv.90通关+1主动槽</p><p>• <b>🗡️ 法宝系统</b>：9大法宝（诛仙剑/噬血珠/戮仙剑/玲珑塔/太极图/玄武甲/天书/伏羲琴/昆仑镜），50级升级+5阶突破+觉醒，战斗中触发主动技能</p><p>• <b>🌟 转生（飞升）系统</b>：通关100层魔王后可飞升，最多九转，获得仙缘点永久加成，15种仙术学习，转生商店，怪物难度递增奖励递增</p><p style="color:var(--cinnabar);font-weight:bold;margin-top:8px">⚠️ 存档完全兼容，无需重新开始！老存档自动迁移新数据。</p></div></div></div></div>';
 
 function toggleNotice(){
     var body=document.getElementById('noticeBody');
@@ -6392,6 +6392,26 @@ window.xxBagUnequip=xxBagUnequip;
 window.xxBagDiscard=xxBagDiscard;
 window.xxBagClearLow=xxBagClearLow;
 window.xxDoEnhance=xxDoEnhance;
+
+/* 🌟 核心修复：解决炼丹、突破、法宝、转生所有按键无反应 */
+window.doAlchemy = doAlchemy;
+window.upgradeFurnace = upgradeFurnace;
+window.startBreakthrough = startBreakthrough;
+window.upgradeTreasure = upgradeTreasure;
+window.breakthroughTreasure = breakthroughTreasure;
+window.equipTreasure = equipTreasure;
+window.unequipTreasure = unequipTreasure;
+window.doRebirth = doRebirth;
+window.allocateCelestPoint = allocateCelestPoint;
+window.resetCelestAlloc = resetCelestAlloc;
+window.learnXianShu = learnXianShu;
+window.buyRebirthShop = buyRebirthShop;
+window.xxSkill = function(sid){
+    if (!G.cmb || G.cmb.locked || (G.cmb.cd && G.cmb.cd[sid] > 0)) return;
+    doSkillUse(sid);
+    rc();
+};
+
 window.xxStartEasterEgg = function() {
     var btn = document.getElementById('eggBtn');
     var status = document.getElementById('eggStatus');
@@ -6496,7 +6516,6 @@ function showEggRewardModal(audioUrl) {
     mask.innerHTML = h; document.body.appendChild(mask);
     document.getElementById('eggCloseBtn').onclick = function() { mask.remove(); rc(); };
 }
-
 /* === 排行榜与每日数据 0点重置与清理 === */
 function checkLeaderboardReset(){
     var today = new Date().toISOString().split('T')[0];
