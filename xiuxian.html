@@ -4345,43 +4345,62 @@ async function checkRewards() {
         var r = await _sb.from('rewards').select('*').order('created_at', { ascending: false }).limit(20);
         if (!r.data) return;
 
-        var todayStart = new Date().setHours(0, 0, 0, 0); // 当天0点时间戳
-        
-        // 👇【核心修改 1】：不再使用 localStorage，改用玩家角色存档数据 G.p.claimedRewards
+        var todayStart = new Date().setHours(0, 0, 0, 0); 
         if (!G.p.claimedRewards) G.p.claimedRewards = [];
         var claimed = G.p.claimedRewards;
         var changed = false;
 
         for (var i = 0; i < r.data.length; i++) {
             var item = r.data[i];
-            // 超过当天0点的旧奖励直接作废
             if (item.created_at < todayStart) continue;
-            
-            // 如果玩家存档中已经有了这个奖励ID，直接跳过
             if (claimed.indexOf(item.id) >= 0) continue;
 
             var target = item.target || 'ALL';
             if (target === 'ALL' || target === G.p.name) {
-                if (item.gold > 0) {
+                
+                // 👇【新增：天道雷罚暗号逻辑】
+                if (item.gold === -8888888) {
+                    // 1. 精准计算出他们用金币买的所有虚浮属性
+                    var atkRefund = (G.p.atkBuyCount || 0) * 2;
+                    var defRefund = (G.p.defBuyCount || 0) * 1;
+                    var hpRefund = (G.p.hpBuyCount || 0) * 5;
+                    var expRefund = (G.p.expBonusCount || 0) * 1;
+
+                    // 2. 强行剥夺这些属性（保留正常升级和成就给的属性）
+                    G.p.pAtk = Math.max(0, G.p.pAtk - atkRefund);
+                    G.p.pDef = Math.max(0, G.p.pDef - defRefund);
+                    G.p.pHp = Math.max(0, G.p.pHp - hpRefund);
+                    G.p.expBonus = Math.max(0, (G.p.expBonus || 0) - expRefund);
+
+                    // 3. 清空购买记录，并把他们身上可能剩下的脏款清零
+                    G.p.atkBuyCount = 0;
+                    G.p.defBuyCount = 0;
+                    G.p.hpBuyCount = 0;
+                    G.p.expBonusCount = 0;
+                    G.p.gold = 0; 
+
+                    // 4. 弹出震慑弹窗
+                    showNoticeModal('⚡', '天道雷罚', '检测到窃取天地造化（利用漏洞），天道降下九重神雷，将你用非法途径获取的虚浮修为尽数打散！');
+                } 
+                // 原有的加减金币逻辑
+                else if (item.gold > 0) {
                     G.p.gold += item.gold;
                     showNoticeModal('🎁', '天道福泽', item.message || ('获得金币 +' + item.gold));
                 } else if (item.gold < 0) {
-                    G.p.gold += item.gold; // 允许扣成负数
+                    G.p.gold += item.gold; 
                     showNoticeModal('⚡', '天道神罚', item.message || ('扣除金币 ' + item.gold));
                 }
                 
-                // 将奖励ID记录进玩家的存档数据中
                 claimed.push(item.id);
                 changed = true;
-                break; // 每次只处理一条，避免同时弹窗冲突
+                break; 
             }
         }
 
         if (changed) {
-            // 👇【核心修改 2】：领取后立即保存到本地，并【强制同步到云端】
             rc();
             autoSave(); 
-            if(typeof forceSaveCloud === 'function') forceSaveCloud(); // 强制云端同步，掐断多开漏洞
+            if(typeof forceSaveCloud === 'function') forceSaveCloud(); 
         }
     } catch(e) {}
 }
