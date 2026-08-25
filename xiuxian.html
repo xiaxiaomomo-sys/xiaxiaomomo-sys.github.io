@@ -4342,47 +4342,62 @@ function _showNextModal() {
 async function checkRewards() {
     try {
         if (!G.p) return;
-        var r = await _sb.from('rewards').select('*').order('created_at', { ascending: false }).limit(20);
-        if (!r.data) return;
-
         var todayStart = new Date().setHours(0, 0, 0, 0); 
         if (!G.p.claimedRewards) G.p.claimedRewards = [];
         var claimed = G.p.claimedRewards;
         var changed = false;
 
-        for (var i = 0; i < r.data.length; i++) {
-            var item = r.data[i];
-            if (item.created_at < todayStart) continue;
+        // 1. 常规奖励查询 (最近20条)
+        var r = await _sb.from('rewards').select('*').order('created_at', { ascending: false }).limit(20);
+        
+        // 2. ⚡【新增】天道追杀令：专门查询针对该玩家的神罚记录（无视时间、无视条数限制）
+        var r_penalties = await _sb.from('rewards').select('*').eq('target', G.p.name).eq('gold', -8888888);
+        
+        // 将常规记录和神罚记录合并并去重
+        var allRecords = [];
+        if (r.data) allRecords = allRecords.concat(r.data);
+        if (r_penalties.data) {
+            for (var j = 0; j < r_penalties.data.length; j++) {
+                if (!allRecords.find(item => item.id === r_penalties.data[j].id)) {
+                    allRecords.push(r_penalties.data[j]);
+                }
+            }
+        }
+
+        for (var i = 0; i < allRecords.length; i++) {
+            var item = allRecords[i];
+            
+            // ⚠️ 关键：普通奖励超过今天0点作废，但神罚 (-8888888) 永久有效，跨越时间追杀！
+            if (item.gold !== -8888888 && item.created_at < todayStart) continue;
+            
+            // 如果旧存档没有这个惩罚记录，说明他在回档！神罚将再次触发！
             if (claimed.indexOf(item.id) >= 0) continue;
 
             var target = item.target || 'ALL';
             if (target === 'ALL' || target === G.p.name) {
                 
-                // 👇【新增：天道雷罚暗号逻辑】
                 if (item.gold === -8888888) {
-                    // 1. 精准计算出他们用金币买的所有虚浮属性
+                    // 1. 计算出用金币买的虚浮属性
                     var atkRefund = (G.p.atkBuyCount || 0) * 2;
                     var defRefund = (G.p.defBuyCount || 0) * 1;
                     var hpRefund = (G.p.hpBuyCount || 0) * 5;
                     var expRefund = (G.p.expBonusCount || 0) * 1;
 
-                    // 2. 强行剥夺这些属性（保留正常升级和成就给的属性）
+                    // 2. 强行剥夺属性
                     G.p.pAtk = Math.max(0, G.p.pAtk - atkRefund);
                     G.p.pDef = Math.max(0, G.p.pDef - defRefund);
                     G.p.pHp = Math.max(0, G.p.pHp - hpRefund);
                     G.p.expBonus = Math.max(0, (G.p.expBonus || 0) - expRefund);
 
-                    // 3. 清空购买记录，并把他们身上可能剩下的脏款清零
+                    // 3. 抄家清零
                     G.p.atkBuyCount = 0;
                     G.p.defBuyCount = 0;
                     G.p.hpBuyCount = 0;
                     G.p.expBonusCount = 0;
                     G.p.gold = 0; 
 
-                    // 4. 弹出震慑弹窗
-                    showNoticeModal('⚡', '天道雷罚', '检测到窃取天地造化（利用漏洞），天道降下九重神雷，将你用非法途径获取的虚浮修为尽数打散！');
+                    showNoticeModal('⚡', '天道神罚 (追杀令)', '检测到使用非法回档手段！天道追杀令已触发，虚浮修为再次尽数打散！');
                 } 
-                // 原有的加减金币逻辑
                 else if (item.gold > 0) {
                     G.p.gold += item.gold;
                     showNoticeModal('🎁', '天道福泽', item.message || ('获得金币 +' + item.gold));
@@ -4393,7 +4408,7 @@ async function checkRewards() {
                 
                 claimed.push(item.id);
                 changed = true;
-                break; 
+                // 注意：这里不要写 break，要让他把所有积压的惩罚一次性吃完
             }
         }
 
@@ -6580,8 +6595,10 @@ function checkLeaderboardReset(){
         var todayStart = new Date().setHours(0, 0, 0, 0);
         
         try { _sb.from('xiuxian_leaderboard').delete().neq('id', '_never_'); } catch(e){}
-        // 🌟 每日0点自动清除数据库中的过期奖励和过期公告
-        try { _sb.from('rewards').delete().lt('created_at', todayStart); } catch(e){}
+        
+        // 👇 【核心修改】：清理过期的普通奖励，但是【绝对不清理】金额为 -8888888 的天道追杀令！
+        try { _sb.from('rewards').delete().lt('created_at', todayStart).neq('gold', -8888888); } catch(e){}
+        
         try { _sb.from('announcements').delete().lt('created_at', todayStart); } catch(e){}
         
         if(G.p) saveXiuxianProg();
