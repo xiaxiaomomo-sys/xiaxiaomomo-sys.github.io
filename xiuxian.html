@@ -4200,6 +4200,7 @@ function migrate(d){
     if(d.p._achPetExpBonus===undefined) d.p._achPetExpBonus=0;
     if(d.p._shopDiscount===undefined) d.p._shopDiscount=1.0;
     if(d.p._title===undefined) d.p._title='';
+    if(!d.p.claimedRewards) d.p.claimedRewards = []; // 新增：奖励领取防刷记录
 
     // 🌟 防止极旧版本存档缺少技能数组导致 rc() 渲染时崩溃
     if(!d.p.aSkl) d.p.aSkl=[];
@@ -4344,15 +4345,19 @@ async function checkRewards() {
         var r = await _sb.from('rewards').select('*').order('created_at', { ascending: false }).limit(20);
         if (!r.data) return;
 
-        var todayStart = new Date().setHours(0, 0, 0, 0); // 🌟 当天0点时间戳
-        var claimKey = 'xx_rewards_claimed_' + (G.p ? G.p.name : 'unknown');
-        var claimed = JSON.parse(localStorage.getItem(claimKey) || '[]');
+        var todayStart = new Date().setHours(0, 0, 0, 0); // 当天0点时间戳
+        
+        // 👇【核心修改 1】：不再使用 localStorage，改用玩家角色存档数据 G.p.claimedRewards
+        if (!G.p.claimedRewards) G.p.claimedRewards = [];
+        var claimed = G.p.claimedRewards;
         var changed = false;
 
         for (var i = 0; i < r.data.length; i++) {
             var item = r.data[i];
-            // 🌟 超过当天0点的旧奖励直接作废，换网页也不会再弹
+            // 超过当天0点的旧奖励直接作废
             if (item.created_at < todayStart) continue;
+            
+            // 如果玩家存档中已经有了这个奖励ID，直接跳过
             if (claimed.indexOf(item.id) >= 0) continue;
 
             var target = item.target || 'ALL';
@@ -4361,19 +4366,22 @@ async function checkRewards() {
                     G.p.gold += item.gold;
                     showNoticeModal('🎁', '天道福泽', item.message || ('获得金币 +' + item.gold));
                 } else if (item.gold < 0) {
-                    G.p.gold += item.gold; // 🌟 允许扣成负数（负债状态）
+                    G.p.gold += item.gold; // 允许扣成负数
                     showNoticeModal('⚡', '天道神罚', item.message || ('扣除金币 ' + item.gold));
                 }
+                
+                // 将奖励ID记录进玩家的存档数据中
                 claimed.push(item.id);
                 changed = true;
-                break;
+                break; // 每次只处理一条，避免同时弹窗冲突
             }
         }
 
         if (changed) {
-            localStorage.setItem(claimKey, JSON.stringify(claimed));
+            // 👇【核心修改 2】：领取后立即保存到本地，并【强制同步到云端】
             rc();
-            autoSave();
+            autoSave(); 
+            if(typeof forceSaveCloud === 'function') forceSaveCloud(); // 强制云端同步，掐断多开漏洞
         }
     } catch(e) {}
 }
