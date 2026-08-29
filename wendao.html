@@ -926,10 +926,11 @@ function spawnMonster(){G.thisRunMaxStage=Math.max(G.thisRunMaxStage||1,G.stage)
 }
 function spawnBossVuln(){if(getTalent('k13')>0)setTimeout(spawnFlashZip,1500)}
 function applyDamage(dmg,type='tap'){
-  if(currentMonsterHP.m<=0)return;
+  if(!dmg||dmg.m===undefined||isNaN(dmg.m)||dmg.m<=0)return;
+  if(currentMonsterHP.m<=0||isNaN(currentMonsterHP.m))return;
   currentMonsterHP=currentMonsterHP.sub(dmg);
   if(currentMonsterHP.m<0)currentMonsterHP=new BN(0,0);
-  if(G.settings.showDamageNumbers&&type==='tap')showDmgPop(dmg,type);
+  if(G.settings.showDamageNumbers)showDmgPop(dmg,type);
   if(currentMonsterHP.m<=0){onMonsterKill(dmg)}
   updateHPUI()
 }
@@ -960,6 +961,7 @@ function handleTap(e){
   G.totalTaps++;G.dailyTaps++;
   let sb=getSetBonus();
   let dmg=getTapDamage();
+  if(!dmg||isNaN(dmg.m))dmg=new BN(1,0);
   let isCrit=Math.random()<0.15+sb.critChance+tCritChanceAdd();if(isCrit)dmg=dmg.mul((3+getTalentEffect('k5')-1)*sb.critDmg*tCritMult()*getHeroPassiveBonus().crit);
   let isDeadly=G.skillsActive[1]>0&&Math.random()<0.3+getTalentChance('r2')+getSetBonus().deadlyChance;if(isDeadly)dmg=dmg.mul(10*sb.deadlyDmg*tCritMult());
   if(G.combo>=10&&getSetBonus().ambushDmg>1&&Math.random()<0.2)applyDamage(dmg.mul(getSetBonus().ambushDmg),'splash');
@@ -976,7 +978,7 @@ function handleTap(e){
 }
 function toggleBossFight(force){if(force){G.bossFailed=false;G.currentTitan=G.titanPerStage;spawnMonster()}}
 function showDmgPop(dmg,type){let p=document.createElement('div');p.className='dmg-pop '+type;p.textContent=dmg.format();p.style.left=(30+Math.random()*40)+'%';p.style.top=(35+Math.random()*25)+'%';p.style.setProperty('--dx',(Math.random()*60-30)+'px');let a=document.getElementById('battleArea');if(a){a.appendChild(p);setTimeout(()=>p.remove(),700)}}
-function updateHPUI(){let ratio=currentMonsterHP.div(currentMonsterMaxHP);let pct=ratio.m*Math.pow(10,ratio.e)*100;pct=Math.max(0,Math.min(100,pct));let f=document.getElementById('hpFill');if(f)f.style.width=pct+'%';let t=document.getElementById('hpText');if(t)t.textContent=currentMonsterHP.format()+'/'+currentMonsterMaxHP.format()}
+function updateHPUI(){if(isNaN(currentMonsterHP.m)||isNaN(currentMonsterMaxHP.m)){currentMonsterHP=new BN(100,0);currentMonsterMaxHP=new BN(100,0)}let ratio=currentMonsterHP.div(currentMonsterMaxHP);let pct=ratio.m*Math.pow(10,ratio.e)*100;if(isNaN(pct))pct=100;pct=Math.max(0,Math.min(100,pct));let f=document.getElementById('hpFill');if(f)f.style.width=pct+'%';let t=document.getElementById('hpText');if(t)t.textContent=currentMonsterHP.format()+'/'+currentMonsterMaxHP.format()}
 function spawnFlashZip(){if(!G.isBoss||document.querySelector('.flash-zip-point'))return;let z=document.createElement('div');z.className='flash-zip-point';z.style.left=(30+Math.random()*40)+'%';z.style.top=(30+Math.random()*40)+'%';z.onclick=e=>{e.stopPropagation();let d=getTapDamage().mul(getTalentEffect('k13'));applyDamage(d,'deadly');playAudio('zip');z.remove();toast('🎯 弱点处决！')};let a=document.getElementById('battleArea');if(a){a.appendChild(z);setTimeout(()=>z.remove(),2500)}}
 function spawnFairy(){if(document.querySelector('.fairy'))return;let f=document.createElement('div');f.className='fairy';f.textContent='☁️';f.style.top=(15+Math.random()*25)+'%';f.style.left='-40px';let a=document.getElementById('battleArea');if(a)a.appendChild(f);let st=Date.now();let iv=setInterval(()=>{let el=(Date.now()-st)/1000;f.style.left=(el*55-40)+'px';if(el>10){clearInterval(iv);f.remove()}},30);f.onclick=e=>{e.stopPropagation();clearInterval(iv);f.remove();playAudio('fairy');let roll=Math.random();if(roll<0.35){G.mana=G.maxMana;toast('☁️ 灵力全满')}else if(roll<0.7){let g=getGoldDrop(G.stage,true).mul(10*getSetBonus().fairyDmg);G.stone=G.stone.add(g);toast('☁️ 横财+'+g.format())}else if(roll<0.75){G.gem+=Math.floor(10*getSetBonus().fairyDmg);toast('☁️ 仙玉+'+Math.floor(10*getSetBonus().fairyDmg))}else{SKILLS.forEach(s=>G.skillsActive[s.id]=30);toast('☁️ 全技能激活30秒')}updateUI()}}
 function triggerHeartOfGold(){if(!G.hogReady)return;G.hogReady=false;G.hogTimer=30;let r=getGoldDrop(G.stage,true).mul(8*getTalentEffect('k7'));G.stone=G.stone.add(r);let t=document.getElementById('petTip');if(t)t.style.display='none';let c=document.getElementById('petCompanion');if(c)c.classList.remove('hog-ready');playAudio('fairy');toast('🦊 聚宝+'+r.format())}
