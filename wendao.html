@@ -909,7 +909,7 @@ function getHeroDPS(){let total=new BN(0);HEROES.forEach(h=>{let lv=G.heroLevels
   mult=mult.mul(artAllH).mul(artHero);
   if(G.isBoss)mult=mult.mul(new BN(1).add(getArtifactMult('bossDmg'))).mul(tBossMult());else mult=mult.mul(new BN(1).add(getArtifactMult('nonBossDmg'))).mul(tNonBossMult());let eb=getEquipBonus();mult=mult.mul(eb.hero||1).mul(eb.all||1);if(G.furyTimer>0)mult=mult.mul(3*tFuryMult());mult=mult.mul(tHeroMult()).mul(tAllMult()).mul(getSetBonus().warcryDmg);let hp=getHeroPassiveBonus();mult=mult.mul(hp.hero).mul(hp.all);return total.mul(mult)}
 function getShipDamage(){let sb=getSetBonus();let d=getHeroDPS().mul(15*getTalentEffect('w2')).mul(getClanBonus().ship).mul(sb.ship).mul(sb.companionDmg);if(getTalent('r4')>0&&Math.random()<getTalentChance('r4'))d=d.mul(5);if(getTalent('w9')>0&&Math.random()<0.05)G.currentTitan+=Math.floor(getTalentFlat('w9'));return d.mul(tShipMult()).mul(tAllMult())}
-function getMonsterMaxHP(stage,isBoss){let base=new BN(17.5);let growth=new BN(1.139);let growthPow=growth.pow(stage);let stageMult=1+0.005*stage;let hp=base.mul(growthPow).mul(stageMult);if(isBoss){let bs=2+stage/500*0.5;if(stage%10===5||stage%10===0)bs*=2.5;hp=hp.mul(bs)}console.log('[DEBUG getMonsterMaxHP] stage='+stage+' base='+base.format()+' growthPow='+growthPow.format()+' m='+growthPow.m+' e='+growthPow.e+' stageMult='+stageMult+' result='+hp.format()+' m='+hp.m+' e='+hp.e);return hp}
+function getMonsterMaxHP(stage,isBoss){let hp=new BN(17.5).mul(new BN(1.139).pow(stage)).mul(1+0.005*stage);if(isBoss){let bs=2+stage/500*0.5;if(stage%10===5||stage%10===0)bs*=2.5;hp=hp.mul(bs)}return hp}
 function getGoldDrop(stage,isBoss){let sb=getSetBonus();let base=new BN(17.5).mul(new BN(1.139).pow(stage)).mul(1+0.005*stage);let g=base;if(isBoss){let bs=2+stage/500*0.5;if(stage%10===5||stage%10===0)bs*=2.5;g=g.mul(bs*3*sb.bossGold)}if(G.skillsActive[2]>0)g=g.mul((5+G.skillsLvl[2]*0.3)*sb.hogMult);g=g.mul(getTalentEffect('r1')).mul(getTalentEffect('a1'));g=g.mul(sb.gold).mul(getPetBonus('gold'));let eb=getEquipBonus();g=g.mul(eb.gold||1);let hp=getHeroPassiveBonus();g=g.mul(hp.gold);if(isBoss)g=g.mul(hp.bossGold);return g}
 function getAdvancedStartStage(){return 1}
 function getPrestigeRelicGain(){let ms=G.thisRunMaxStage||G.maxStage;if(ms<75)return new BN(0);let gain=new BN(Math.max(1,Math.floor(Math.pow(Math.max(0,(ms-75))/14,3))));
@@ -974,7 +974,7 @@ function onMonsterKill(dmg){
   if(getTalent('s11')>0&&Math.random()<0.2)G.mana=Math.min(getMaxMana(),G.mana+2+getTalent('s11')*0.1);
   if(getTalent('a12')>0)G.stone=G.stone.add(gold.mul(getTalent('a12')*0.05));
   if(getTalent('a9')>0&&Math.random()<0.2+getTalent('a9')*0.02){SKILLS.forEach(s=>{G.skillsCd[s.id]=Math.max(0,G.skillsCd[s.id]-getTalentFlat('a9'))});toast('👑 以财证道！技能CD重置')}
-  if(monsterType==='portar'){G.stage+=10+getSetBonus().portarSkip;if(G.stage>G.maxStage)G.maxStage=G.stage;G.currentTitan=0;G.gem+=3;toast('🌀 太虚仙门！飞跃'+(50+getSetBonus().portarSkip)+'层+3仙玉');spawnMonster();updateUI();return}
+  if(monsterType==='portar'){G.currentTitan+=2+getSetBonus().portarSkip;G.gem+=3;toast('🌀 太虚仙门！跳过'+(2+getSetBonus().portarSkip)+'只小怪+3仙玉');spawnMonster();updateUI();return}
   if(monsterType==='snap'){G.currentTitan+=Math.floor(3*getSetBonus().snapEffect);spawnSnapTrail();toast('⚡ 快速怪！连杀'+Math.floor(3*getSetBonus().snapEffect)+'只')}
   else if(dmg.gte(currentMonsterMaxHP.mul(2))&&!G.isBoss)G.currentTitan+=2;
   else G.currentTitan++;
@@ -1013,7 +1013,7 @@ function updateHPUI(){
   if(isNaN(pct)||!isFinite(pct))pct=currentMonsterHP.m<=0?0:100;
   pct=Math.max(0,Math.min(100,pct));
   let f=document.getElementById('hpFill');if(f)f.style.width=pct+'%';
-  let txt=document.getElementById('hpText');if(txt)txt.textContent=currentMonsterHP.format()+'/'+currentMonsterMaxHP.format()+' [st:'+G.stage+' m:'+(currentMonsterMaxHP.m||0).toFixed(2)+' e:'+(currentMonsterMaxHP.e||0)+']'
+  let txt=document.getElementById('hpText');if(txt)txt.textContent=currentMonsterHP.format()+'/'+currentMonsterMaxHP.format()
 }
 // ===== 补全缺失函数 =====
 function spawnChestersonGold(){
@@ -1085,7 +1085,7 @@ function useSkill(id){
   if(G.skillsCd[id]>0){openSkillUpgrade(id);return}
   if(G.mana<cost){openSkillUpgrade(id);return}
   G.mana-=cost;G.skillsCd[id]=s.cd*getSetBonus().skillCd;G.mana=Math.min(getMaxMana(),G.mana+cost*getSetBonus().manaRefund);
-  if(s.type==='hs'){playAudio('hs');spawnThunder();let sb=getSetBonus();let d=getTapDamage().mul((200+lv*20)*getTalentEffect('s3')*getTalentEffect('s13')*getTalentEffect('s16')*sb.hs*sb.skillEffect).mul(tSkillMult()).mul(tAllMult()).mul(sb.skillDmg).mul(sb.splashDmg);applyDamage(d,'splash');G.stage+=5+lv*2+getTalentFlat('s6')+sb.splashSkip;if(G.stage>G.maxStage)G.maxStage=G.stage;toast('⚡ 神雷飞跃'+(5+lv*2+getTalentFlat('s6')+sb.splashSkip)+'层')}
+  if(s.type==='hs'){playAudio('hs');spawnThunder();let sb=getSetBonus();let d=getTapDamage().mul((200+lv*20)*getTalentEffect('s3')*getTalentEffect('s13')*getTalentEffect('s16')*sb.hs*sb.skillEffect).mul(tSkillMult()).mul(tAllMult()).mul(sb.skillDmg).mul(sb.splashDmg);applyDamage(d,'splash');if(getTalent('s6')>0||sb.splashSkip>0){let skip=getTalentFlat('s6')+sb.splashSkip;G.currentTitan+=skip;toast('⚡ 神雷连跳'+skip+'只小怪')}}
   else{playAudio('skill'+id);let sb=getSetBonus();let baseDur=id===5?s.dur+getTalentFlat('s5'):s.dur;G.skillsActive[id]=baseDur*getTalentEffect('s14')*(1+getTalentFlat('sm6')*0.1)*getClanBonus().skillDur*sb.skillDur*sb.skillEffect;
     if(id===1)toast('🗡️ 诛仙剑意');
     if(id===2){spawnGoldBurst();toast('✋ 造化金手')}
@@ -1311,7 +1311,7 @@ function spawnPrestigeFlash(){
 function openPanel(name){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));let t=document.getElementById('panel-'+name);if(t)t.classList.add('open');if(name==='heroes')renderHeroes();if(name==='talents')renderTalents();if(name==='artifacts')renderArtifacts();if(name==='pets')renderPets();if(name==='equip')renderEquip();if(name==='clan')renderClan();if(name==='craft')renderCraft();if(name==='enchant')renderEnchant();if(name==='tasks')renderTasks();if(name==='tourney')loadTourney();if(name==='achievements')renderAchievements();if(name==='settings'){let cn=document.getElementById('cloudName');if(cn)cn.value=G.cloudName||'';let cp=document.getElementById('cloudPwd');if(cp)cp.value=G.cloudPwd||''}}
 function closePanel(){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));hideTalentTip()}
 function openStagePicker(){let modal=document.getElementById('stagePickerModal'),slider=document.getElementById('stageRange');slider.max=Math.max(1,G.stage);slider.value=G.stage;document.getElementById('uiPickerVal').textContent=G.stage;modal.classList.add('show')}
-function applyStageTravel(){let target=parseInt(document.getElementById('stageRange').value)||1;G.stage=target;G.thisRunMaxStage=Math.max(G.thisRunMaxStage||1,target);G.currentTitan=0;G.bossFailed=false;document.getElementById('stagePickerModal').classList.remove('show');spawnMonster();updateUI();toast('🚀 第'+G.stage+'层')}
+function applyStageTravel(){let target=parseInt(document.getElementById('stageRange').value)||1;if(target>G.stage){toast('⚠️ 只能选择当前层及以下');return}G.stage=target;G.currentTitan=0;G.bossFailed=false;document.getElementById('stagePickerModal').classList.remove('show');spawnMonster();updateUI();toast('🌀 已穿梭至第'+target+'层')}
 /* ===== 设置 ===== */
 function toggleDmgNumbers(){G.settings.showDamageNumbers=!G.settings.showDamageNumbers;let b=document.getElementById('btnDmgText');if(b)b.textContent=G.settings.showDamageNumbers?'开启':'关闭'}
 function toggleFx(){G.settings.highFx=!G.settings.highFx;let b=document.getElementById('btnFx');if(b)b.textContent=G.settings.highFx?'高画质':'极简';if(G.settings.highFx)initBgParticles();else{let c=document.getElementById('bgParticles');if(c)c.innerHTML=''}}
