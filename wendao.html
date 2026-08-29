@@ -1013,7 +1013,7 @@ function updateHPUI(){
   if(isNaN(pct)||!isFinite(pct))pct=currentMonsterHP.m<=0?0:100;
   pct=Math.max(0,Math.min(100,pct));
   let f=document.getElementById('hpFill');if(f)f.style.width=pct+'%';
-  let txt=document.getElementById('hpText');if(txt)txt.textContent=currentMonsterHP.format()+'/'+currentMonsterMaxHP.format()
+  let txt=document.getElementById('hpText');if(txt)txt.textContent=currentMonsterHP.format()+'/'+currentMonsterMaxHP.format()+' [st:'+G.stage+' m:'+(currentMonsterMaxHP.m||0).toFixed(2)+' e:'+(currentMonsterMaxHP.e||0)+']'
 }
 // ===== 补全缺失函数 =====
 function spawnChestersonGold(){
