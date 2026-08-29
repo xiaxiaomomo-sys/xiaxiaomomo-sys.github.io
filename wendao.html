@@ -934,8 +934,11 @@ function spawnMonster(){G.thisRunMaxStage=Math.max(G.thisRunMaxStage||1,G.stage)
   monsterType=G.isBoss?'boss':(r<0.01*sb.chestChance*chestBonus?'chesterson':r<(0.03*sb.snapChance*snapBonus)?'snap':r<(0.02*sb.portarChance*portarBonus)?'portar':'normal');
   if(monsterType==='portar')monsterType='portar';
   currentMonsterMaxHP=getMonsterMaxHP(G.stage,G.isBoss);
-  if(!currentMonsterMaxHP||isNaN(currentMonsterMaxHP.m)||currentMonsterMaxHP.m<=0)currentMonsterMaxHP=new BN(100,0);
-currentMonsterHP=new BN(currentMonsterMaxHP);
+  if(!currentMonsterMaxHP||isNaN(currentMonsterMaxHP.m)||currentMonsterMaxHP.m<=0){
+    let calcHP=getMonsterMaxHP(G.stage,G.isBoss);
+    currentMonsterMaxHP=(calcHP&&calcHP.m>0)?calcHP:new BN(1000,0);
+  }
+  currentMonsterHP=new BN(currentMonsterMaxHP);
   if(G.vulnStacks>0&&!G.isBoss)G.vulnStacks=Math.max(0,G.vulnStacks-1);
   let sp=document.getElementById('enemySprite');
   if(sp){sp.className='enemy-sprite'+(G.isBoss?' boss-spawn':'');let icons={normal:'👹',boss:'👿',portar:'🚪',chesterson:'💰',snap:'⚡'};sp.textContent=icons[monsterType]||'👹'}
@@ -949,7 +952,7 @@ currentMonsterHP=new BN(currentMonsterMaxHP);
 function spawnBossVuln(){if(getTalent('k13')>0)setTimeout(spawnFlashZip,1500)}
 function applyDamage(dmg,type='tap'){
   if(!dmg||dmg.m===undefined||isNaN(dmg.m)||dmg.m<=0)return;
-  if(isNaN(currentMonsterHP.m)){currentMonsterHP=new BN(currentMonsterMaxHP);return}
+  if(isNaN(currentMonsterHP.m)||!currentMonsterMaxHP||currentMonsterMaxHP.m<=0){spawnMonster();return}
   if(currentMonsterHP.m<=0){onMonsterKill(dmg);return}
   currentMonsterHP=currentMonsterHP.sub(dmg);
   if(currentMonsterHP.m<0)currentMonsterHP=new BN(0,0);
@@ -1001,7 +1004,17 @@ function handleTap(e){
 }
 function toggleBossFight(force){if(force){G.bossFailed=false;G.currentTitan=G.titanPerStage;spawnMonster()}}
 function showDmgPop(dmg,type){let p=document.createElement('div');p.className='dmg-pop '+type;p.textContent=dmg.format();p.style.left=(30+Math.random()*40)+'%';p.style.top=(35+Math.random()*25)+'%';p.style.setProperty('--dx',(Math.random()*60-30)+'px');let a=document.getElementById('battleArea');if(a){a.appendChild(p);setTimeout(()=>p.remove(),700)}}
-function updateHPUI(){if(isNaN(currentMonsterHP.m)||isNaN(currentMonsterMaxHP.m)||currentMonsterMaxHP.m<=0){currentMonsterHP=new BN(100,0);currentMonsterMaxHP=new BN(100,0)}let ratio=currentMonsterHP.div(currentMonsterMaxHP);let pct=(ratio.m*Math.pow(10,ratio.e))*100;if(isNaN(pct)||!isFinite(pct))pct=100;pct=Math.max(0,Math.min(100,pct));let f=document.getElementById('hpFill');if(f)f.style.width=pct+'%';let t=document.getElementById('hpText');if(t)t.textContent=currentMonsterHP.format()+'/'+currentMonsterMaxHP.format()}
+function updateHPUI(){
+  if(!currentMonsterMaxHP||isNaN(currentMonsterMaxHP.m)||currentMonsterMaxHP.m<=0){spawnMonster();return}
+  if(!currentMonsterHP||isNaN(currentMonsterHP.m)){currentMonsterHP=new BN(currentMonsterMaxHP)}
+  if(currentMonsterHP.m<0)currentMonsterHP=new BN(0,0);
+  let ratio=currentMonsterHP.div(currentMonsterMaxHP);
+  let pct=(ratio.m*Math.pow(10,ratio.e))*100;
+  if(isNaN(pct)||!isFinite(pct))pct=currentMonsterHP.m<=0?0:100;
+  pct=Math.max(0,Math.min(100,pct));
+  let f=document.getElementById('hpFill');if(f)f.style.width=pct+'%';
+  let txt=document.getElementById('hpText');if(txt)txt.textContent=currentMonsterHP.format()+'/'+currentMonsterMaxHP.format()
+}
 // ===== 补全缺失函数 =====
 function spawnChestersonGold(){
   let ba=getBattleArea();if(!ba)return;
@@ -1226,7 +1239,7 @@ rid=Math.random()<0.7?'common':'rare'}let rarity=RARITIES.find(x=>x.id===rid);le
 function equipItem(id){id=parseFloat(id);let idx=G.equipInv.findIndex(e=>e.id===id);if(idx<0)return;let eq=G.equipInv[idx];let old=G.equipment[eq.slot];G.equipment[eq.slot]=eq;G.equipInv.splice(idx,1);if(old)G.equipInv.push(old);playAudio('buy');renderEquip();updateUI();checkActivatedSets()}
 function sellEquip(id){id=parseFloat(id);let idx=G.equipInv.findIndex(e=>e.id===id);if(idx<0)return;let eq=G.equipInv[idx];let shards=eq.rarity==='mythic'?10:eq.rarity==='legendary'?5:eq.rarity==='rare'?2:1;G.craftShards+=shards;G.totalShardsSpent=(G.totalShardsSpent||0)+shards;G.equipInv.splice(idx,1);toast('分解+'+shards+'碎片');renderEquip()}
 function upgradeEquip(id){id=parseFloat(id);let eq=G.equipInv.find(e=>e.id===id);if(!eq)return;let cost=10+eq.level*5;if(G.craftShards<cost)return toast('碎片不足(需'+cost+')');G.craftShards-=cost;eq.level++;let r=RARITIES.find(x=>x.id===eq.rarity)||RARITIES[0];eq.mainStat.val=equipMainVal(eq.slot,eq.mainStat.type,r);eq.subStats.forEach(s=>s.val=equipSubVal(r));playAudio('fairy');toast('⬆️ '+eq.name+'→Lv.'+eq.level);renderEquip();updateUI()}
-function numFmt(n){if(!isFinite(n))return'∞';if(n>=1e30)return(n/1e30).toFixed(2)+'极';if(n>=1e24)return(n/1e24).toFixed(2)+'载';if(n>=1e20)return(n/1e20).toFixed(2)+'沟';if(n>=1e16)return(n/1e16).toFixed(2)+'垓';if(n>=1e12)return(n/1e12).toFixed(2)+'兆';if(n>=1e8)return(n/1e8).toFixed(2)+'亿';if(n>=1e4)return(n/1e4).toFixed(2)+'万';return Math.floor(n).toString()}
+function numFmt(n){if(!isFinite(n))return'∞';if(n<1000)return Math.floor(n).toString();const U=['','K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc','UDc','DDc','TDc','QaDc','QiDc','SxDc','SpDc','OcDc','NoDc','Vg','UVg','DVg','TVg','QaVg','QiVg','SxVg','SpVg','OcVg','NoVg','Tg','UTg','DTg','TTg','QaTg','QiTg','SxTg','SpTg','OcTg','NoTg'];let tier=Math.floor(Math.log10(n)/3);if(tier>=U.length)return n.toExponential(2);let val=n/Math.pow(10,tier*3);return val.toFixed(val<10?2:val<100?1:0)+U[tier]}
 function rerollEquip(id){id=parseFloat(id);let eq=G.equipInv.find(e=>e.id===id);if(!eq)return;let cost=15;if(G.craftShards<cost)return toast('碎片不足(需15)');G.craftShards-=cost;let r=RARITIES.find(x=>x.id===eq.rarity);let pool=SLOT_SUB_POOL[eq.slot]||['all'];eq.subStats=[];for(let i=0;i<r.sub;i++){let st=pool[Math.floor(Math.random()*pool.length)];let stt=STAT_TYPES.find(x=>x.type===st);eq.subStats.push({type:st,name:stt?stt.name:st,val:equipSubVal(r)})}playAudio('fairy');toast('🔄 重铸完成');renderEquip()}
 const RARITY_ORDER={common:0,rare:1,legendary:2,mythic:3};
 function sellAllLow(){let sh=0,removed=0;G.equipInv=G.equipInv.filter(function(e){if(e.rarity==='common'||e.rarity==='rare'){sh+=(e.rarity==='rare'?3:1);removed++;return false}return true});if(removed>0){G.craftShards+=sh;G.totalShardsSpent=(G.totalShardsSpent||0)+sh;playAudio('fairy');toast('🧹 一键分解'+removed+'件白蓝 +'+sh+'碎片');renderEquip()}else toast('背包中无白蓝装备')}
