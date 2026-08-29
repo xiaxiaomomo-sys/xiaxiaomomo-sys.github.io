@@ -217,7 +217,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft Y
 .mode-orb{background:rgba(255,235,59,.3);color:#ffeb3b;border:1px solid #ffeb3b}
 input[type=text],input[type=password]{width:100%;padding:4px;border-radius:4px;background:#000;border:1px solid rgba(201,168,76,.3);color:#fff;font-size:8.5px;margin-bottom:3px;outline:none}
 /* 全局字体放大 */
-.res-tag{font-size:11px!important}.stage-title{font-size:13px!important}.stage-sub{font-size:9px!important}.titan-counter{font-size:12px!important}.clanship{font-size:10px!important}.dps-meter{font-size:10px!important}.hp-text{font-size:9px!important}.mana-text{font-size:9px!important}.skill-card .s-name{font-size:7.5px!important}.skill-card .s-cost,.skill-card .s-lvl{font-size:6.5px!important}.nav-tab{font-size:9px!important}.nav-tab .tab-icon{font-size:16px!important}.panel-head h3{font-size:13px!important}.card-row .c-title{font-size:11px!important}.card-row .c-desc{font-size:9px!important}.card-row .c-stat{font-size:9px!important}.btn-buy{font-size:9px!important}.btn-small{font-size:8px!important}.tier-badge{font-size:8.5px!important}.talent-node .t-name{font-size:7.5px!important}.equip-slot .es-name{font-size:8px!important}.equip-slot .es-stat{font-size:7.5px!important}.ei-name{font-size:9.5px!important}.ei-stat{font-size:8px!important}.task-item .c-title{font-size:10px!important}.task-item .c-desc{font-size:8.5px!important}.toast{font-size:11px!important}</style>
+.res-tag{font-size:11px!important}.stage-title{font-size:13px!important}.stage-sub{font-size:9px!important}.titan-counter{font-size:12px!important}.clanship{font-size:10px!important}.dps-meter{font-size:10px!important}.hp-text{font-size:9px!important}.mana-text{font-size:9px!important}.skill-card .s-name{font-size:7.5px!important}.skill-card .s-cost,.skill-card .s-lvl{font-size:6.5px!important}.nav-tab{font-size:9px!important}.nav-tab .tab-icon{font-size:16px!important}.panel-head h3{font-size:13px!important}.card-row .c-title{font-size:11px!important}.card-row .c-desc{font-size:9px!important}.card-row .c-stat{font-size:9px!important}.btn-buy{font-size:9px!important}.btn-small{font-size:8px!important}.tier-badge{font-size:8.5px!important}.talent-node .t-name{font-size:7.5px!important}.equip-slot .es-name{font-size:8px!important}.equip-slot .es-stat{font-size:7.5px!important}.ei-name{font-size:9.5px!important}.ei-stat{font-size:8px!important}.task-item .c-title{font-size:10px!important}.task-item .c-desc{font-size:8.5px!important}.toast{font-size:11px!important}@keyframes coinFly{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-60px) scale(0.5);opacity:0}}
+@keyframes snapFlash{0%{opacity:1;transform:scale(1.5)}100%{opacity:0;transform:scale(0.5)}}
+@keyframes comboFlash{0%{opacity:0.8}100%{opacity:0}}
+@keyframes equipFlash{0%{opacity:1}100%{opacity:0}}
+</style>
 </head>
 <body>
 <div id="app">
@@ -979,6 +983,64 @@ function handleTap(e){
 function toggleBossFight(force){if(force){G.bossFailed=false;G.currentTitan=G.titanPerStage;spawnMonster()}}
 function showDmgPop(dmg,type){let p=document.createElement('div');p.className='dmg-pop '+type;p.textContent=dmg.format();p.style.left=(30+Math.random()*40)+'%';p.style.top=(35+Math.random()*25)+'%';p.style.setProperty('--dx',(Math.random()*60-30)+'px');let a=document.getElementById('battleArea');if(a){a.appendChild(p);setTimeout(()=>p.remove(),700)}}
 function updateHPUI(){if(isNaN(currentMonsterHP.m)||isNaN(currentMonsterMaxHP.m)){currentMonsterHP=new BN(100,0);currentMonsterMaxHP=new BN(100,0)}let ratio=currentMonsterHP.div(currentMonsterMaxHP);let pct=ratio.m*Math.pow(10,ratio.e)*100;if(isNaN(pct))pct=100;pct=Math.max(0,Math.min(100,pct));let f=document.getElementById('hpFill');if(f)f.style.width=pct+'%';let t=document.getElementById('hpText');if(t)t.textContent=currentMonsterHP.format()+'/'+currentMonsterMaxHP.format()}
+// ===== 补全缺失函数 =====
+function spawnChestersonGold(){
+  let ba=getBattleArea();if(!ba)return;
+  for(let i=0;i<8;i++){
+    let coin=document.createElement('div');
+    coin.style.cssText='position:absolute;font-size:16px;z-index:8;pointer-events:none;left:'+(40+Math.random()*20)+'%;top:'+(45+Math.random()*10)+'%;animation:coinFly '+(0.8+Math.random()*0.5)+'s forwards';
+    coin.textContent='💰';
+    ba.appendChild(coin);
+    setTimeout(()=>coin.remove(),1500);
+  }
+}
+function playEnemyDie(){
+  if(!G.settings.sound||!audioCtx)return;
+  try{
+    let t=audioCtx.currentTime;
+    let osc=audioCtx.createOscillator();
+    let gain=audioCtx.createGain();
+    osc.connect(gain);gain.connect(audioCtx.destination);
+    osc.type='sawtooth';
+    osc.frequency.setValueAtTime(400,t);
+    osc.frequency.exponentialRampToValueAtTime(80,t+0.2);
+    gain.gain.setValueAtTime(0.15,t);
+    gain.gain.linearRampToValueAtTime(0.001,t+0.2);
+    osc.start(t);osc.stop(t+0.2);
+  }catch(e){}
+}
+function spawnSnapTrail(){
+  let ba=getBattleArea();if(!ba)return;
+  for(let i=0;i<5;i++){
+    let bolt=document.createElement('div');
+    bolt.style.cssText='position:absolute;font-size:14px;z-index:8;pointer-events:none;left:'+(30+i*8)+'%;top:'+(40+Math.random()*20)+'%;animation:snapFlash 0.3s forwards';
+    bolt.textContent='⚡';
+    ba.appendChild(bolt);
+    setTimeout(()=>bolt.remove(),400);
+  }
+}
+function spawnEquipDropFlash(){
+  let ba=getBattleArea();if(!ba)return;
+  let flash=document.createElement('div');
+  flash.style.cssText='position:absolute;inset:0;background:radial-gradient(circle,rgba(201,168,76,.3) 0%,transparent 70%);z-index:6;pointer-events:none;animation:equipFlash 0.5s forwards';
+  ba.appendChild(flash);
+  setTimeout(()=>flash.remove(),600);
+}
+function toggleBgm(){
+  G.settings.bgm=!G.settings.bgm;
+  let btn=document.getElementById('btnBgm');
+  if(btn)btn.textContent=G.settings.bgm?'音乐:开':'音乐:关';
+  if(G.settings.bgm){startBgm()}else{stopBgm()}
+  toast(G.settings.bgm?'背景音乐已开启':'背景音乐已关闭');
+}
+function spawnComboEdge(){
+  let ba=getBattleArea();if(!ba)return;
+  let edge=document.createElement('div');
+  edge.style.cssText='position:absolute;inset:0;border:2px solid var(--gold);border-radius:8px;z-index:7;pointer-events:none;animation:comboFlash 0.3s forwards';
+  ba.appendChild(edge);
+  setTimeout(()=>edge.remove(),400);
+}
+// ===== 补全结束 =====
 function spawnFlashZip(){if(!G.isBoss||document.querySelector('.flash-zip-point'))return;let z=document.createElement('div');z.className='flash-zip-point';z.style.left=(30+Math.random()*40)+'%';z.style.top=(30+Math.random()*40)+'%';z.onclick=e=>{e.stopPropagation();let d=getTapDamage().mul(getTalentEffect('k13'));applyDamage(d,'deadly');playAudio('zip');z.remove();toast('🎯 弱点处决！')};let a=document.getElementById('battleArea');if(a){a.appendChild(z);setTimeout(()=>z.remove(),2500)}}
 function spawnFairy(){if(document.querySelector('.fairy'))return;let f=document.createElement('div');f.className='fairy';f.textContent='☁️';f.style.top=(15+Math.random()*25)+'%';f.style.left='-40px';let a=document.getElementById('battleArea');if(a)a.appendChild(f);let st=Date.now();let iv=setInterval(()=>{let el=(Date.now()-st)/1000;f.style.left=(el*55-40)+'px';if(el>10){clearInterval(iv);f.remove()}},30);f.onclick=e=>{e.stopPropagation();clearInterval(iv);f.remove();playAudio('fairy');let roll=Math.random();if(roll<0.35){G.mana=G.maxMana;toast('☁️ 灵力全满')}else if(roll<0.7){let g=getGoldDrop(G.stage,true).mul(10*getSetBonus().fairyDmg);G.stone=G.stone.add(g);toast('☁️ 横财+'+g.format())}else if(roll<0.75){G.gem+=Math.floor(10*getSetBonus().fairyDmg);toast('☁️ 仙玉+'+Math.floor(10*getSetBonus().fairyDmg))}else{SKILLS.forEach(s=>G.skillsActive[s.id]=30);toast('☁️ 全技能激活30秒')}updateUI()}}
 function triggerHeartOfGold(){if(!G.hogReady)return;G.hogReady=false;G.hogTimer=30;let r=getGoldDrop(G.stage,true).mul(8*getTalentEffect('k7'));G.stone=G.stone.add(r);let t=document.getElementById('petTip');if(t)t.style.display='none';let c=document.getElementById('petCompanion');if(c)c.classList.remove('hog-ready');playAudio('fairy');toast('🦊 聚宝+'+r.format())}
