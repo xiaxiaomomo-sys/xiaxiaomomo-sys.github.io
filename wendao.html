@@ -791,25 +791,18 @@ function getArtifactEffect(art){
   if(!art||art.effB===undefined)return new BN(0);
   let lv=G.artifacts[art.id];
   if(lv===undefined||lv===null)return new BN(0);
-  let L;
-  if(typeof lv==='number'){
-    if(lv<=0)return new BN(0);
-    L=new BN(lv);
-  }else if(lv instanceof BN){
-    if(lv.m<=0)return new BN(0);
-    L=new BN(lv.m,lv.e);
-  }else if(typeof lv==='object'&&lv!==null&&'m' in lv){
-    if(lv.m<=0)return new BN(0);
-    L=new BN(lv.m,lv.e||0);
-  }else{
-    L=new BN(1);
-  }
+  let level;
+  if(typeof lv==='number')level=lv;
+  else if(lv instanceof BN)level=lv.m*Math.pow(10,lv.e);
+  else if(typeof lv==='object'&&lv!==null&&'m' in lv)level=lv.m*Math.pow(10,lv.e||0);
+  else level=1;
+  if(!isFinite(level)||level<=0)return new BN(0);
   let effD=art.effD||1;
-  let powered=L.pow(effD);
-  let result=new BN(art.effB).mul(powered);
+  let powered=Math.pow(level,effD);
+  let resultVal=art.effB*powered;
   let talentMult=getTalentEffect('a4');
-  if(talentMult&&typeof talentMult==='number'&&talentMult>0)result=result.mul(talentMult);
-  return result;
+  if(talentMult&&typeof talentMult==='number'&&talentMult>0)resultVal*=talentMult;
+  return new BN(resultVal);
 }
 function getArtifactMult(fx){let total=new BN(0);ART_POOL.forEach(a=>{if(a.fx===fx)total=total.add(getArtifactEffect(a))});return total}
 
@@ -1227,12 +1220,12 @@ function getItemLevel(){return Math.max(1,Math.min(5000,Math.floor(G.maxStage/15
 function equipMainVal(slot,type,rarity){let base=(SLOT_MAIN_BASE[slot]&&SLOT_MAIN_BASE[slot][type])||1;return Math.floor(base*Math.pow(1.0125,getItemLevel())*rarity.mult)}
 function equipSubVal(rarity){return Math.floor((0.5+Math.random()*2)*Math.pow(1.0125,getItemLevel())*rarity.mult)}
 function dropEquip(forcedRarity){let slot=EQUIP_SLOTS[Math.floor(Math.random()*EQUIP_SLOTS.length)];let lv=getItemLevel();let rid;if(forcedRarity)rid=forcedRarity;else{// BOSS只掉白蓝(凡品/极品), 传说/神话仅靠锻造系统制作
-rid=Math.random()<0.7?'common':'rare'}let rarity=RARITIES.find(x=>x.id===rid);let slotPool=Object.keys(SLOT_MAIN_BASE[slot.id]||{all:1});let mainType=slotPool[Math.floor(Math.random()*slotPool.length)];let mainVal=equipMainVal(slot.id,mainType,rarity);let subPool=SLOT_SUB_POOL[slot.id];let subs=[];for(let i=0;i<rarity.sub;i++){let st=subPool[Math.floor(Math.random()*subPool.length)];let stt=STAT_TYPES.find(x=>x.type===st);subs.push({type:st,name:stt?stt.name:st,val:equipSubVal(rarity)})}let set=null;if(rid==='legendary'||rid==='mythic')set=EQUIP_SETS[Math.floor(Math.random()*EQUIP_SETS.length)].id;let eq={id:Date.now()+Math.random(),slot:slot.id,name:rarity.name+'·'+slot.name,rarity:rid,icon:slot.icon,level:lv,mainStat:{type:mainType,name:(STAT_TYPES.find(x=>x.type===mainType)||{}).name||'全伤',val:mainVal},subStats:subs,set:set,enchant:0};G.equipInv.push(eq);spawnEquipDropFlash();playAudio('drop');toast('📦 掉落【'+eq.name+' Lv.'+lv+'】');renderEquip()}
-function equipItem(id){let idx=G.equipInv.findIndex(e=>e.id===id);if(idx<0)return;let eq=G.equipInv[idx];let old=G.equipment[eq.slot];G.equipment[eq.slot]=eq;G.equipInv.splice(idx,1);if(old)G.equipInv.push(old);playAudio('buy');renderEquip();updateUI();checkActivatedSets()}
-function sellEquip(id){let idx=G.equipInv.findIndex(e=>e.id===id);if(idx<0)return;let eq=G.equipInv[idx];let shards=eq.rarity==='mythic'?10:eq.rarity==='legendary'?5:eq.rarity==='rare'?2:1;G.craftShards+=shards;G.totalShardsSpent=(G.totalShardsSpent||0)+shards;G.equipInv.splice(idx,1);toast('分解+'+shards+'碎片');renderEquip()}
-function upgradeEquip(id){let eq=G.equipInv.find(e=>e.id===id);if(!eq)return;let cost=10+eq.level*5;if(G.craftShards<cost)return toast('碎片不足(需'+cost+')');G.craftShards-=cost;eq.level++;let r=RARITIES.find(x=>x.id===eq.rarity)||RARITIES[0];eq.mainStat.val=equipMainVal(eq.slot,eq.mainStat.type,r);eq.subStats.forEach(s=>s.val=equipSubVal(r));playAudio('fairy');toast('⬆️ '+eq.name+'→Lv.'+eq.level);renderEquip();updateUI()}
+rid=Math.random()<0.7?'common':'rare'}let rarity=RARITIES.find(x=>x.id===rid);let slotPool=Object.keys(SLOT_MAIN_BASE[slot.id]||{all:1});let mainType=slotPool[Math.floor(Math.random()*slotPool.length)];let mainVal=equipMainVal(slot.id,mainType,rarity);let subPool=SLOT_SUB_POOL[slot.id];let subs=[];for(let i=0;i<rarity.sub;i++){let st=subPool[Math.floor(Math.random()*subPool.length)];let stt=STAT_TYPES.find(x=>x.type===st);subs.push({type:st,name:stt?stt.name:st,val:equipSubVal(rarity)})}let set=null;if(rid==='legendary'||rid==='mythic')set=EQUIP_SETS[Math.floor(Math.random()*EQUIP_SETS.length)].id;let eq={id:Date.now()+Math.floor(Math.random()*10000),slot:slot.id,name:rarity.name+'·'+slot.name,rarity:rid,icon:slot.icon,level:lv,mainStat:{type:mainType,name:(STAT_TYPES.find(x=>x.type===mainType)||{}).name||'全伤',val:mainVal},subStats:subs,set:set,enchant:0};G.equipInv.push(eq);spawnEquipDropFlash();playAudio('drop');toast('📦 掉落【'+eq.name+' Lv.'+lv+'】');renderEquip()}
+function equipItem(id){id=parseFloat(id);let idx=G.equipInv.findIndex(e=>e.id===id);if(idx<0)return;let eq=G.equipInv[idx];let old=G.equipment[eq.slot];G.equipment[eq.slot]=eq;G.equipInv.splice(idx,1);if(old)G.equipInv.push(old);playAudio('buy');renderEquip();updateUI();checkActivatedSets()}
+function sellEquip(id){id=parseFloat(id);let idx=G.equipInv.findIndex(e=>e.id===id);if(idx<0)return;let eq=G.equipInv[idx];let shards=eq.rarity==='mythic'?10:eq.rarity==='legendary'?5:eq.rarity==='rare'?2:1;G.craftShards+=shards;G.totalShardsSpent=(G.totalShardsSpent||0)+shards;G.equipInv.splice(idx,1);toast('分解+'+shards+'碎片');renderEquip()}
+function upgradeEquip(id){id=parseFloat(id);let eq=G.equipInv.find(e=>e.id===id);if(!eq)return;let cost=10+eq.level*5;if(G.craftShards<cost)return toast('碎片不足(需'+cost+')');G.craftShards-=cost;eq.level++;let r=RARITIES.find(x=>x.id===eq.rarity)||RARITIES[0];eq.mainStat.val=equipMainVal(eq.slot,eq.mainStat.type,r);eq.subStats.forEach(s=>s.val=equipSubVal(r));playAudio('fairy');toast('⬆️ '+eq.name+'→Lv.'+eq.level);renderEquip();updateUI()}
 function numFmt(n){if(!isFinite(n))return'∞';if(n>=1e30)return(n/1e30).toFixed(2)+'极';if(n>=1e24)return(n/1e24).toFixed(2)+'载';if(n>=1e20)return(n/1e20).toFixed(2)+'沟';if(n>=1e16)return(n/1e16).toFixed(2)+'垓';if(n>=1e12)return(n/1e12).toFixed(2)+'兆';if(n>=1e8)return(n/1e8).toFixed(2)+'亿';if(n>=1e4)return(n/1e4).toFixed(2)+'万';return Math.floor(n).toString()}
-function rerollEquip(id){let eq=G.equipInv.find(e=>e.id===id);if(!eq)return;let cost=15;if(G.craftShards<cost)return toast('碎片不足(需15)');G.craftShards-=cost;let r=RARITIES.find(x=>x.id===eq.rarity);let pool=SLOT_SUB_POOL[eq.slot]||['all'];eq.subStats=[];for(let i=0;i<r.sub;i++){let st=pool[Math.floor(Math.random()*pool.length)];let stt=STAT_TYPES.find(x=>x.type===st);eq.subStats.push({type:st,name:stt?stt.name:st,val:equipSubVal(r)})}playAudio('fairy');toast('🔄 重铸完成');renderEquip()}
+function rerollEquip(id){id=parseFloat(id);let eq=G.equipInv.find(e=>e.id===id);if(!eq)return;let cost=15;if(G.craftShards<cost)return toast('碎片不足(需15)');G.craftShards-=cost;let r=RARITIES.find(x=>x.id===eq.rarity);let pool=SLOT_SUB_POOL[eq.slot]||['all'];eq.subStats=[];for(let i=0;i<r.sub;i++){let st=pool[Math.floor(Math.random()*pool.length)];let stt=STAT_TYPES.find(x=>x.type===st);eq.subStats.push({type:st,name:stt?stt.name:st,val:equipSubVal(r)})}playAudio('fairy');toast('🔄 重铸完成');renderEquip()}
 const RARITY_ORDER={common:0,rare:1,legendary:2,mythic:3};
 function sellAllLow(){let sh=0,removed=0;G.equipInv=G.equipInv.filter(function(e){if(e.rarity==='common'||e.rarity==='rare'){sh+=(e.rarity==='rare'?3:1);removed++;return false}return true});if(removed>0){G.craftShards+=sh;G.totalShardsSpent=(G.totalShardsSpent||0)+sh;playAudio('fairy');toast('🧹 一键分解'+removed+'件白蓝 +'+sh+'碎片');renderEquip()}else toast('背包中无白蓝装备')}
 function openActiveSets(){let list=document.getElementById('activeSetsList');let active=EQUIP_SETS.filter(s=>getSetCount(s.id)>=5);list.innerHTML=active.length?active.map(s=>{let lvl=getSetLevel(s.id);return'<div style="font-size:8.5px;padding:5px 8px;margin-bottom:4px;background:rgba(0,0,0,.4);border-radius:6px;border-left:3px solid '+(s.tier==='mythic'?'#c4a0ff':'var(--gold)')+'"><b style="color:'+(s.tier==='mythic'?'#c4a0ff':'var(--gold2)')+'">'+s.icon+' '+s.name+'</b> Lv.'+lvl+'<br><span style="color:var(--paper);font-size:8px">'+s.desc+'</span></div>'}).join(''):'<div style="text-align:center;font-size:9px;color:var(--mist);padding:15px">尚未激活任何套装<br>集齐5件同套装部件即可永久激活</div>';document.getElementById('activeSetsModal').classList.add('show')}
