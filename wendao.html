@@ -118,8 +118,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft Y
 .mana-fill{height:100%;background:linear-gradient(90deg,var(--rune),#81ecec);transition:width .15s}
 .mana-text{font-size:7px;color:var(--mist);text-align:center;padding:1px 0}
 .skill-bar{display:flex;gap:2px;padding:2px 4px;background:#0d0a08;justify-content:center;border-bottom:1px solid rgba(201,168,76,.15)}
-.skill-card{flex:1;max-width:44px;aspect-ratio:1;border-radius:5px;background:linear-gradient(145deg,var(--ink3),var(--ink2));border:1px solid rgba(201,168,76,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden}
-.skill-card.ready{border-color:var(--gold);box-shadow:0 0 5px rgba(201,168,76,.3)}
+.skill-card{flex:1;max-width:56px;min-width:48px;aspect-ratio:1;border-radius:8px;background:linear-gradient(145deg,var(--ink3),var(--ink2));border:2px solid rgba(201,168,76,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:all .15s;z-index:10}
+.skill-card.ready{border-color:var(--gold);box-shadow:0 0 8px rgba(201,168,76,.5);animation:skillPulse 1.5s ease-in-out infinite}
+@keyframes skillPulse{0%,100%{box-shadow:0 0 6px rgba(201,168,76,.4)}50%{box-shadow:0 0 14px rgba(201,168,76,.7)}}
 .skill-card.active{border-color:var(--jade2);box-shadow:0 0 8px rgba(115,201,158,.5)}
 .skill-card .s-icon{font-size:16px}.skill-card .s-name{font-size:7px;color:var(--mist);transform:scale(.85)}
 .skill-card .s-cost{position:absolute;top:0;right:2px;font-size:6.5px;color:#81ecec;font-weight:700}
@@ -941,7 +942,7 @@ function spawnMonster(){G._monsterDying=false;G.thisRunMaxStage=Math.max(G.thisR
   currentMonsterHP=new BN(currentMonsterMaxHP);
   if(G.vulnStacks>0&&!G.isBoss)G.vulnStacks=Math.max(0,G.vulnStacks-1);
   let sp=document.getElementById('enemySprite');
-  if(sp){sp.className='enemy-sprite'+(G.isBoss?' boss-spawn':'');let icons={normal:'👹',boss:'👿',portar:'🚪',chesterson:'💰',snap:'⚡'};sp.textContent=icons[monsterType]||'👹'}
+  if(sp){sp.className='enemy-sprite'+(G.isBoss?' boss-spawn':'');let normalIcons=['👹','👺','👻','💀','🧟','🦇','🕷️','🦂','🐍','🦑','🐙','🦖','🐲','🔥','🌋','☠️','👽','🤖','🦴','🩸'];let bossIcons=['👿','😈','👹','🐉','🦕','🔥','💀','☠️','👺','🧌'];let chosenIcon=monsterType==='normal'?normalIcons[Math.floor(G.stage/5)%normalIcons.length]:monsterType==='boss'?bossIcons[Math.floor(G.stage/50)%bossIcons.length]:({portar:'🚪',chesterson:'💰',snap:'⚡'})[monsterType]||'👹';sp.textContent=chosenIcon}
   let c=document.getElementById('titanCounter');
   if(c){let labels={normal:'妖兽 '+(G.currentTitan+1)+'/'+req,boss:'⚠️ 领主降临',portar:'🌀 太虚仙门',chesterson:'💰 宝箱怪',snap:'⚡ 快速怪'};c.textContent=labels[monsterType]||'妖兽';c.className='titan-counter'+(G.isBoss?' boss':'')}
   let tw=document.getElementById('bossTimerWrap');if(tw)tw.style.display=G.isBoss?'block':'none';
@@ -1084,9 +1085,9 @@ function getHeroTotalLevel(){let t=0;for(let i=0;i<HEROES.length;i++)t+=G.heroLe
 function getSkillUnlocked(id){return getHeroTotalLevel()>=(SKILLS[id]||{}).unlockLv||0}
 function useSkill(id){
   let s=SKILLS[id],lv=G.skillsLvl[id]||1,cost=getSkillCost(id);
-  if(!isSkillUnlocked(id))return toast('🔒 需主角Lv.'+s.unlockLv+' 解锁');
-  if(G.skillsCd[id]>0){openSkillUpgrade(id);return}
-  if(G.mana<cost){openSkillUpgrade(id);return}
+  if(!isSkillUnlocked(id)){toast('🔒 需主角Lv.'+s.unlockLv+' 解锁');return}
+  if(G.skillsCd[id]>0){toast('⏳ 冷却中 '+Math.ceil(G.skillsCd[id])+'秒');return}
+  if(G.mana<cost){toast('💧 灵力不足 需'+cost);return}
   G.mana-=cost;G.skillsCd[id]=s.cd*getSetBonus().skillCd;G.mana=Math.min(getMaxMana(),G.mana+cost*getSetBonus().manaRefund);
   if(s.type==='hs'){playAudio('hs');spawnThunder();let sb=getSetBonus();let d=getTapDamage().mul((200+lv*20)*getTalentEffect('s3')*getTalentEffect('s13')*getTalentEffect('s16')*sb.hs*sb.skillEffect).mul(tSkillMult()).mul(tAllMult()).mul(sb.skillDmg).mul(sb.splashDmg);applyDamage(d,'splash');let skip=3+getTalentFlat('s6')+sb.splashSkip;G.currentTitan+=skip;toast('⚡ 神雷连跳'+skip+'只小怪')}
   else{playAudio('skill'+id);let sb=getSetBonus();let baseDur=id===5?s.dur+getTalentFlat('s5'):s.dur;G.skillsActive[id]=baseDur*getTalentEffect('s14')*(1+getTalentFlat('sm6')*0.1)*getClanBonus().skillDur*sb.skillDur*sb.skillEffect;
