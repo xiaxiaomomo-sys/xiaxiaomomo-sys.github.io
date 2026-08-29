@@ -922,7 +922,7 @@ function getSkillCost(id){let s=SKILLS[id],lv=G.skillsLvl[id]||1;return Math.max
 function getSkillUpgradeCost(id){let lv=G.skillsLvl[id]||1;return Math.floor(10*Math.pow(1.5,lv-1))}
 function getSkillEffect(id){let lv=G.skillsLvl[id]||1;if(id===0)return'伤害x'+(200+lv*20)+',跳5层';if(id===1)return'致命+'+(30+lv*5)+'%';if(id===2)return'金币x'+(5+lv*0.3);if(id===3)return'点击x'+(4+lv*0.5);if(id===4)return'道友x'+(3+lv*0.3);if(id===5)return'分身20/s,伤害x'+(0.6+lv*0.05);return''}
 /* ===== 战斗系统 ===== */
-function spawnMonster(){G.thisRunMaxStage=Math.max(G.thisRunMaxStage||1,G.stage);
+function spawnMonster(){G._monsterDying=false;G.thisRunMaxStage=Math.max(G.thisRunMaxStage||1,G.stage);
   const req=Math.max(1,G.titanPerStage-Math.floor(getTalent('r3')*0.5));
   G.fightTime=0;G.wallWarned=false;
   G.isBoss=G.currentTitan>=req;
@@ -952,6 +952,7 @@ function spawnMonster(){G.thisRunMaxStage=Math.max(G.thisRunMaxStage||1,G.stage)
 function spawnBossVuln(){if(getTalent('k13')>0)setTimeout(spawnFlashZip,1500)}
 function applyDamage(dmg,type='tap'){
   if(!dmg||dmg.m===undefined||isNaN(dmg.m)||dmg.m<=0)return;
+  if(G._monsterDying)return;
   if(isNaN(currentMonsterHP.m)||!currentMonsterMaxHP||currentMonsterMaxHP.m<=0){spawnMonster();return}
   if(currentMonsterHP.m<=0){onMonsterKill(dmg);return}
   currentMonsterHP=currentMonsterHP.sub(dmg);
@@ -961,6 +962,8 @@ function applyDamage(dmg,type='tap'){
   updateHPUI()
 }
 function onMonsterKill(dmg){
+  if(G._monsterDying)return;
+  G._monsterDying=true;
   G.totalKills++;if(G.isBoss){G.bossKills++;G.dailyBossKills++}
   let gold=getGoldDrop(G.stage,G.isBoss);
   if(monsterType==='chesterson'){gold=gold.mul(10*getSetBonus().chestGold);spawnChestersonGold()}
