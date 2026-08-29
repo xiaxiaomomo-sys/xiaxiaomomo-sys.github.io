@@ -934,7 +934,8 @@ function spawnMonster(){G.thisRunMaxStage=Math.max(G.thisRunMaxStage||1,G.stage)
   monsterType=G.isBoss?'boss':(r<0.01*sb.chestChance*chestBonus?'chesterson':r<(0.03*sb.snapChance*snapBonus)?'snap':r<(0.02*sb.portarChance*portarBonus)?'portar':'normal');
   if(monsterType==='portar')monsterType='portar';
   currentMonsterMaxHP=getMonsterMaxHP(G.stage,G.isBoss);
-  currentMonsterHP=new BN(currentMonsterMaxHP);
+  if(!currentMonsterMaxHP||isNaN(currentMonsterMaxHP.m)||currentMonsterMaxHP.m<=0)currentMonsterMaxHP=new BN(100,0);
+currentMonsterHP=new BN(currentMonsterMaxHP);
   if(G.vulnStacks>0&&!G.isBoss)G.vulnStacks=Math.max(0,G.vulnStacks-1);
   let sp=document.getElementById('enemySprite');
   if(sp){sp.className='enemy-sprite'+(G.isBoss?' boss-spawn':'');let icons={normal:'👹',boss:'👿',portar:'🚪',chesterson:'💰',snap:'⚡'};sp.textContent=icons[monsterType]||'👹'}
@@ -948,7 +949,8 @@ function spawnMonster(){G.thisRunMaxStage=Math.max(G.thisRunMaxStage||1,G.stage)
 function spawnBossVuln(){if(getTalent('k13')>0)setTimeout(spawnFlashZip,1500)}
 function applyDamage(dmg,type='tap'){
   if(!dmg||dmg.m===undefined||isNaN(dmg.m)||dmg.m<=0)return;
-  if(currentMonsterHP.m<=0||isNaN(currentMonsterHP.m))return;
+  if(isNaN(currentMonsterHP.m)){currentMonsterHP=new BN(currentMonsterMaxHP);return}
+  if(currentMonsterHP.m<=0){onMonsterKill(dmg);return}
   currentMonsterHP=currentMonsterHP.sub(dmg);
   if(currentMonsterHP.m<0)currentMonsterHP=new BN(0,0);
   if(G.settings.showDamageNumbers)showDmgPop(dmg,type);
@@ -999,7 +1001,7 @@ function handleTap(e){
 }
 function toggleBossFight(force){if(force){G.bossFailed=false;G.currentTitan=G.titanPerStage;spawnMonster()}}
 function showDmgPop(dmg,type){let p=document.createElement('div');p.className='dmg-pop '+type;p.textContent=dmg.format();p.style.left=(30+Math.random()*40)+'%';p.style.top=(35+Math.random()*25)+'%';p.style.setProperty('--dx',(Math.random()*60-30)+'px');let a=document.getElementById('battleArea');if(a){a.appendChild(p);setTimeout(()=>p.remove(),700)}}
-function updateHPUI(){if(isNaN(currentMonsterHP.m)||isNaN(currentMonsterMaxHP.m)){currentMonsterHP=new BN(100,0);currentMonsterMaxHP=new BN(100,0)}let ratio=currentMonsterHP.div(currentMonsterMaxHP);let pct=ratio.m*Math.pow(10,ratio.e)*100;if(isNaN(pct))pct=100;pct=Math.max(0,Math.min(100,pct));let f=document.getElementById('hpFill');if(f)f.style.width=pct+'%';let t=document.getElementById('hpText');if(t)t.textContent=currentMonsterHP.format()+'/'+currentMonsterMaxHP.format()}
+function updateHPUI(){if(isNaN(currentMonsterHP.m)||isNaN(currentMonsterMaxHP.m)||currentMonsterMaxHP.m<=0){currentMonsterHP=new BN(100,0);currentMonsterMaxHP=new BN(100,0)}let ratio=currentMonsterHP.div(currentMonsterMaxHP);let pct=(ratio.m*Math.pow(10,ratio.e))*100;if(isNaN(pct)||!isFinite(pct))pct=100;pct=Math.max(0,Math.min(100,pct));let f=document.getElementById('hpFill');if(f)f.style.width=pct+'%';let t=document.getElementById('hpText');if(t)t.textContent=currentMonsterHP.format()+'/'+currentMonsterMaxHP.format()}
 // ===== 补全缺失函数 =====
 function spawnChestersonGold(){
   let ba=getBattleArea();if(!ba)return;
