@@ -931,7 +931,7 @@ function spawnMonster(){G.thisRunMaxStage=Math.max(G.thisRunMaxStage||1,G.stage)
   let chestBonus=(1+getPetBonus('chest')+getPetBonus('chestFairy')*0.5)*sb.specialTrigger*sb.titanSpawn;
   let snapBonus=(1+getPetBonus('snap'))*sb.specialTrigger;
   let portarBonus=(1+getPetBonus('portar'))*sb.specialTrigger;
-  monsterType=G.isBoss?'boss':(r<0.01*sb.chestChance*chestBonus?'chesterson':r<(0.03*sb.snapChance*snapBonus)?'snap':r<(0.02*sb.portarChance*portarBonus)?'portar':'normal');
+  monsterType=G.isBoss?'boss':(r<0.01*sb.chestChance*chestBonus?'chesterson':r<(0.03*sb.snapChance*snapBonus)?'snap':r<(0.01*sb.portarChance*portarBonus)?'portar':'normal');
   if(monsterType==='portar')monsterType='portar';
   currentMonsterMaxHP=getMonsterMaxHP(G.stage,G.isBoss);
   if(!currentMonsterMaxHP||isNaN(currentMonsterMaxHP.m)||currentMonsterMaxHP.m<=0){
@@ -974,7 +974,7 @@ function onMonsterKill(dmg){
   if(getTalent('s11')>0&&Math.random()<0.2)G.mana=Math.min(getMaxMana(),G.mana+2+getTalent('s11')*0.1);
   if(getTalent('a12')>0)G.stone=G.stone.add(gold.mul(getTalent('a12')*0.05));
   if(getTalent('a9')>0&&Math.random()<0.2+getTalent('a9')*0.02){SKILLS.forEach(s=>{G.skillsCd[s.id]=Math.max(0,G.skillsCd[s.id]-getTalentFlat('a9'))});toast('👑 以财证道！技能CD重置')}
-  if(monsterType==='portar'){G.stage+=50+getSetBonus().portarSkip;if(G.stage>G.maxStage)G.maxStage=G.stage;G.currentTitan=0;G.gem+=3;toast('🌀 太虚仙门！飞跃'+(50+getSetBonus().portarSkip)+'层+3仙玉');spawnMonster();updateUI();return}
+  if(monsterType==='portar'){G.stage+=10+getSetBonus().portarSkip;if(G.stage>G.maxStage)G.maxStage=G.stage;G.currentTitan=0;G.gem+=3;toast('🌀 太虚仙门！飞跃'+(50+getSetBonus().portarSkip)+'层+3仙玉');spawnMonster();updateUI();return}
   if(monsterType==='snap'){G.currentTitan+=Math.floor(3*getSetBonus().snapEffect);spawnSnapTrail();toast('⚡ 快速怪！连杀'+Math.floor(3*getSetBonus().snapEffect)+'只')}
   else if(dmg.gte(currentMonsterMaxHP.mul(2))&&!G.isBoss)G.currentTitan+=2;
   else G.currentTitan++;
@@ -1005,7 +1005,7 @@ function handleTap(e){
 function toggleBossFight(force){if(force){G.bossFailed=false;G.currentTitan=G.titanPerStage;spawnMonster()}}
 function showDmgPop(dmg,type){let p=document.createElement('div');p.className='dmg-pop '+type;p.textContent=dmg.format();p.style.left=(30+Math.random()*40)+'%';p.style.top=(35+Math.random()*25)+'%';p.style.setProperty('--dx',(Math.random()*60-30)+'px');let a=document.getElementById('battleArea');if(a){a.appendChild(p);setTimeout(()=>p.remove(),700)}}
 function updateHPUI(){
-  if(!currentMonsterMaxHP||isNaN(currentMonsterMaxHP.m)||currentMonsterMaxHP.m<=0){spawnMonster();return}
+  if(!currentMonsterMaxHP||isNaN(currentMonsterMaxHP.m)||currentMonsterMaxHP.m<=0){if(!G._hpRecovering){G._hpRecovering=true;spawnMonster();G._hpRecovering=false;}return}
   if(!currentMonsterHP||isNaN(currentMonsterHP.m)){currentMonsterHP=new BN(currentMonsterMaxHP)}
   if(currentMonsterHP.m<0)currentMonsterHP=new BN(0,0);
   let ratio=currentMonsterHP.div(currentMonsterMaxHP);
