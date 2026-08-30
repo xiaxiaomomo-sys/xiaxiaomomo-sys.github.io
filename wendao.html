@@ -131,7 +131,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft Y
 .nav-tab{flex:1;min-width:12%;padding:4px 0;display:flex;flex-direction:column;align-items:center;font-size:8.5px;color:var(--mist);background:none;border:none;cursor:pointer}
 .nav-tab.active{color:var(--gold2);background:rgba(201,168,76,.08)}
 .nav-tab .tab-icon{font-size:15px;margin-bottom:1px}
-.panel{position:absolute;inset:0;bottom:44px;background:linear-gradient(180deg,var(--ink2),var(--ink));z-index:30;display:none;flex-direction:column}
+.panel{position:absolute;inset:0;bottom:44px;background:linear-gradient(180deg,var(--ink2),var(--ink));z-index:60;display:none;flex-direction:column}
 .panel.open{display:flex}
 .panel-head{display:flex;align-items:center;justify-content:space-between;padding:5px 7px;background:rgba(201,168,76,.1);border-bottom:1px solid rgba(201,168,76,.2)}
 .panel-head h3{font-size:11px;color:var(--gold2)}
@@ -1395,10 +1395,11 @@ function updateUI(){
   // 技能栏渲染
   renderSkillBar();
 }
+let _skillBarCache='';
 function renderSkillBar(){
   let bar=document.getElementById('skillBar');
   if(!bar)return;
-  bar.innerHTML=SKILLS.map(s=>{
+  let html=SKILLS.map(s=>{
     let unlocked=isSkillUnlocked(s.id);
     let cd=G.skillsCd[s.id]||0;
     let act=G.skillsActive[s.id]||0;
@@ -1408,7 +1409,7 @@ function renderSkillBar(){
     if(!unlocked){
       return '<div class="skill-card locked" title="主角Lv.'+s.unlockLv+'解锁"><span class="s-icon">🔒</span><span class="s-name">Lv.'+s.unlockLv+'</span></div>';
     }
-    return '<div class="skill-card '+(ready?'ready':'')+(act>0?' active':'')+'" onclick="useSkill('+s.id+')" title="'+s.name+' Lv.'+lv+'\n'+s.desc+'\n消耗:'+cost+'灵力\n冷却:'+s.cd+'秒">'+
+    return '<div class="skill-card '+(ready?'ready':'')+(act>0?' active':'')+'" data-skill-id="'+s.id+'" title="'+s.name+' Lv.'+lv+'\n'+s.desc+'\n消耗:'+cost+'灵力\n冷却:'+s.cd+'秒">'+
       '<span class="s-cost">'+cost+'</span>'+
       '<span class="s-icon">'+s.icon+'</span>'+
       '<span class="s-name">'+s.name+'</span>'+
@@ -1417,6 +1418,9 @@ function renderSkillBar(){
       (act>0?'<div class="s-active-line"></div>':'')+
     '</div>';
   }).join('');
+  if(html===_skillBarCache)return;
+  _skillBarCache=html;
+  bar.innerHTML=html;
 }
 
 
@@ -1532,6 +1536,8 @@ window.onload=function(){
   gameLoop();
   setInterval(saveGame,10000);
   document.addEventListener('click',()=>{initAudio();if(G.settings.bgm)startBgm()},{once:true});
+  let _sb=document.getElementById('skillBar');
+  if(_sb)_sb.addEventListener('click',function(e){let c=e.target.closest('.skill-card[data-skill-id]');if(c)useSkill(parseInt(c.dataset.skillId));});
   let today=new Date().toDateString();
   if(G.checkinDate!==today)setTimeout(()=>openCheckin(),1500);
 };
