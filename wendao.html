@@ -993,7 +993,7 @@ function handleTap(e){
   let dmg=getTapDamage();
   if(!dmg||isNaN(dmg.m))dmg=new BN(1,0);
   let isCrit=Math.random()<0.15+sb.critChance+tCritChanceAdd();if(isCrit)dmg=dmg.mul((3+getTalentEffect('k5')-1)*sb.critDmg*tCritMult()*getHeroPassiveBonus().crit);
-  let isDeadly=G.skillsActive[1]>0&&Math.random()<0.3+getTalentChance('r2')+getSetBonus().deadlyChance;if(isDeadly)dmg=dmg.mul(10*sb.deadlyDmg*tCritMult());
+  let isDeadly=G.skillsActive[1]>0&&Math.random()<0.3+(G.skillsLvl[1]||1)*0.05+getTalentChance('r2')+getSetBonus().deadlyChance;if(isDeadly)dmg=dmg.mul((10+(G.skillsLvl[1]||1)*2)*sb.deadlyDmg*tCritMult());
   if(G.combo>=10&&getSetBonus().ambushDmg>1&&Math.random()<0.2)applyDamage(dmg.mul(getSetBonus().ambushDmg),'splash');
   if(getTalent('k8')>0&&Math.random()<0.15)applyDamage(dmg,'tap');
   if(getTalent('k12')>0&&Math.random()<0.1)applyDamage(dmg,'splash');
