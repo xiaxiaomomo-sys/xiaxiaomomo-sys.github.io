@@ -633,7 +633,7 @@ const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 const SAVE_KEY='wendao_v8_save';
 const RELIC_EXP = 3.0; // TT2圣物产出指数(原版1.75, 校准后3.0)
 let G={stage:1,
-  thisRunMaxStage:1,maxStage:1,currentTitan:0,titanPerStage:8,isBoss:false,bossTimer:30,bossFailed:false,
+  thisRunMaxStage:1,maxStage:1,fairyCooldown:false,currentTitan:0,titanPerStage:8,isBoss:false,bossTimer:30,bossFailed:false,
 stone:new BN(10),gem:50,relic:new BN(0),sp:0,mana:100,maxMana:100,
 heroLevels:{},heroAsc:{},skillsActive:{},skillsCd:{},skillsLvl:{0:1,1:1,2:1,3:1,4:1,5:1},
 talents:{},artifacts:{},pets:{0:1},activePet:0,petEggs:2,petEggTimer:7200,
@@ -1078,7 +1078,7 @@ function spawnComboEdge(){
 }
 // ===== 补全结束 =====
 function spawnFlashZip(){if(!G.isBoss||document.querySelector('.flash-zip-point'))return;let z=document.createElement('div');z.className='flash-zip-point';z.style.left=(30+Math.random()*40)+'%';z.style.top=(30+Math.random()*40)+'%';z.onclick=e=>{e.stopPropagation();let d=getTapDamage().mul(getTalentEffect('k13'));applyDamage(d,'deadly');playAudio('zip');z.remove();toast('🎯 弱点处决！')};let a=document.getElementById('battleArea');if(a){a.appendChild(z);setTimeout(()=>z.remove(),2500)}}
-function spawnFairy(){if(document.querySelector('.fairy'))return;let f=document.createElement('div');f.className='fairy';f.textContent='☁️';f.style.top=(15+Math.random()*25)+'%';f.style.left='-40px';let a=document.getElementById('battleArea');if(a)a.appendChild(f);let st=Date.now();let iv=setInterval(()=>{let el=(Date.now()-st)/1000;f.style.left=(el*55-40)+'px';if(el>10){clearInterval(iv);f.remove()}},30);f.onclick=e=>{e.stopPropagation();clearInterval(iv);f.remove();playAudio('fairy');let roll=Math.random();if(roll<0.35){G.mana=G.maxMana;toast('☁️ 灵力全满')}else if(roll<0.7){let g=getGoldDrop(G.stage,true).mul(10*getSetBonus().fairyDmg);G.stone=G.stone.add(g);toast('☁️ 横财+'+g.format())}else if(roll<0.75){G.gem+=Math.floor(10*getSetBonus().fairyDmg);toast('☁️ 仙玉+'+Math.floor(10*getSetBonus().fairyDmg))}else{SKILLS.forEach(s=>G.skillsActive[s.id]=30);toast('☁️ 全技能激活30秒')}updateUI()}}
+function spawnFairy(){if(document.querySelector('.fairy'))return;let f=document.createElement('div');f.className='fairy';f.textContent='☁️';f.style.top=(15+Math.random()*25)+'%';f.style.left='-40px';let a=document.getElementById('battleArea');if(a)a.appendChild(f);let st=Date.now();let iv=setInterval(()=>{let el=(Date.now()-st)/1000;f.style.left=(el*55-40)+'px';if(el>15){clearInterval(iv);f.remove();G.fairyCooldown=true;setTimeout(()=>{G.fairyCooldown=false},10000)}},30);f.onclick=e=>{e.stopPropagation();clearInterval(iv);f.remove();G.fairyCooldown=true;setTimeout(()=>{G.fairyCooldown=false},10000);playAudio('fairy');let roll=Math.random();if(roll<0.35){G.mana=G.maxMana;toast('☁️ 灵力全满')}else if(roll<0.7){let g=getGoldDrop(G.stage,true).mul(10*getSetBonus().fairyDmg);G.stone=G.stone.add(g);toast('☁️ 横财+'+g.format())}else if(roll<0.75){G.gem+=Math.floor(10*getSetBonus().fairyDmg);toast('☁️ 仙玉+'+Math.floor(10*getSetBonus().fairyDmg))}else{SKILLS.forEach(s=>G.skillsActive[s.id]=30);toast('☁️ 全技能激活30秒')}updateUI()}}
 function triggerHeartOfGold(){if(!G.hogReady)return;G.hogReady=false;G.hogTimer=30;let r=getGoldDrop(G.stage,true).mul(8*getTalentEffect('k7'));G.stone=G.stone.add(r);let t=document.getElementById('petTip');if(t)t.style.display='none';let c=document.getElementById('petCompanion');if(c)c.classList.remove('hog-ready');playAudio('fairy');toast('🦊 聚宝+'+r.format())}
 /* ===== 技能系统 ===== */
 function getHeroTotalLevel(){let t=0;for(let i=0;i<HEROES.length;i++)t+=G.heroLevels[i]||0;return t}
@@ -1489,7 +1489,7 @@ try{
   if(G.furyTimer>0){G.furyTimer-=dt;if(G.furyTimer<=0){let a=getBattleArea();if(a){let o=a.querySelector('.fury-overlay');if(o)o.remove()}updateModeBadges()}}
   if(G.contractTimer>0){G.contractTimer-=dt;G.mana=Math.max(0,G.mana-5*dt);if(G.contractTimer<=0){let a=getBattleArea();if(a){let o=a.querySelector('.contract-overlay');if(o)o.remove()}updateModeBadges()}}
   if(getTalent('a5')>0&&G.mana>10&&Math.random()<dt*.2){G.contractTimer=3;let a=getBattleArea();if(a&&!a.querySelector('.contract-overlay')){let o=document.createElement('div');o.className='contract-overlay';a.appendChild(o)}updateModeBadges()}
-  if(Math.random()<dt*(0.04+getTalentChance('a3'))*getSetBonus().fairyChance)spawnFairy();
+  if(!G.fairyCooldown&&Math.random()<dt*0.025*getTalentEffect('a3')*getSetBonus().fairyChance)spawnFairy();
   if(G.isBoss&&Math.random()<dt*0.25)spawnFlashZip();
   if(getTalent('w7')>0&&Math.random()<dt*(0.1+getTalentFlat('w7')*0.005))spawnOrb();
   if(G.isBoss!==(bgmPlaying&&G.isBoss)){if(G.settings.bgm&&bgmPlaying)playBgmLoop()}
