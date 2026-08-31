@@ -1355,9 +1355,9 @@ function onSettingsTitleClick(){settingsClicks++;if(settingsClicks>=10){settings
 function verifyGmPassword(){let v=document.getElementById('gmPwdInput').value;if(v==='83266121'){G.gmUnlocked=true;document.getElementById('gmFab').classList.add('show');document.getElementById('gmPasswordModal').classList.remove('show');toast('GM已解锁')}else toast('密钥错误')}
 /* ===== 开局福利兑换码 ===== */
 const REDEEM_CODES={
-  '林深宇宙无敌最俊朗':{name:'清修启程礼',stone:,gem:100,eggs:2,sp:1},
-  '林深宇宙无敌最潇洒':{name:'筑基问道礼',stone:[1.5, 5],gem:150,eggs:3,sp:3},
-  '林深宇宙无敌最帅气':{name:'渡劫飞升礼',stone:[2.5, 5],gem:250,eggs:5,sp:6,equip:'mythic'},
+  '林深宇宙无敌最俊朗':{name:'清修启程礼',stone:[0.5,5],gem:100,eggs:2,sp:1},
+  '林深宇宙无敌最潇洒':{name:'筑基问道礼',stone:[1.5,5],gem:150,eggs:3,sp:3},
+  '林深宇宙无敌最帅气':{name:'渡劫飞升礼',stone:[2.5,5],gem:250,eggs:5,sp:6,equip:'mythic'},
   '林深宇宙无敌最霸气':{name:'无上至尊礼',gem:400,eggs:5,sp:5,artifact:'art_25'}
 };
 function redeemCode(){
@@ -1370,10 +1370,16 @@ function redeemCode(){
   if(G.redeemedCodes.includes(code)){if(status)status.textContent='⏳ 该兑换码已领取过';toast('已领取过该兑换码');return}
   G.redeemedCodes.push(code);
   let r=REDEEM_CODES[code];
-  if(r.stone)G.stone=G.stone.add(new BN(r.stone[0],r.stone));
+  if(r.stone){
+    let amount=Array.isArray(r.stone)?r.stone[0]:r.stone;
+    G.stone=G.stone.add(new BN(amount));
+  }
   if(r.gem)G.gem+=r.gem;
   if(r.eggs)G.petEggs=Math.min(Math.floor(getClanBonus().eggCap),G.petEggs+r.eggs);
-  if(r.relic)G.relic=G.relic.add(new BN(r.relic[0],r.relic));
+  if(r.relic){
+    let relicAmount=Array.isArray(r.relic)?r.relic[0]:r.relic;
+    G.relic=G.relic.add(new BN(relicAmount));
+  }
   if(r.sp)G.sp+=r.sp;
   if(r.equip)dropEquip(r.equip);
   if(r.artifact){
