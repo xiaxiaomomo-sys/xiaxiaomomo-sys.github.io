@@ -898,8 +898,23 @@ function getSetBonus(){
   return b
 }
 function getEquipBonus(){let b={tap:0,hero:0,ship:0,all:0,crit:0,gold:0,mana:0};let slots=['weapon','head','robe','aura','slash'];slots.forEach(function(s){let e=G.equipment[s];if(e){let ench=1+(e.enchant||0)*0.2;if(e.mainStat)b[e.mainStat.type]=(b[e.mainStat.type]||0)+e.mainStat.val*ench/100;if(e.subStats)e.subStats.forEach(function(st){b[st.type]=(b[st.type]||0)+st.val*ench/100})}});return {tap:1+b.tap,hero:1+b.hero,ship:1+b.ship,all:1+b.all,crit:1+b.crit,gold:1+b.gold,mana:1+b.mana}}
-function getPetBonus(type){let mult=1;let sb=getSetBonus();PETS.forEach(p=>{let lv=G.pets[p.id]||0;if(lv>0&&p.val){let match=(p.type===type)||(p.type==='all')||(type==='all');if(match){let act=G.activePet===p.id;let ratio=act?sb.activePet:Math.min(1,Math.floor(lv/5)*0.05);mult*=(1+p.val*lv*ratio*getTalentEffect('k3')*getTalentEffect('sm1')*sb.pet)}}});return mult}
-function getTapDamage(){let base=new BN(10);let bestHeroDps=new BN(0);HEROES.forEach(h=>{let lv=G.heroLevels[h.id]||0;if(lv>0){let d=new BN(h.dps).mul(getHeroLevelMult(lv));if(bestHeroDps.m===0||d.gte(bestHeroDps))bestHeroDps=d}});if(bestHeroDps.m>0)base=base.add(bestHeroDps.mul(0.03));let k2pct=getTalentEffect('k2')-1;if(k2pct>0)base=base.add(getHeroDPS().mul(k2pct));let mult=new BN(1);mult=mult.mul(getTalentEffect('k1'));if(G.skillsActive[3]>0)mult=mult.mul((4+G.skillsLvl[3]*0.5)*getTalentEffect('k4')*getSetBonus().fs);if(getTalent('sm2')&&G.skillsActive[3]>0)mult=mult.mul(getTalentEffect('sm2'));let sb=getSetBonus();mult=mult.mul(getPetBonus('tap'));mult=mult.mul(getRealmBonus());mult=mult.mul(getClanBonus().all);mult=mult.mul(sb.all).mul(sb.tap).mul(sb.basicDmg).mul(getEnchantBonus());
+function getPetBonus(type){
+  let mult=1;
+  let sb=getSetBonus();
+  let sm4=getTalentEffect('sm4')||1;
+  PETS.forEach(p=>{
+    let lv=G.pets[p.id]||0;
+    if(lv>0&&p.val){
+      let match=(p.type===type)||(p.type==='all')||(type==='all');
+      if(match){
+        let act=G.activePet===p.id;
+        let ratio=act?sb.activePet:Math.min(1,Math.floor(lv/5)*0.05)*sm4;
+        mult*=(1+p.val*lv*ratio*getTalentEffect('k3')*getTalentEffect('sm1')*sb.pet);
+      }
+    }
+  });
+  return mult;
+}function getTapDamage(){let base=new BN(10);let bestHeroDps=new BN(0);HEROES.forEach(h=>{let lv=G.heroLevels[h.id]||0;if(lv>0){let d=new BN(h.dps).mul(getHeroLevelMult(lv));if(bestHeroDps.m===0||d.gte(bestHeroDps))bestHeroDps=d}});if(bestHeroDps.m>0)base=base.add(bestHeroDps.mul(0.03));let k2pct=getTalentEffect('k2')-1;if(k2pct>0)base=base.add(getHeroDPS().mul(k2pct));let mult=new BN(1);mult=mult.mul(getTalentEffect('k1'));if(G.skillsActive[3]>0)mult=mult.mul((4+G.skillsLvl[3]*0.5)*getTalentEffect('k4')*getSetBonus().fs);if(getTalent('sm2')&&G.skillsActive[3]>0)mult=mult.mul(getTalentEffect('sm2'));let sb=getSetBonus();mult=mult.mul(getPetBonus('tap'));mult=mult.mul(getRealmBonus());mult=mult.mul(getClanBonus().all);mult=mult.mul(sb.all).mul(sb.tap).mul(sb.basicDmg).mul(getEnchantBonus());
   let artAll=new BN(1).add(getArtifactMult('allDmg')).add(getArtifactMult('allDmg2')).add(getArtifactMult('allDmg3')).add(getArtifactMult('artifactBase'));
   let artTap=new BN(1).add(getArtifactMult('tapDmg')).add(getArtifactMult('swordDmg')).add(getArtifactMult('daggerCombo'));
   let artCount=new BN(1).add(getArtifactMult('dmgByArtCount').mul(getArtifactCount()));
@@ -911,14 +926,14 @@ function getHeroDPS(){let total=new BN(0);HEROES.forEach(h=>{let lv=G.heroLevels
   let artHero=new BN(1).add(getArtifactMult('heroBase')).add(getArtifactMult('meleeHero')).add(getArtifactMult('rangedHero')).add(getArtifactMult('spellHero')).add(getArtifactMult('groundHero')).add(getArtifactMult('flyingHero'));
   mult=mult.mul(artAllH).mul(artHero);
   if(G.isBoss)mult=mult.mul(new BN(1).add(getArtifactMult('bossDmg'))).mul(tBossMult());else mult=mult.mul(new BN(1).add(getArtifactMult('nonBossDmg'))).mul(tNonBossMult());let eb=getEquipBonus();mult=mult.mul(eb.hero||1).mul(eb.all||1);if(G.furyTimer>0)mult=mult.mul(3*tFuryMult());mult=mult.mul(tHeroMult()).mul(tAllMult()).mul(getSetBonus().warcryDmg);let hp=getHeroPassiveBonus();mult=mult.mul(hp.hero).mul(hp.all);return total.mul(mult)}
-function getShipDamage(){let sb=getSetBonus();let d=getHeroDPS().mul(15*getTalentEffect('w2')).mul(getClanBonus().ship).mul(sb.ship).mul(sb.companionDmg);if(getTalent('r4')>0&&Math.random()<getTalentChance('r4'))d=d.mul(5);if(getTalent('w9')>0&&Math.random()<0.05)G.currentTitan+=Math.floor(getTalentFlat('w9'));return d.mul(tShipMult()).mul(tAllMult())}
+function getShipDamage(){let sb=getSetBonus();let d=getHeroDPS().mul(15*getTalentEffect('w2')).mul(getClanBonus().ship).mul(sb.ship).mul(getPetBonus('ship'));if(getTalent('r4')>0&&Math.random()<getTalentChance('r4'))d=d.mul(5);if(getTalent('w9')>0&&Math.random()<0.05)G.currentTitan+=Math.floor(getTalentFlat('w9'));return d.mul(tShipMult()).mul(tAllMult())}
 function getMonsterMaxHP(stage,isBoss){let hp=new BN(17.5).mul(new BN(1.15).pow(stage)).mul(1+0.005*stage);if(isBoss){let bs=3+stage/500*0.5;if(stage%10===5||stage%10===0)bs*=2.5;hp=hp.mul(bs)}return hp}
 function getGoldDrop(stage,isBoss){let sb=getSetBonus();let base=new BN(17.5).mul(new BN(1.139).pow(stage)).mul(1+0.005*stage);let g=base;if(isBoss){let bs=3+stage/500*0.5;if(stage%10===5||stage%10===0)bs*=2.5;g=g.mul(bs*3*sb.bossGold)}if(G.skillsActive[2]>0)g=g.mul((5+G.skillsLvl[2]*0.3)*sb.hogMult);g=g.mul(getTalentEffect('r1')).mul(getTalentEffect('a1')).mul(tGoldMult());g=g.mul(sb.gold).mul(getPetBonus('gold'));let eb=getEquipBonus();g=g.mul(eb.gold||1);let hp=getHeroPassiveBonus();g=g.mul(hp.gold);if(isBoss)g=g.mul(hp.bossGold);return g}
 function getAdvancedStartStage(){return 1}
 function getPrestigeRelicGain(){let ms=G.thisRunMaxStage||G.maxStage;if(ms<75)return new BN(0);let gain=new BN(Math.max(1,Math.floor(Math.pow(Math.max(0,(ms-75))/14,3))));
  let bos=ART_POOL.find(a=>a.fx==='relicGain');
 if(bos&&G.artifacts[bos.id])gain=gain.mul(new BN(1).add(getArtifactEffect(bos)));
-  return gain.mul(getSetBonus().relicGain)}
+  return gain.mul(getSetBonus().relicGain).mul(getPetBonus('relic'))}
 function getPrestigeSpGain(){let gained=0;if(!G.spMilestones)G.spMilestones={};for(let ms=50;ms<=G.maxStage;ms+=50){if(!G.spMilestones['s'+ms]){G.spMilestones['s'+ms]=1;gained++}}for(let ms=1000;ms<=G.maxStage;ms+=1000){if(!G.spMilestones['k'+ms]){G.spMilestones['k'+ms]=1;gained+=5}}return gained}
 // TT2英雄质变曲线: 每级基础成长 + 逢10/50级质变 + 1000级超级质变 + 3000+每50级
 function getHeroLevelMult(lv){if(lv<=0)return 0;return Math.pow(1.035,Math.min(lv,1000))*lv}
@@ -1146,9 +1161,13 @@ function tCloneMult(){return getTalentEffect('s2')*getTalentEffect('s9')*getTale
 function tContractMult(){return getTalentEffect('a13')*getTalentEffect('a17')}
 function tFuryMult(){return getTalentEffect('a8')}
 function tManaMax(){return getTalentEffect('s1')*getTalentEffect('s7')}
-function getMaxMana(){return Math.floor(100*tManaMax()+getSetBonus().manaMax)}
-function getManaRegen(){return (getMaxMana()/600)*getTalentEffect('s1')*getSetBonus().manaRegen*(1+getTalent('k14')*0.25)}
-function getCloneDamage(){let base=getTapDamage().mul((0.6+G.skillsLvl[5]*0.05)*20).mul(getSetBonus().clone);return base.mul(tCloneMult()).mul(tPetMult()).mul(tAllMult())}
+function getMaxMana(){
+  let base = 100 * tManaMax() + getSetBonus().manaMax;
+  return Math.floor(base * getPetBonus('manaMax')); // 乘上灵力上限宠物加成
+}
+function getManaRegen(){
+  return (getMaxMana()/600)*getTalentEffect('s1')*getSetBonus().manaRegen*(1+getTalent('k14')*0.25)*getPetBonus('mana'); // 乘上回蓝宠物加成
+}function getCloneDamage(){let base=getTapDamage().mul((0.6+G.skillsLvl[5]*0.05)*20).mul(getSetBonus().clone).mul(getPetBonus('clone'));return base.mul(tCloneMult()).mul(tPetMult()).mul(tAllMult())}
 function getTreeSpent(tid){let t=TALENT_TREES.find(x=>x.id===tid),tot=0;if(!t)return 0;t.tiers.forEach(tr=>tr.skills.forEach(s=>{let lv=G.talents[s.id]||0;for(let i=0;i<lv;i++)tot+=getSkillSpCost(s,i)}));return tot}
 function renderTalents(){
   let u=document.getElementById('uiSp2');if(u)u.textContent=G.sp;let spt=document.getElementById('uiSpTotal');if(spt)spt.textContent=getTotalSpNeeded();
@@ -1437,11 +1456,14 @@ function updateUI(){
   el=document.getElementById('uiPrestigeGain');if(el)el.textContent=getPrestigeRelicGain().format();
   el=document.getElementById('uiPrestigeSpGain');if(el)el.textContent=getPrestigeSpGain();
   el=document.getElementById('uiPrestigeStartStage');if(el)el.textContent=1;
-  // 战斗界面宠物显示
+ // 战斗界面宠物显示
   let activePet=PETS.find(p=>p.id===G.activePet);
   if(activePet){
+    let curLv = G.pets[G.activePet] || 0;
     let pi=document.getElementById('petIcon');if(pi)pi.textContent=activePet.icon;
-    let pn=document.getElementById('petName');if(pn)pn.textContent=activePet.name+' Lv.'+(G.pets[G.activePet]||0);
+    let pn=document.getElementById('petName');if(pn)pn.textContent=activePet.name+' Lv.'+curLv;
+    let pb=document.getElementById('uiPetBonus');
+    if(pb) pb.textContent = '+' + Math.round(activePet.val * curLv * 100) + '%'; // 实时显示当前出战宠物的加成百分比
   }
   // 连击显示
   let cb=document.getElementById('uiCombo');if(cb)cb.textContent=G.combo||0;
