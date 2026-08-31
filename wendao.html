@@ -927,7 +927,15 @@ function getHeroDPS(){let total=new BN(0);HEROES.forEach(h=>{let lv=G.heroLevels
   if(G.isBoss)mult=mult.mul(new BN(1).add(getArtifactMult('bossDmg'))).mul(tBossMult());else mult=mult.mul(new BN(1).add(getArtifactMult('nonBossDmg'))).mul(tNonBossMult());let eb=getEquipBonus();mult=mult.mul(eb.hero||1).mul(eb.all||1);if(G.furyTimer>0)mult=mult.mul(3*tFuryMult());mult=mult.mul(tHeroMult()).mul(tAllMult()).mul(getSetBonus().warcryDmg);let hp=getHeroPassiveBonus();mult=mult.mul(hp.hero).mul(hp.all);return total.mul(mult)}
 function getShipDamage(){let sb=getSetBonus();let d=getHeroDPS().mul(15*getTalentEffect('w2')).mul(getClanBonus().ship).mul(sb.ship).mul(sb.companionDmg).mul(getPetBonus('ship'));if(getTalent('r4')>0&&Math.random()<getTalentChance('r4'))d=d.mul(5);if(getTalent('w9')>0&&Math.random()<0.05)G.currentTitan+=Math.floor(getTalentFlat('w9'));return d.mul(tShipMult()).mul(tAllMult())}function getMonsterMaxHP(stage,isBoss){let hp=new BN(17.5).mul(new BN(1.15).pow(stage)).mul(1+0.005*stage);if(isBoss){let bs=3+stage/500*0.5;if(stage%10===5||stage%10===0)bs*=2.5;hp=hp.mul(bs)}return hp}
 function getGoldDrop(stage,isBoss){let sb=getSetBonus();let base=new BN(17.5).mul(new BN(1.139).pow(stage)).mul(1+0.005*stage);let g=base;if(isBoss){let bs=3+stage/500*0.5;if(stage%10===5||stage%10===0)bs*=2.5;g=g.mul(bs*3*sb.bossGold)}if(G.skillsActive[2]>0)g=g.mul((5+G.skillsLvl[2]*0.3)*sb.hogMult);g=g.mul(getTalentEffect('r1')).mul(getTalentEffect('a1')).mul(tGoldMult());g=g.mul(sb.gold).mul(getPetBonus('gold'));let eb=getEquipBonus();g=g.mul(eb.gold||1);let hp=getHeroPassiveBonus();g=g.mul(hp.gold);if(isBoss)g=g.mul(hp.bossGold);return g}
-function getAdvancedStartStage(){return 1}
+function getAdvancedStartStage(){
+  let ms = G.maxStage || 1;
+  if(ms < 75) return 1;
+  let sb = getSetBonus();
+  // 基础起跑 60%，宗门等级每级+1%（最高+20%），高贵剑士等套装乘算，最高上限 90%
+  let ratio = (0.60 + Math.min(0.20, (G.clanLevel || 0) * 0.01)) * (sb.advStart || 1);
+  ratio = Math.min(0.90, Math.max(0.1, ratio));
+  return Math.max(1, Math.floor(ms * ratio));
+}
 function getPrestigeRelicGain(){let ms=G.thisRunMaxStage||G.maxStage;if(ms<75)return new BN(0);let gain=new BN(Math.max(1,Math.floor(Math.pow(Math.max(0,(ms-75))/14,3))));
  let bos=ART_POOL.find(a=>a.fx==='relicGain');
 if(bos&&G.artifacts[bos.id])gain=gain.mul(new BN(1).add(getArtifactEffect(bos)));
@@ -1313,14 +1321,44 @@ function upgradeBuilding(id){let b=CLAN_BUILDINGS.find(x=>x.id===id),lv=G.clanBu
 function upgradeShipReload(){if(G.shipReloadLvl>=13)return;let cost=Math.floor(30*Math.pow(1.6,G.shipReloadLvl));if(G.gem<cost)return toast('仙玉不足');G.gem-=cost;G.shipReloadLvl++;playAudio('fairy');toast('玄舟装填→Lv.'+G.shipReloadLvl);renderClan();updateUI()}
 /* ===== 渡劫 ===== */
 function checkStageMilestones(){let oldMax=G.maxStage;if(G.stage>oldMax){G.maxStage=G.stage;if(!G.spMilestones)G.spMilestones={};let gained=0;if(G.maxStage%50===0&&!G.spMilestones['s'+G.maxStage]){G.spMilestones['s'+G.maxStage]=1;gained++}if(G.maxStage%1000===0&&!G.spMilestones['k'+G.maxStage]){G.spMilestones['k'+G.maxStage]=1;gained+=5}if(gained>0){G.sp+=gained;toast('🌟 里程碑！到达'+G.maxStage+'层 +'+gained+'SP')}}}
-function doPrestige(){if((G.thisRunMaxStage||G.maxStage)<75)return toast('本次修行需达到第75层方可渡劫');let relic=getPrestigeRelicGain(),sp=getPrestigeSpGain();G.relic=G.relic.add(relic);G.totalRelic=G.totalRelic.add(relic);G.sp+=sp;G.prestigeCount++;
-  // TT2式转生: 英雄等级重置, 回退到1层重新攒钱买英雄, 金币清零
-  G.stage=1;G.currentTitan=0;G.isBoss=false;G.bossFailed=false;G.thisRunMaxStage=1;G.stageLocked=false;
-  G.stone=new BN(0);G.masterLevel=1;G.heroLevels={};G.skillsLvl={0:1,1:1,2:1,3:1,4:1,5:1};G.skillsCd={};
-  G.skillsActive={};G.mana=G.maxMana;G.combo=0;G.vulnStacks=0;G.poisonStacks=0;
-  playAudio('prestige');spawnPrestigeFlash();spawnMonster();updateHPUI();closePanel();
-  toast('🌊 渡劫！+'+relic.format()+'碎片 +'+sp+'SP，于第'+G.stage+'层起跑');
-  submitScore();checkAchievements();updateUI()}
+function doPrestige(){
+  if((G.thisRunMaxStage||G.maxStage)<75)return toast('本次修行需达到第75层方可渡劫');
+  let relic=getPrestigeRelicGain(),sp=getPrestigeSpGain();
+  G.relic=G.relic.add(relic);
+  G.totalRelic=G.totalRelic.add(relic);
+  G.sp+=sp;
+  G.prestigeCount++;
+
+  let startStage = getAdvancedStartStage();
+  G.stage = startStage;
+  G.currentTitan = 0;
+  G.isBoss = false;
+  G.bossFailed = false;
+  G.thisRunMaxStage = startStage;
+  G.stageLocked = false;
+
+  // 核心破局：按起跑层直接赠送 50 只怪物的启动灵石，玩家一落地即可直接把道友买到秒怪水平！
+  G.stone = getGoldDrop(startStage, false).mul(50);
+  G.masterLevel = 1;
+  G.heroLevels = {};
+  G.skillsLvl = {0:1,1:1,2:1,3:1,4:1,5:1};
+  G.skillsCd = {};
+  G.skillsActive = {};
+  G.mana = G.maxMana;
+  G.combo = 0;
+  G.vulnStacks = 0;
+  G.poisonStacks = 0;
+
+  playAudio('prestige');
+  spawnPrestigeFlash();
+  spawnMonster();
+  updateHPUI();
+  closePanel();
+  toast('🌊 渡劫！+'+relic.format()+'碎片 +'+sp+'SP，于第'+startStage+'层起跑');
+  submitScore();
+  checkAchievements();
+  updateUI();
+}
 /* ===== 签到 ===== */
 function openCheckin(){renderCheckin();document.getElementById('checkinModal').classList.add('show')}
 function renderCheckin(){let grid=document.getElementById('checkinGrid');if(!grid)return;grid.innerHTML=CHECKIN_REWARDS.map((r,i)=>{let day=i+1,done=G.checkinDay>=day,today=G.checkinDay===i;let icon=r.sp?'🌿':r.gem?'💠':r.eggs?'🥚':r.equip?'⚔️':'🎁';let txt=r.sp?r.sp+'SP':r.gem?r.gem+'💎':r.eggs?r.eggs+'蛋':r.equip?'装备':'?';return'<div class="checkin-day '+(done?'done':'')+(today?' today':'')+'"><div class="cd-icon">'+icon+'</div><div class="cd-reward">D'+day+'</div><div class="cd-reward">'+txt+'</div></div>'}).join('');let today=new Date().toDateString();let btn=document.getElementById('checkinBtn');let canCheckin=G.checkinDate!==today;btn.textContent=canCheckin?'立即签到':'今日已签到';btn.disabled=!canCheckin}
@@ -1453,7 +1491,7 @@ function updateUI(){
   // 转生面板
   el=document.getElementById('uiPrestigeGain');if(el)el.textContent=getPrestigeRelicGain().format();
   el=document.getElementById('uiPrestigeSpGain');if(el)el.textContent=getPrestigeSpGain();
-  el=document.getElementById('uiPrestigeStartStage');if(el)el.textContent=1;
+  el=document.getElementById('uiPrestigeStartStage');if(el)el.textContent=getAdvancedStartStage();
  // 战斗界面宠物显示
   let activePet=PETS.find(p=>p.id===G.activePet);
   if(activePet){
