@@ -1467,10 +1467,10 @@ function onSettingsTitleClick(){settingsClicks++;if(settingsClicks>=10){settings
 function verifyGmPassword(){let v=document.getElementById('gmPwdInput').value;if(v==='83266121'){G.gmUnlocked=true;document.getElementById('gmFab').classList.add('show');document.getElementById('gmPasswordModal').classList.remove('show');toast('GM已解锁')}else toast('密钥错误')}
 /* ===== 开局福利兑换码 ===== */
 const REDEEM_CODES={
-  '林深宇宙无敌最俊朗':{name:'清修启程礼',stone:[0.5,5],gem:100,eggs:2,sp:1},
-  '林深宇宙无敌最潇洒':{name:'筑基问道礼',stone:[1.5,5],gem:150,eggs:3,sp:3},
-  '林深宇宙无敌最帅气':{name:'渡劫飞升礼',stone:[2.5,5],gem:250,eggs:5,sp:6,equip:'mythic'},
-  '林深宇宙无敌最霸气':{name:'无上至尊礼',gem:400,eggs:5,sp:5,artifact:'art_25'}
+  '林深宇宙无敌最俊朗':{name:'清修启程礼',stone:500000,gem:100,eggs:2,sp:1},          // 50万灵石
+  '林深宇宙无敌最潇洒':{name:'筑基问道礼',stone:1500000,gem:150,eggs:3,sp:3},        // 150万灵石
+  '林深宇宙无敌最帅气':{name:'渡劫飞升礼',stone:5000000,gem:250,eggs:5,sp:6,equip:'mythic'}, // 500万灵石
+  '林深宇宙无敌最霸气':{name:'无上至尊礼',stone:10000000,gem:400,eggs:5,sp:5,artifact:'art_25'} // 1000万灵石
 };
 function redeemCode(){
   let input=document.getElementById('redeemInput');
