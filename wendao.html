@@ -632,6 +632,8 @@ const SUPABASE_URL='https://wmnyhzfwffotycaqitvm.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtbnloemZ3ZmZvdHljYXFpdHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwNjIyNTMsImV4cCI6MjEwMTYzODI1M30.s0kwvk3uMsshgOsZQOCDErCMr3UN3VXUIhj3yo2pk9c';
 const SAVE_KEY='wendao_v8_save';
 const RELIC_EXP = 3.0; // TT2圣物产出指数(原版1.75, 校准后3.0)
+let isDeletingSave = false;
+let autoSaveInterval = null;
 let G={stage:1,
   thisRunMaxStage:1,maxStage:1,fairyCooldown:false,currentTitan:0,titanPerStage:8,isBoss:false,bossTimer:30,bossFailed:false,
 stone:new BN(10),gem:50,relic:new BN(0),sp:0,mana:100,maxMana:100,
@@ -1402,10 +1404,15 @@ function openDeleteSave(){document.getElementById('deleteSaveModal').classList.a
 function doDeleteSave(){
   let v=document.getElementById('deleteConfirmInput').value.trim();
   if(v!=='确认删除'){toast('请输入「确认删除」方可执行');return}
-  try{localStorage.removeItem(SAVE_KEY);localStorage.removeItem(SAVE_KEY+'_ck')}catch(e){}
+  isDeletingSave = true; // 1. 锁死保存，防止旧数据被重新写回
+  if(autoSaveInterval) clearInterval(autoSaveInterval); // 2. 停掉自动保存定时器
+  try{
+    localStorage.removeItem(SAVE_KEY);
+    localStorage.removeItem(SAVE_KEY+'_ck');
+  }catch(e){}
   document.getElementById('deleteSaveModal').classList.remove('show');
   toast('🗑️ 存档已删除，正在重新开始...');
-  setTimeout(()=>location.reload(),600);
+  setTimeout(()=>{ location.replace(location.href); }, 200); // 3. 立即重载页面
 }
 /* ===== 游戏循环 ===== */
 
@@ -1641,7 +1648,7 @@ async function resetLeaderboardIfNewDay(){
   try{await fetch(SUPABASE_URL+'/rest/v1/wendao_leaderboard',{method:'DELETE',headers:{apikey:SUPABASE_KEY,'Prefer':'return=minimal'}})}catch(e){}
 }
 /* ===== 存档 ===== */
-function saveGame(){try{let s=JSON.stringify(G);localStorage.setItem(SAVE_KEY,s);localStorage.setItem(SAVE_KEY+'_ck',cksum(s))}catch(e){}}
+function saveGame(){if(isDeletingSave)return;try{let s=JSON.stringify(G);localStorage.setItem(SAVE_KEY,s);localStorage.setItem(SAVE_KEY+'_ck',cksum(s))}catch(e){}}
 function cksum(str){let h=5381;for(let i=0;i<str.length;i++)h=((h*33)^str.charCodeAt(i))>>>0;return h.toString(36)}
 function migrateLegacyEquip(){let changed=false;let fix=function(e){if(!e)return;let map={epic:'mythic',uncommon:'rare'};if(e.rarity&&map[e.rarity]){e.rarity=map[e.rarity];changed=true}};G.equipInv.forEach(fix);['weapon','head','robe','aura','slash'].forEach(s=>fix(G.equipment[s]))}
 function loadGame(){try{let str=localStorage.getItem(SAVE_KEY);if(str){let ck=localStorage.getItem(SAVE_KEY+'_ck');if(ck&&ck!==cksum(str)){toast('⚠️ 检测到本地存档被篡改，已拒绝载入');return false}let d=JSON.parse(str);Object.assign(G,d);G.stone=new BN(d.stone);G.relic=new BN(d.relic);G.totalGold=new BN(d.totalGold||0);G.totalRelic=new BN(d.totalRelic||0);if(G.artifacts&&typeof G.artifacts==='object'){for(let k in G.artifacts){let v=G.artifacts[k];if(v instanceof BN)continue;if(typeof v==='number'){G.artifacts[k]=new BN(v);continue;}if(typeof v==='object'&&v!==null&&'m' in v){G.artifacts[k]=new BN(v.m,v.e||0);continue;}G.artifacts[k]=new BN(1)}}migrateLegacyEquip();if(!G.activatedSets)G.activatedSets={};if(!G.masterLevel)G.masterLevel=1;checkActivatedSets();let el=Math.min(28800,Math.max(0,(Date.now()-(G.lastTick||Date.now()))/1000));if(el>60){let offMult=1+getTalentEffect('r14');let eg=Math.floor(el/7200*offMult*getSetBonus().offlineCap);if(eg>0){G.petEggs=Math.min(Math.floor(getClanBonus().eggCap),(G.petEggs||0)+eg);toast('🌙 离线+'+eg+'蛋')}let maxSilent=Math.min(G.maxStage,Math.floor(G.maxStage*(0.99+getTalent('r7')*0.002)));let sg=Math.min(maxSilent-G.stage,Math.floor(el/12*offMult*getSetBonus().offlineStage));if(sg>0){G.stage+=sg;toast('🌙 离线推关+'+sg+'层')}let offGold=getHeroDPS().mul(el*getSetBonus().offlineGold*0.05*getSetBonus().offlineDmg);if(offGold.m>0){G.stone=G.stone.add(offGold);toast('🌙 离线灵石+'+offGold.format())}}
@@ -1848,7 +1855,7 @@ window.onload=function(){
   initBgParticles();
   resetLeaderboardIfNewDay();
   gameLoop();
-  setInterval(saveGame,10000);
+  autoSaveInterval = setInterval(saveGame, 10000);
   document.addEventListener('click',()=>{initAudio();if(G.settings.bgm)startBgm()},{once:true});
   let _sb=document.getElementById('skillBar');
 if(_sb){
