@@ -1766,7 +1766,39 @@ function cksum(str){let h=5381;for(let i=0;i<str.length;i++)h=((h*33)^str.charCo
 function migrateLegacyEquip(){let changed=false;let fix=function(e){if(!e)return;let map={epic:'mythic',uncommon:'rare'};if(e.rarity&&map[e.rarity]){e.rarity=map[e.rarity];changed=true}};G.equipInv.forEach(fix);['weapon','head','robe','aura','slash'].forEach(s=>fix(G.equipment[s]))}
 function loadGame(){try{let str=localStorage.getItem(SAVE_KEY);if(str){let ck=localStorage.getItem(SAVE_KEY+'_ck');if(ck&&ck!==cksum(str)){toast('⚠️ 检测到本地存档被篡改，已拒绝载入');return false}let d=JSON.parse(str);Object.assign(G,d);G.stone=new BN(d.stone);G.relic=new BN(d.relic);G.totalGold=new BN(d.totalGold||0);G.totalRelic=new BN(d.totalRelic||0);if(G.artifacts&&typeof G.artifacts==='object'){for(let k in G.artifacts){let v=G.artifacts[k];if(v instanceof BN)continue;if(typeof v==='number'){G.artifacts[k]=new BN(v);continue;}if(typeof v==='object'&&v!==null&&'m' in v){G.artifacts[k]=new BN(v.m,v.e||0);continue;}G.artifacts[k]=new BN(1)}}migrateLegacyEquip();if(!G.activatedSets)G.activatedSets={};if(!G.masterLevel)G.masterLevel=1;checkActivatedSets();let el=Math.min(28800,Math.max(0,(Date.now()-(G.lastTick||Date.now()))/1000));if(el>60){let offMult=1+getTalentEffect('r14');let eg=Math.floor(el/7200*offMult*getSetBonus().offlineCap);if(eg>0){G.petEggs=Math.min(Math.floor(getClanBonus().eggCap),(G.petEggs||0)+eg);toast('🌙 离线+'+eg+'蛋')}let maxSilent=Math.min(G.maxStage,Math.floor(G.maxStage*(0.99+getTalent('r7')*0.002)));let sg=Math.min(maxSilent-G.stage,Math.floor(el/12*offMult*getSetBonus().offlineStage));if(sg>0){G.stage+=sg;toast('🌙 离线推关+'+sg+'层')}let offGold=getHeroDPS().mul(el*getSetBonus().offlineGold*0.05*getSetBonus().offlineDmg);if(offGold.m>0){G.stone=G.stone.add(offGold);toast('🌙 离线灵石+'+offGold.format())}}
 G.lastTick=Date.now();
-}}catch(e){console.error('loadGame error:',e)}}
+      // ===== 老玩家历史 SP 自动补发检测 =====
+      if(!G.spMilestones) G.spMilestones={};
+      let autoCompensateSp = 0;
+      for(let ms=20; ms<=(G.maxStage||1); ms+=20){
+        if(!G.spMilestones['s'+ms]){
+          G.spMilestones['s'+ms]=1;
+          autoCompensateSp += 1;
+        }
+      }
+      for(let ms=500; ms<=(G.maxStage||1); ms+=500){
+        if(!G.spMilestones['m'+ms]){
+          G.spMilestones['m'+ms]=1;
+          autoCompensateSp += 3;
+        }
+      }
+      for(let ms=1000; ms<=(G.maxStage||1); ms+=1000){
+        if(!G.spMilestones['k'+ms]){
+          G.spMilestones['k'+ms]=1;
+          autoCompensateSp += 5;
+        }
+      }
+      if(autoCompensateSp > 0){
+        G.sp += autoCompensateSp;
+        setTimeout(()=>{
+          toast('🎁 版本更新：已为您自动补发历史关卡 ' + autoCompensateSp + ' 点 SP！');
+          updateUI();
+          renderTalents();
+        }, 1000);
+      }
+      // ===================================
+    }
+  }catch(e){console.error('loadGame error:',e)}
+}
 /* ===== 战力计算辅助函数 ===== */
 function getPlayerTotalPower(){
   let totalSp = G.sp || 0;
