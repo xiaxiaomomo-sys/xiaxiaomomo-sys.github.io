@@ -1502,26 +1502,51 @@ function initBgParticles(){
   }
 }
 
-function gameLoop(){
-try{
-  gameLoop._t=(gameLoop._t||0)+1;
-  if(gameLoop._t%3600===0)resetLeaderboardIfNewDay();
-  if(!checkServerHours()){updateUI();
-  requestAnimationFrame(gameLoop);return}
-  let now=Date.now(),dt=(now-G.lastTick)/1000;G.lastTick=now;if(dt>1||dt<=0||isNaN(dt))dt=.05;
+/* ===== 游戏循环 & 后台挂机运行 ===== */
+function stepGameTick(dt){
+  if(dt<=0||isNaN(dt))return;
+  if(dt>2)dt=2;
   G.mana=Math.min(getMaxMana(),G.mana+getManaRegen()*dt);
-  let eggCap=Math.floor(getClanBonus().eggCap);if(G.petEggs<eggCap){G.petEggTimer-=dt*getClanBonus().eggSpeed;if(G.petEggTimer<=0){G.petEggs=Math.min(eggCap,G.petEggs+1);G.petEggTimer=7200;toast('🥚 灵兽蛋+1')}}
-  SKILLS.forEach(s=>{if(G.skillsCd[s.id]>0)G.skillsCd[s.id]=Math.max(0,G.skillsCd[s.id]-dt);if(G.skillsActive[s.id]>0){G.skillsActive[s.id]=Math.max(0,G.skillsActive[s.id]-dt);if(G.skillsActive[s.id]===0&&s.id===5)removeClone()}});
-  if(G.isBoss){G.bossTimer-=dt;let bf=document.getElementById('bossTimerFill');if(bf)bf.style.width=(G.bossTimer/30*100)+'%';if(G.bossTimer<=0){G.bossFailed=true;G.currentTitan=0;toast('⏳ 领主超时');spawnMonster()}}
+  let eggCap=Math.floor(getClanBonus().eggCap);
+  if(G.petEggs<eggCap){
+    G.petEggTimer-=dt*getClanBonus().eggSpeed;
+    if(G.petEggTimer<=0){G.petEggs=Math.min(eggCap,G.petEggs+1);G.petEggTimer=7200;toast('🥚 灵兽蛋+1')}
+  }
+  SKILLS.forEach(s=>{
+    if(G.skillsCd[s.id]>0)G.skillsCd[s.id]=Math.max(0,G.skillsCd[s.id]-dt);
+    if(G.skillsActive[s.id]>0){G.skillsActive[s.id]=Math.max(0,G.skillsActive[s.id]-dt);if(G.skillsActive[s.id]===0&&s.id===5)removeClone()}
+  });
+  if(G.isBoss){
+    G.bossTimer-=dt;
+    let bf=document.getElementById('bossTimerFill');
+    if(bf)bf.style.width=(G.bossTimer/30*100)+'%';
+    if(G.bossTimer<=0){G.bossFailed=true;G.currentTitan=0;toast('⏳ 领主超时');spawnMonster()}
+  }
   G.fightTime=(G.fightTime||0)+dt;
-  // 卡墙警告: 30秒未击破提示
   if(G.fightTime>30&&!G.wallWarned&&currentMonsterHP.div(currentMonsterMaxHP).m>0.8){G.wallWarned=true;toast('⛰️ 境界瓶颈！30秒未击破，建议渡劫提升道行')}
   let dps=getHeroDPS();if(dps.m>0)applyDamage(dps.mul(dt),'ship');
-  if(G.skillsActive[5]>0){let sc=getCloneDamage().mul(dt);applyDamage(sc,'tap');if(Math.random()<dt*5)spawnCloneSlash();if((getSetBonus().cloneSplash||getSetBonus().skipChance>0)&&Math.random()<dt*(0.5+getSetBonus().skipChance*5)){G.currentTitan++;toast('👥 分身跳怪')}if(getTalent('s4')>0&&Math.random()<getTalentChance('s4')*5*dt){G.mana=Math.min(getMaxMana(),G.mana+2)}if(getTalent('s9')>0&&Math.random()<dt*0.5){applyDamage(currentMonsterMaxHP.mul(getTalent('s9')*0.002),'deadly')}}
+  if(G.skillsActive[5]>0){
+    let sc=getCloneDamage().mul(dt);applyDamage(sc,'tap');
+    if(!document.hidden&&Math.random()<dt*5)spawnCloneSlash();
+    if((getSetBonus().cloneSplash||getSetBonus().skipChance>0)&&Math.random()<dt*(0.5+getSetBonus().skipChance*5)){G.currentTitan++;toast('👥 分身跳怪')}
+    if(getTalent('s4')>0&&Math.random()<getTalentChance('s4')*5*dt){G.mana=Math.min(getMaxMana(),G.mana+2)}
+    if(getTalent('s9')>0&&Math.random()<dt*0.5){applyDamage(currentMonsterMaxHP.mul(getTalent('s9')*0.002),'deadly')}
+  }
   if(G.poisonStacks>0){applyDamage(getTapDamage().mul(0.05*G.poisonStacks*dt),'poison');if(Math.random()<dt*.3)G.poisonStacks=Math.max(0,G.poisonStacks-1)}
-  if(getSetBonus().extraTap>0){let et=getSetBonus().extraTap;G.autoTapAcc=(G.autoTapAcc||0)+et*dt;while(G.autoTapAcc>=1){G.autoTapAcc-=1;applyDamage(getTapDamage(),'tap');if(Math.random()<0.05+tCritChanceAdd()*0.3){applyDamage(getTapDamage().mul(2),'crit')}}}
-  G.clanShipTimer-=dt;let se=document.getElementById('shipTimer');if(se)se.textContent=Math.max(0,G.clanShipTimer).toFixed(1)+'s';if(G.clanShipTimer<=0){G.clanShipTimer=getShipInterval();let sd=getShipDamage();applyDamage(sd,'ship');spawnShipProjectile();playAudio('ship');let cs=document.getElementById('clanShip');if(cs){cs.classList.add('firing');setTimeout(()=>cs.classList.remove('firing'),400)}}
-  if(!G.hogReady){G.hogTimer-=dt*getSetBonus().hogDur;if(G.hogTimer<=0){G.hogReady=true;let t=document.getElementById('petTip');if(t)t.style.display='block';let c=document.getElementById('petCompanion');if(c)c.classList.add('hog-ready')}}
+  if(getSetBonus().extraTap>0){
+    let et=getSetBonus().extraTap;G.autoTapAcc=(G.autoTapAcc||0)+et*dt;
+    while(G.autoTapAcc>=1){G.autoTapAcc-=1;applyDamage(getTapDamage(),'tap');if(Math.random()<0.05+tCritChanceAdd()*0.3){applyDamage(getTapDamage().mul(2),'crit')}}
+  }
+  G.clanShipTimer-=dt;
+  let se=document.getElementById('shipTimer');if(se)se.textContent=Math.max(0,G.clanShipTimer).toFixed(1)+'s';
+  if(G.clanShipTimer<=0){
+    G.clanShipTimer=getShipInterval();let sd=getShipDamage();applyDamage(sd,'ship');
+    if(!document.hidden){spawnShipProjectile();playAudio('ship');let cs=document.getElementById('clanShip');if(cs){cs.classList.add('firing');setTimeout(()=>cs.classList.remove('firing'),400)}}
+  }
+  if(!G.hogReady){
+    G.hogTimer-=dt*getSetBonus().hogDur;
+    if(G.hogTimer<=0){G.hogReady=true;let t=document.getElementById('petTip');if(t)t.style.display='block';let c=document.getElementById('petCompanion');if(c)c.classList.add('hog-ready')}
+  }
   if(G.comboTimer>0){G.comboTimer-=dt;if(G.comboTimer<=0)G.combo=0}
   if(G.furyTimer>0){G.furyTimer-=dt;if(G.furyTimer<=0){let a=getBattleArea();if(a){let o=a.querySelector('.fury-overlay');if(o)o.remove()}updateModeBadges()}}
   if(G.contractTimer>0){G.contractTimer-=dt;G.mana=Math.max(0,G.mana-5*dt);if(G.contractTimer<=0){let a=getBattleArea();if(a){let o=a.querySelector('.contract-overlay');if(o)o.remove()}updateModeBadges()}}
@@ -1529,10 +1554,64 @@ try{
   if(!G.fairyCooldown&&Math.random()<dt*0.025*getTalentEffect('a3')*getSetBonus().fairyChance)spawnFairy();
   if(G.isBoss&&Math.random()<dt*0.25)spawnFlashZip();
   if(getTalent('w7')>0&&Math.random()<dt*(0.1+getTalentFlat('w7')*0.005))spawnOrb();
-  if(G.isBoss!==(bgmPlaying&&G.isBoss)){if(G.settings.bgm&&bgmPlaying)playBgmLoop()}
-  checkAchievements();updateUI();requestAnimationFrame(gameLoop)
-}catch(e){console.error("gameLoop error:",e);requestAnimationFrame(gameLoop)}
+  checkAchievements();
+  if(!document.hidden)updateUI();
 }
+
+function processOfflineProgress(el){
+  if(el<=1)return;
+  let offMult=1+getTalentEffect('r14');
+  let eg=Math.floor(el/7200*offMult*getSetBonus().offlineCap);
+  if(eg>0){G.petEggs=Math.min(Math.floor(getClanBonus().eggCap),(G.petEggs||0)+eg);toast('🌙 后台挂机+'+eg+'蛋')}
+  let maxSilent=Math.min(G.maxStage,Math.floor(G.maxStage*(0.99+getTalent('r7')*0.002)));
+  let sg=Math.min(maxSilent-G.stage,Math.floor(el/12*offMult*getSetBonus().offlineStage));
+  if(sg>0){G.stage+=sg;toast('🌙 后台推关+'+sg+'层');spawnMonster()}
+  let offGold=getHeroDPS().mul(el*getSetBonus().offlineGold*0.05*getSetBonus().offlineDmg);
+  if(offGold.m>0){G.stone=G.stone.add(offGold);toast('🌙 后台灵石+'+offGold.format())}
+  G.mana=Math.min(getMaxMana(),G.mana+getManaRegen()*Math.min(300,el));
+  updateUI();
+}
+
+function gameLoop(){
+  try{
+    gameLoop._t=(gameLoop._t||0)+1;
+    if(gameLoop._t%3600===0)resetLeaderboardIfNewDay();
+    if(!checkServerHours()){updateUI();requestAnimationFrame(gameLoop);return}
+    let now=Date.now(),dt=(now-G.lastTick)/1000;G.lastTick=now;
+    if(dt>0){
+      if(dt>5){
+        processOfflineProgress(dt);
+      } else {
+        stepGameTick(Math.min(1, dt));
+      }
+    }
+    requestAnimationFrame(gameLoop);
+  }catch(e){console.error("gameLoop error:",e);requestAnimationFrame(gameLoop)}
+}
+
+/* ===== Web Worker 独立后台挂机线程 ===== */
+(function initBackgroundWorker(){
+  try {
+    let blob = new Blob([
+      "let last=Date.now();setInterval(function(){let now=Date.now(),dt=(now-last)/1000;last=now;if(dt>0&&dt<5)postMessage(dt);},100);"
+    ], {type: 'application/javascript'});
+    let worker = new Worker(URL.createObjectURL(blob));
+    worker.onmessage = function(e){
+      if(document.hidden){
+        G.lastTick=Date.now();
+        stepGameTick(e.data);
+      }
+    };
+  } catch(e) {}
+  document.addEventListener('visibilitychange', function(){
+    if(!document.hidden){
+      let now=Date.now(), dt=(now - G.lastTick)/1000;
+      G.lastTick=now;
+      if(dt>5) processOfflineProgress(dt);
+      updateUI();
+    }
+  });
+})();
 function spawnShipProjectile(){if(!G.settings.highFx)return;let a=getBattleArea();if(!a)return;let p=document.createElement('div');p.className='ship-projectile';p.style.left='15px';p.style.top='20px';a.appendChild(p);let start=Date.now();let iv=setInterval(()=>{let el=(Date.now()-start)/300;p.style.left=(15+el*200)+'px';p.style.top=(20+el*100)+'px';if(el>=1){clearInterval(iv);p.remove();let e=document.createElement('div');e.className='ship-explosion';e.style.left=(35+Math.random()*30)+'%';e.style.top=(35+Math.random()*30)+'%';a.appendChild(e);setTimeout(()=>e.remove(),400)}},16)}
 /* ===== 服务器时间 ===== */
 let hasAutoSavedTonight=false;
