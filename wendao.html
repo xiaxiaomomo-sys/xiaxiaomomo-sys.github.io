@@ -266,7 +266,7 @@ input[type=text],input[type=password]{width:100%;padding:4px;border-radius:4px;b
     <button class="nav-tab" onclick="openPanel('settings')"><span class="tab-icon">⚙️</span>设置</button>
   </div>
   <div class="panel" id="panel-heroes"><div class="panel-head"><h3>👥 37位宗门道友录</h3><button class="close-btn" onclick="closePanel()">✕</button></div><div class="panel-body" id="listHeroes"></div></div>
-  <div class="panel" id="panel-talents"><div class="panel-head"><h3>🌿 六脉大道 (SP:<span id="uiSp2" style="color:var(--gold2)">0</span>/<span id="uiSpTotal">2442</span>)</h3><div><button class="btn-buy" style="padding:2px 5px;background:#c0392b;color:#fff;font-size:7px" onclick="resetTalents()">洗点</button><button class="close-btn" style="margin-left:5px" onclick="closePanel()">✕</button></div></div><div class="panel-body"><div class="tree-nav" id="treeTabs"></div><div style="font-size:7px;color:var(--mist);margin-bottom:3px;display:flex;justify-content:space-between"><span>本脉投入:<b id="uiTreeSpent" style="color:var(--jade2)">0</b></span><span>悬停查看详情</span></div><div class="tree-canvas" id="treeCanvas"></div></div></div>
+  <div class="panel" id="panel-talents"><div class="panel-head"><h3>🌿 六脉大道 (SP:<span id="uiSp2" style="color:var(--gold2)">0</span>/<span id="uiSpTotal">2442</span>)</h3><div><button class="btn-buy" style="padding:2px 5px;background:#c0392b;color:#fff;font-size:7px" onclick="resetTalents()">洗点</button><button class="close-btn" style="margin-left:5px" onclick="closePanel()">✕</button></div></div><div class="panel-body"><div style="display:flex;gap:4px;margin-bottom:6px"><button class="btn-buy" style="flex:1" onclick="buySpWithGem(1)">💠 80仙玉买 1SP</button><button class="btn-buy" style="flex:1;background:linear-gradient(145deg,var(--gold),var(--gold3));color:#000" onclick="buySpWithGem(5)">🎁 350仙玉买 5SP</button></div><div class="tree-nav" id="treeTabs"></div><div style="font-size:7px;color:var(--mist);margin-bottom:3px;display:flex;justify-content:space-between"><span>本脉投入:<b id="uiTreeSpent" style="color:var(--jade2)">0</b></span><span>悬停查看详情</span></div><div class="tree-canvas" id="treeCanvas"></div></div></div>
   <div class="panel" id="panel-artifacts"><div class="panel-head"><h3>🏺 98件天道法宝阁</h3><button class="close-btn" onclick="closePanel()">✕</button></div><div class="panel-body"><div style="text-align:center;padding:5px;background:rgba(0,0,0,.3);border-radius:5px;margin-bottom:5px"><button class="btn-buy" id="btnDrawArt" onclick="drawArtifact()">🔮 参悟 (<span id="uiNextArtCost">1</span>碎片)</button></div><div id="listArtifacts"></div></div></div>
   <div class="panel" id="panel-pets"><div class="panel-head"><h3>🐉 万兽灵宠苑 (蛋:<span id="uiEggCount" style="color:var(--gold2)">0/10</span>)</h3><button class="close-btn" onclick="closePanel()">✕</button></div><div class="panel-body"><div style="display:flex;gap:4px;margin-bottom:5px"><button class="btn-buy" style="flex:1" onclick="hatchPetEgg()">🥚 孵化 (<span id="uiEggTimer">02:00:00</span>)</button><button class="btn-buy" style="flex:1;background:rgba(201,168,76,.15);border:1px solid var(--gold);color:var(--gold2)" onclick="hatchAllPetEggs()">⚡ 全部</button><button class="btn-buy" style="flex:1;background:rgba(91,132,196,.2);border:1px solid var(--rune);color:#81ecec" onclick="instantHatch()">💠 购买(80)</button></div><div id="listPets"></div></div></div>
   <div class="panel" id="panel-equip"><div class="panel-head"><h3>⚔️ 本命法器 (锻造碎片:<span id="uiShards" style="color:var(--gold2)">0</span>)</h3><button class="close-btn" onclick="closePanel()">✕</button></div><div class="panel-body"><div id="equipSlotsView" style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:4px"></div><div style="display:flex;gap:4px;margin-bottom:5px"><button class="btn-buy" style="flex:1" onclick="openPanel('craft')">🔨 锻造</button><button class="btn-buy" style="flex:1" onclick="openPanel('enchant')">✨ 附魔</button><button class="btn-buy" style="flex:1;background:rgba(196,160,255,.2);border:1px solid #c4a0ff;color:#c4a0ff" onclick="openActiveSets()">📜 套装效果</button></div><div id="listEquipInv"></div></div></div>
@@ -940,8 +940,29 @@ function getPrestigeRelicGain(){let ms=G.thisRunMaxStage||G.maxStage;if(ms<75)re
  let bos=ART_POOL.find(a=>a.fx==='relicGain');
 if(bos&&G.artifacts[bos.id])gain=gain.mul(new BN(1).add(getArtifactEffect(bos)));
   return gain.mul(getSetBonus().relicGain).mul(getPetBonus('relic'))}
-function getPrestigeSpGain(){let gained=0;if(!G.spMilestones)G.spMilestones={};for(let ms=50;ms<=G.maxStage;ms+=50){if(!G.spMilestones['s'+ms]){G.spMilestones['s'+ms]=1;gained++}}for(let ms=1000;ms<=G.maxStage;ms+=1000){if(!G.spMilestones['k'+ms]){G.spMilestones['k'+ms]=1;gained+=5}}return gained}
-// TT2英雄质变曲线: 每级基础成长 + 逢10/50级质变 + 1000级超级质变 + 3000+每50级
+function getPrestigeSpGain(){
+  let gained=0;
+  if(!G.spMilestones)G.spMilestones={};
+  for(let ms=20;ms<=G.maxStage;ms+=20){
+    if(!G.spMilestones['s'+ms]){
+      G.spMilestones['s'+ms]=1;
+      gained+=1;
+    }
+  }
+  for(let ms=500;ms<=G.maxStage;ms+=500){
+    if(!G.spMilestones['m'+ms]){
+      G.spMilestones['m'+ms]=1;
+      gained+=3;
+    }
+  }
+  for(let ms=1000;ms<=G.maxStage;ms+=1000){
+    if(!G.spMilestones['k'+ms]){
+      G.spMilestones['k'+ms]=1;
+      gained+=5;
+    }
+  }
+  return gained;
+}// TT2英雄质变曲线: 每级基础成长 + 逢10/50级质变 + 1000级超级质变 + 3000+每50级
 function getHeroLevelMult(lv){if(lv<=0)return 0;return Math.pow(1.035,Math.min(lv,1000))*lv}
 function getSkillCost(id){let s=SKILLS[id],lv=G.skillsLvl[id]||1;return Math.max(1,Math.floor((s.baseCost+(lv-1)*3)*getClanBonus().skillCost*getSetBonus().skillCost*(1-getTalent('a11')*0.01)))}
 function getSkillUpgradeCost(id){let lv=G.skillsLvl[id]||1;return Math.floor(10*Math.pow(1.5,lv-1))}
@@ -1230,6 +1251,18 @@ function openTalentDetail(id){
   modal.classList.add('show');
 }
 function upgradeTalent(id){let s=findTalent(id);if(!s)return;let lv=G.talents[id]||0,cost=getSkillSpCost(s,lv),tree=TALENT_TREES.find(t=>t.tiers.some(tr=>tr.skills.some(k=>k.id===id))),spent=getTreeSpent(tree.id),tr=tree.tiers.find(x=>x.skills.some(k=>k.id===id));if(spent<tr.req){toast('需先投入'+tr.req+'SP解锁本阶');return}if(G.sp>=cost&&lv<s.max){G.sp-=cost;G.talents[id]=lv+1;playAudio('fairy');toast(s.name+'→Lv.'+(lv+1));renderTalents();updateUI()}else if(lv>=s.max)toast('已满级')}
+function buySpWithGem(count){
+  let cost = count === 5 ? 350 : 80;
+  if(G.gem < cost) return toast('仙玉不足 (需 ' + cost + ' 仙玉)');
+  G.gem -= cost;
+  G.sp += count;
+  playAudio('fairy');
+  toast('✨ 参悟成功！获得 +' + count + ' SP');
+  renderTalents();
+  updateUI();
+  saveGame();
+}
+
 function resetTalents(){if(G.resetTokens>0){G.resetTokens--;doResetTalents();toast('🔄 重置令牌消耗，洗点完成')}else if(G.gem>=50){G.gem-=50;doResetTalents();toast('🔄 消耗50仙玉洗点完成')}else{toast('需重置令牌或50仙玉')}}
 function doResetTalents(){let refund=0;TALENT_TREES.forEach(t=>t.tiers.forEach(tr=>tr.skills.forEach(s=>{let lv=G.talents[s.id]||0;for(let i=0;i<lv;i++)refund+=getSkillSpCost(s,i)})));G.sp+=refund;G.talents={};renderTalents();updateUI()}
 /* ===== 道友系统 ===== */
@@ -1320,8 +1353,30 @@ function upgradeClanLevel(){if(G.clanLevel>=30)return;let cost=Math.floor(20*Mat
 function upgradeBuilding(id){let b=CLAN_BUILDINGS.find(x=>x.id===id),lv=G.clanBuildings[id]||0,max=id==='park'?15:20;if(lv>=max)return;let cost=Math.floor(15*Math.pow(1.4,lv));if(G.gem<cost)return toast('仙玉不足');G.gem-=cost;G.clanBuildings[id]=lv+1;playAudio('fairy');toast(b.name+'→Lv.'+(lv+1));renderClan();updateUI()}
 function upgradeShipReload(){if(G.shipReloadLvl>=13)return;let cost=Math.floor(30*Math.pow(1.6,G.shipReloadLvl));if(G.gem<cost)return toast('仙玉不足');G.gem-=cost;G.shipReloadLvl++;playAudio('fairy');toast('玄舟装填→Lv.'+G.shipReloadLvl);renderClan();updateUI()}
 /* ===== 渡劫 ===== */
-function checkStageMilestones(){let oldMax=G.maxStage;if(G.stage>oldMax){G.maxStage=G.stage;if(!G.spMilestones)G.spMilestones={};let gained=0;if(G.maxStage%50===0&&!G.spMilestones['s'+G.maxStage]){G.spMilestones['s'+G.maxStage]=1;gained++}if(G.maxStage%1000===0&&!G.spMilestones['k'+G.maxStage]){G.spMilestones['k'+G.maxStage]=1;gained+=5}if(gained>0){G.sp+=gained;toast('🌟 里程碑！到达'+G.maxStage+'层 +'+gained+'SP')}}}
-function doPrestige(){
+function checkStageMilestones(){
+  let oldMax=G.maxStage;
+  if(G.stage>oldMax){
+    G.maxStage=G.stage;
+    if(!G.spMilestones)G.spMilestones={};
+    let gained=0;
+    if(G.maxStage%20===0&&!G.spMilestones['s'+G.maxStage]){
+      G.spMilestones['s'+G.maxStage]=1;
+      gained+=1; // 每20层+1SP
+    }
+    if(G.maxStage%500===0&&!G.spMilestones['m'+G.maxStage]){
+      G.spMilestones['m'+G.maxStage]=1;
+      gained+=3; // 逢500层额外+3SP
+    }
+    if(G.maxStage%1000===0&&!G.spMilestones['k'+G.maxStage]){
+      G.spMilestones['k'+G.maxStage]=1;
+      gained+=5; // 逢1000层额外+5SP
+    }
+    if(gained>0){
+      G.sp+=gained;
+      toast('🌟 里程碑！到达'+G.maxStage+'层 +'+gained+'SP');
+    }
+  }
+}function doPrestige(){
   if((G.thisRunMaxStage||G.maxStage)<75)return toast('本次修行需达到第75层方可渡劫');
   let relic=getPrestigeRelicGain(),sp=getPrestigeSpGain();
   G.relic=G.relic.add(relic);
