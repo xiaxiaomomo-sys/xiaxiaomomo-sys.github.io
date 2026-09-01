@@ -463,7 +463,7 @@ const ART_POOL=[
 {id:'art_24',name:'猎人药膏',icon:'🧴',cat:'cd',fx:'scMana',desc:'降低身外化身灵力消耗',costC:2,costE:2,effB:.01,effD:1,max:40},
 // ===== 收益类 (25-41) =====
 {id:'art_25',name:'暗影之书(核心)',icon:'📖',cat:'revenue',fx:'relicGain',desc:'渡劫碎片获取提升(核心复利)',costC:.7,costE:2.5,effB:0.20,effD:1,max:-1},
-{id:'art_26',name:'不死圣水',icon:'🧪',cat:'revenue',fx:'maxMana',desc:'增加最大灵力上限',costC:1.5,costE:2,effB:40,effD:1,max:-1},
+{id:'art_26',name:'不死圣水',icon:'🧪',cat:'revenue',fx:'maxMana',desc:'增加最大灵力上限',costC:1.5,costE:2,effB:1.5,effD:1,max:-1},
 {id:'art_27',name:'神秘法杖',icon:'🪄',cat:'revenue',fx:'manaRegen',desc:'增加被动灵力自然秒回',costC:1.5,costE:2,effB:0.08,effD:1,max:-1},
 {id:'art_28',name:'瓦尔伦之石',icon:'💎',cat:'revenue',fx:'goldBySkills',desc:'按激活技能数额外获得灵石',costC:1.5,costE:2,effB:0.40,effD:1,max:-1},
 {id:'art_29',name:'英雄之盾',icon:'🛡️',cat:'revenue',fx:'bossGold',desc:'大幅增加首领击杀灵石掉落',costC:1.5,costE:2,effB:0.40,effD:1,max:-1},
@@ -1079,7 +1079,18 @@ function getHeroLevelMult(lv){
 
   return mult;
 }
-function getSkillCost(id){let s=SKILLS[id],lv=G.skillsLvl[id]||1;let artType=s.type;let artFx={'hs':'hsMana','ds':'dsMana','hom':'homMana','fs':'fsMana','wc':'wcMana','sc':'scMana'};let manaReduction=artFx[artType]?getArtifactMult(artFx[artType]):new BN(0);return Math.max(1,Math.floor((s.baseCost+(lv-1)*3)*getClanBonus().skillCost*getSetBonus().skillCost*(1-getTalent('a11')*0.01)*(1-manaReduction.m*Math.pow(10,manaReduction.e))))}
+function getSkillCost(id){
+  let s = SKILLS[id], lv = G.skillsLvl[id] || 1;
+  let artType = s.type;
+  let artFx = {'hs':'hsMana','ds':'dsMana','hom':'homMana','fs':'fsMana','wc':'wcMana','sc':'scMana'};
+  let manaReduction = artFx[artType] ? getArtifactMult(artFx[artType]) : new BN(0);
+  
+  // TT2 式平滑指数成长：低级便宜，50级满级消耗明显
+  let rawCost = s.baseCost * Math.pow(1.065, lv - 1) + Math.pow(lv, 1.5);
+  
+  let finalCost = rawCost * getClanBonus().skillCost * getSetBonus().skillCost * (1 - getTalent('a11') * 0.01) * (1 - manaReduction.m * Math.pow(10, manaReduction.e));
+  return Math.max(1, Math.floor(finalCost));
+}
 function getSkillUpgradeCost(id){let lv=G.skillsLvl[id]||1;return Math.floor(10*Math.pow(1.5,lv-1))}
 function getSkillEffect(id){let lv=G.skillsLvl[id]||1;if(id===0)return'伤害x'+(200+lv*20)+',跳5层';if(id===1)return'致命+'+(30+lv*5)+'%';if(id===2)return'金币x'+(5+lv*0.3);if(id===3)return'点击x'+(4+lv*0.5);if(id===4)return'道友x'+(3+lv*0.3);if(id===5)return'分身20/s,伤害x'+(0.6+lv*0.05);return''}
 /* ===== 战斗系统 ===== */
@@ -1474,8 +1485,9 @@ function getMaxMana(){
   return Math.floor(base*getPetBonus('manaMax'));
 }
 function getManaRegen(){
-  var base=(getMaxMana()/600)*getTalentEffect('s1')*getSetBonus().manaRegen*(1+getTalent('k14')*0.25)*getPetBonus('mana');
-  base*=(1+a('manaRegen')+a('passiveMana'));
+  // 基础自然回蓝 1.5/s，通过气修天赋、灵宠、法宝稳定放大
+  var base = 1.5 * getTalentEffect('s1') * getSetBonus().manaRegen * (1 + getTalent('k14') * 0.25) * getPetBonus('mana');
+  base *= (1 + a('manaRegen') * 0.1 + a('passiveMana') * 0.05);
   return base;
 }
 function getCloneDamage(){
