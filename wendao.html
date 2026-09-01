@@ -229,7 +229,7 @@ input[type=text],input[type=password]{width:100%;padding:4px;border-radius:4px;b
   <div class="server-mask" id="serverClosed"><div class="moon-icon">🌙</div><h2>夜深了，天地灵气闭锁</h2><p>开服时间：每日 08:00 - 次日 01:00</p><div class="countdown" id="serverCountdown">计算中...</div></div>
   <div class="modal-mask" id="sleepModal"><div class="modal-box"><div style="font-size:28px;margin-bottom:4px">🌙</div><h3 style="font-size:13px;color:var(--gold2)">子夜将至，天道归宁</h3><p style="font-size:8.5px;color:var(--mist);margin:6px 0">服务器将在 <b style="color:var(--crimson2)">01:00</b> 准时关闭维护。<br>系统已为您<b style="color:var(--jade2)">自动上传最新云端存档</b>！</p><button class="btn-buy" style="width:100%;padding:6px" onclick="document.getElementById('sleepModal').classList.remove('show')">遵命闭关</button></div></div>
   <div class="modal-mask" id="stagePickerModal"><div class="modal-box"><h3>🗺️ 大千秘境传送盘</h3><p style="font-size:8.5px">自由穿梭已通关卡</p><div style="margin:8px 0"><div style="font-size:13px;font-weight:900;color:var(--gold2)">第 <span id="uiPickerVal">1</span> 层</div><input type="range" id="stageRange" min="1" max="1" value="1" style="width:100%;accent-color:var(--gold)" oninput="document.getElementById('uiPickerVal').textContent=this.value"></div><div style="text-align:left;margin:4px 0;font-size:9px;color:var(--mist)"><label style="cursor:pointer"><input type="checkbox" id="stageLockCheck" style="vertical-align:middle"> 🔒 锁定本关挂机（击杀BOSS不推进）</label></div><div style="display:flex;gap:5px"><button class="btn-buy" style="flex:1" onclick="applyStageTravel()">🚀 穿梭</button><button class="btn-buy" style="flex:1;background:#444;color:#fff" onclick="document.getElementById('stagePickerModal').classList.remove('show')">取消</button></div></div></div>
-  <div class="modal-mask" id="skillUpgradeModal"><div class="modal-box"><div id="suIcon" style="font-size:28px">⚡</div><h3 id="suName">技能名</h3><p id="suDesc" style="font-size:8px">描述</p><div style="background:rgba(0,0,0,.4);padding:6px;border-radius:6px;font-size:8.5px;text-align:left;margin-bottom:8px"><div style="margin-bottom:2px">当前 Lv.<span id="suCurLvl">1</span>: <span id="suCurEffect" style="color:var(--jade2)">-</span></div><div>下一级: <span id="suNextEffect" style="color:var(--gold2)">-</span></div></div><div style="display:flex;gap:5px"><button class="btn-buy" style="flex:1" id="suUpBtn" onclick="upgradeSkill()">升级 (<span id="suCost">10</span>💎灵石)</button><button class="btn-buy" style="flex:1;background:#444;color:#fff" onclick="document.getElementById('skillUpgradeModal').classList.remove('show')">关闭</button></div></div></div>
+  <div class="modal-mask" id="skillUpgradeModal"><div class="modal-box"><div id="suIcon" style="font-size:28px">⚡</div><h3 id="suName">技能名</h3><p id="suDesc" style="font-size:8px">描述</p><div style="background:rgba(0,0,0,.4);padding:6px;border-radius:6px;font-size:8.5px;text-align:left;margin-bottom:8px"><div style="margin-bottom:2px">当前 Lv.<span id="suCurLvl">1</span>: <span id="suCurEffect" style="color:var(--jade2)">-</span></div><div>升级后: <span id="suNextEffect" style="color:var(--gold2)">-</span></div></div><div style="display:flex;gap:4px"><button class="btn-small" style="min-width:44px;background:linear-gradient(145deg,var(--gold),var(--gold3));color:#000;font-size:9px" id="suMultBtn" onclick="cycleSkillUpgradeMult()">×1</button><button class="btn-buy" style="flex:1" id="suUpBtn" onclick="upgradeSkill()">升级 (<span id="suCost">10</span>💎灵石)</button><button class="btn-buy" style="flex:1;background:#444;color:#fff" onclick="document.getElementById('skillUpgradeModal').classList.remove('show')">关闭</button></div></div></div>
   <div class="modal-mask" id="gmPasswordModal"><div class="modal-box"><div style="font-size:26px;margin-bottom:4px">🔒</div><h3>天道密钥验证</h3><p style="font-size:8.5px">输入密钥解锁GM</p><input type="password" id="gmPwdInput" placeholder="密钥" style="text-align:center;letter-spacing:3px" maxlength="16"><div style="display:flex;gap:5px"><button class="btn-buy" style="flex:1" onclick="verifyGmPassword()">确认</button><button class="btn-buy" style="flex:1;background:#444;color:#fff" onclick="document.getElementById('gmPasswordModal').classList.remove('show')">取消</button></div></div></div>
   <div class="modal-mask" id="checkinModal"><div class="modal-box"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><h3 style="margin:0">📅 每日签到</h3><button class="close-btn" onclick="document.getElementById('checkinModal').classList.remove('show')" style="font-size:16px;background:none;border:none;color:var(--crimson2);cursor:pointer">✕</button></div><p style="font-size:8px">连续签到奖励递增，断签重置</p><div class="checkin-grid" id="checkinGrid"></div><button class="btn-buy" style="width:100%;margin-top:6px" id="checkinBtn" onclick="doCheckin()">立即签到</button></div></div>
   <div class="modal-mask" id="deleteSaveModal"><div class="modal-box"><div style="font-size:28px;margin-bottom:4px">🗑️</div><h3 style="font-size:13px;color:var(--crimson2)">删除当前存档</h3><p style="font-size:8.5px;color:var(--mist);margin:6px 0">此操作将清空所有进度与兑换码记录，<b style="color:var(--crimson2)">不可恢复</b>！<br>请输入「确认删除」以继续</p><input type="text" id="deleteConfirmInput" placeholder="输入：确认删除" style="width:100%;padding:4px;border-radius:4px;background:#000;border:1px solid var(--crimson);color:#fff;font-size:8.5px;margin-bottom:6px;outline:none"><div style="display:flex;gap:5px"><button class="btn-buy" style="flex:1;background:var(--crimson);color:#fff" onclick="doDeleteSave()">🗑️ 确认删除</button><button class="btn-buy" style="flex:1;background:#444;color:#fff" onclick="document.getElementById('deleteSaveModal').classList.remove('show')">取消</button></div></div></div>
@@ -1313,9 +1313,91 @@ function useSkill(id){
     if(id===5){spawnClone();toast('👥 身外化身')}}
   updateUI()
 }
-function openSkillUpgrade(id){let s=SKILLS[id],lv=G.skillsLvl[id]||1,cost=getSkillUpgradeCost(id);document.getElementById('suIcon').textContent=s.icon;document.getElementById('suName').textContent=s.name+' Lv.'+lv;document.getElementById('suDesc').textContent=s.desc;document.getElementById('suCurLvl').textContent=lv;document.getElementById('suCurEffect').textContent=getSkillEffect(id);document.getElementById('suNextEffect').textContent=lv>=50?'已满级':getSkillEffectPreview(id,lv+1);document.getElementById('suCost').textContent=new BN(cost).format();document.getElementById('suUpBtn').disabled=!G.stone.gte(new BN(cost))||lv>=50;document.getElementById('skillUpgradeModal').classList.add('show');window._suId=id}
-function getSkillEffectPreview(id,lv){if(id===0)return'伤害x'+(200+lv*20);if(id===1)return'致命+'+(30+lv*5)+'%';if(id===2)return'金币x'+(5+lv*0.3);if(id===3)return'点击x'+(4+lv*0.5);if(id===4)return'道友x'+(3+lv*0.3);if(id===5)return'分身伤害x'+(0.6+lv*0.05);return''}
-function upgradeSkill(){let id=window._suId;if(id===undefined)return;let lv=G.skillsLvl[id]||1,cost=new BN(getSkillUpgradeCost(id));if(G.stone.gte(cost)&&lv<50){G.stone=G.stone.sub(cost);G.skillsLvl[id]=lv+1;playAudio('fairy');toast(SKILLS[id].name+'→Lv.'+(lv+1));openSkillUpgrade(id);updateUI()}else if(lv>=50)toast('已达满级(50)');else toast('灵石不足')}
+let skillUpgradeMult = 1;
+function getSkillMultLabel(){ return skillUpgradeMult === 'max' ? 'MAX' : '×' + skillUpgradeMult; }
+function cycleSkillUpgradeMult(){
+  if(skillUpgradeMult === 1) skillUpgradeMult = 10;
+  else if(skillUpgradeMult === 10) skillUpgradeMult = 'max';
+  else skillUpgradeMult = 1;
+  let id = window._suId;
+  if(id !== undefined) openSkillUpgrade(id);
+}
+
+function getSkillUpgradeCost(id, lv){
+  return Math.floor(10 * Math.pow(1.5, lv - 1));
+}
+
+function calcSkillUpgrade(id, mult){
+  let curLv = G.skillsLvl[id] || 1;
+  let maxLv = 50;
+  if(curLv >= maxLv) return { count: 0, totalCost: new BN(0), targetLv: curLv };
+  let targetCount = mult === 'max' ? (maxLv - curLv) : Math.min(mult, maxLv - curLv);
+  let count = 0, totalCost = new BN(0);
+  for(let i = 0; i < targetCount; i++){
+    let cost = new BN(getSkillUpgradeCost(id, curLv + i));
+    if(mult === 'max' && !G.stone.gte(totalCost.add(cost))) break;
+    totalCost = totalCost.add(cost);
+    count++;
+  }
+  return { count: count, totalCost: totalCost, targetLv: curLv + count };
+}
+
+function openSkillUpgrade(id){
+  let s = SKILLS[id], lv = G.skillsLvl[id] || 1;
+  let info = calcSkillUpgrade(id, skillUpgradeMult);
+  document.getElementById('suIcon').textContent = s.icon;
+  document.getElementById('suName').textContent = s.name + ' Lv.' + lv + (lv >= 50 ? ' (已圆满)' : '');
+  document.getElementById('suDesc').textContent = s.desc;
+  document.getElementById('suCurLvl').textContent = lv;
+  document.getElementById('suCurEffect').textContent = getSkillEffect(id);
+  
+  let mb = document.getElementById('suMultBtn');
+  if(mb) mb.textContent = getSkillMultLabel();
+  
+  if(lv >= 50){
+    document.getElementById('suNextEffect').textContent = '已达最高境界(50级)';
+    document.getElementById('suCost').textContent = '-';
+    document.getElementById('suUpBtn').disabled = true;
+    document.getElementById('suUpBtn').textContent = '已满级';
+  } else {
+    let targetLv = info.targetLv;
+    let countText = info.count > 1 ? '(+' + info.count + '级至Lv.' + targetLv + ')' : '';
+    document.getElementById('suNextEffect').textContent = getSkillEffectPreview(id, targetLv) + ' ' + countText;
+    document.getElementById('suCost').textContent = info.totalCost.format();
+    let canAfford = info.count > 0 && G.stone.gte(info.totalCost);
+    document.getElementById('suUpBtn').disabled = !canAfford;
+    document.getElementById('suUpBtn').innerHTML = '升级' + (info.count > 1 ? '+' + info.count : '') + ' (<span id="suCost">' + (skillUpgradeMult === 'max' ? (info.count > 0 ? info.totalCost.format() : '灵石不足') : info.totalCost.format()) + '</span>💎灵石)';
+  }
+  document.getElementById('skillUpgradeModal').classList.add('show');
+  window._suId = id;
+}
+
+function getSkillEffectPreview(id, lv){
+  if(id === 0) return '伤害x' + (200 + lv * 20) + ',跳5层';
+  if(id === 1) return '致命+' + (30 + lv * 5) + '%';
+  if(id === 2) return '金币x' + (5 + lv * 0.3).toFixed(1);
+  if(id === 3) return '点击x' + (4 + lv * 0.5).toFixed(1);
+  if(id === 4) return '道友x' + (3 + lv * 0.3).toFixed(1);
+  if(id === 5) return '分身20/s,伤害x' + (0.6 + lv * 0.05).toFixed(2);
+  return '';
+}
+
+function upgradeSkill(){
+  let id = window._suId;
+  if(id === undefined) return;
+  let lv = G.skillsLvl[id] || 1;
+  if(lv >= 50) return toast('已达满级(50)');
+  let info = calcSkillUpgrade(id, skillUpgradeMult);
+  if(info.count <= 0 || !G.stone.gte(info.totalCost)) return toast('灵石不足');
+  
+  G.stone = G.stone.sub(info.totalCost);
+  G.skillsLvl[id] = info.targetLv;
+  playAudio('fairy');
+  toast(SKILLS[id].name + ' 升至 Lv.' + info.targetLv + (info.count > 1 ? ' (+' + info.count + '级)' : ''));
+  openSkillUpgrade(id);
+  updateUI();
+  saveGame();
+}
 /* ===== 天赋系统 ===== */
 // TT2 SP消耗硬编码表 (T1线性/T2中度/T3平方/T4指数/T5极端膨胀)
 // TT2 SP消耗硬编码表 (45级 T1线性/T2中度/T3平方/T4指数/T5极端膨胀, 点不满)
