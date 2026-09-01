@@ -124,6 +124,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft Y
 .skill-card.active{border-color:var(--jade2);box-shadow:0 0 8px rgba(115,201,158,.5)}
 .skill-card .s-icon{font-size:16px}.skill-card .s-name{font-size:7px;color:var(--mist);transform:scale(.85)}
 .skill-card .s-cost{position:absolute;top:0;right:2px;font-size:6.5px;color:#81ecec;font-weight:700}
+.skill-card .s-up-badge{position:absolute;top:1px;left:2px;font-size:7px;color:var(--gold2);font-weight:900;background:rgba(201,168,76,.35);border:1px solid var(--gold);border-radius:3px;padding:0 2px;cursor:pointer;z-index:55;line-height:1.1}
+.skill-card .s-up-badge:hover{background:var(--gold);color:#000}
 .skill-card .s-lvl{position:absolute;bottom:0;left:2px;font-size:6.5px;color:var(--gold2);font-weight:700}
 .skill-card .s-mask{position:absolute;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--gold2)}
 .skill-card .s-active-line{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--jade2)}
@@ -462,8 +464,8 @@ const ART_POOL=[
 {id:'art_23',name:'奥术斗篷',icon:'🧥',cat:'cd',fx:'wcMana',desc:'降低万仙战吼灵力消耗',costC:2,costE:2,effB:.01,effD:1,max:40},
 {id:'art_24',name:'猎人药膏',icon:'🧴',cat:'cd',fx:'scMana',desc:'降低身外化身灵力消耗',costC:2,costE:2,effB:.01,effD:1,max:40},
 // ===== 收益类 (25-41) =====
-{id:'art_25',name:'暗影之书(核心)',icon:'📖',cat:'revenue',fx:'relicGain',desc:'渡劫碎片获取提升(核心复利)',costC:.7,costE:2.5,effB:0.20,effD:1,max:-1},
-{id:'art_26',name:'不死圣水',icon:'🧪',cat:'revenue',fx:'maxMana',desc:'增加最大灵力上限',costC:1.5,costE:2,effB:1.5,effD:1,max:-1},
+{id:'art_25',name:'暗影之书(核心)',icon:'📖',cat:'revenue',fx:'relicGain',desc:'渡劫碎片获取提升(核心复利)',costC:1.2,costE:2.0,effB:0.05,effD:1,max:-1},
+{id:'art_26',name:'不死圣水',icon:'🧪',cat:'revenue',fx:'maxMana',desc:'增加最大灵力上限',costC:1.5,costE:2.0,effB:1.5,effD:1,max:-1},
 {id:'art_27',name:'神秘法杖',icon:'🪄',cat:'revenue',fx:'manaRegen',desc:'增加被动灵力自然秒回',costC:1.5,costE:2,effB:0.08,effD:1,max:-1},
 {id:'art_28',name:'瓦尔伦之石',icon:'💎',cat:'revenue',fx:'goldBySkills',desc:'按激活技能数额外获得灵石',costC:1.5,costE:2,effB:0.40,effD:1,max:-1},
 {id:'art_29',name:'英雄之盾',icon:'🛡️',cat:'revenue',fx:'bossGold',desc:'大幅增加首领击杀灵石掉落',costC:1.5,costE:2,effB:0.40,effD:1,max:-1},
@@ -875,51 +877,74 @@ function getSetBonus(){
   });
   _setBonusCache=b;_setBonusFrame=curFrame;return b
 }
-function getEquipBonus(){   var b={tap:0,hero:0,ship:0,all:0,crit:0,gold:0,mana:0};   var allEquip=1+a('allEquip');   var slotArts={weapon:['weaponEquip','heroWeapon'],head:['helmetEquip','helmetEquip2'],robe:['armorEquip'],aura:['auraEquip'],slash:['slashEquip']};   var slots=['weapon','head','robe','aura','slash'];   slots.forEach(function(s){     var e=G.equipment[s];     if(e){       var ench=1+(e.enchant||0)*0.2;       var sm=allEquip;       (slotArts[s]||[]).forEach(function(fx){sm+=a(fx)});       if(e.mainStat)b[e.mainStat.type]=(b[e.mainStat.type]||0)+e.mainStat.val*ench*sm/100;       if(e.subStats)e.subStats.forEach(function(st){b[st.type]=(b[st.type]||0)+st.val*ench*sm/100})     }   });   return{tap:1+b.tap,hero:1+b.hero,ship:1+b.ship,all:1+b.all,crit:1+b.crit,gold:1+b.gold,mana:1+b.mana} }
+function getEquipBonus(){
+  var b = {tap:1, hero:1, ship:1, all:1, crit:1, gold:1, mana:1};
+  var allEquip = 1 + a('allEquip');
+  var slotArts = {weapon:['weaponEquip','heroWeapon'], head:['helmetEquip','helmetEquip2'], robe:['armorEquip'], aura:['auraEquip'], slash:['slashEquip']};
+  var slots = ['weapon','head','robe','aura','slash'];
+  slots.forEach(function(s){
+    var e = G.equipment[s];
+    if(e){
+      var ench = 1 + (e.enchant || 0) * 0.2;
+      var sm = allEquip;
+      (slotArts[s] || []).forEach(function(fx){ sm += a(fx); });
+      if(e.mainStat && e.mainStat.val){
+        b[e.mainStat.type] = (b[e.mainStat.type] || 1) * (1 + (e.mainStat.val * ench * sm) / 100);
+      }
+      if(e.subStats) e.subStats.forEach(function(st){
+        b[st.type] = (b[st.type] || 1) * (1 + (st.val * ench * sm) / 100);
+      });
+    }
+  });
+  return b;
+}
 function getPetBonus(type){
-  var mult=1;
-  var sb=getSetBonus();
-  var sm4=getTalentEffect('sm4')||1;
-  // 智能词条映射字典，确保所有细分类型的灵宠都能生效
-  var typeMap={
-    'tap':['tap','dagger','basic'],
-    'hero':['hero'],
-    'ship':['ship'],
-    'clone':['clone'],
-    'mana':['mana','manaMax','spellDur'],
-    'manaMax':['manaMax','spellDur'],
-    'relic':['relic','artifact'],
-    'crit':['crit','petCrit'],
-    'deadly':['deadly'],
-    'gold':['gold','bossGold','chestGold','fairyGold','offlineGold','hog','chestFairy'],
-    'bossGold':['bossGold','gold'],
-    'chestGold':['chestGold','gold'],
-    'fairyGold':['fairyGold','fairy','gold'],
-    'offlineGold':['offlineGold','gold'],
-    'chest':['chest','chestFairy'],
-    'snap':['snap'],
-    'portar':['portar'],
-    'fs':['fs','basic','tap'],
-    'hs':['hs','splash']
+  var mult = 1;
+  var sb = getSetBonus();
+  var sm4 = getTalentEffect('sm4') || 1;
+  var typeMap = {
+    'tap': ['tap', 'dagger', 'basic'],
+    'hero': ['hero'],
+    'ship': ['ship'],
+    'clone': ['clone'],
+    'mana': ['mana', 'manaMax', 'spellDur'],
+    'manaMax': ['manaMax', 'spellDur'],
+    'relic': ['relic', 'artifact'],
+    'crit': ['crit', 'petCrit'],
+    'deadly': ['deadly'],
+    'gold': ['gold', 'bossGold', 'chestGold', 'fairyGold', 'offlineGold', 'hog', 'chestFairy'],
+    'bossGold': ['bossGold', 'gold'],
+    'chestGold': ['chestGold', 'gold'],
+    'fairyGold': ['fairyGold', 'fairy', 'gold'],
+    'offlineGold': ['offlineGold', 'gold'],
+    'chest': ['chest', 'chestFairy'],
+    'snap': ['snap'],
+    'portar': ['portar'],
+    'fs': ['fs', 'basic', 'tap'],
+    'hs': ['hs', 'splash']
   };
   PETS.forEach(function(p){
-    var lv=G.pets[p.id]||0;
-    if(lv>0&&p.val){
-      var match=(p.type===type)||(p.type==='all')||(type==='all');
-      if(!match&&typeMap[type]&&typeMap[type].includes(p.type)){
-        match=true;
+    var lv = G.pets[p.id] || 0;
+    if(lv > 0 && p.val){
+      var match = (p.type === type) || (p.type === 'all') || (type === 'all');
+      if(!match && typeMap[type] && typeMap[type].includes(p.type)){
+        match = true;
       }
       if(match){
-        var act=G.activePet===p.id;
-        var ratio=act?sb.activePet:Math.min(1,Math.floor(lv/5)*0.05)*sm4;
-        mult*=(1+p.val*lv*ratio*getTalentEffect('k3')*getTalentEffect('sm1')*sb.pet);
+        var act = G.activePet === p.id;
+        var ratio = act ? sb.activePet : Math.min(1, Math.floor(lv / 5) * 0.05) * sm4;
+        mult *= (1 + p.val * lv * ratio * getTalentEffect('k3') * getTalentEffect('sm1') * sb.pet);
       }
     }
   });
-  mult*=(1+bn2n(getArtifactMult('petDmg')));
-  mult*=(1+bn2n(getArtifactMult('petMult')));
-  mult*=(1+a('companionDmg'));
-  mult*=(1+a('companionCrit'));
+
+  // 【核心隔离】：这 4 个伤害法宝只允许乘入伤害计算，绝不能污染灵力、回蓝、金币与渡劫碎片！
+  if(type === 'pet' || type === 'ship' || type === 'hero' || type === 'all'){
+    mult *= (1 + bn2n(getArtifactMult('petDmg')));
+    mult *= (1 + bn2n(getArtifactMult('petMult')));
+    mult *= (1 + a('companionDmg'));
+    mult *= (1 + a('companionCrit'));
+  }
   return mult;
 }
   function getTapDamage(){let base=new BN(10);let bestHeroDps=new BN(0);HEROES.forEach(h=>{let lv=G.heroLevels[h.id]||0;if(lv>0){let d=new BN(h.dps).mul(getHeroLevelMult(lv));if(bestHeroDps.m===0||d.gte(bestHeroDps))bestHeroDps=d}});if(bestHeroDps.m>0)base=base.add(bestHeroDps.mul(0.03));let k2pct=getTalentEffect('k2')-1;if(k2pct>0)base=base.add(getHeroDPS().mul(k2pct));let mult=new BN(1);mult=mult.mul(getTalentEffect('k1'));if(G.skillsActive[3]>0)mult=mult.mul((4+G.skillsLvl[3]*0.5)*getTalentEffect('k4')*getSetBonus().fs).mul(new BN(1).add(getArtifactMult('fs')));if(getTalent('sm2')&&G.skillsActive[3]>0)mult=mult.mul(getTalentEffect('sm2'));let sb=getSetBonus();mult=mult.mul(getPetBonus('tap'));mult=mult.mul(getRealmBonus());mult=mult.mul(getClanBonus().all);mult=mult.mul(sb.all).mul(sb.tap).mul(sb.basicDmg).mul(getEnchantBonus());
@@ -1016,18 +1041,26 @@ function getGoldDrop(stage,isBoss){
   return g
 }
   function getAdvancedStartStage(){
-  let ms = G.maxStage || 1;
-  if(ms < 75) return 1;
+  // TT2 铁律：按“当前所在层”折算起跑层，不推关就会逐级衰减
+  let cur = G.stage || 1;
+  if(cur < 75) return 1;
   let sb = getSetBonus();
-  // 基础起跑 60%，宗门等级每级+1%（最高+20%），高贵剑士等套装乘算，最高上限 90%
   let ratio = (0.60 + Math.min(0.20, (G.clanLevel || 0) * 0.01)) * (sb.advStart || 1);
   ratio = Math.min(0.90, Math.max(0.1, ratio));
-  return Math.max(1, Math.floor(ms * ratio));
+  return Math.max(1, Math.floor(cur * ratio));
 }
-function getPrestigeRelicGain(){let ms=G.thisRunMaxStage||G.maxStage;if(ms<75)return new BN(0);let gain=new BN(Math.max(1,Math.floor(Math.pow(Math.max(0,(ms-75))/14,3))));
- let bos=ART_POOL.find(a=>a.fx==='relicGain');
-if(bos&&G.artifacts[bos.id])gain=gain.mul(new BN(1).add(getArtifactEffect(bos)));
-  return gain.mul(getSetBonus().relicGain).mul(getPetBonus('relic'))}
+
+function getPrestigeRelicGain(){
+  let cur = G.stage || 1;
+  let start = G.prestigeStartStage || 1;
+  // 【防刷机制】：如果落地没有推关（未超过起跑层 15 层），收益强制为 0
+  if(cur <= start || cur < (start + 15) || cur < 75) return new BN(0, 0);
+  
+  let gain = new BN(Math.max(1, Math.floor(Math.pow(Math.max(0, (cur - 75)) / 14, 3))));
+  let bos = ART_POOL.find(a => a.fx === 'relicGain');
+  if(bos && G.artifacts[bos.id]) gain = gain.mul(new BN(1).add(getArtifactEffect(bos)));
+  return gain.mul(getSetBonus().relicGain).mul(getPetBonus('relic'));
+}
 function getPrestigeSpGain(){
   let gained=0;
   if(!G.spMilestones)G.spMilestones={};
@@ -1050,7 +1083,8 @@ function getPrestigeSpGain(){
     }
   }
   return gained;
-}// TT2英雄质变曲线: 每级基础成长 + 逢10/50级质变 + 1000级超级质变 + 3000+每50级
+}
+  // TT2英雄质变曲线: 每级基础成长 + 逢10/50级质变 + 1000级超级质变 + 3000+每50级
 function getHeroLevelMult(lv){
   if(lv <= 0) return 0;
   // 1~10000 级平滑指数增长
@@ -1477,16 +1511,18 @@ function tContractMult(){return getTalentEffect('a13')*getTalentEffect('a17')}
 function tFuryMult(){return getTalentEffect('a8')}
 function tManaMax(){return getTalentEffect('s1')*getTalentEffect('s7')}
 function getMaxMana(){
-  let artBn=getArtifactMult('maxMana');
-  let artMana=(artBn&&artBn.m>0)?(artBn.m*Math.pow(10,artBn.e)):0;
-  let base=(100+artMana)*tManaMax()+getSetBonus().manaMax;
-  let eb=getEquipBonus();
-  if(eb.mana>1)base=base*eb.mana;
-  return Math.floor(base*getPetBonus('manaMax'));
+  let artBn = getArtifactMult('maxMana');
+  let artMana = (artBn && artBn.m > 0) ? (artBn.m * Math.pow(10, artBn.e)) : 0;
+  let base = (100 + artMana) * tManaMax() + getSetBonus().manaMax;
+  let eb = getEquipBonus();
+  if(eb.mana > 1) base = base * eb.mana;
+  // 蓝量上限健康稳定在 500~2500
+  return Math.floor(base * Math.min(5, getPetBonus('manaMax')));
 }
+
 function getManaRegen(){
-  // 基础自然回蓝 1.5/s，通过气修天赋、灵宠、法宝稳定放大
-  var base = 1.5 * getTalentEffect('s1') * getSetBonus().manaRegen * (1 + getTalent('k14') * 0.25) * getPetBonus('mana');
+  // 固定基础回蓝 1.5/s，稳定控制在 5~25/s 之间
+  var base = 1.5 * getTalentEffect('s1') * getSetBonus().manaRegen * (1 + getTalent('k14') * 0.25) * Math.min(5, getPetBonus('mana'));
   base *= (1 + a('manaRegen') * 0.1 + a('passiveMana') * 0.05);
   return base;
 }
@@ -1740,15 +1776,30 @@ let ec=document.getElementById('uiEggCount');if(ec)ec.textContent=G.petEggs+'/'+
 /* ===== 装备系统 ===== */
 const EQUIP_SLOTS=[{id:'weapon',name:'飞剑',icon:'🗡️'},{id:'head',name:'法冠',icon:'👑'},{id:'robe',name:'道袍',icon:'🥋'},{id:'aura',name:'灵光',icon:'✨'},{id:'slash',name:'剑佩',icon:'📿'}];
 const STAT_TYPES=[{type:'tap',name:'点击'},{type:'hero',name:'道友'},{type:'ship',name:'玄舟'},{type:'all',name:'全伤'},{type:'crit',name:'暴伤'},{type:'gold',name:'金币'},{type:'mana',name:'灵力'}];
-// TT2品质: common x1(0副) / rare x3(1副) / legendary x10(2副) / mythic x20(3副)
-const RARITIES=[{id:'common',name:'凡品',cls:'rarity-common',main:1,sub:0,mult:1,growth:1.0125},{id:'rare',name:'极品',cls:'rarity-rare',main:3,sub:1,mult:3.5,growth:1.0125},{id:'legendary',name:'传说',cls:'rarity-legendary',main:5,sub:2,mult:12,growth:1.0125},{id:'mythic',name:'神话',cls:'rarity-mythic',main:8,sub:3,mult:35,growth:1.0125}];
+// TT2 标准装备品质倍率与指数成长
+const RARITIES=[
+  {id:'common',name:'凡品',cls:'rarity-common',main:1,sub:0,mult:1,growth:1.030},
+  {id:'rare',name:'极品',cls:'rarity-rare',main:3,sub:1,mult:5,growth:1.038},
+  {id:'legendary',name:'传说',cls:'rarity-legendary',main:5,sub:2,mult:25,growth:1.045},
+  {id:'mythic',name:'神话',cls:'rarity-mythic',main:8,sub:3,mult:100,growth:1.055}
+];
 // 部位限定副属性池 (TT2: 不同部位固定随机池)
 const SLOT_SUB_POOL={weapon:['tap','crit','all'],head:['hero','mana','gold'],robe:['hero','gold','all'],aura:['all','crit','mana'],slash:['ship','tap','crit']};
 // 部位主属性基础值 (TT2 Base, Growth 1.012)
 const SLOT_MAIN_BASE={weapon:{tap:2,all:1.2},head:{hero:1.5,mana:3},robe:{hero:2,all:1.5},aura:{all:2,crit:1.5},slash:{ship:3,tap:1.5}};
 function getItemLevel(){return Math.max(1,Math.min(5000,Math.floor(G.maxStage/15)))}
-function equipMainVal(slot,type,rarity){let base=(SLOT_MAIN_BASE[slot]&&SLOT_MAIN_BASE[slot][type])||1;return Math.floor(base*Math.pow(1.0125,getItemLevel())*rarity.mult)}
-function equipSubVal(rarity){return Math.floor((0.5+Math.random()*2)*Math.pow(1.0125,getItemLevel())*rarity.mult)}
+function equipMainVal(slot,type,rarity){
+  let base = (SLOT_MAIN_BASE[slot] && SLOT_MAIN_BASE[slot][type]) || 1;
+  let lv = getItemLevel();
+  // TT2 指数成长：1000层神话装备约数千倍，3000层约数百万倍爆发
+  let val = base * rarity.mult * Math.pow(rarity.growth, lv);
+  return Math.max(1, Math.floor(val));
+}
+function equipSubVal(rarity){
+  let lv = getItemLevel();
+  let val = (0.5 + Math.random() * 1.5) * (rarity.mult * 0.4) * Math.pow(rarity.growth, lv);
+  return Math.max(1, Math.floor(val));
+}
 function dropEquip(forcedRarity){let slot=EQUIP_SLOTS[Math.floor(Math.random()*EQUIP_SLOTS.length)];let lv=getItemLevel();let rid;if(forcedRarity)rid=forcedRarity;else{// BOSS只掉白蓝(凡品/极品), 传说/神话仅靠锻造系统制作
 rid=Math.random()<0.7?'common':'rare'}let rarity=RARITIES.find(x=>x.id===rid);let slotPool=Object.keys(SLOT_MAIN_BASE[slot.id]||{all:1});let mainType=slotPool[Math.floor(Math.random()*slotPool.length)];let mainVal=equipMainVal(slot.id,mainType,rarity);let subPool=SLOT_SUB_POOL[slot.id];let subs=[];for(let i=0;i<rarity.sub;i++){let st=subPool[Math.floor(Math.random()*subPool.length)];let stt=STAT_TYPES.find(x=>x.type===st);subs.push({type:st,name:stt?stt.name:st,val:equipSubVal(rarity)})}let set=null;if(rid==='legendary'||rid==='mythic')set=EQUIP_SETS[Math.floor(Math.random()*EQUIP_SETS.length)].id;let eq={id:Date.now()+Math.floor(Math.random()*10000),slot:slot.id,name:rarity.name+'·'+slot.name,rarity:rid,icon:slot.icon,level:lv,mainStat:{type:mainType,name:(STAT_TYPES.find(x=>x.type===mainType)||{}).name||'全伤',val:mainVal},subStats:subs,set:set,enchant:0};G.equipInv.push(eq);spawnEquipDropFlash();playAudio('drop');toast('📦 掉落【'+eq.name+' Lv.'+lv+'】');renderEquip()}
 function equipItem(id){id=parseFloat(id);let idx=G.equipInv.findIndex(e=>e.id===id);if(idx<0)return;let eq=G.equipInv[idx];let old=G.equipment[eq.slot];G.equipment[eq.slot]=eq;G.equipInv.splice(idx,1);if(old)G.equipInv.push(old);playAudio('buy');renderEquip();updateUI();checkActivatedSets()}
@@ -1817,30 +1868,38 @@ function checkStageMilestones(){
       toast('🌟 里程碑！到达'+G.maxStage+'层 +'+gained+'SP');
     }
   }
-}function doPrestige(){
-  if((G.thisRunMaxStage||G.maxStage)<75)return toast('本次修行需达到第75层方可渡劫');
-  let relic=getPrestigeRelicGain(),sp=getPrestigeSpGain();
-  G.relic=G.relic.add(relic);
-  G.totalRelic=G.totalRelic.add(relic);
-  G.sp+=sp;
+}
+  function doPrestige(){
+  let cur = G.stage || 1;
+  let start = G.prestigeStartStage || 1;
+  let minReq = start + 15;
+  if(cur < 75) return toast('当前层数未达75层，天道法则不允渡劫');
+  if(cur < minReq) return toast('需在本次修行中至少突破至第 ' + minReq + ' 层方可渡劫');
+
+  let relic = getPrestigeRelicGain(), sp = getPrestigeSpGain();
+  if(relic.m <= 0) return toast('需实际推关后方可获得渡劫碎片');
+
+  G.relic = G.relic.add(relic);
+  G.totalRelic = G.totalRelic.add(relic);
+  G.sp += sp;
   G.prestigeCount++;
 
-  let startStage = getAdvancedStartStage();
-  G.stage = startStage;
+  let nextStart = getAdvancedStartStage(); // 按当前实际层计算下一次起跑层
+  G.prestigeStartStage = nextStart; // 记录起跑层，封死原地套娃
+  G.stage = nextStart;
+  G.thisRunMaxStage = nextStart;
   G.currentTitan = 0;
   G.isBoss = false;
   G.bossFailed = false;
-  G.thisRunMaxStage = startStage;
   G.stageLocked = false;
 
-  // 核心破局：按起跑层直接赠送 50 只怪物的启动灵石，玩家一落地即可直接把道友买到秒怪水平！
-  G.stone = getGoldDrop(startStage, false).mul(50);
+  G.stone = getGoldDrop(nextStart, false).mul(50);
   G.masterLevel = 1;
   G.heroLevels = {};
   G.skillsLvl = {0:1,1:1,2:1,3:1,4:1,5:1};
   G.skillsCd = {};
   G.skillsActive = {};
-  G.mana = G.maxMana;
+  G.mana = getMaxMana();
   G.combo = 0;
   G.vulnStacks = 0;
   G.poisonStacks = 0;
@@ -1850,10 +1909,11 @@ function checkStageMilestones(){
   spawnMonster();
   updateHPUI();
   closePanel();
-  toast('🌊 渡劫！+'+relic.format()+'碎片 +'+sp+'SP，于第'+startStage+'层起跑');
+  toast('🌊 渡劫成功！获得 +' + relic.format() + ' 碎片，于第 ' + nextStart + ' 层重塑道胎');
   submitScore();
   checkAchievements();
   updateUI();
+  saveGame();
 }
 /* ===== 签到 ===== */
 function openCheckin(){renderCheckin();document.getElementById('checkinModal').classList.add('show')}
@@ -2291,52 +2351,43 @@ function loadGame(){
       }
       G.lastTick = Date.now();
 
-      // ===== 【方案 B】老玩家飞升重构与 500 仙玉 + 10 SP 更新补偿 =====
-      if(!G.v82_asc_migrated){
-        G.v82_asc_migrated = true;
-        let hadOldAsc = G.heroAsc && Object.values(G.heroAsc).some(v => v > 0);
-        G.heroAsc = {}; // 重置所有道友飞升阶数，按 10000 级新规则统一起跑
-        if(hadOldAsc || (G.maxStage || 1) >= 100){
-          G.gem = (G.gem || 0) + 500;
-          G.sp = (G.sp || 0) + 10;
-          setTimeout(()=>{
-            toast('🎁 飞升体系升级：已为您重构道友境界，并补发 500 仙玉 + 10 SP 更新大礼包！');
-            updateUI();
-            renderHeroes();
-            renderTalents();
-            saveGame();
-          }, 1500);
+      // ===== 【天道自愈】：自动修正暗影之书超标数值，发放 1000 仙玉 + 20 SP 全员大礼包 =====
+      if(!G.v82_rebalance_fixed){
+        G.v82_rebalance_fixed = true;
+        let ms = G.maxStage || 1;
+        
+        // 1. 智能压缩暗影之书到健康上限（当前层数 * 1.5，比如1000关最高保留1500级）
+        let maxHealthyBos = Math.max(10, Math.floor(ms * 1.5));
+        if(G.artifacts && G.artifacts['art_25']){
+          let bosLv = G.artifacts['art_25'];
+          let cur = (typeof bosLv === 'number') ? bosLv : (bosLv.m * Math.pow(10, bosLv.e || 0));
+          if(cur > maxHealthyBos){
+            G.artifacts['art_25'] = new BN(maxHealthyBos);
+          }
         }
-      }
+        
+        // 2. 清理异常虚高碎片，重置为当前关卡正常 1 次渡劫收益
+        let healthyRelic = Math.floor(Math.pow(Math.max(1, ms - 75) / 14, 3) * 10);
+        G.relic = new BN(healthyRelic);
+        
+        // 3. 自动将暴走的蓝量拉回健康上限
+        G.mana = Math.min(G.mana || 100, getMaxMana());
 
-      // ===== 老玩家历史 SP 自动补发检测 =====
-      if(!G.spMilestones) G.spMilestones = {};
-      let autoCompensateSp = 0;
-      for(let ms = 20; ms <= (G.maxStage || 1); ms += 20){
-        if(!G.spMilestones['s' + ms]){
-          G.spMilestones['s' + ms] = 1;
-          autoCompensateSp += 1;
-        }
-      }
-      for(let ms = 500; ms <= (G.maxStage || 1); ms += 500){
-        if(!G.spMilestones['m' + ms]){
-          G.spMilestones['m' + ms] = 1;
-          autoCompensateSp += 3;
-        }
-      }
-      for(let ms = 1000; ms <= (G.maxStage || 1); ms += 1000){
-        if(!G.spMilestones['k' + ms]){
-          G.spMilestones['k' + ms] = 1;
-          autoCompensateSp += 5;
-        }
-      }
-      if(autoCompensateSp > 0){
-        G.sp += autoCompensateSp;
+        // 4. 重置道友飞升阶数，按 10000 级新规则统一起跑
+        G.heroAsc = {};
+
+        // 5. 全员自动发放天道补偿礼包：1000 仙玉 + 20 SP
+        G.gem = (G.gem || 0) + 1000;
+        G.sp = (G.sp || 0) + 20;
+        
         setTimeout(()=>{
-          toast('🎁 版本更新：已为您自动补发历史关卡 ' + autoCompensateSp + ' 点 SP！');
+          toast('📜 天道重归清明：已修复暗影之书异象，特为全员发放 1000 仙玉 + 20 SP 天道补偿！');
           updateUI();
+          renderArtifacts();
+          renderHeroes();
           renderTalents();
-        }, 1000);
+          saveGame();
+        }, 1200);
       }
     }
   }catch(e){
@@ -2561,11 +2612,28 @@ window.onload=function(){
   gameLoop();
   autoSaveInterval = setInterval(saveGame, 10000);
   document.addEventListener('click',()=>{initAudio();if(G.settings.bgm)startBgm()},{once:true});
-  let _sb=document.getElementById('skillBar');
-if(_sb){
-  _sb.addEventListener('click',function(e){let c=e.target.closest('.skill-card[data-skill-id]');if(c)useSkill(parseInt(c.dataset.skillId));});
-  _sb.addEventListener('contextmenu',function(e){e.preventDefault();let c=e.target.closest('.skill-card[data-skill-id]');if(c)openSkillUpgrade(parseInt(c.dataset.skillId));});
-}
+  
+  let _sb = document.getElementById('skillBar');
+  if(_sb){
+    // 1. 点击释放技能（排除点击左上角 ▲ 按钮的情况）
+    _sb.addEventListener('click', function(e){
+      let c = e.target.closest('.skill-card[data-skill-id]');
+      if(c && !e.target.classList.contains('s-up-badge')){
+        useSkill(parseInt(c.dataset.skillId));
+      }
+    });
+    // 2. 强制拦截原生右键菜单（彻底防止误弹“刷新网页”），并唤起升级弹窗
+    _sb.addEventListener('contextmenu', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      let c = e.target.closest('.skill-card[data-skill-id]');
+      if(c){
+        openSkillUpgrade(parseInt(c.dataset.skillId));
+      }
+      return false;
+    });
+  }
+
   let today=new Date().toDateString();
   if(G.checkinDate!==today)setTimeout(()=>openCheckin(),1500);
 };
