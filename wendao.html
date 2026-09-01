@@ -880,10 +880,35 @@ function getPetBonus(type){
   var mult=1;
   var sb=getSetBonus();
   var sm4=getTalentEffect('sm4')||1;
+  // 智能词条映射字典，确保所有细分类型的灵宠都能生效
+  var typeMap={
+    'tap':['tap','dagger','basic'],
+    'hero':['hero'],
+    'ship':['ship'],
+    'clone':['clone'],
+    'mana':['mana','manaMax','spellDur'],
+    'manaMax':['manaMax','spellDur'],
+    'relic':['relic','artifact'],
+    'crit':['crit','petCrit'],
+    'deadly':['deadly'],
+    'gold':['gold','bossGold','chestGold','fairyGold','offlineGold','hog','chestFairy'],
+    'bossGold':['bossGold','gold'],
+    'chestGold':['chestGold','gold'],
+    'fairyGold':['fairyGold','fairy','gold'],
+    'offlineGold':['offlineGold','gold'],
+    'chest':['chest','chestFairy'],
+    'snap':['snap'],
+    'portar':['portar'],
+    'fs':['fs','basic','tap'],
+    'hs':['hs','splash']
+  };
   PETS.forEach(function(p){
     var lv=G.pets[p.id]||0;
     if(lv>0&&p.val){
       var match=(p.type===type)||(p.type==='all')||(type==='all');
+      if(!match&&typeMap[type]&&typeMap[type].includes(p.type)){
+        match=true;
+      }
       if(match){
         var act=G.activePet===p.id;
         var ratio=act?sb.activePet:Math.min(1,Math.floor(lv/5)*0.05)*sm4;
@@ -1326,8 +1351,7 @@ function tTapMult(){return getTalentEffect('k9')*getTalentEffect('k12')*getTalen
 function tHeroMult(){return getTalentEffect('w3')*getTalentEffect('w6')*getTalentEffect('w8')*getTalentEffect('w14')}
 function tShipMult(){return getTalentEffect('w5')*getTalentEffect('w11')*getTalentEffect('w13')*getTalentEffect('w17')}
 function tPetMult(){return getTalentEffect('k11')*getTalentEffect('sm3')*getTalentEffect('sm5')*getTalentEffect('sm7')*getTalentEffect('sm8')*getTalentEffect('sm9')*getTalentEffect('sm10')*getTalentEffect('sm11')*getTalentEffect('sm12')*getTalentEffect('sm13')*getTalentEffect('sm14')*getTalentEffect('sm15')*getTalentEffect('sm16')*getTalentEffect('sm17')*getTalentEffect('sm18')}
-function tSkillMult(){let base=getTalentEffect('k15')*getTalentEffect('s8')*getTalentEffect('s10')*getTalentEffect('s12')*getTalentEffect('s13')*getTalentEffect('s15')*getTalentEffect('s16')*getTalentEffect('s17')*getTalentEffect('s18')*getTalentEffect('a11')*getTalentEffect('w10');let artAA=getArtifactMult('allActive');return base*(1+artAA.m*Math.pow(10,artAA.e))}
-function tGoldMult(){return getTalentEffect('r11')*getTalentEffect('r15')*getTalentEffect('a2')*getTalentEffect('a6')*getTalentEffect('a12')*getTalentEffect('a16')*getTalentEffect('a10')}
+function tSkillMult(){let base=getTalentEffect('k15')*getTalentEffect('s8')*getTalentEffect('s10')*getTalentEffect('s12')*getTalentEffect('s13')*getTalentEffect('s15')*getTalentEffect('s16')*getTalentEffect('s17')*getTalentEffect('s18')*getTalentEffect('a11')*getTalentEffect('w10');let artAA=getArtifactMult('allActive');let artSpellCrit=a('spellCrit');return base*(1+artAA.m*Math.pow(10,artAA.e))*(1+artSpellCrit)}function tGoldMult(){return getTalentEffect('r11')*getTalentEffect('r15')*getTalentEffect('a2')*getTalentEffect('a6')*getTalentEffect('a12')*getTalentEffect('a16')*getTalentEffect('a10')}
 function tCritMult(){let base=getTalentEffect('r2')*getTalentEffect('r10')*getTalentEffect('r13');let artCD=getArtifactMult('critDmg');return base*(1+artCD.m*Math.pow(10,artCD.e))}
 function tCritChanceAdd(){return getTalentChance('k10')+getTalentChance('r8')+getTalentChance('r2')}
 function tBossMult(){return getTalentEffect('w15')}
