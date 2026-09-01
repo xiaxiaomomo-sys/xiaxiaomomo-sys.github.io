@@ -968,7 +968,8 @@ function getGoldDrop(stage,isBoss){
   var g=base;
   if(isBoss){var bs=3+stage/500*0.5;if(stage%10===5||stage%10===0)bs*=2.5;g=g.mul(bs*3*sb.bossGold)}
   if(G.skillsActive[2]>0)g=g.mul((5+G.skillsLvl[2]*0.3)*(1+a('homEffect'))*sb.hogMult);
-  var ac=0;SKILLS.forEach(function(s){if(G.skillsActive[s.id]>0)activeCount++});
+  // art_28: 按激活技能数
+  var ac=0;SKILLS.forEach(function(s){if(G.skillsActive[s.id]>0)ac++});
   if(ac>0)g=g.mul(new BN(1).add(getArtifactMult('goldBySkills').mul(ac)));
   var artAllG=getArtifactMult('allGold');
   g=g.mul(getTalentEffect('r1')).mul(getTalentEffect('a1')).mul(tGoldMult()).mul(new BN(1).add(artAllG)).mul(new BN(1).add(getArtifactMult('stealthGold')));
