@@ -1778,7 +1778,7 @@ function stepGameTick(dt){
   let fairyRate = getTalentEffect('a3') * getSetBonus().fairyChance;
   G.fairyTimer = (G.fairyTimer || 20) - dt * fairyRate;
   if(G.fairyTimer <= 0){
-    G.fairyTimer = 20 + Math.random() * 8; // 每 20~28 秒必出一次（天赋点高后只需 10~15 秒）
+    G.fairyTimer = 60 + Math.random() * 20; // 基础 60~80 秒必出一次（天赋点高后只需 35~45 秒） // 
     spawnFairy();
   }
   if(G.isBoss&&Math.random()<dt*0.25)spawnFlashZip();
