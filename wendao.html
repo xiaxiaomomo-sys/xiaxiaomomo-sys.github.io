@@ -324,8 +324,13 @@ const SKILLS=[{id:0,name:'九天神雷',icon:'⚡',baseCost:15,cd:30,dur:0,type:
 const HERO_NAMES=['青云小童','采药药童','执剑游侠','伏虎武僧','天音仙子','御剑散修','紫阳真人','托塔天将','落霞仙姑','太乙金仙','纯阳剑仙','广寒仙子','九天玄女','真武大帝','赤脚大仙','南极仙翁','托塔李天王','二郎真君','三坛海会','齐天大圣','地藏尊者','菩提祖师','镇元大仙','灵宝天尊','元始天尊','道德天尊','娲皇圣母','伏羲人皇','神农炎帝','轩辕黄帝','东皇太一','帝俊妖皇','十二祖巫','通天教主','鸿钧道祖','盘古大神','混沌之主'];
 const HERO_ICONS=['👦','🌿','⚔️','🥋','🪕','🗡️','🧙','🛡️','🧚','🌟','⚡','🌙','🦚','🐢','👣','🍑','👑','👁️','🔥','🐵','🧘','🎋','🍃','📜','🔯','☯️','🐍','🐉','🌾','🗡️','☀️','🦅','🗿','⚔️','🌌','🪓','☸️'];
 // TT2英雄被动3档: Lv20/Lv50/Lv1000 (Lv1000大被动)
-const HP_LVL=[20,50,1000];
-const HP_MULT=[1.15,1.3,5];
+const HP_LVL=[20, 50, 100, 200, 400, 1000];
+const HP_MULT=[1.2, 1.3, 1.5, 1.8, 2.5, 5.0];
+const HP_NAME={'tap':'全局点击','all':'全局全伤','hero':'道友秒伤','gold':'灵石掉落','bossGold':'首领灵石','crit':'暴击伤害'};
+const HERO_TYPES=['melee','ranged','spell'];
+const HERO_LOCS=['ground','flying'];
+const TYPE_NAME={'melee':'⚔️近战','ranged':'🏹远程','spell':'🔮法术'};
+const LOC_NAME={'ground':'🌲地面','flying':'🦅飞行'};
 const HERO_PASSIVES=[
 ['tap','all','tap','hero','all','hero'],
 ['hero','hero','hero','hero','hero','hero'],
@@ -365,7 +370,7 @@ const HERO_PASSIVES=[
 ['tap','hero','tap','hero','hero','hero'],
 ['hero','all','tap','hero','tap','hero']
 ];
-const HEROES=HERO_NAMES.map((n,i)=>({id:i,name:n,icon:HERO_ICONS[i],cost:Math.floor(10*Math.pow(4.2,i)),dps:Math.floor(8*Math.pow(2.6,i)),passive:HERO_PASSIVES[i]}));
+const HEROES=HERO_NAMES.map((n,i)=>({id:i,name:n,icon:HERO_ICONS[i],type:HERO_TYPES[i%3],loc:HERO_LOCS[(Math.floor(i/2))%2],cost:Math.floor(10*Math.pow(4.2,i)),dps:Math.floor(8*Math.pow(2.6,i)),passive:HERO_PASSIVES[i]}));
 
 const TALENT_TREES=[
 {id:'knight',name:'剑修脉',icon:'⚔️',tiers:[
@@ -940,13 +945,50 @@ function getPetBonus(type){
   let artCount=new BN(1).add(getArtifactMult('dmgByArtCount').mul(getArtifactCount()));
   mult=mult.mul(artAll).mul(artTap).mul(artCount);
   if(G.isBoss)mult=mult.mul(new BN(1).add(getArtifactMult('bossDmg'))).mul(tBossMult());else mult=mult.mul(new BN(1).add(getArtifactMult('nonBossDmg'))).mul(tNonBossMult());let eb=getEquipBonus();mult=mult.mul(eb.tap||1).mul(eb.all||1);if(G.skillsActive[2]>0)mult=mult.mul(5+G.skillsLvl[2]*0.3);if(G.furyTimer>0)mult=mult.mul(3*tFuryMult());if(G.contractTimer>0)mult=mult.mul(getTalentEffect('a5')*tContractMult());if(G.orbActive)mult=mult.mul(1+G.orbCount*getTalentEffect('w7'));if(G.vulnStacks>0)mult=mult.mul(1+G.vulnStacks*0.1);mult=mult.mul(tTapMult()).mul(tAllMult()).mul(tPetMult()).mul(getSetBonus().petCrit).mul(G.combo>=10?getSetBonus().comboDmg:1);let hp=getHeroPassiveBonus();mult=mult.mul(hp.tap).mul(hp.all);let masterMult=Math.pow(1.15,Math.floor(G.masterLevel/20));mult=mult.mul(masterMult);return base.mul(mult)}
-function getHeroPassiveBonus(){let r={tap:1,all:1,hero:1,gold:1,bossGold:1,crit:1};for(let i=0;i<HEROES.length;i++){let lv=G.heroLevels[i]||0;if(lv<=0)continue;let seq=HERO_PASSIVES[i]||[];for(let j=0;j<seq.length;j++){if(lv>=HP_LVL[j])r[seq[j]]+=(HP_MULT[j]-1);}}return r}
-function getHeroDPS(){let total=new BN(0);HEROES.forEach(h=>{let lv=G.heroLevels[h.id]||0;if(lv>0){let asc=G.heroAsc[h.id]||0;let d=new BN(h.dps).mul(Math.pow(1e70,asc)).mul(getHeroLevelMult(lv));total=total.add(d)}});let mult=new BN(1);mult=mult.mul(getTalentEffect('w1'));if(G.skillsActive[4]>0)mult=mult.mul((3+G.skillsLvl[4]*0.3)*getTalentEffect('w4')*getTalentEffect('w10')*getSetBonus().warcryAtkSpd);mult=mult.mul(getRealmBonus());let sb=getSetBonus();mult=mult.mul(sb.all).mul(sb.hero).mul(sb.basicDmg).mul(getClanBonus().all).mul(getClanBonus().heroDps).mul(getEnchantBonus()).mul(getPetBonus('hero'));
-  let artAllH=new BN(1).add(getArtifactMult('allDmg')).add(getArtifactMult('allDmg2')).add(getArtifactMult('allDmg3')).add(getArtifactMult('artifactBase'));
-  let artHero=new BN(1).add(getArtifactMult('heroBase')).add(getArtifactMult('meleeHero')).add(getArtifactMult('rangedHero')).add(getArtifactMult('spellHero')).add(getArtifactMult('groundHero')).add(getArtifactMult('flyingHero'));
-  mult=mult.mul(artAllH).mul(artHero);
-  if(G.isBoss)mult=mult.mul(new BN(1).add(getArtifactMult('bossDmg'))).mul(tBossMult());else mult=mult.mul(new BN(1).add(getArtifactMult('nonBossDmg'))).mul(tNonBossMult());let eb=getEquipBonus();mult=mult.mul(eb.hero||1).mul(eb.all||1);if(G.furyTimer>0)mult=mult.mul(3*tFuryMult());mult=mult.mul(tHeroMult()).mul(tAllMult()).mul(getSetBonus().warcryDmg);let hp=getHeroPassiveBonus();mult=mult.mul(hp.hero).mul(hp.all);return total.mul(mult)}
-function getShipDamage(){let sb=getSetBonus();let d=getHeroDPS().mul(15*getTalentEffect('w2')).mul(getClanBonus().ship).mul(sb.ship).mul(sb.companionDmg).mul(getPetBonus('ship'));if(getTalent('r4')>0&&Math.random()<getTalentChance('r4'))d=d.mul(5);if(getTalent('w9')>0&&Math.random()<0.05)G.currentTitan+=Math.floor(getTalentFlat('w9'));return d.mul(tShipMult()).mul(tAllMult())}function getMonsterMaxHP(stage,isBoss){let hp=new BN(17.5).mul(new BN(1.15).pow(stage)).mul(1+0.005*stage);if(isBoss){let bs=3+stage/500*0.5;if(stage%10===5||stage%10===0)bs*=2.5;hp=hp.mul(bs)}return hp}
+function getHeroPassiveBonus(){
+  let r={tap:1,all:1,hero:1,gold:1,bossGold:1,crit:1};
+  for(let i=0;i<HEROES.length;i++){
+    let lv=G.heroLevels[i]||0;
+    if(lv<=0)continue;
+    let seq=HERO_PASSIVES[i]||[];
+    for(let j=0;j<seq.length;j++){
+      if(lv>=HP_LVL[j]){
+        let pType=seq[j];
+        if(r[pType]!==undefined) r[pType] += (HP_MULT[j]-1);
+      }
+    }
+  }
+  return r;
+}
+function getHeroDPS(){
+  let total=new BN(0);
+  let artAllH=new BN(1).add(getArtifactMult('allDmg')).add(getArtifactMult('allDmg2')).add(getArtifactMult('allDmg3')).add(getArtifactMult('artifactBase')).add(getArtifactMult('stackDmg'));
+  let artBase=new BN(1).add(getArtifactMult('heroBase'));
+  HEROES.forEach(h=>{
+    let lv=G.heroLevels[h.id]||0;
+    if(lv>0){
+      let asc=G.heroAsc[h.id]||0;
+      let typeMult=new BN(1).add(getArtifactMult(h.type+'Hero')).add(getArtifactMult(h.loc+'Hero'));
+      let d=new BN(h.dps).mul(Math.pow(1e70,asc)).mul(getHeroLevelMult(lv)).mul(typeMult);
+      total=total.add(d);
+    }
+  });
+  let mult=new BN(1);
+  mult=mult.mul(getTalentEffect('w1'));
+  if(G.skillsActive>0)mult=mult.mul((3+G.skillsLvl*0.3)*getTalentEffect('w4')*getTalentEffect('w10')*getSetBonus().warcryAtkSpd);
+  mult=mult.mul(getRealmBonus());
+  let sb=getSetBonus();
+  mult=mult.mul(sb.all).mul(sb.hero).mul(sb.basicDmg).mul(getClanBonus().all).mul(getClanBonus().heroDps).mul(getEnchantBonus()).mul(getPetBonus('hero'));
+  mult=mult.mul(artAllH).mul(artBase);
+  if(G.isBoss)mult=mult.mul(new BN(1).add(getArtifactMult('bossDmg'))).mul(tBossMult());else mult=mult.mul(new BN(1).add(getArtifactMult('nonBossDmg'))).mul(tNonBossMult());
+  let eb=getEquipBonus();
+  mult=mult.mul(eb.hero||1).mul(eb.all||1);
+  if(G.furyTimer>0)mult=mult.mul(3*tFuryMult());
+  mult=mult.mul(tHeroMult()).mul(tAllMult()).mul(getSetBonus().warcryDmg);
+  let hp=getHeroPassiveBonus();
+  mult=mult.mul(hp.hero).mul(hp.all);
+  return total.mul(mult);
+}function getShipDamage(){let sb=getSetBonus();let d=getHeroDPS().mul(15*getTalentEffect('w2')).mul(getClanBonus().ship).mul(sb.ship).mul(sb.companionDmg).mul(getPetBonus('ship'));if(getTalent('r4')>0&&Math.random()<getTalentChance('r4'))d=d.mul(5);if(getTalent('w9')>0&&Math.random()<0.05)G.currentTitan+=Math.floor(getTalentFlat('w9'));return d.mul(tShipMult()).mul(tAllMult())}function getMonsterMaxHP(stage,isBoss){let hp=new BN(17.5).mul(new BN(1.15).pow(stage)).mul(1+0.005*stage);if(isBoss){let bs=3+stage/500*0.5;if(stage%10===5||stage%10===0)bs*=2.5;hp=hp.mul(bs)}return hp}
 function getGoldDrop(stage,isBoss){let sb=getSetBonus();let base=new BN(17.5).mul(new BN(1.139).pow(stage)).mul(1+0.005*stage);let g=base;if(isBoss){let bs=3+stage/500*0.5;if(stage%10===5||stage%10===0)bs*=2.5;g=g.mul(bs*3*sb.bossGold)}if(G.skillsActive[2]>0)g=g.mul((5+G.skillsLvl[2]*0.3)*sb.hogMult);g=g.mul(getTalentEffect('r1')).mul(getTalentEffect('a1')).mul(tGoldMult());g=g.mul(sb.gold).mul(getPetBonus('gold'));let eb=getEquipBonus();g=g.mul(eb.gold||1);let hp=getHeroPassiveBonus();g=g.mul(hp.gold);if(isBoss)g=g.mul(hp.bossGold);return g}
 function getAdvancedStartStage(){
   let ms = G.maxStage || 1;
@@ -984,7 +1026,19 @@ function getPrestigeSpGain(){
   }
   return gained;
 }// TT2英雄质变曲线: 每级基础成长 + 逢10/50级质变 + 1000级超级质变 + 3000+每50级
-function getHeroLevelMult(lv){if(lv<=0)return 0;return Math.pow(1.035,Math.min(lv,1000))*lv}
+function getHeroLevelMult(lv){
+  if(lv<=0)return 0;
+  let mult = Math.pow(1.035, Math.min(lv, 1000)) * lv;
+  if(lv >= 10) mult *= 2;
+  if(lv >= 25) mult *= 3;
+  if(lv >= 50) mult *= 4;
+  if(lv >= 100) mult *= 5;
+  if(lv >= 200) mult *= 5;
+  if(lv >= 400) mult *= 10;
+  if(lv >= 800) mult *= 10;
+  if(lv >= 1000) mult *= 1000;
+  return mult;
+}
 function getSkillCost(id){let s=SKILLS[id],lv=G.skillsLvl[id]||1;return Math.max(1,Math.floor((s.baseCost+(lv-1)*3)*getClanBonus().skillCost*getSetBonus().skillCost*(1-getTalent('a11')*0.01)))}
 function getSkillUpgradeCost(id){let lv=G.skillsLvl[id]||1;return Math.floor(10*Math.pow(1.5,lv-1))}
 function getSkillEffect(id){let lv=G.skillsLvl[id]||1;if(id===0)return'伤害x'+(200+lv*20)+',跳5层';if(id===1)return'致命+'+(30+lv*5)+'%';if(id===2)return'金币x'+(5+lv*0.3);if(id===3)return'点击x'+(4+lv*0.5);if(id===4)return'道友x'+(3+lv*0.3);if(id===5)return'分身20/s,伤害x'+(0.6+lv*0.05);return''}
@@ -1371,7 +1425,37 @@ function buyHero(id,mult){
   updateUI()
 }
 
-function renderHeroes(){let list=document.getElementById('listHeroes');if(!list)return;list.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;margin-bottom:5px;background:rgba(201,168,76,.12);border-radius:6px;border:1px solid rgba(201,168,76,.25)"><span style="font-size:10px;color:var(--gold2)">💎 当前灵石</span><span style="font-size:12px;font-weight:900;color:var(--gold2)">'+G.stone.format()+'</span></div>'+'<div style="display:flex;align-items:center;gap:5px;padding:5px 8px;margin-bottom:5px;background:rgba(201,168,76,.15);border-radius:6px;border:1px solid var(--gold)"><div style="font-size:22px">🧙</div><div style="flex:1;min-width:0"><div style="font-size:9px;font-weight:700;color:var(--gold2)">主角·道尊 Lv.'+G.masterLevel+'</div><div style="font-size:6.5px;color:var(--mist)">每20级点击伤害翻倍(TT2公式) · 倍率×'+(G.masterLevel*Math.pow(2,Math.floor(Math.max(0,G.masterLevel-10)/20))).toFixed(0)+'</div></div><div style="display:flex;gap:2px"><button class="btn-small" onclick="upgradeMaster(1)" '+(G.stone.gte(getMasterUpgradeCost(G.masterLevel,1))?'':'disabled')+'>+1<br><span style="font-size:5.5px">'+getMasterUpgradeCost(G.masterLevel,1).format()+'</span></button><button class="btn-small" onclick="upgradeMaster(10)" '+(G.stone.gte(getMasterUpgradeCost(G.masterLevel,10))?'':'disabled')+'>+10<br><span style="font-size:5.5px">'+getMasterUpgradeCost(G.masterLevel,10).format()+'</span></button><button class="btn-small" style="background:var(--jade);color:#000" onclick="upgradeMasterMax()">MAX<br><span style="font-size:5.5px">花光所有</span></button></div></div>'+HEROES.map(h=>{let lv=G.heroLevels[h.id]||0,asc=G.heroAsc[h.id]||0,dps=new BN(h.dps).mul(Math.pow(1e70,asc)).mul(getHeroLevelMult(Math.max(1,lv)));function hc(n){return getHeroCost(h.id,lv,n)}return'<div class="card-row"><div class="c-avatar">'+h.icon+'</div><div class="c-info"><div class="c-title">'+h.name+' <span style="font-size:7px;color:var(--gold2)">Lv.'+lv+(asc?' ✦'+asc:'')+'</span></div><div class="c-desc">逢10/100/1000级质变，满级1000</div><div class="c-stat">秒伤:'+dps.format()+'</div></div><div style="display:flex;flex-direction:column;gap:5px">'+function(){let isMax=upgradeMult==='max';let cst=isMax?null:hc(upgradeMult);let dis=isMax?false:!G.stone.gte(cst);return'<div style="display:flex;gap:2px"><button class="btn-small" style="min-width:42px;background:linear-gradient(145deg,var(--gold),var(--gold3));color:#000;font-size:9px" onclick="cycleUpgradeMult()">'+getMultLabel()+'</button>'+(lv>=1000?'<button class="btn-small" style="min-width:58px;background:linear-gradient(145deg,#f1d479,#c9a84c);color:#000" onclick="tryAscendHero('+h.id+')">🌟飞升</button>':'<button class="btn-small" style="min-width:58px" onclick="buyHero(\''+h.id+'\','+(isMax?"'max'":upgradeMult)+')" '+(dis?'disabled':'')+'>升级<br><span style="font-size:6px">'+(isMax?'花光所有':cst.format())+'</span></button>')+'</div>'}()+'</div></div>'}).join('')}
+function renderHeroes(){
+  let list=document.getElementById('listHeroes');
+  if(!list)return;
+  let hp=getHeroPassiveBonus();
+  let activePassiveCount=0;
+  HEROES.forEach(h=>{
+    let lv=G.heroLevels[h.id]||0;
+    HP_LVL.forEach(req=>{if(lv>=req)activePassiveCount++;});
+  });
+  let headerOverview='<div style="font-size:7.5px;padding:4px 6px;margin-bottom:5px;background:rgba(201,168,76,.12);border-radius:6px;border:1px solid rgba(201,168,76,.25);line-height:1.4;text-align:left">'+
+    '<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="color:var(--gold2);font-weight:900">📜 全局被动总览 (已激活 '+activePassiveCount+'/222)</span><span style="color:var(--gold2)">💎 '+G.stone.format()+'</span></div>'+
+    '<span style="color:var(--paper)">全伤: <b style="color:var(--jade2)">+'+Math.round((hp.all-1)*100)+'%</b> · 点击: <b style="color:var(--jade2)">+'+Math.round((hp.tap-1)*100)+'%</b> · 道友: <b style="color:var(--jade2)">+'+Math.round((hp.hero-1)*100)+'%</b> · 灵石: <b style="color:var(--jade2)">+'+Math.round((hp.gold-1)*100)+'%</b> · 暴伤: <b style="color:var(--jade2)">+'+Math.round((hp.crit-1)*100)+'%</b></span>'+
+  '</div>';
+  let masterCard='<div style="display:flex;align-items:center;gap:5px;padding:5px 8px;margin-bottom:5px;background:rgba(201,168,76,.15);border-radius:6px;border:1px solid var(--gold)"><div style="font-size:22px">🧙</div><div style="flex:1;min-width:0"><div style="font-size:9px;font-weight:700;color:var(--gold2)">主角·道尊 Lv.'+G.masterLevel+'</div><div style="font-size:6.5px;color:var(--mist)">每20级点击伤害翻倍 · 倍率×'+(G.masterLevel*Math.pow(2,Math.floor(Math.max(0,G.masterLevel-10)/20))).toFixed(0)+'</div></div><div style="display:flex;gap:2px"><button class="btn-small" onclick="upgradeMaster(1)" '+(G.stone.gte(getMasterUpgradeCost(G.masterLevel,1))?'':'disabled')+'>+1<br><span style="font-size:5.5px">'+getMasterUpgradeCost(G.masterLevel,1).format()+'</span></button><button class="btn-small" onclick="upgradeMaster(10)" '+(G.stone.gte(getMasterUpgradeCost(G.masterLevel,10))?'':'disabled')+'>+10<br><span style="font-size:5.5px">'+getMasterUpgradeCost(G.masterLevel,10).format()+'</span></button><button class="btn-small" style="background:var(--jade);color:#000" onclick="upgradeMasterMax()">MAX<br><span style="font-size:5.5px">花光所有</span></button></div></div>';
+  let heroCards=HEROES.map(h=>{
+    let lv=G.heroLevels[h.id]||0,asc=G.heroAsc[h.id]||0;
+    let typeMult=new BN(1).add(getArtifactMult(h.type+'Hero')).add(getArtifactMult(h.loc+'Hero'));
+    let dps=new BN(h.dps).mul(Math.pow(1e70,asc)).mul(getHeroLevelMult(Math.max(1,lv))).mul(typeMult);
+    function hc(n){return getHeroCost(h.id,lv,n)}
+    let badgesHtml=(HERO_PASSIVES[h.id]||[]).slice(0,6).map((pt,idx)=>{
+      let req=HP_LVL[idx],unlocked=lv>=req,pName=HP_NAME[pt]||pt,pct=Math.round((HP_MULT[idx]-1)*100);
+      return '<span style="font-size:5.5px;padding:1px 3px;border-radius:3px;background:'+(unlocked?'rgba(115,201,158,.25)':'rgba(0,0,0,.4)')+';border:1px solid '+(unlocked?'var(--jade2)':'rgba(255,255,255,.1)')+';color:'+(unlocked?'var(--jade2)':'var(--mist)')+'" title="'+(unlocked?'已激活':'未激活')+'：'+req+'级解锁 '+pName+'+'+pct+'% (全局有效)">'+(unlocked?'✅':'🔒')+req+'级:'+pName+'+'+pct+'%</span>';
+    }).join(' ');
+    let typeTag='<span style="font-size:6px;padding:1px 3px;border-radius:3px;background:rgba(201,168,76,.2);color:var(--gold2);margin-left:3px">'+TYPE_NAME[h.type]+'·'+LOC_NAME[h.loc]+'</span>';
+    return '<div class="card-row"><div class="c-avatar">'+h.icon+'</div><div class="c-info"><div class="c-title">'+h.name+typeTag+' <span style="font-size:7px;color:var(--gold2)">Lv.'+lv+(asc?' ✦'+asc:'')+'</span></div><div class="c-desc" style="display:flex;flex-wrap:wrap;gap:2px;margin:2px 0">'+badgesHtml+'</div><div class="c-stat">秒伤:'+dps.format()+'</div></div><div style="display:flex;flex-direction:column;gap:5px">'+function(){
+      let isMax=upgradeMult==='max';let cst=isMax?null:hc(upgradeMult);let dis=isMax?false:!G.stone.gte(cst);
+      return '<div style="display:flex;gap:2px"><button class="btn-small" style="min-width:42px;background:linear-gradient(145deg,var(--gold),var(--gold3));color:#000;font-size:9px" onclick="cycleUpgradeMult()">'+getMultLabel()+'</button>'+(lv>=1000?'<button class="btn-small" style="min-width:58px;background:linear-gradient(145deg,#f1d479,#c9a84c);color:#000" onclick="tryAscendHero('+h.id+')">🌟飞升</button>':'<button class="btn-small" style="min-width:58px" onclick="buyHero(\''+h.id+'\','+(isMax?"'max'":upgradeMult)+')" '+(dis?'disabled':'')+'>升级<br><span style="font-size:6px">'+(isMax?'花光所有':cst.format())+'</span></button>')+'</div>';
+    }()+'</div></div>';
+  }).join('');
+  list.innerHTML=headerOverview+masterCard+heroCards;
+}
 /* ===== 法宝系统 ===== */
 function drawArtifact(){let unowned=ART_POOL.filter(a=>!G.artifacts[a.id]);if(unowned.length===0)return toast('已集齐103件天道法宝！');let count=Object.keys(G.artifacts).length,cost=new BN(Math.floor(Math.pow(1.35,count)*Math.pow(count+1,1.25)));if(G.relic.gte(cost)){G.relic=G.relic.sub(cost);let p=unowned[Math.floor(Math.random()*unowned.length)];G.artifacts[p.id]=new BN(1);playAudio('fairy');toast('🏺 参悟成功！获得【'+p.name+'】');renderArtifacts();updateUI()}else toast('天道碎片不足')}
 function upgradeArtifact(id,mult){let a=ART_POOL.find(x=>x.id===id);if(!a)return;let lv=G.artifacts[id]||new BN(1);if(typeof lv==='number')lv=new BN(lv);let n=0,tot=new BN(0);if(mult==='max'){while(n<1000){if(a.max>0&&lv.add(n).gte(a.max))break;let c=getArtifactCost(a,lv.add(n));if(!G.relic.gte(tot.add(c)))break;tot=tot.add(c);n++}if(n<=0)return toast('碎片不足')}else{mult=mult||1;for(let k=0;k<mult;k++){if(a.max>0&&lv.add(k).gte(a.max))break;tot=tot.add(getArtifactCost(a,lv.add(k)));n++}if(n<=0)return toast('已达最高等级')}if(G.relic.gte(tot)){G.relic=G.relic.sub(tot);G.artifacts[id]=lv.add(n);playAudio('fairy');renderArtifacts();updateUI()}else toast('碎片不足')}
