@@ -894,7 +894,7 @@ function getPetBonus(type){
   let artTap=new BN(1).add(getArtifactMult('tapDmg')).add(getArtifactMult('swordDmg')).add(getArtifactMult('daggerCombo'));
   let artCount=new BN(1).add(getArtifactMult('dmgByArtCount').mul(getArtifactCount()));
   mult=mult.mul(artAll).mul(artTap).mul(artCount);
-  if(G.isBoss)mult=mult.mul(new BN(1).add(getArtifactMult('bossDmg'))).mul(tBossMult());else mult=mult.mul(new BN(1).add(getArtifactMult('nonBossDmg'))).mul(tNonBossMult());let eb=getEquipBonus();mult=mult.mul(eb.tap||1).mul(eb.all||1);if(G.skillsActive[2]>0)mult=mult.mul(5+G.skillsLvl[2]*0.3);if(G.furyTimer>0)mult=mult.mul(3*tFuryMult());if(G.contractTimer>0)mult=mult.mul(getTalentEffect('a5')*tContractMult());if(G.orbActive)mult=mult.mul(1+G.orbCount*getTalentEffect('w7'));if(G.vulnStacks>0)mult=mult.mul(1+G.vulnStacks*0.1);mult=mult.mul(tTapMult()).mul(tAllMult()).mul(tPetMult()).mul(getSetBonus().petCrit).mul(G.combo>=10?getSetBonus().comboDmg:1);let hp=getHeroPassiveBonus();mult=mult.mul(hp.tap).mul(hp.all);let masterMult=Math.pow(1.15,Math.floor(G.masterLevel/20));mult=mult.mul(masterMult);return base.mul(mult)}
+  if(G.isBoss)mult=mult.mul(new BN(1).add(getArtifactMult('bossDmg'))).mul(tBossMult());else mult=mult.mul(new BN(1).add(getArtifactMult('nonBossDmg'))).mul(tNonBossMult());let eb=getEquipBonus();mult=mult.mul(eb.tap||1).mul(eb.all||1).mul(eb.crit||1);if(G.skillsActive[2]>0)mult=mult.mul(5+G.skillsLvl[2]*0.3);if(G.furyTimer>0)mult=mult.mul(3*tFuryMult());if(G.contractTimer>0)mult=mult.mul(getTalentEffect('a5')*tContractMult());if(G.orbActive)mult=mult.mul(1+G.orbCount*getTalentEffect('w7'));if(G.vulnStacks>0)mult=mult.mul(1+G.vulnStacks*0.1);mult=mult.mul(tTapMult()).mul(tAllMult()).mul(tPetMult()).mul(getSetBonus().petCrit).mul(G.combo>=10?getSetBonus().comboDmg:1);let hp=getHeroPassiveBonus();mult=mult.mul(hp.tap).mul(hp.all);let masterMult=Math.pow(1.15,Math.floor(G.masterLevel/20));mult=mult.mul(masterMult);return base.mul(mult)}
 function getHeroPassiveBonus(){
   let r={tap:1,all:1,hero:1,gold:1,bossGold:1,crit:1};
   for(let i=0;i<HEROES.length;i++){
@@ -938,7 +938,8 @@ function getHeroDPS(){
   let hp=getHeroPassiveBonus();
   mult=mult.mul(hp.hero).mul(hp.all);
   return total.mul(mult);
-}function getShipDamage(){let sb=getSetBonus();let d=getHeroDPS().mul(15*getTalentEffect('w2')).mul(getClanBonus().ship).mul(sb.ship).mul(sb.companionDmg).mul(getPetBonus('ship'));if(getTalent('r4')>0&&Math.random()<getTalentChance('r4'))d=d.mul(5);if(getTalent('w9')>0&&Math.random()<0.05)G.currentTitan+=Math.floor(getTalentFlat('w9'));return d.mul(tShipMult()).mul(tAllMult())}function getMonsterMaxHP(stage,isBoss){let hp=new BN(17.5).mul(new BN(1.15).pow(stage)).mul(1+0.005*stage);if(isBoss){let bs=3+stage/500*0.5;if(stage%10===5||stage%10===0)bs*=2.5;hp=hp.mul(bs)}return hp}
+}
+function getShipDamage(){let sb=getSetBonus();let d=getHeroDPS().mul(15*getTalentEffect('w2')).mul(getClanBonus().ship).mul(sb.ship).mul(sb.companionDmg).mul(getPetBonus('ship'));if(getTalent('r4')>0&&Math.random()<getTalentChance('r4'))d=d.mul(5);if(getTalent('w9')>0&&Math.random()<0.05)G.currentTitan+=Math.floor(getTalentFlat('w9'));let eb=getEquipBonus();d=d.mul(eb.ship||1);return d.mul(tShipMult()).mul(tAllMult())}function getMonsterMaxHP(stage,isBoss){let hp=new BN(17.5).mul(new BN(1.15).pow(stage)).mul(1+0.005*stage);if(isBoss){let bs=3+stage/500*0.5;if(stage%10===5||stage%10===0)bs*=2.5;hp=hp.mul(bs)}return hp}
 function getGoldDrop(stage,isBoss){let sb=getSetBonus();let base=new BN(17.5).mul(new BN(1.139).pow(stage)).mul(1+0.005*stage);let g=base;if(isBoss){let bs=3+stage/500*0.5;if(stage%10===5||stage%10===0)bs*=2.5;g=g.mul(bs*3*sb.bossGold)}if(G.skillsActive[2]>0)g=g.mul((5+G.skillsLvl[2]*0.3)*sb.hogMult);g=g.mul(getTalentEffect('r1')).mul(getTalentEffect('a1')).mul(tGoldMult());g=g.mul(sb.gold).mul(getPetBonus('gold'));let eb=getEquipBonus();g=g.mul(eb.gold||1);let hp=getHeroPassiveBonus();g=g.mul(hp.gold);if(isBoss)g=g.mul(hp.bossGold);return g}
 function getAdvancedStartStage(){
   let ms = G.maxStage || 1;
@@ -997,7 +998,7 @@ function spawnMonster(){G._monsterDying=false;G.thisRunMaxStage=Math.max(G.thisR
   const req=Math.max(1,G.titanPerStage-Math.floor(getTalent('r3')*0.5));
   G.fightTime=0;G.wallWarned=false;
   G.isBoss=G.currentTitan>=req;
-  if(G.isBoss)G.bossTimer=30;
+  if(G.isBoss)G.bossTimer=30+getArtifactMult('bossDuration').m*Math.pow(10,getArtifactMult('bossDuration').e);
   let r=Math.random();let sb=getSetBonus();
   let chestBonus=(getPetBonus('chest')+(getPetBonus('chestFairy')-1)*0.5)*sb.specialTrigger*sb.titanSpawn;
   let snapBonus=getPetBonus('snap')*sb.specialTrigger;
@@ -1242,7 +1243,7 @@ function getTalentChance(id){let s=findTalent(id),L=G.talents[id]||0;if(!s||L<=0
   })))
 })();
 /* ===== TT2式天赋流乘区聚合（所有108节点效果接线）===== */
-function tAllMult(){return getTalentEffect('w12')*getTalentEffect('w16')*getTalentEffect('w18')*getTalentEffect('r18')*getTalentEffect('a15')*getTalentEffect('a14')*getTalentEffect('a18')*(1+getSetBonus().warlordT4*0.25)*(1+getSetBonus().knightT4*0.25)*(1+getSetBonus().sorcererT4*0.25)*(1+getSetBonus().rogueT4*0.25)}
+function tAllMult(){return getTalentEffect('w12')*getTalentEffect('w16')*getTalentEffect('w18')*getTalentEffect('r18')*getTalentEffect('a15')*getTalentEffect('a18')*(1+getSetBonus().warlordT4*0.25)*(1+getSetBonus().knightT4*0.25)*(1+getSetBonus().sorcererT4*0.25)*(1+getSetBonus().rogueT4*0.25)}
 function tTapMult(){return getTalentEffect('k9')*getTalentEffect('k12')*getTalentEffect('k16')*getTalentEffect('k17')*getTalentEffect('k18')*getTalentEffect('r9')*getTalentEffect('r16')*getTalentEffect('r17')}
 function tHeroMult(){return getTalentEffect('w3')*getTalentEffect('w6')*getTalentEffect('w8')*getTalentEffect('w14')}
 function tShipMult(){return getTalentEffect('w5')*getTalentEffect('w11')*getTalentEffect('w13')*getTalentEffect('w17')}
@@ -1258,10 +1259,12 @@ function tContractMult(){return getTalentEffect('a13')*getTalentEffect('a17')}
 function tFuryMult(){return getTalentEffect('a8')}
 function tManaMax(){return getTalentEffect('s1')*getTalentEffect('s7')}
 function getMaxMana(){
-  let artBn = getArtifactMult('maxMana');
-  let artMana = (artBn && artBn.m > 0) ? (artBn.m * Math.pow(10, artBn.e)) : 0;
-  let base = (100 + artMana) * tManaMax() + getSetBonus().manaMax;
-  return Math.floor(base * getPetBonus('manaMax'));
+  let artBn=getArtifactMult('maxMana');
+  let artMana=(artBn&&artBn.m>0)?(artBn.m*Math.pow(10,artBn.e)):0;
+  let base=(100+artMana)*tManaMax()+getSetBonus().manaMax;
+  let eb=getEquipBonus();
+  if(eb.mana>1)base=base*eb.mana;
+  return Math.floor(base*getPetBonus('manaMax'));
 }
 function getManaRegen(){
   return (getMaxMana()/600)*getTalentEffect('s1')*getSetBonus().manaRegen*(1+getTalent('k14')*0.25)*getPetBonus('mana'); // 乘上回蓝宠物加成
