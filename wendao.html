@@ -2351,13 +2351,36 @@ function loadGame(){
       }
       G.lastTick = Date.now();
 
-      // ===== 【天道自愈】：自动修正暗影之书超标数值，发放 1000 仙玉 + 20 SP 全员大礼包 =====
+      // ===== 【天道自愈】：修正暗影之书与超标层数，发放 1000 仙玉 + 20 SP 全员大礼包 =====
       if(!G.v82_rebalance_fixed){
         G.v82_rebalance_fixed = true;
-        let ms = G.maxStage || 1;
         
-        // 1. 智能压缩暗影之书到健康上限（当前层数 * 1.5，比如1000关最高保留1500级）
-        let maxHealthyBos = Math.max(10, Math.floor(ms * 1.5));
+        // 1. 关卡与装备等级安全收敛：将超过 1500 层的异常数据平滑校准至第一梯队合理线（1500层）
+        const FAIR_MAX_STAGE = 1500;
+        const FAIR_MAX_ITEM_LV = Math.floor(FAIR_MAX_STAGE / 15); // 100 级装备
+        
+        if((G.maxStage || 1) > FAIR_MAX_STAGE){
+          G.maxStage = FAIR_MAX_STAGE;
+          G.stage = Math.min(G.stage || FAIR_MAX_STAGE, FAIR_MAX_STAGE);
+          G.thisRunMaxStage = Math.min(G.thisRunMaxStage || FAIR_MAX_STAGE, FAIR_MAX_STAGE);
+          G.prestigeStartStage = Math.min(G.prestigeStartStage || FAIR_MAX_STAGE, Math.floor(FAIR_MAX_STAGE * 0.7));
+        }
+
+        // 2. 将超标装备等级收敛回 100 级，防止打造出几百万倍的失控神装
+        function compressItem(e){
+          if(!e) return;
+          if(e.level > FAIR_MAX_ITEM_LV){
+            e.level = FAIR_MAX_ITEM_LV;
+            let r = RARITIES.find(x => x.id === e.rarity) || RARITIES[0];
+            e.mainStat.val = equipMainVal(e.slot, e.mainStat.type, r);
+            if(e.subStats) e.subStats.forEach(s => s.val = equipSubVal(r));
+          }
+        }
+        ['weapon','head','robe','aura','slash'].forEach(s => compressItem(G.equipment[s]));
+        (G.equipInv || []).forEach(compressItem);
+
+        // 3. 智能压缩暗影之书到健康上限（1500 级）
+        let maxHealthyBos = Math.max(10, Math.floor((G.maxStage || 1) * 1.5));
         if(G.artifacts && G.artifacts['art_25']){
           let bosLv = G.artifacts['art_25'];
           let cur = (typeof bosLv === 'number') ? bosLv : (bosLv.m * Math.pow(10, bosLv.e || 0));
@@ -2366,17 +2389,17 @@ function loadGame(){
           }
         }
         
-        // 2. 清理异常虚高碎片，重置为当前关卡正常 1 次渡劫收益
-        let healthyRelic = Math.floor(Math.pow(Math.max(1, ms - 75) / 14, 3) * 10);
+        // 4. 清理异常虚高碎片，重置为当前关卡健康 1 次渡劫收益
+        let healthyRelic = Math.floor(Math.pow(Math.max(1, (G.maxStage || 1) - 75) / 14, 3) * 10);
         G.relic = new BN(healthyRelic);
         
-        // 3. 自动将暴走的蓝量拉回健康上限
+        // 5. 自动将暴走的蓝量拉回健康上限
         G.mana = Math.min(G.mana || 100, getMaxMana());
 
-        // 4. 重置道友飞升阶数，按 10000 级新规则统一起跑
+        // 6. 重置道友飞升阶数，按 10000 级新规则统一起跑
         G.heroAsc = {};
 
-        // 5. 全员自动发放天道补偿礼包：1000 仙玉 + 20 SP
+        // 7. 全员自动发放天道补偿礼包：1000 仙玉 + 20 SP
         G.gem = (G.gem || 0) + 1000;
         G.sp = (G.sp || 0) + 20;
         
@@ -2386,6 +2409,7 @@ function loadGame(){
           renderArtifacts();
           renderHeroes();
           renderTalents();
+          renderEquip();
           saveGame();
         }, 1200);
       }
