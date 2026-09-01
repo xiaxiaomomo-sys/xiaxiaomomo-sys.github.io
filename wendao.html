@@ -2291,7 +2291,7 @@ async function cloudSave(){
         body:JSON.stringify({
           save_data:sd,
           max_stage:G.maxStage,
-          total_power:getPlayerTotalPower(), // ✅ 第1处修改
+          total_power:getPlayerTotalPower(),
           updated_at: Date.now()
         })
       });
@@ -2312,7 +2312,7 @@ async function cloudSave(){
           password:p,
           save_data:sd,
           max_stage:G.maxStage,
-          total_power:getPlayerTotalPower(), // ✅ 第2处修改
+          total_power:getPlayerTotalPower(),
           updated_at: Date.now()
         })
       });
@@ -2389,7 +2389,7 @@ async function cloudLoad(){
     if(!G.v82_asc_migrated){
       G.v82_asc_migrated = true;
       let hadOldAsc = G.heroAsc && Object.values(G.heroAsc).some(v => v > 0);
-      G.heroAsc = {}; // 重置飞升阶数，统一起跑线
+      G.heroAsc = {};
       if(hadOldAsc || (G.maxStage || 1) >= 100){
         G.gem = (G.gem || 0) + 500;
         G.sp = (G.sp || 0) + 10;
@@ -2407,6 +2407,49 @@ async function cloudLoad(){
     toast('📥 提取成功');
   }catch(e){
     s.textContent='失败:'+e.message;
+  }
+}
+
+async function submitScore(){
+  if(!G.cloudName)return;
+  let power=getPlayerTotalPower();
+  try{
+    let c=await fetch(SUPABASE_URL+'/rest/v1/wendao_leaderboard?player_name=eq.'+encodeURIComponent(G.cloudName),{headers:{apikey:SUPABASE_KEY}});
+    let ex=await c.json();
+    if(ex.length>0){
+      await fetch(SUPABASE_URL+'/rest/v1/wendao_leaderboard?player_name=eq.'+encodeURIComponent(G.cloudName),{
+        method:'PATCH',
+        headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify({max_stage:G.maxStage,power:power,updated_at:Date.now()})
+      });
+    }else{
+      await fetch(SUPABASE_URL+'/rest/v1/wendao_leaderboard',{
+        method:'POST',
+        headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify({
+          id:'lb_'+G.cloudName+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8),
+          player_name:G.cloudName,
+          max_stage:G.maxStage,
+          power:power,
+          updated_at:Date.now()
+        })
+      });
+    }
+  }catch(e){}
+}
+
+async function loadTourney(){
+  document.getElementById('uiMyCloudName').textContent=G.cloudName||'未绑定';
+  let myP = document.getElementById('uiMyPower');
+  if(myP) myP.textContent = '第 ' + (G.maxStage || 1) + ' 层';
+  document.getElementById('tourneyBindHint').style.display=G.cloudName?'none':'block';
+  resetLeaderboardIfNewDay();
+  try{
+    let r=await fetch(SUPABASE_URL+'/rest/v1/wendao_leaderboard?select=*&order=max_stage.desc,power.desc&limit=25&updated_at=gte.'+new Date().setHours(0,0,0,0),{headers:{apikey:SUPABASE_KEY}});
+    let d=await r.json();
+    document.getElementById('listTourney').innerHTML=d.map((p,i)=>'<div style="display:flex;justify-content:space-between;padding:3px 5px;border-bottom:1px solid rgba(201,168,76,.1);font-size:8px"><span>'+(i<3?['🥇','🥈','🥉'][i]:'#'+(i+1))+' '+p.player_name+'</span><span style="color:var(--gold2);font-weight:900">第 '+(p.max_stage||1)+' 层</span></div>').join('')||'<div style="text-align:center;color:var(--mist);font-size:9px;padding:10px">今日无论道数据，快来冲榜！</div>';
+  }catch(e){
+    document.getElementById('listTourney').innerHTML='<div style="text-align:center;color:var(--mist);font-size:9px;padding:10px">加载失败</div>';
   }
 }
 /* ===== Toast ===== */
