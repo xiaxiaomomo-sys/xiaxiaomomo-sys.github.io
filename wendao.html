@@ -2145,26 +2145,94 @@ async function resetLeaderboardIfNewDay(){
 function saveGame(){if(isDeletingSave)return;try{let s=JSON.stringify(G);localStorage.setItem(SAVE_KEY,s);localStorage.setItem(SAVE_KEY+'_ck',cksum(s))}catch(e){}}
 function cksum(str){let h=5381;for(let i=0;i<str.length;i++)h=((h*33)^str.charCodeAt(i))>>>0;return h.toString(36)}
 function migrateLegacyEquip(){let changed=false;let fix=function(e){if(!e)return;let map={epic:'mythic',uncommon:'rare'};if(e.rarity&&map[e.rarity]){e.rarity=map[e.rarity];changed=true}};G.equipInv.forEach(fix);['weapon','head','robe','aura','slash'].forEach(s=>fix(G.equipment[s]))}
-function loadGame(){try{let str=localStorage.getItem(SAVE_KEY);if(str){let ck=localStorage.getItem(SAVE_KEY+'_ck');if(ck&&ck!==cksum(str)){toast('⚠️ 检测到本地存档被篡改，已拒绝载入');return false}let d=JSON.parse(str);Object.assign(G,d);G.stone=new BN(d.stone);G.relic=new BN(d.relic);G.totalGold=new BN(d.totalGold||0);G.totalRelic=new BN(d.totalRelic||0);if(G.artifacts&&typeof G.artifacts==='object'){for(let k in G.artifacts){let v=G.artifacts[k];if(v instanceof BN)continue;if(typeof v==='number'){G.artifacts[k]=new BN(v);continue;}if(typeof v==='object'&&v!==null&&'m' in v){G.artifacts[k]=new BN(v.m,v.e||0);continue;}G.artifacts[k]=new BN(1)}}migrateLegacyEquip();if(!G.activatedSets)G.activatedSets={};if(!G.masterLevel)G.masterLevel=1;checkActivatedSets();let el=Math.min(28800,Math.max(0,(Date.now()-(G.lastTick||Date.now()))/1000));if(el>60){let offMult=1+getTalentEffect('r14');let eg=Math.floor(el/7200*offMult*getSetBonus().offlineCap);if(eg>0){G.petEggs=Math.min(Math.floor(getClanBonus().eggCap),(G.petEggs||0)+eg);toast('🌙 离线+'+eg+'蛋')}let maxSilent=Math.min(G.maxStage,Math.floor(G.maxStage*(0.99+getTalent('r7')*0.002)));let sg=Math.min(maxSilent-G.stage,Math.floor(el/12*offMult*getSetBonus().offlineStage));if(sg>0){G.stage+=sg;toast('🌙 离线推关+'+sg+'层')}let offGold=getHeroDPS().mul(el*getSetBonus().offlineGold*0.05*getSetBonus().offlineDmg);if(offGold.m>0){G.stone=G.stone.add(offGold);toast('🌙 离线灵石+'+offGold.format())}}
-G.lastTick=Date.now();
+function loadGame(){
+  try{
+    let str = localStorage.getItem(SAVE_KEY);
+    if(str){
+      let ck = localStorage.getItem(SAVE_KEY + '_ck');
+      if(ck && ck !== cksum(str)){
+        toast('⚠️ 检测到本地存档被篡改，已拒绝载入');
+        return false;
+      }
+      let d = JSON.parse(str);
+      Object.assign(G, d);
+      G.stone = new BN(d.stone);
+      G.relic = new BN(d.relic);
+      G.totalGold = new BN(d.totalGold || 0);
+      G.totalRelic = new BN(d.totalRelic || 0);
+      if(G.artifacts && typeof G.artifacts === 'object'){
+        for(let k in G.artifacts){
+          let v = G.artifacts[k];
+          if(v instanceof BN) continue;
+          if(typeof v === 'number'){ G.artifacts[k] = new BN(v); continue; }
+          if(typeof v === 'object' && v !== null && 'm' in v){ G.artifacts[k] = new BN(v.m, v.e || 0); continue; }
+          G.artifacts[k] = new BN(1);
+        }
+      }
+      migrateLegacyEquip();
+      if(!G.activatedSets) G.activatedSets = {};
+      if(!G.masterLevel) G.masterLevel = 1;
+      checkActivatedSets();
+
+      // 离线挂机收益计算
+      let el = Math.min(28800, Math.max(0, (Date.now() - (G.lastTick || Date.now())) / 1000));
+      if(el > 60){
+        let offMult = 1 + getTalentEffect('r14');
+        let eg = Math.floor(el / 7200 * offMult * getSetBonus().offlineCap);
+        if(eg > 0){
+          G.petEggs = Math.min(Math.floor(getClanBonus().eggCap), (G.petEggs || 0) + eg);
+          toast('🌙 离线+' + eg + '蛋');
+        }
+        let maxSilent = Math.min(G.maxStage, Math.floor(G.maxStage * (0.99 + getTalent('r7') * 0.002)));
+        let sg = Math.min(maxSilent - G.stage, Math.floor(el / 12 * offMult * getSetBonus().offlineStage));
+        if(sg > 0){
+          G.stage += sg;
+          toast('🌙 离线推关+' + sg + '层');
+        }
+        let offGold = getHeroDPS().mul(el * getSetBonus().offlineGold * 0.05 * getSetBonus().offlineDmg);
+        if(offGold.m > 0){
+          G.stone = G.stone.add(offGold);
+          toast('🌙 离线灵石+' + offGold.format());
+        }
+      }
+      G.lastTick = Date.now();
+
+      // ===== 【方案 B】老玩家飞升重构与 500 仙玉 + 10 SP 更新补偿 =====
+      if(!G.v82_asc_migrated){
+        G.v82_asc_migrated = true;
+        let hadOldAsc = G.heroAsc && Object.values(G.heroAsc).some(v => v > 0);
+        G.heroAsc = {}; // 重置所有道友飞升阶数，按 10000 级新规则统一起跑
+        if(hadOldAsc || (G.maxStage || 1) >= 100){
+          G.gem = (G.gem || 0) + 500;
+          G.sp = (G.sp || 0) + 10;
+          setTimeout(()=>{
+            toast('🎁 飞升体系升级：已为您重构道友境界，并补发 500 仙玉 + 10 SP 更新大礼包！');
+            updateUI();
+            renderHeroes();
+            renderTalents();
+            saveGame();
+          }, 1500);
+        }
+      }
+
       // ===== 老玩家历史 SP 自动补发检测 =====
-      if(!G.spMilestones) G.spMilestones={};
+      if(!G.spMilestones) G.spMilestones = {};
       let autoCompensateSp = 0;
-      for(let ms=20; ms<=(G.maxStage||1); ms+=20){
-        if(!G.spMilestones['s'+ms]){
-          G.spMilestones['s'+ms]=1;
+      for(let ms = 20; ms <= (G.maxStage || 1); ms += 20){
+        if(!G.spMilestones['s' + ms]){
+          G.spMilestones['s' + ms] = 1;
           autoCompensateSp += 1;
         }
       }
-      for(let ms=500; ms<=(G.maxStage||1); ms+=500){
-        if(!G.spMilestones['m'+ms]){
-          G.spMilestones['m'+ms]=1;
+      for(let ms = 500; ms <= (G.maxStage || 1); ms += 500){
+        if(!G.spMilestones['m' + ms]){
+          G.spMilestones['m' + ms] = 1;
           autoCompensateSp += 3;
         }
       }
-      for(let ms=1000; ms<=(G.maxStage||1); ms+=1000){
-        if(!G.spMilestones['k'+ms]){
-          G.spMilestones['k'+ms]=1;
+      for(let ms = 1000; ms <= (G.maxStage || 1); ms += 1000){
+        if(!G.spMilestones['k' + ms]){
+          G.spMilestones['k' + ms] = 1;
           autoCompensateSp += 5;
         }
       }
@@ -2177,8 +2245,9 @@ G.lastTick=Date.now();
         }, 1000);
       }
     }
+  }catch(e){
+    console.error('loadGame error:', e);
   }
-catch(e){console.error('loadGame error:',e)}
 }
 /* ===== 战力计算辅助函数 ===== */
 function getPlayerTotalPower(){
@@ -2315,6 +2384,19 @@ async function cloudLoad(){
     G.cloudName=n;
     G.cloudPwd=p;
     s.textContent='✅ 读取成功';
+
+    // ===== 【方案 B】云端旧存档双保险重构与 500 仙玉 + 10 SP 补偿 =====
+    if(!G.v82_asc_migrated){
+      G.v82_asc_migrated = true;
+      let hadOldAsc = G.heroAsc && Object.values(G.heroAsc).some(v => v > 0);
+      G.heroAsc = {}; // 重置飞升阶数，统一起跑线
+      if(hadOldAsc || (G.maxStage || 1) >= 100){
+        G.gem = (G.gem || 0) + 500;
+        G.sp = (G.sp || 0) + 10;
+        toast('🎁 云端存档已升级：已为您重构道友境界，并补发 500 仙玉 + 10 SP！');
+      }
+    }
+
     spawnMonster();
     renderHeroes();
     renderTalents();
@@ -2325,49 +2407,6 @@ async function cloudLoad(){
     toast('📥 提取成功');
   }catch(e){
     s.textContent='失败:'+e.message;
-  }
-}
-
-async function submitScore(){
-  if(!G.cloudName)return;
-  let power=getPlayerTotalPower(); // ✅ 第3处修改
-  try{
-    let c=await fetch(SUPABASE_URL+'/rest/v1/wendao_leaderboard?player_name=eq.'+encodeURIComponent(G.cloudName),{headers:{apikey:SUPABASE_KEY}});
-    let ex=await c.json();
-    if(ex.length>0){
-      await fetch(SUPABASE_URL+'/rest/v1/wendao_leaderboard?player_name=eq.'+encodeURIComponent(G.cloudName),{
-        method:'PATCH',
-        headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-        body:JSON.stringify({max_stage:G.maxStage,power:power,updated_at:Date.now()})
-      });
-    }else{
-      await fetch(SUPABASE_URL+'/rest/v1/wendao_leaderboard',{
-        method:'POST',
-        headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-        body:JSON.stringify({
-          id:'lb_'+G.cloudName+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8),
-          player_name:G.cloudName,
-          max_stage:G.maxStage,
-          power:power,
-          updated_at:Date.now()
-        })
-      });
-    }
-  }catch(e){}
-}
-
-async function loadTourney(){
-  document.getElementById('uiMyCloudName').textContent=G.cloudName||'未绑定';
-  let myP = document.getElementById('uiMyPower');
-  if(myP) myP.textContent = '第 ' + (G.maxStage || 1) + ' 层';
-  document.getElementById('tourneyBindHint').style.display=G.cloudName?'none':'block';
-  resetLeaderboardIfNewDay();
-  try{
-    let r=await fetch(SUPABASE_URL+'/rest/v1/wendao_leaderboard?select=*&order=max_stage.desc,power.desc&limit=25&updated_at=gte.'+new Date().setHours(0,0,0,0),{headers:{apikey:SUPABASE_KEY}});
-    let d=await r.json();
-    document.getElementById('listTourney').innerHTML=d.map((p,i)=>'<div style="display:flex;justify-content:space-between;padding:3px 5px;border-bottom:1px solid rgba(201,168,76,.1);font-size:8px"><span>'+(i<3?['🥇','🥈','🥉'][i]:'#'+(i+1))+' '+p.player_name+'</span><span style="color:var(--gold2);font-weight:900">第 '+(p.max_stage||1)+' 层</span></div>').join('')||'<div style="text-align:center;color:var(--mist);font-size:9px;padding:10px">今日无论道数据，快来冲榜！</div>';
-  }catch(e){
-    document.getElementById('listTourney').innerHTML='<div style="text-align:center;color:var(--mist);font-size:9px;padding:10px">加载失败</div>';
   }
 }
 /* ===== Toast ===== */
