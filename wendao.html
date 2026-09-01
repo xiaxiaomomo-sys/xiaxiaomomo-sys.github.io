@@ -527,7 +527,7 @@ const ART_POOL=[
 {id:'art_86',name:'死亡之斧',icon:'🪓',cat:'damage',fx:'critChance',desc:'全队暴击几率提升',costC:1.5,costE:2,effB:0.02,effD:1,max:-1},
 {id:'art_87',name:'哈迪斯宝珠',icon:'🔮',cat:'damage',fx:'inactiveTap',desc:'离线点击与技能伤害提升',costC:1.5,costE:2,effB:0.20,effD:1,max:-1},
 {id:'art_88',name:'莫格莱之剑',icon:'🗡️',cat:'damage',fx:'daggerCombo',desc:'连击连续打击伤害提升',costC:1.5,costE:2,effB:0.40,effD:1,max:-1},
-{id:'art_89',name:'充能卡片',icon:'🃏',cat:'damage',fx:'cardCountDmg',desc:'按卡牌被动总数额外增伤',costC:1.5,costE:2,effB:0.08,effD:1,max:-1},
+{id:'art_89',name:'万仙道卷',icon:'📜',cat:'damage',fx:'cardCountDmg',desc:'按道友已激活被动总数提供全局增伤',costC:1.5,costE:2,effB:0.08,effD:1,max:-1},
 {id:'art_90',name:'宇宙六分仪',icon:'🔭',cat:'damage',fx:'daggerShipSplash',desc:'玄舟与飞剑溅射伤害提升',costC:1.5,costE:2,effB:0.20,effD:1,max:-1},
 {id:'art_91',name:'无尽弹药带',icon:'🔫',cat:'damage',fx:'heroWeapon',desc:'道友法器装备基础加成',costC:1.5,costE:2,effB:0.20,effD:1,max:-1},
 {id:'art_92',name:'不断增长的堆叠',icon:'📚',cat:'damage',fx:'stackDmg',desc:'随层数递增全队全体伤害',costC:1.5,costE:2,effB:0.40,effD:1,max:-1},
@@ -1308,6 +1308,16 @@ function tAllMult(){
   if(artDmgBySkills>0){
     var activeCount=0;SKILLS.forEach(function(s){if(G.skillsActive[s.id]>0)activeCount++});
     if(activeCount>0)base*=(1+artDmgBySkills*activeCount);
+  }
+  // 【新增】89号法宝生效：按已激活的道友被动技能总数加成全伤害
+  var artCard=a('cardCountDmg');
+  if(artCard>0){
+    var passiveCount=0;
+    HEROES.forEach(function(h){
+      var lv=G.heroLevels[h.id]||0;
+      HP_LVL.forEach(function(req){if(lv>=req)passiveCount++;});
+    });
+    if(passiveCount>0)base*=(1+artCard*passiveCount*0.05);
   }
   base*=(1+a('passiveMana')*0.5);
   return base;
