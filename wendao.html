@@ -859,80 +859,17 @@ function checkActivatedSets(){
   if(newly.length > 0) toast("🌟 套装已永久激活：【" + newly.join("、") + "】！");
 }
 function getActiveSets(){return EQUIP_SETS.filter(s=>G.activatedSets[s.id]===true)}
+let _setBonusCache=null,_setBonusFrame=-1;
 function getSetBonus(){
+  let curFrame=(typeof gameLoop._t!=='undefined')?gameLoop._t:0;
+  if(_setBonusCache!==null&&_setBonusFrame===curFrame)return _setBonusCache;
   let b={tap:1,hero:1,ship:1,clone:1,pet:1,hs:1,fs:1,all:1,gold:1,critDmg:1,deadlyDmg:1,critChance:0,manaRegen:1,manaMax:0,skillCost:1,skillDur:1,skillCd:1,skillEffect:1,dropRate:1,hogMult:1,hogDur:1,offlineStage:1,offlineGold:1,offlineCap:.9,advStart:1,splashSkip:0,extraTap:0,fairyChance:1,chestChance:1,snapChance:1,snapEffect:1,portarChance:1,portarSkip:0,ambush:0,enchantMult:1,enchantDmgPer:0,basicDmg:1,companionDmg:1,titanSpawn:1,specialTrigger:1,activePet:1,warlordT4:0,rogueT4:0,knightT4:0,sorcererT4:0,cloneSplash:false,warcryAtkSpd:1,shipInterval:1,manaRefund:0,relicGain:1,chestGold:1,splashDmg:1,deadlyChance:0,warcryDmg:1,bossGold:1,skillDmg:1,skipChance:0,manaOnKill:0,offlineDmg:1,petCrit:1,comboDmg:1,fairyDmg:1,ambushDmg:1};
   let active=getActiveSets(),mythicCount=active.filter(s=>s.tier==='mythic').length,legendCount=active.filter(s=>s.tier==='legendary').length;
   let setBoost=1;active.forEach(s=>{if(s.fx.setBoost)setBoost*=s.fx.setBoost*getSetMult(s.id)});
   active.forEach(s=>{let m=getSetMult(s.id)*setBoost;let f=s.fx;
-    if(f.allDmg)b.all*=Math.pow(f.allDmg,m);
-    if(f.allGold)b.gold*=Math.pow(f.allGold,m);
-    if(f.tapDmg)b.tap*=Math.pow(f.tapDmg,m);
-    if(f.heroDmg)b.hero*=Math.pow(f.heroDmg,m);
-    if(f.shipDmg)b.ship*=Math.pow(f.shipDmg,m);
-    if(f.cloneDmg)b.clone*=Math.pow(f.cloneDmg,m);
-    if(f.petDmg)b.pet*=Math.pow(f.petDmg,m);
-    if(f.hsDmg)b.hs*=Math.pow(f.hsDmg,m);
-    if(f.fsDmg)b.fs*=Math.pow(f.fsDmg,m);
-    if(f.critDmg)b.critDmg*=Math.pow(f.critDmg,m);
-    if(f.deadlyDmg)b.deadlyDmg*=Math.pow(f.deadlyDmg,m);
-    if(f.critChance)b.critChance+=f.critChance*m;
-    if(f.manaRegen)b.manaRegen*=Math.pow(f.manaRegen,m);
-    if(f.manaMax)b.manaMax+=f.manaMax*m;
-    if(f.skillCost)b.skillCost*=Math.pow(f.skillCost,m);
-    if(f.skillDur)b.skillDur*=Math.pow(f.skillDur,m);
-    if(f.skillCd)b.skillCd*=Math.pow(f.skillCd,m);
-    if(f.skillEffect)b.skillEffect*=Math.pow(f.skillEffect,m);
-    if(f.dropRate)b.dropRate*=Math.pow(f.dropRate,m);
-    if(f.hogMult)b.hogMult*=Math.pow(f.hogMult,m);
-    if(f.hogDur)b.hogDur*=Math.pow(f.hogDur,m);
-    if(f.offlineStage)b.offlineStage*=Math.pow(f.offlineStage,m);
-    if(f.offlineGold)b.offlineGold*=Math.pow(f.offlineGold,m);
-    if(f.offlineCap)b.offlineCap=Math.max(b.offlineCap,f.offlineCap);
-    if(f.advStart)b.advStart*=Math.pow(f.advStart,m);
-    if(f.splashSkip)b.splashSkip+=f.splashSkip*m;
-    if(f.extraTap)b.extraTap+=f.extraTap*m;
-    if(f.fairyChance)b.fairyChance*=Math.pow(f.fairyChance,m);
-    if(f.chestChance)b.chestChance*=Math.pow(f.chestChance,m);
-    if(f.snapChance)b.snapChance*=Math.pow(f.snapChance,m);
-    if(f.snapEffect)b.snapEffect*=Math.pow(f.snapEffect,m);
-    if(f.portarChance)b.portarChance*=Math.pow(f.portarChance,m);
-    if(f.portarSkip)b.portarSkip+=f.portarSkip*m;
-    if(f.ambush)b.ambush+=f.ambush*m;
-    if(f.enchantMult)b.enchantMult*=Math.pow(f.enchantMult,m);
-    if(f.enchantDmgPer)b.enchantDmgPer+=f.enchantDmgPer*m;
-    if(f.basicDmg)b.basicDmg*=Math.pow(f.basicDmg,m);
-    if(f.companionDmg)b.companionDmg*=Math.pow(f.companionDmg,m);
-    if(f.titanSpawn)b.titanSpawn*=Math.pow(f.titanSpawn,m);
-    if(f.specialTrigger)b.specialTrigger*=Math.pow(f.specialTrigger,m);
-    if(f.activePet)b.activePet*=Math.pow(f.activePet,m);
-    if(f.warlordT4)b.warlordT4+=f.warlordT4;
-    if(f.rogueT4)b.rogueT4+=f.rogueT4;
-    if(f.knightT4)b.knightT4+=f.knightT4;
-    if(f.sorcererT4)b.sorcererT4+=f.sorcererT4;
-    if(f.cloneSplash)b.cloneSplash=true;
-    if(f.warcryAtkSpd)b.warcryAtkSpd*=Math.pow(f.warcryAtkSpd,m);
-    if(f.shipInterval)b.shipInterval*=Math.pow(f.shipInterval,m);
-    if(f.mythicMult)b.all*=Math.pow(2,mythicCount*m);
-    if(f.legendGoldPerSet)b.gold*=Math.pow(1+f.legendGoldPerSet,legendCount*m);
-    if(f.legendDmgPerSet)b.all*=Math.pow(1+f.legendDmgPerSet,legendCount*m);
-    if(f.gold)b.gold*=Math.pow(f.gold,m);
-    if(f.manaRefund)b.manaRefund+=f.manaRefund*m;
-    if(f.relicGain)b.relicGain*=Math.pow(f.relicGain,m);
-    if(f.chestGold)b.chestGold*=Math.pow(f.chestGold,m);
-    if(f.splashDmg)b.splashDmg*=Math.pow(f.splashDmg,m);
-    if(f.deadlyChance)b.deadlyChance+=f.deadlyChance*m;
-    if(f.warcryDmg)b.warcryDmg*=Math.pow(f.warcryDmg,m);
-    if(f.bossGold)b.bossGold*=Math.pow(f.bossGold,m);
-    if(f.skillDmg)b.skillDmg*=Math.pow(f.skillDmg,m);
-    if(f.skipChance)b.skipChance+=f.skipChance*m;
-    if(f.manaOnKill)b.manaOnKill+=f.manaOnKill*m;
-    if(f.offlineDmg)b.offlineDmg*=Math.pow(f.offlineDmg,m);
-    if(f.petCrit)b.petCrit*=Math.pow(f.petCrit,m);
-    if(f.comboDmg)b.comboDmg*=Math.pow(f.comboDmg,m);
-    if(f.fairyDmg)b.fairyDmg*=Math.pow(f.fairyDmg,m);
-    if(f.ambushDmg)b.ambushDmg*=Math.pow(f.ambushDmg,m);
+    if(f.allDmg)b.all*=Math.pow(f.allDmg,m);if(f.allGold)b.gold*=Math.pow(f.allGold,m);if(f.tapDmg)b.tap*=Math.pow(f.tapDmg,m);if(f.heroDmg)b.hero*=Math.pow(f.heroDmg,m);if(f.shipDmg)b.ship*=Math.pow(f.shipDmg,m);if(f.cloneDmg)b.clone*=Math.pow(f.cloneDmg,m);if(f.petDmg)b.pet*=Math.pow(f.petDmg,m);if(f.hsDmg)b.hs*=Math.pow(f.hsDmg,m);if(f.fsDmg)b.fs*=Math.pow(f.fsDmg,m);if(f.critDmg)b.critDmg*=Math.pow(f.critDmg,m);if(f.deadlyDmg)b.deadlyDmg*=Math.pow(f.deadlyDmg,m);if(f.critChance)b.critChance+=f.critChance*m;if(f.manaRegen)b.manaRegen*=Math.pow(f.manaRegen,m);if(f.manaMax)b.manaMax+=f.manaMax*m;if(f.skillCost)b.skillCost*=Math.pow(f.skillCost,m);if(f.skillDur)b.skillDur*=Math.pow(f.skillDur,m);if(f.skillCd)b.skillCd*=Math.pow(f.skillCd,m);if(f.skillEffect)b.skillEffect*=Math.pow(f.skillEffect,m);if(f.dropRate)b.dropRate*=Math.pow(f.dropRate,m);if(f.hogMult)b.hogMult*=Math.pow(f.hogMult,m);if(f.hogDur)b.hogDur*=Math.pow(f.hogDur,m);if(f.offlineStage)b.offlineStage*=Math.pow(f.offlineStage,m);if(f.offlineGold)b.offlineGold*=Math.pow(f.offlineGold,m);if(f.offlineCap)b.offlineCap=Math.max(b.offlineCap,f.offlineCap);if(f.advStart)b.advStart*=Math.pow(f.advStart,m);if(f.splashSkip)b.splashSkip+=f.splashSkip*m;if(f.extraTap)b.extraTap+=f.extraTap*m;if(f.fairyChance)b.fairyChance*=Math.pow(f.fairyChance,m);if(f.chestChance)b.chestChance*=Math.pow(f.chestChance,m);if(f.snapChance)b.snapChance*=Math.pow(f.snapChance,m);if(f.snapEffect)b.snapEffect*=Math.pow(f.snapEffect,m);if(f.portarChance)b.portarChance*=Math.pow(f.portarChance,m);if(f.portarSkip)b.portarSkip+=f.portarSkip*m;if(f.ambush)b.ambush+=f.ambush*m;if(f.enchantMult)b.enchantMult*=Math.pow(f.enchantMult,m);if(f.enchantDmgPer)b.enchantDmgPer+=f.enchantDmgPer*m;if(f.basicDmg)b.basicDmg*=Math.pow(f.basicDmg,m);if(f.companionDmg)b.companionDmg*=Math.pow(f.companionDmg,m);if(f.titanSpawn)b.titanSpawn*=Math.pow(f.titanSpawn,m);if(f.specialTrigger)b.specialTrigger*=Math.pow(f.specialTrigger,m);if(f.activePet)b.activePet*=Math.pow(f.activePet,m);if(f.warlordT4)b.warlordT4+=f.warlordT4;if(f.rogueT4)b.rogueT4+=f.rogueT4;if(f.knightT4)b.knightT4+=f.knightT4;if(f.sorcererT4)b.sorcererT4+=f.sorcererT4;if(f.cloneSplash)b.cloneSplash=true;if(f.warcryAtkSpd)b.warcryAtkSpd*=Math.pow(f.warcryAtkSpd,m);if(f.shipInterval)b.shipInterval*=Math.pow(f.shipInterval,m);if(f.mythicMult)b.all*=Math.pow(2,mythicCount*m);if(f.legendGoldPerSet)b.gold*=Math.pow(1+f.legendGoldPerSet,legendCount*m);if(f.legendDmgPerSet)b.all*=Math.pow(1+f.legendDmgPerSet,legendCount*m);if(f.gold)b.gold*=Math.pow(f.gold,m);if(f.manaRefund)b.manaRefund+=f.manaRefund*m;if(f.relicGain)b.relicGain*=Math.pow(f.relicGain,m);if(f.chestGold)b.chestGold*=Math.pow(f.chestGold,m);if(f.splashDmg)b.splashDmg*=Math.pow(f.splashDmg,m);if(f.deadlyChance)b.deadlyChance+=f.deadlyChance*m;if(f.warcryDmg)b.warcryDmg*=Math.pow(f.warcryDmg,m);if(f.bossGold)b.bossGold*=Math.pow(f.bossGold,m);if(f.skillDmg)b.skillDmg*=Math.pow(f.skillDmg,m);if(f.skipChance)b.skipChance+=f.skipChance*m;if(f.manaOnKill)b.manaOnKill+=f.manaOnKill*m;if(f.offlineDmg)b.offlineDmg*=Math.pow(f.offlineDmg,m);if(f.petCrit)b.petCrit*=Math.pow(f.petCrit,m);if(f.comboDmg)b.comboDmg*=Math.pow(f.comboDmg,m);if(f.fairyDmg)b.fairyDmg*=Math.pow(f.fairyDmg,m);if(f.ambushDmg)b.ambushDmg*=Math.pow(f.ambushDmg,m);
   });
-  return b
+  _setBonusCache=b;_setBonusFrame=curFrame;return b
 }
 function getEquipBonus(){let b={tap:0,hero:0,ship:0,all:0,crit:0,gold:0,mana:0};let slots=['weapon','head','robe','aura','slash'];slots.forEach(function(s){let e=G.equipment[s];if(e){let ench=1+(e.enchant||0)*0.2;if(e.mainStat)b[e.mainStat.type]=(b[e.mainStat.type]||0)+e.mainStat.val*ench/100;if(e.subStats)e.subStats.forEach(function(st){b[st.type]=(b[st.type]||0)+st.val*ench/100})}});return {tap:1+b.tap,hero:1+b.hero,ship:1+b.ship,all:1+b.all,crit:1+b.crit,gold:1+b.gold,mana:1+b.mana}}
 function getPetBonus(type){
@@ -987,7 +924,7 @@ function getHeroDPS(){
   });
   let mult=new BN(1);
   mult=mult.mul(getTalentEffect('w1'));
-  if(G.skillsActive>0)mult=mult.mul((3+G.skillsLvl*0.3)*getTalentEffect('w4')*getTalentEffect('w10')*getSetBonus().warcryAtkSpd);
+   if(G.skillsActive[4]>0)mult=mult.mul((3+(G.skillsLvl[4]||1)*0.3)*getTalentEffect('w4')*getTalentEffect('w10')*getSetBonus().warcryAtkSpd);
   mult=mult.mul(getRealmBonus());
   let sb=getSetBonus();
   mult=mult.mul(sb.all).mul(sb.hero).mul(sb.basicDmg).mul(getClanBonus().all).mul(getClanBonus().heroDps).mul(getEnchantBonus()).mul(getPetBonus('hero'));
@@ -1825,12 +1762,15 @@ function spawnOrb(){
   updateModeBadges();
 }
 function initBgParticles(){
-  // 背景粒子效果（简化版，避免性能问题）
   let ba=getBattleArea();if(!ba)return;
   if(!G.settings.highFx)return;
+  ba.querySelectorAll('.bg-particle').forEach(p=>p.remove());
   for(let i=0;i<8;i++){
     let p=document.createElement('div');
-    p.style.cssText='position:absolute;width:2px;height:2px;background:rgba(201,168,76,.3);border-radius:50%;left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;animation:floatP'+i+' '+(5+Math.random()*5)+'s infinite';
+    p.className='bg-particle';
+    p.style.left=Math.random()*100+'%';
+    p.style.animationDuration=(5+Math.random()*5)+'s';
+    p.style.animationDelay=(-Math.random()*8)+'s';
     ba.appendChild(p);
   }
 }
@@ -1893,7 +1833,6 @@ function stepGameTick(dt){
   if(G.isBoss&&Math.random()<dt*0.25)spawnFlashZip();
   if(getTalent('w7')>0&&Math.random()<dt*(0.1+getTalentFlat('w7')*0.005))spawnOrb();
   checkAchievements();
-  if(!document.hidden)updateUI();
 }
 
 function processOfflineProgress(el){
@@ -1910,11 +1849,12 @@ function processOfflineProgress(el){
   updateUI();
 }
 
+let _lastUILoopUpdate=0;const _UI_LOOP_INTERVAL=100;
 function gameLoop(){
   try{
     gameLoop._t=(gameLoop._t||0)+1;
     if(gameLoop._t%3600===0)resetLeaderboardIfNewDay();
-    if(!checkServerHours()){updateUI();requestAnimationFrame(gameLoop);return}
+    if(!checkServerHours()){requestAnimationFrame(gameLoop);return}
     let now=Date.now(),dt=(now-G.lastTick)/1000;G.lastTick=now;
     if(dt>0){
       if(dt>5){
@@ -1923,10 +1863,14 @@ function gameLoop(){
         stepGameTick(Math.min(1, dt));
       }
     }
+    let _nowUI=Date.now();
+    if(_nowUI-_lastUILoopUpdate>=_UI_LOOP_INTERVAL){
+      _lastUILoopUpdate=_nowUI;
+      if(!document.hidden)updateUI();
+    }
     requestAnimationFrame(gameLoop);
   }catch(e){console.error("gameLoop error:",e);requestAnimationFrame(gameLoop)}
 }
-
 /* ===== Web Worker 独立后台挂机线程 ===== */
 (function initBackgroundWorker(){
   try {
