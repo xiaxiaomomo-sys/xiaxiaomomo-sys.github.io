@@ -2484,16 +2484,6 @@ function loadGame(){
     console.error('loadGame error:', e);
   }
 }
-/* ===== 战力计算辅助函数 ===== */
-function getPlayerTotalPower(){
-  let totalSp = G.sp || 0;
-  if(G.talents){
-    for(let k in G.talents){
-      totalSp += (G.talents[k] || 0);
-    }
-  }
-  return G.maxStage * 100 + totalSp * 500;
-}
 
 /* ===== 战力计算辅助函数 ===== */
 function getPlayerTotalPower(){
@@ -2505,7 +2495,6 @@ function getPlayerTotalPower(){
   }
   return G.maxStage * 100 + totalSp * 500;
 }
-
 /* ===== 云存档 ===== */
 async function cloudSave(silent=false){
   let nameInput = document.getElementById('cloudName');
@@ -2622,10 +2611,10 @@ async function cloudLoad(){
     G.cloudPwd = p;
     s.textContent = '✅ 读取成功';
 
-    // ===== 【天道自愈】：云端旧存档双保险重构 =====
-    if(!G.v82_rebalance_fixed){
-      G.v82_rebalance_fixed = true;
-      let ms = G.maxStage || 1;
+   // ===== 【天道自愈 v2】：云端旧存档双保险重构 =====
+    if(!G.v82_rebalance_fixed_v2){
+      G.v82_rebalance_fixed_v2 = true;
+      let ms = Math.min(G.maxStage || 1, 1500);
       const FAIR_MAX_STAGE = 1500;
       const FAIR_MAX_ITEM_LV = Math.floor(FAIR_MAX_STAGE / 15);
       if((G.maxStage || 1) > FAIR_MAX_STAGE){
@@ -2645,22 +2634,28 @@ async function cloudLoad(){
       }
       ['weapon','head','robe','aura','slash'].forEach(s => compressItem(G.equipment[s]));
       (G.equipInv || []).forEach(compressItem);
-      let maxHealthyBos = Math.max(10, Math.floor((G.maxStage || 1) * 1.5));
-      if(G.artifacts && G.artifacts['art_25']){
-        let bosLv = G.artifacts['art_25'];
-        let cur = (typeof bosLv === 'number') ? bosLv : (bosLv.m * Math.pow(10, bosLv.e || 0));
-        if(cur > maxHealthyBos){
-          G.artifacts['art_25'] = new BN(maxHealthyBos);
+      
+      // 全量法宝大自愈：压缩所有超过 2,250 级的无上限法宝
+      let maxHealthyArtLevel = Math.max(50, Math.floor(ms * 1.5));
+      if(G.artifacts){
+        for(let id in G.artifacts){
+          let artDef = ART_POOL.find(x => x.id === id);
+          if(artDef && artDef.max === -1){
+            let lv = G.artifacts[id];
+            let cur = (typeof lv === 'number') ? lv : (lv.m * Math.pow(10, lv.e || 0));
+            if(cur > maxHealthyArtLevel){
+              G.artifacts[id] = new BN(maxHealthyArtLevel);
+            }
+          }
         }
       }
-      let healthyRelic = Math.floor(Math.pow(Math.max(1, (G.maxStage || 1) - 75) / 14, 3) * 10);
+      let healthyRelic = Math.floor(Math.pow(Math.max(1, ms - 75) / 14, 3) * 10);
       G.relic = new BN(healthyRelic);
       G.mana = Math.min(G.mana || 100, getMaxMana());
       G.heroAsc = {};
       G.gem = (G.gem || 0) + 1000;
       G.sp = (G.sp || 0) + 20;
     }
-
     spawnMonster();
     renderHeroes();
     renderTalents();
