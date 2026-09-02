@@ -2832,6 +2832,11 @@ async function cloudLoad(){
 
 async function submitScore(){
   if(!G.cloudName) return;
+  // 核心保险：如果关卡超过当前版本上限（1500），强制纠正为1500，绝不允许6000层上榜！
+  if((G.maxStage || 1) > 1500){
+    G.maxStage = 1500;
+    G.stage = Math.min(G.stage || 1500, 1500);
+  }
   let power = getPlayerTotalPower();
   try{
     let c = await fetch(SUPABASE_URL + '/rest/v1/wendao_leaderboard?player_name=eq.' + encodeURIComponent(G.cloudName), { headers: { apikey: SUPABASE_KEY } });
@@ -2840,7 +2845,7 @@ async function submitScore(){
       await fetch(SUPABASE_URL + '/rest/v1/wendao_leaderboard?player_name=eq.' + encodeURIComponent(G.cloudName), {
         method: 'PATCH',
         headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ max_stage: G.maxStage, power: power, updated_at: Date.now() })
+        body: JSON.stringify({ max_stage: Math.min(1500, G.maxStage), power: power, updated_at: Date.now() })
       });
     } else {
       await fetch(SUPABASE_URL + '/rest/v1/wendao_leaderboard', {
@@ -2849,7 +2854,7 @@ async function submitScore(){
         body: JSON.stringify({
           id: 'lb_' + G.cloudName + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
           player_name: G.cloudName,
-          max_stage: G.maxStage,
+          max_stage: Math.min(1500, G.maxStage),
           power: power,
           updated_at: Date.now()
         })
