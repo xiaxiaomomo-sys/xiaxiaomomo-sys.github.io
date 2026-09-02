@@ -1814,8 +1814,113 @@ function equipSubVal(rarity){
 }
 function dropEquip(forcedRarity){let slot=EQUIP_SLOTS[Math.floor(Math.random()*EQUIP_SLOTS.length)];let lv=getItemLevel();let rid;if(forcedRarity)rid=forcedRarity;else{// BOSS只掉白蓝(凡品/极品), 传说/神话仅靠锻造系统制作
 rid=Math.random()<0.7?'common':'rare'}let rarity=RARITIES.find(x=>x.id===rid);let slotPool=Object.keys(SLOT_MAIN_BASE[slot.id]||{all:1});let mainType=slotPool[Math.floor(Math.random()*slotPool.length)];let mainVal=equipMainVal(slot.id,mainType,rarity);let subPool=SLOT_SUB_POOL[slot.id];let subs=[];for(let i=0;i<rarity.sub;i++){let st=subPool[Math.floor(Math.random()*subPool.length)];let stt=STAT_TYPES.find(x=>x.type===st);subs.push({type:st,name:stt?stt.name:st,val:equipSubVal(rarity)})}let set=null;if(rid==='legendary'||rid==='mythic')set=EQUIP_SETS[Math.floor(Math.random()*EQUIP_SETS.length)].id;let eq={id:Date.now()+Math.floor(Math.random()*10000),slot:slot.id,name:rarity.name+'·'+slot.name,rarity:rid,icon:slot.icon,level:lv,mainStat:{type:mainType,name:(STAT_TYPES.find(x=>x.type===mainType)||{}).name||'全伤',val:mainVal},subStats:subs,set:set,enchant:0};G.equipInv.push(eq);spawnEquipDropFlash();playAudio('drop');toast('📦 掉落【'+eq.name+' Lv.'+lv+'】');renderEquip()}
-function equipItem(id){id=parseFloat(id);let idx=G.equipInv.findIndex(e=>e.id===id);if(idx<0)return;let eq=G.equipInv[idx];let old=G.equipment[eq.slot];G.equipment[eq.slot]=eq;G.equipInv.splice(idx,1);if(old)G.equipInv.push(old);playAudio('buy');renderEquip();updateUI();checkActivatedSets()}
+function equipItem(id){
+  id=parseFloat(id);
+  let idx=G.equipInv.findIndex(e=>e.id===id);
+  if(idx<0)return;
+  let eq=G.equipInv[idx];
+  let old=G.equipment[eq.slot];
+  // 【修复】穿戴新装备时，自动转移强化等级（取较高值）
+  if(old&&(old.enchant||0)>0){
+    eq.enchant=Math.max(eq.enchant||0,old.enchant);
+    old.enchant=0;
+  }
+  G.equipment[eq.slot]=eq;
+  G.equipInv.splice(idx,1);
+  if(old)G.equipInv.push(old);
+  playAudio('buy');
+  renderEquip();
+  updateUI();
+  checkActivatedSets();
+}
 function sellEquip(id){id=parseFloat(id);let idx=G.equipInv.findIndex(e=>e.id===id);if(idx<0)return;let eq=G.equipInv[idx];let shards=eq.rarity==='mythic'?10:eq.rarity==='legendary'?5:eq.rarity==='rare'?2:1;G.craftShards+=shards;G.totalShardsSpent=(G.totalShardsSpent||0)+shards;G.equipInv.splice(idx,1);toast('分解+'+shards+'碎片');renderEquip()}
+  function unequipItem(slot){
+  let eq=G.equipment[slot];
+  if(!eq)return toast('该位置无装备');
+  G.equipInv.push(eq);
+  G.equipment[slot]=null;
+  playAudio('buy');
+  toast('已卸下【'+eq.name+'】');
+  renderEquip();
+  updateUI();
+  checkActivatedSets();
+}
+function upgradeEquippedItem(slot){
+  let eq=G.equipment[slot];
+  if(!eq)return;
+  let costReduction=Math.max(0.1,1-a('equipCost')-a('upgradeCost'));
+  let cost=Math.max(1,Math.floor((10+eq.level*5)*costReduction));
+  if(G.craftShards<cost)return toast('碎片不足(需'+cost+')');
+  G.craftShards-=cost;
+  eq.level++;
+  let r=RARITIES.find(x=>x.id===eq.rarity)||RARITIES[0];
+  eq.mainStat.val=equipMainVal(eq.slot,eq.mainStat.type,r);
+  eq.subStats.forEach(s=>s.val=equipSubVal(r));
+  playAudio('fairy');
+  toast('⬆️ '+eq.name+'→Lv.'+eq.level);
+  renderEquip();
+  updateUI();
+}
+function rerollEquippedItem(slot){
+  let eq=G.equipment[slot];
+  if(!eq)return;
+  let cost=15;
+  if(G.craftShards<cost)return toast('碎片不足(需'+cost+')');
+  G.craftShards-=cost;
+  let r=RARITIES.find(x=>x.id===eq.rarity)||RARITIES[0];
+  let pool=SLOT_SUB_POOL[eq.slot]||['all'];
+  eq.subStats=[];
+  for(let i=0;i<r.sub;i++){
+    let st=pool[Math.floor(Math.random()*pool.length)];
+    let stt=STAT_TYPES.find(x=>x.type===st);
+    eq.subStats.push({type:st,name:stt?stt.name:st,val:equipSubVal(r)});
+  }
+  playAudio('fairy');
+  toast('🔄 重铸完成');
+  renderEquip();
+  updateUI();
+}
+function openEquippedItemMenu(slot){
+  let eq=G.equipment[slot];
+  if(!eq)return;
+  let slotDef=EQUIP_SLOTS.find(s=>s.id===slot);
+  let r=RARITIES.find(x=>x.id===eq.rarity)||RARITIES[0];
+  let setName=eq.set?(EQUIP_SETS.find(s=>s.id===eq.set)||{}).name||'':'';
+  let costReduction=Math.max(0.1,1-a('equipCost')-a('upgradeCost'));
+  let upCost=Math.max(1,Math.floor((10+eq.level*5)*costReduction));
+  let rerollCost=15;
+  let modal=document.getElementById('equippedItemModal');
+  if(!modal){
+    modal=document.createElement('div');
+    modal.id='equippedItemModal';
+    modal.className='modal-mask';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML='<div class="modal-box" style="max-width:280px;text-align:left">'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
+      '<span style="font-size:32px">'+eq.icon+'</span>'+
+      '<div>'+
+        '<div style="font-size:12px;font-weight:900" class="'+r.cls+'">'+eq.name+' Lv.'+eq.level+'</div>'+
+        (setName?'<span class="set-badge">'+setName+'</span>':'')+
+        '<div style="font-size:8px;color:#ff9f43">强化 +'+(eq.enchant||0)+' · '+slotDef.name+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="background:rgba(0,0,0,.3);padding:6px;border-radius:6px;font-size:9px;margin-bottom:8px">'+
+      '<div style="color:var(--gold2);margin-bottom:3px">主属性: '+eq.mainStat.name+' +'+numFmt(eq.mainStat.val)+'</div>'+
+      eq.subStats.map(s=>'<div style="color:var(--paper)">副属性: '+s.name+' +'+numFmt(s.val)+'</div>').join('')+
+    '</div>'+
+    '<div style="display:flex;gap:4px;margin-bottom:6px">'+
+      '<button class="btn-buy" style="flex:1" onclick="upgradeEquippedItem(\''+slot+'\');document.getElementById(\'equippedItemModal\').classList.remove(\'show\')" '+(G.craftShards>=upCost?'':'disabled')+'>⬆️ 升级('+upCost+'碎)</button>'+
+      '<button class="btn-buy" style="flex:1" onclick="rerollEquippedItem(\''+slot+'\');document.getElementById(\'equippedItemModal\').classList.remove(\'show\')" '+(G.craftShards>=rerollCost?'':'disabled')+'>🔄 重铸('+rerollCost+'碎)</button>'+
+    '</div>'+
+    '<div style="display:flex;gap:4px;margin-bottom:6px">'+
+      '<button class="btn-buy" style="flex:1;background:rgba(91,132,196,.3);border:1px solid var(--rune);color:#81ecec" onclick="document.getElementById(\'equippedItemModal\').classList.remove(\'show\');openPanel(\'enchant\')">✨ 附魔(+'+(eq.enchant||0)+')</button>'+
+      '<button class="btn-buy" style="flex:1;background:#c0392b;color:#fff" onclick="unequipItem(\''+slot+'\');document.getElementById(\'equippedItemModal\').classList.remove(\'show\')">📦 卸下</button>'+
+    '</div>'+
+    '<button class="btn-buy" style="width:100%;background:#444;color:#fff" onclick="document.getElementById(\'equippedItemModal\').classList.remove(\'show\')">关闭</button>'+
+  '</div>';
+  modal.classList.add('show');
+}
 function upgradeEquip(id){id=parseFloat(id);let eq=G.equipInv.find(e=>e.id===id);if(!eq)return;let cost=Math.max(1,Math.floor((10+eq.level*5)*Math.max(0.1,1-a('equipCost')-a('upgradeCost'))));if(G.craftShards<cost)return toast('碎片不足(需'+cost+')');G.craftShards-=cost;eq.level++;let r=RARITIES.find(x=>x.id===eq.rarity)||RARITIES[0];eq.mainStat.val=equipMainVal(eq.slot,eq.mainStat.type,r);eq.subStats.forEach(s=>s.val=equipSubVal(r));playAudio('fairy');toast('⬆️ '+eq.name+'→Lv.'+eq.level);renderEquip();updateUI()}
 function numFmt(n){if(!isFinite(n))return'∞';if(n<1000)return Math.floor(n).toString();const U=['','K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc','UDc','DDc','TDc','QaDc','QiDc','SxDc','SpDc','OcDc','NoDc','Vg','UVg','DVg','TVg','QaVg','QiVg','SxVg','SpVg','OcVg','NoVg','Tg','UTg','DTg','TTg','QaTg','QiTg','SxTg','SpTg','OcTg','NoTg'];let tier=Math.floor(Math.log10(n)/3);if(tier>=U.length)return n.toExponential(2);let val=n/Math.pow(10,tier*3);return val.toFixed(val<10?2:val<100?1:0)+U[tier]}
 function rerollEquip(id){id=parseFloat(id);let eq=G.equipInv.find(e=>e.id===id);if(!eq)return;let cost=15;if(G.craftShards<cost)return toast('碎片不足(需15)');G.craftShards-=cost;let r=RARITIES.find(x=>x.id===eq.rarity);let pool=SLOT_SUB_POOL[eq.slot]||['all'];eq.subStats=[];for(let i=0;i<r.sub;i++){let st=pool[Math.floor(Math.random()*pool.length)];let stt=STAT_TYPES.find(x=>x.type===st);eq.subStats.push({type:st,name:stt?stt.name:st,val:equipSubVal(r)})}playAudio('fairy');toast('🔄 重铸完成');renderEquip()}
@@ -1823,33 +1928,83 @@ const RARITY_ORDER={common:0,rare:1,legendary:2,mythic:3};
 function sellAllLow(){let sh=0,removed=0;G.equipInv=G.equipInv.filter(function(e){if(e.rarity==='common'||e.rarity==='rare'){sh+=(e.rarity==='rare'?3:1);removed++;return false}return true});if(removed>0){G.craftShards+=sh;G.totalShardsSpent=(G.totalShardsSpent||0)+sh;playAudio('fairy');toast('🧹 一键分解'+removed+'件白蓝 +'+sh+'碎片');renderEquip()}else toast('背包中无白蓝装备')}
 function openActiveSets(){let list=document.getElementById('activeSetsList');let active=EQUIP_SETS.filter(s=>getSetCount(s.id)>=5);list.innerHTML=active.length?active.map(s=>{let lvl=getSetLevel(s.id);return'<div style="font-size:8.5px;padding:5px 8px;margin-bottom:4px;background:rgba(0,0,0,.4);border-radius:6px;border-left:3px solid '+(s.tier==='mythic'?'#c4a0ff':'var(--gold)')+'"><b style="color:'+(s.tier==='mythic'?'#c4a0ff':'var(--gold2)')+'">'+s.icon+' '+s.name+'</b> Lv.'+lvl+'<br><span style="color:var(--paper);font-size:8px">'+s.desc+'</span></div>'}).join(''):'<div style="text-align:center;font-size:9px;color:var(--mist);padding:15px">尚未激活任何套装<br>集齐5件同套装部件即可永久激活</div>';document.getElementById('activeSetsModal').classList.add('show')}
 function renderEquip(){
-  let eb = getEquipBonus();
-  let totalStatBar = document.getElementById('equipTotalStatBar');
+  let eb=getEquipBonus();
+  let totalStatBar=document.getElementById('equipTotalStatBar');
   if(!totalStatBar){
-    let sv = document.getElementById('equipSlotsView');
+    let sv=document.getElementById('equipSlotsView');
     if(sv){
-      totalStatBar = document.createElement('div');
-      totalStatBar.id = 'equipTotalStatBar';
-      totalStatBar.style.cssText = 'font-size:8px;padding:4px 6px;background:rgba(201,168,76,.15);border:1px solid var(--gold);border-radius:6px;margin-bottom:6px;line-height:1.4;color:var(--gold2);text-align:left';
-      sv.parentNode.insertBefore(totalStatBar, sv);
+      totalStatBar=document.createElement('div');
+      totalStatBar.id='equipTotalStatBar';
+      totalStatBar.style.cssText='font-size:8px;padding:4px 6px;background:rgba(201,168,76,.15);border:1px solid var(--gold);border-radius:6px;margin-bottom:6px;line-height:1.4;color:var(--gold2);text-align:left';
+      sv.parentNode.insertBefore(totalStatBar,sv);
     }
   }
   if(totalStatBar){
-    totalStatBar.innerHTML = '<b>⚔️ 当前穿戴总属性加成：</b><br>' +
-      '<span style="color:var(--paper)">全伤: <b style="color:var(--jade2)">+' + Math.round((eb.all-1)*100) + '%</b> · ' +
-      '点击: <b style="color:var(--jade2)">+' + Math.round((eb.tap-1)*100) + '%</b> · ' +
-      '道友: <b style="color:var(--jade2)">+' + Math.round((eb.hero-1)*100) + '%</b> · ' +
-      '暴伤: <b style="color:var(--jade2)">+' + Math.round((eb.crit-1)*100) + '%</b> · ' +
-      '金币: <b style="color:var(--jade2)">+' + Math.round((eb.gold-1)*100) + '%</b></span>';
+    totalStatBar.innerHTML='<b>⚔️ 当前穿戴总属性加成：</b><br>'+
+      '<span style="color:var(--paper)">全伤: <b style="color:var(--jade2)">+'+Math.round((eb.all-1)*100)+'%</b> · '+
+      '点击: <b style="color:var(--jade2)">+'+Math.round((eb.tap-1)*100)+'%</b> · '+
+      '道友: <b style="color:var(--jade2)">+'+Math.round((eb.hero-1)*100)+'%</b> · '+
+      '暴伤: <b style="color:var(--jade2)">+'+Math.round((eb.crit-1)*100)+'%</b> · '+
+      '金币: <b style="color:var(--jade2)">+'+Math.round((eb.gold-1)*100)+'%</b></span>';
   }
-  let sv=document.getElementById('equipSlotsView');if(sv)sv.innerHTML=EQUIP_SLOTS.map(s=>{let e=G.equipment[s.id];let setInfo = (e && e.set) ? ('<span class="set-badge">' + (EQUIP_SETS.find(x=>x.id===e.set)||{}).name + '</span>') : '';return'<div class="equip-slot '+(e?'':'empty')+'" title="'+(e?(e.name+'\n'+e.mainStat.name+'+'+numFmt(e.mainStat.val)):'未穿戴')+'">'+(e?'<div class="es-enchant">+'+(e.enchant||0)+'</div>':'')+'<div class="es-icon">'+s.icon+'</div><div class="es-name '+(e?(RARITIES.find(r=>r.id===e.rarity)||RARITIES[0]).cls:'')+'">'+(e?e.name.split('·'):'空')+setInfo+'</div><div class="es-stat">'+(e?e.mainStat.name+'+'+numFmt(e.mainStat.val):'')+'</div></div>'}).join('');
-  let us=document.getElementById('uiShards');if(us)us.textContent=G.craftShards;let inv=document.getElementById('listEquipInv');if(inv)inv.innerHTML='<div style="margin-bottom:4px"><button class="btn-small" onclick="sellAllLow()">🧹 一键分解白蓝</button></div>'+G.equipInv.slice().sort(function(a,b){return (RARITY_ORDER[b.rarity]-RARITY_ORDER[a.rarity])||(b.level-a.level)}).map(e=>{let r=RARITIES.find(x=>x.id===e.rarity)||RARITIES[0];let setName=e.set?(EQUIP_SETS.find(s=>s.id===e.set)||{}).name||'':'';let upCost=10+e.level*5;return'<div class="equip-inv-item"><div class="ei-icon">'+e.icon+'</div><div class="ei-info"><div class="ei-name '+r.cls+'">'+e.name+' Lv.'+e.level+(e.set?'<span class="set-badge">'+setName+'</span>':'')+'</div><div class="ei-stat">'+e.mainStat.name+'+'+numFmt(e.mainStat.val)+(e.subStats.length?' | '+e.subStats.map(s=>s.name+'+'+numFmt(s.val)).join(' '):'')+'</div></div><div style="display:flex;flex-direction:column;gap:5px"><button class="btn-small" onclick="equipItem(\''+e.id+'\')">穿戴</button><button class="btn-small" onclick="upgradeEquip(\''+e.id+'\')" '+(G.craftShards>=upCost?'':'disabled')+'>升级'+upCost+'</button><button class="btn-small" onclick="rerollEquip(\''+e.id+'\')" '+(G.craftShards>=15?'':'disabled')+'>重铸15</button><button class="btn-sell" onclick="sellEquip(\''+e.id+'\')">分解</button></div></div>'}).join('')||'<div style="text-align:center;font-size:9px;color:var(--mist);padding:10px">背包为空</div>';
+  let sv=document.getElementById('equipSlotsView');
+  if(sv)sv.innerHTML=EQUIP_SLOTS.map(s=>{
+    let e=G.equipment[s.id];
+    let setInfo=(e&&e.set)?('<span class="set-badge">'+(EQUIP_SETS.find(x=>x.id===e.set)||{}).name+'</span>':'');
+    let clickAttr=e?' onclick="openEquippedItemMenu(\''+s.id+'\')" style="cursor:pointer"':'';
+    return'<div class="equip-slot '+(e?'':'empty')+'"'+clickAttr+' title="'+(e?(e.name+'\n'+e.mainStat.name+'+'+numFmt(e.mainStat.val)):'未穿戴')+'">'+(e?'<div class="es-enchant">+'+(e.enchant||0)+'</div>':'')+'<div class="es-icon">'+s.icon+'</div><div class="es-name '+(e?(RARITIES.find(r=>r.id===e.rarity)||RARITIES[0]).cls:'')+'">'+(e?e.name.split('·'):'空')+setInfo+'</div><div class="es-stat">'+(e?e.mainStat.name+'+'+numFmt(e.mainStat.val):'')+'</div></div>'
+  }).join('');
+  let us=document.getElementById('uiShards');
+  if(us)us.textContent=G.craftShards;
+  let inv=document.getElementById('listEquipInv');
+  if(inv)inv.innerHTML='<div style="margin-bottom:4px"><button class="btn-small" onclick="sellAllLow()">🧹 一键分解白蓝</button></div>'+G.equipInv.slice().sort(function(a,b){return(RARITY_ORDER[b.rarity]-RARITY_ORDER[a.rarity])||(b.level-a.level)}).map(e=>{
+    let r=RARITIES.find(x=>x.id===e.rarity)||RARITIES[0];
+    let setName=e.set?(EQUIP_SETS.find(s=>s.id===e.set)||{}).name||'':'';
+    let upCost=10+e.level*5;
+    return'<div class="equip-inv-item"><div class="ei-icon">'+e.icon+'</div><div class="ei-info"><div class="ei-name '+r.cls+'">'+e.name+' Lv.'+e.level+(e.set?'<span class="set-badge">'+setName+'</span>':'')+' '+(e.enchant?'<span style="color:#ff9f43">+'+e.enchant+'</span>':'')+'</div><div class="ei-stat">'+e.mainStat.name+'+'+numFmt(e.mainStat.val)+(e.subStats.length?' | '+e.subStats.map(s=>s.name+'+'+numFmt(s.val)).join(' '):'')+'</div></div><div style="display:flex;flex-direction:column;gap:5px"><button class="btn-small" onclick="equipItem(\''+e.id+'\')">穿戴</button><button class="btn-small" onclick="upgradeEquip(\''+e.id+'\')" '+(G.craftShards>=upCost?'':'disabled')+'>升级'+upCost+'</button><button class="btn-small" onclick="rerollEquip(\''+e.id+'\')" '+(G.craftShards>=15?'':'disabled')+'>重铸15</button><button class="btn-sell" onclick="sellEquip(\''+e.id+'\')">分解</button></div></div>'
+  }).join('')||'<div style="text-align:center;font-size:9px;color:var(--mist);padding:10px">背包为空</div>';
 }
-function renderCraft(){let p=document.getElementById('craftPanel');if(!p)return;p.innerHTML='<div style="font-size:8px;padding:4px 6px;background:rgba(201,168,76,.15);border:1px solid var(--gold);border-radius:4px;margin-bottom:6px;color:var(--gold2);text-align:left">🔨 锻造碎片: <b>'+G.craftShards+'</b><br><span style="color:var(--paper);font-size:7.5px">💡 提示：打造获得过即永久点亮图鉴，集齐 5 个不同部位永久激活套装词条！</span></div><div style="font-size:8px;color:var(--gold2);margin-bottom:4px">━━ 神话套 ━━</div>'+EQUIP_SETS.filter(s=>s.tier==='mythic').map(s=>{let cnt=getSetCount(s.id),lvl=getSetLevel(s.id),cost=50+lvl*30;return'<div class="card-row"><div class="c-avatar">'+s.icon+'</div><div class="c-info"><div class="c-title">'+s.name+' <span class="set-badge">'+cnt+'/5</span> Lv.'+lvl+'</div><div class="c-desc">'+s.desc+'</div></div><button class="btn-buy" onclick="craftSet(\''+s.id+'\')" '+(G.craftShards>=80?'':'disabled')+'>锻造(80)</button><button class="btn-small" onclick="upgradeSet(\''+s.id+'\')" style="margin-left:3px" '+(G.craftShards>=cost&&cnt>=5?'':'disabled')+'>升级('+cost+')</button></div>'}).join('')+'<div style="font-size:8px;color:var(--gold2);margin:6px 0 4px">━━ 传说套 ━━</div>'+EQUIP_SETS.filter(s=>s.tier==='legendary').map(s=>{let cnt=getSetCount(s.id),lvl=getSetLevel(s.id),cost=30+lvl*20;return'<div class="card-row"><div class="c-avatar">'+s.icon+'</div><div class="c-info"><div class="c-title">'+s.name+' <span class="set-badge">'+cnt+'/5</span> Lv.'+lvl+'</div><div class="c-desc">'+s.desc+'</div></div><button class="btn-buy" onclick="craftSet(\''+s.id+'\')" '+(G.craftShards>=50?'':'disabled')+'>锻造(50)</button><button class="btn-small" onclick="upgradeSet(\''+s.id+'\')" style="margin-left:3px" '+(G.craftShards>=cost&&cnt>=5?'':'disabled')+'>升级('+cost+')</button></div>'}).join('')}
-function craftSet(setId){let s=EQUIP_SETS.find(x=>x.id===setId);let cost=Math.max(1,Math.floor((s.tier==='mythic'?80:50)*Math.max(0.1,1-a('equipCost'))));if(G.craftShards<cost)return toast('碎片不足(需'+cost+')');G.craftShards-=cost;let slot=EQUIP_SLOTS[Math.floor(Math.random()*EQUIP_SLOTS.length)];let rid=s.tier==='mythic'?'mythic':'legendary';let rarity=RARITIES.find(x=>x.id===rid);let eq={id:Date.now()+Math.random(),slot:slot.id,name:(s.tier==='mythic'?'神话':'传说')+'·'+slot.name,rarity:rid,icon:slot.icon,level:getItemLevel(),mainStat:{type:'all',name:'全伤',val:equipMainVal(slot.id,'all',rarity)},subStats:[{type:'tap',name:'点击',val:equipSubVal(rarity)}],set:setId,enchant:0};G.equipInv.push(eq);playAudio('drop');toast('🔨 锻造【'+s.name+'】部件');renderCraft();renderEquip();checkActivatedSets()}
-function upgradeSet(setId){let s=EQUIP_SETS.find(x=>x.id===setId);if(!isSetComplete(setId))return toast('需集齐5件激活套装');let lvl=getSetLevel(setId);let cost=s.tier==='mythic'?(50+lvl*30):(30+lvl*20);if(G.craftShards<cost)return toast('碎片不足(需'+cost+')');G.craftShards-=cost;if(!G.setLevels)G.setLevels={};G.setLevels[setId]=lvl+1;playAudio('fairy');toast('⬆️ '+s.name+'→Lv.'+(lvl+1));renderCraft();updateUI()}
-function renderEnchant(){let p=document.getElementById('enchantPanel');if(!p)return;p.innerHTML='<div style="font-size:9px;color:var(--mist);margin-bottom:6px">每级主属性+20%，上限5级</div>'+EQUIP_SLOTS.map(function(s){let e=G.equipment[s.id];if(!e)return'<div class="card-row"><div class="c-avatar">'+s.icon+'</div><div class="c-info"><div class="c-title">'+s.name+'(空)</div></div></div>';let cost={gem:20*Math.pow(2,e.enchant||0),shards:10*Math.pow(2,e.enchant||0)};return'<div class="card-row"><div class="c-avatar">'+e.icon+'</div><div class="c-info"><div class="c-title">'+e.name+' +'+(e.enchant||0)+'</div><div class="c-desc">主属性+'+((e.enchant||0)*20)+'%</div></div><button class="btn-buy" onclick="enchantEquip(\''+s.id+'\')" '+(G.gem>=cost.gem&&G.craftShards>=cost.shards&&(e.enchant||0)<5?'':'disabled')+'>+'+((e.enchant||0)+1)+'('+Math.floor(cost.gem)+'💠+'+Math.floor(cost.shards)+'碎)</button></div>'}).join('')}
-function enchantEquip(slot){let e=G.equipment[slot];if(!e)return;let lv=e.enchant||0;if(lv>=5)return toast('已满级');let cost={gem:Math.floor(20*Math.pow(2,lv)),shards:Math.floor(10*Math.pow(2,lv))};if(G.gem<cost.gem)return toast('仙玉不足');if(G.craftShards<cost.shards)return toast('碎片不足');G.gem-=cost.gem;G.craftShards-=cost.shards;e.enchant=lv+1;playAudio('fairy');toast('✨ '+e.name+'→+'+(lv+1));renderEnchant();renderEquip();updateUI()}
+function renderCraft(){
+  let p=document.getElementById('craftPanel');
+  if(!p)return;
+  p.innerHTML='<div style="font-size:8px;padding:4px 6px;background:rgba(201,168,76,.15);border:1px solid var(--gold);border-radius:4px;margin-bottom:6px;color:var(--gold2);text-align:left">'+
+    '🔨 锻造碎片: <b>'+G.craftShards+'</b>'+
+    '<br><span style="color:var(--paper);font-size:7.5px">💡 提示：打造获得过即永久点亮图鉴，集齐5个不同部位永久激活套装词条！升级套装可增强词条效果倍率。</span>'+
+  '</div>'+
+  '<div style="font-size:8px;color:var(--gold2);margin-bottom:4px">━━ 神话套 ━━</div>'+
+  EQUIP_SETS.filter(s=>s.tier==='mythic').map(s=>{
+    let cnt=getSetCount(s.id),lvl=getSetLevel(s.id),cost=50+lvl*30;
+    let curMult=getSetMult(s.id);
+    let nextMult=Math.pow(1+(lvl+1)*0.1,1+0.1*getCPLevel());
+    return'<div class="card-row"><div class="c-avatar">'+s.icon+'</div><div class="c-info">'+
+      '<div class="c-title">'+s.name+' <span class="set-badge">'+cnt+'/5</span> Lv.'+lvl+'</div>'+
+      '<div class="c-desc">'+s.desc+'</div>'+
+      '<div style="font-size:7px;color:var(--jade2);margin-top:2px">📈 当前倍率: ×'+curMult.toFixed(2)+(cnt>=5?'':(' <span style="color:var(--crimson2)">（需集齐5件）</span>'))+'</div>'+
+      (cnt>=5?'<div style="font-size:6.5px;color:var(--gold2)">升级后: ×'+nextMult.toFixed(2)+' (+'+((nextMult-curMult)*100).toFixed(1)+'%)</div>':'')+
+    '</div>'+
+    '<div style="display:flex;flex-direction:column;gap:3px">'+
+      '<button class="btn-buy" onclick="craftSet(\''+s.id+'\')" '+(G.craftShards>=80?'':'disabled')+'>锻造(80)</button>'+
+      '<button class="btn-small" onclick="upgradeSet(\''+s.id+'\')" '+(G.craftShards>=cost&&cnt>=5?'':'disabled')+'>升级('+cost+')</button>'+
+    '</div></div>'
+  }).join('')+
+  '<div style="font-size:8px;color:var(--gold2);margin:6px 0 4px">━━ 传说套 ━━</div>'+
+  EQUIP_SETS.filter(s=>s.tier==='legendary').map(s=>{
+    let cnt=getSetCount(s.id),lvl=getSetLevel(s.id),cost=30+lvl*20;
+    let curMult=getSetMult(s.id);
+    let nextMult=Math.pow(1+(lvl+1)*0.1,1+0.1*getCPLevel());
+    return'<div class="card-row"><div class="c-avatar">'+s.icon+'</div><div class="c-info">'+
+      '<div class="c-title">'+s.name+' <span class="set-badge">'+cnt+'/5</span> Lv.'+lvl+'</div>'+
+      '<div class="c-desc">'+s.desc+'</div>'+
+      '<div style="font-size:7px;color:var(--jade2);margin-top:2px">📈 当前倍率: ×'+curMult.toFixed(2)+(cnt>=5?'':(' <span style="color:var(--crimson2)">（需集齐5件）</span>'))+'</div>'+
+      (cnt>=5?'<div style="font-size:6.5px;color:var(--gold2)">升级后: ×'+nextMult.toFixed(2)+' (+'+((nextMult-curMult)*100).toFixed(1)+'%)</div>':'')+
+    '</div>'+
+    '<div style="display:flex;flex-direction:column;gap:3px">'+
+      '<button class="btn-buy" onclick="craftSet(\''+s.id+'\')" '+(G.craftShards>=50?'':'disabled')+'>锻造(50)</button>'+
+      '<button class="btn-small" onclick="upgradeSet(\''+s.id+'\')" '+(G.craftShards>=cost&&cnt>=5?'':'disabled')+'>升级('+cost+')</button>'+
+    '</div></div>'
+  }).join('')
+}
+  function enchantEquip(slot){let e=G.equipment[slot];if(!e)return;let lv=e.enchant||0;if(lv>=5)return toast('已满级');let cost={gem:Math.floor(20*Math.pow(2,lv)),shards:Math.floor(10*Math.pow(2,lv))};if(G.gem<cost.gem)return toast('仙玉不足');if(G.craftShards<cost.shards)return toast('碎片不足');G.gem-=cost.gem;G.craftShards-=cost.shards;e.enchant=lv+1;playAudio('fairy');toast('✨ '+e.name+'→+'+(lv+1));renderEnchant();renderEquip();updateUI()}
 /* ===== 宗门系统 ===== */
 const CLAN_BUILDINGS=[{id:'forge',name:'炼器阁',icon:'🔨',desc:'装备掉落率+品质',effect:lv=>'掉落+'+(lv*1)+'% 品质+'+(lv*0.5)+'%'},{id:'park',name:'灵兽苑',icon:'🥚',desc:'蛋速度+上限',effect:lv=>'蛋速+'+(lv*1.5)+'% 上限+'+(10+lv*0.2).toFixed(0)},{id:'library',name:'藏经阁',icon:'📖',desc:'技能消耗-持续+',effect:lv=>'消耗-'+(lv*0.5)+'% 持续+'+(lv*0.3)+'%'},{id:'arena',name:'演武场',icon:'⚔️',desc:'道友DPS+',effect:lv=>'道友+'+(lv*1.5)+'%'}];
 function renderClan(){document.getElementById('uiClanLvl').textContent=G.clanLevel;document.getElementById('clanLvlText').textContent='Lv.'+G.clanLevel;document.getElementById('clanLvlEffect').textContent='玄舟+'+(G.clanLevel*3)+'% 全伤+'+(G.clanLevel*0.5)+'%';let cc=Math.floor(20*Math.pow(1.5,G.clanLevel));let btn=document.getElementById('clanLvlBtn');if(btn){btn.textContent=G.clanLevel>=30?'满级':cc+'💠';btn.disabled=G.clanLevel>=30||G.gem<cc}let bc=document.getElementById('clanBuildings');if(bc)bc.innerHTML=CLAN_BUILDINGS.map(b=>{let lv=G.clanBuildings[b.id]||0,cost=Math.floor(15*Math.pow(1.4,lv)),max=b.id==='park'?15:20;return'<div class="clan-building"><div class="cb-icon">'+b.icon+'</div><div class="cb-info"><div class="cb-name">'+b.name+' Lv.'+lv+'</div><div class="cb-effect">'+b.effect(lv)+'</div></div><button class="btn-buy" onclick="upgradeBuilding(\''+b.id+'\')" '+(lv>=max||G.gem<cost?'disabled':'')+'>'+(lv>=max?'满级':cost+'💠')+'</button></div>'}).join('');document.getElementById('shipLvlText').textContent='Lv.'+G.shipReloadLvl;document.getElementById('shipLvlEffect').textContent='间隔'+getShipInterval().toFixed(1)+'秒';let sc=Math.floor(30*Math.pow(1.6,G.shipReloadLvl));let sb=document.getElementById('shipLvlBtn');if(sb){sb.textContent=G.shipReloadLvl>=13?'满级':sc+'💠';sb.disabled=G.shipReloadLvl>=13||G.gem<sc}}
@@ -2111,7 +2266,6 @@ function updateUI(){
   // 技能栏渲染
   renderSkillBar();
   }
-let _skillBarCache='';
 function renderSkillBar(){
   let bar=document.getElementById('skillBar');
   if(!bar)return;
@@ -2134,12 +2288,8 @@ function renderSkillBar(){
       (act>0?'<div class="s-active-line"></div>':'')+
     '</div>';
   }).join('');
-  if(html===_skillBarCache)return;
-  _skillBarCache=html;
   bar.innerHTML=html;
 }
-
-
 // 缺失函数补全
 function updateModeBadges(){
   let ba=getBattleArea();if(!ba)return;
