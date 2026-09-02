@@ -835,7 +835,12 @@ function isSetComplete(setId){return G.activatedSets[setId]===true}
 function getSetLevel(setId){return G.setLevels?G.setLevels[setId]||0:0}
 function getEnchantBonus(){let sb=getSetBonus();if(sb.enchantDmgPer<=0)return 1;let count=0;['weapon','head','robe','aura','slash'].forEach(s=>{if(G.equipment[s]&&(G.equipment[s].enchant||0)>0)count++});return 1+count*sb.enchantDmgPer*sb.enchantMult}
 function getTotalSpNeeded(){let total=0;TALENT_TREES.forEach(t=>t.tiers.forEach(tr=>tr.skills.forEach(s=>{for(let i=0;i<s.max;i++)total+=getSkillSpCost(s,i)})));return total}
-function getArtifactCost(art,level){let lv=new BN(level);return new BN(art.costC).mul(lv.pow(art.costE))}
+function getArtifactCost(art,level){
+  let lv = new BN(level);
+  // TT2官方标准：暗影之书(relicGain)指数为2.0，其余102件法宝全部为1.5，升级手感极其平滑
+  let exp = (art.fx === 'relicGain') ? 2.0 : 1.5;
+  return new BN(art.costC).mul(lv.pow(exp));
+}
 function getArtifactEffect(art){
   if(!art||art.effB===undefined)return new BN(0);
   let lv=G.artifacts[art.id];
@@ -997,7 +1002,8 @@ function getHeroDPS(){
       if(h.loc === 'flying') extraMult += artFlyShip;
       if(h.loc === 'ground') extraMult += artGround;
       // 每次飞升提供 10^30 倍的独立输出跃升
-      var ascMult = asc > 0 ? new BN(10).pow(asc * 30) : new BN(1);
+     // TT2 官方标准进化：每转提供 2,000 倍基础质变提升，既有质变爽感，又绝不数值崩坏
+var ascMult = asc > 0 ? new BN(2000).pow(asc) : new BN(1);
       var d = new BN(h.dps).mul(ascMult).mul(getHeroLevelMult(lv)).mul(typeMult).mul(extraMult);
       total = total.add(d);
     }
@@ -2832,7 +2838,7 @@ async function cloudLoad(){
 
 async function submitScore(){
   if(!G.cloudName) return;
-  // 核心保险：如果关卡超过当前版本上限（1500），强制纠正为1500，绝不允许6000层上榜！
+  // 【物理天花板硬锁】：关卡只要大于 1500，强制纠偏为 1500，绝不允许 6000 层上榜！
   if((G.maxStage || 1) > 1500){
     G.maxStage = 1500;
     G.stage = Math.min(G.stage || 1500, 1500);
@@ -2862,7 +2868,6 @@ async function submitScore(){
     }
   }catch(e){}
 }
-
 async function loadTourney(){
   document.getElementById('uiMyCloudName').textContent = G.cloudName || '未绑定';
   let myP = document.getElementById('uiMyPower');
