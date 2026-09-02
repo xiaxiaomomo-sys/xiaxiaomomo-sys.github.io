@@ -337,8 +337,20 @@ class BN{constructor(m=0,e=0){if(m instanceof BN){this.m=m.m;this.e=m.e;return}i
 /* ===== 法宝修复补丁辅助函数 ===== */
 function bn2n(bn){return(bn&&bn.m)?bn.m*Math.pow(10,bn.e):0}
 function a(fx){return bn2n(getArtifactMult(fx))}
-const REALMS=[{name:'炼气期',stage:0},{name:'筑基期',stage:50},{name:'金丹期',stage:150},{name:'元婴期',stage:300},{name:'化神期',stage:500},{name:'炼虚期',stage:750},{name:'合体期',stage:1050},{name:'大乘期',stage:1400},{name:'渡劫期',stage:1800},{name:'真仙境',stage:2250},{name:'金仙境',stage:2750},{name:'太乙境',stage:3300},{name:'大罗境',stage:3900},{name:'道祖境',stage:4550},{name:'混沌境',stage:5250}];
-const SKILLS=[{id:0,name:'九天神雷',icon:'⚡',baseCost:15,cd:30,dur:0,type:'hs',unlockLv:1,desc:'极灭神雷，巨额伤害+飞跃5层'},{id:1,name:'诛仙剑意',icon:'🗡️',baseCost:20,cd:90,dur:30,type:'ds',unlockLv:100,desc:'剑阵开启，致命几率+倍率'},{id:2,name:'造化金手',icon:'✋',baseCost:25,cd:120,dur:30,type:'hom',unlockLv:150,desc:'点金诀，点击与掉落+500%'},{id:3,name:'赤焰剑罡',icon:'🔥',baseCost:30,cd:90,dur:30,type:'fs',unlockLv:200,desc:'真火附魔，点击伤害+400%'},{id:4,name:'万仙战吼',icon:'📢',baseCost:35,cd:90,dur:30,type:'wc',unlockLv:150,desc:'斗志激发，道友攻速+玄舟翻倍'},{id:5,name:'身外化身',icon:'👥',baseCost:40,cd:120,dur:30,type:'sc',unlockLv:50,desc:'真灵分身，20次/秒自动狂斩'}];
+const REALMS=[
+  // ===== 凡界凡人期 (0 ~ 1,400层) =====
+  {name:'炼气期',stage:0},{name:'筑基期',stage:50},{name:'金丹期',stage:150},{name:'元婴期',stage:300},
+  {name:'化神期',stage:500},{name:'炼虚期',stage:750},{name:'合体期',stage:1050},{name:'大乘期',stage:1400},
+  // ===== 仙界飞升期 (1,800 ~ 5,250层) =====
+  {name:'渡劫期',stage:1800},{name:'真仙境',stage:2250},{name:'金仙境',stage:2750},{name:'太乙境',stage:3300},
+  {name:'大罗境',stage:3900},{name:'道祖境',stage:4550},{name:'混沌境',stage:5250},
+  // ===== 洪荒无上期 (7,000 ~ 30,000层) =====
+  {name:'鸿蒙初期',stage:7000},{name:'鸿蒙大圆满',stage:10000},{name:'造化仙王',stage:14000},
+  {name:'混元金仙',stage:19000},{name:'混元无极圣人',stage:25000},{name:'无量合道境',stage:32000},
+  // ===== 宇宙永恒期 (40,000 ~ 100,000层) =====
+  {name:'无上天道境',stage:42000},{name:'万界至尊',stage:55000},{name:'鸿蒙掌控者',stage:70000},
+  {name:'源初混沌神',stage:85000},{name:'无极永恒至尊',stage:100000}
+];const SKILLS=[{id:0,name:'九天神雷',icon:'⚡',baseCost:15,cd:30,dur:0,type:'hs',unlockLv:1,desc:'极灭神雷，巨额伤害+飞跃5层'},{id:1,name:'诛仙剑意',icon:'🗡️',baseCost:20,cd:90,dur:30,type:'ds',unlockLv:100,desc:'剑阵开启，致命几率+倍率'},{id:2,name:'造化金手',icon:'✋',baseCost:25,cd:120,dur:30,type:'hom',unlockLv:150,desc:'点金诀，点击与掉落+500%'},{id:3,name:'赤焰剑罡',icon:'🔥',baseCost:30,cd:90,dur:30,type:'fs',unlockLv:200,desc:'真火附魔，点击伤害+400%'},{id:4,name:'万仙战吼',icon:'📢',baseCost:35,cd:90,dur:30,type:'wc',unlockLv:150,desc:'斗志激发，道友攻速+玄舟翻倍'},{id:5,name:'身外化身',icon:'👥',baseCost:40,cd:120,dur:30,type:'sc',unlockLv:50,desc:'真灵分身，20次/秒自动狂斩'}];
 const HERO_NAMES=['青云小童','采药药童','执剑游侠','伏虎武僧','天音仙子','御剑散修','紫阳真人','托塔天将','落霞仙姑','太乙金仙','纯阳剑仙','广寒仙子','九天玄女','真武大帝','赤脚大仙','南极仙翁','托塔李天王','二郎真君','三坛海会','齐天大圣','地藏尊者','菩提祖师','镇元大仙','灵宝天尊','元始天尊','道德天尊','娲皇圣母','伏羲人皇','神农炎帝','轩辕黄帝','东皇太一','帝俊妖皇','十二祖巫','通天教主','鸿钧道祖','盘古大神','混沌之主'];
 const HERO_ICONS=['👦','🌿','⚔️','🥋','🪕','🗡️','🧙','🛡️','🧚','🌟','⚡','🌙','🦚','🐢','👣','🍑','👑','👁️','🔥','🐵','🧘','🎋','🍃','📜','🔯','☯️','🐍','🐉','🌾','🗡️','☀️','🦅','🗿','⚔️','🌌','🪓','☸️'];
 // TT2英雄被动3档: Lv20/Lv50/Lv1000 (Lv1000大被动)
@@ -1846,30 +1858,48 @@ function upgradeBuilding(id){let b=CLAN_BUILDINGS.find(x=>x.id===id),lv=G.clanBu
 function upgradeShipReload(){if(G.shipReloadLvl>=13)return;let cost=Math.floor(30*Math.pow(1.6,G.shipReloadLvl));if(G.gem<cost)return toast('仙玉不足');G.gem-=cost;G.shipReloadLvl++;playAudio('fairy');toast('玄舟装填→Lv.'+G.shipReloadLvl);renderClan();updateUI()}
 /* ===== 渡劫 ===== */
 function checkStageMilestones(){
-  let oldMax=G.maxStage;
-  if(G.stage>oldMax){
-    G.maxStage=G.stage;
-    if(!G.spMilestones)G.spMilestones={};
-    let gained=0;
-    if(G.maxStage%20===0&&!G.spMilestones['s'+G.maxStage]){
-      G.spMilestones['s'+G.maxStage]=1;
-      gained+=1; // 每20层+1SP
+  let oldMax = G.maxStage || 1;
+  let cur = G.stage || 1;
+  if(cur > oldMax){
+    G.maxStage = cur;
+    if(!G.spMilestones) G.spMilestones = {};
+    let gained = 0;
+    
+    // 【防跳关漏领】：检查 oldMax 到当前关卡之间所有被跳过的 20 层里程碑
+    let start20 = Math.floor(oldMax / 20) * 20 + 20;
+    for(let ms = start20; ms <= cur; ms += 20){
+      if(!G.spMilestones['s' + ms]){
+        G.spMilestones['s' + ms] = 1;
+        gained += 1;
+      }
     }
-    if(G.maxStage%500===0&&!G.spMilestones['m'+G.maxStage]){
-      G.spMilestones['m'+G.maxStage]=1;
-      gained+=3; // 逢500层额外+3SP
+    // 检查 500 层大里程碑 (+3 SP)
+    let start500 = Math.floor(oldMax / 500) * 500 + 500;
+    for(let ms = start500; ms <= cur; ms += 500){
+      if(!G.spMilestones['m' + ms]){
+        G.spMilestones['m' + ms] = 1;
+        gained += 3;
+      }
     }
-    if(G.maxStage%1000===0&&!G.spMilestones['k'+G.maxStage]){
-      G.spMilestones['k'+G.maxStage]=1;
-      gained+=5; // 逢1000层额外+5SP
+    // 检查 1000 层超级里程碑 (+5 SP)
+    let start1000 = Math.floor(oldMax / 1000) * 1000 + 1000;
+    for(let ms = start1000; ms <= cur; ms += 1000){
+      if(!G.spMilestones['k' + ms]){
+        G.spMilestones['k' + ms] = 1;
+        gained += 5;
+      }
     }
-    if(gained>0){
-      G.sp+=gained;
-      toast('🌟 里程碑！到达'+G.maxStage+'层 +'+gained+'SP');
+    
+    if(gained > 0){
+      G.sp += gained;
+      toast('🌟 突破里程碑！到达第 ' + cur + ' 层，获得 +' + gained + ' SP！');
+      updateUI();
+      renderTalents();
     }
   }
 }
-  function doPrestige(){
+
+function doPrestige(){
   let cur = G.stage || 1;
   let start = G.prestigeStartStage || 1;
   let minReq = start + 15;
@@ -2324,6 +2354,37 @@ function loadGame(){
         }
       }
       migrateLegacyEquip();
+
+      // ===== 自动补发因跳关漏领的所有历史 SP 里程碑 =====
+      if(!G.spMilestones) G.spMilestones = {};
+      let autoCompensateSp = 0;
+      for(let ms = 20; ms <= (G.maxStage || 1); ms += 20){
+        if(!G.spMilestones['s' + ms]){
+          G.spMilestones['s' + ms] = 1;
+          autoCompensateSp += 1;
+        }
+      }
+      for(let ms = 500; ms <= (G.maxStage || 1); ms += 500){
+        if(!G.spMilestones['m' + ms]){
+          G.spMilestones['m' + ms] = 1;
+          autoCompensateSp += 3;
+        }
+      }
+      for(let ms = 1000; ms <= (G.maxStage || 1); ms += 1000){
+        if(!G.spMilestones['k' + ms]){
+          G.spMilestones['k' + ms] = 1;
+          autoCompensateSp += 5;
+        }
+      }
+      if(autoCompensateSp > 0){
+        G.sp += autoCompensateSp;
+        setTimeout(()=>{
+          toast('🎁 已为您自动补发历史关卡跳过的 ' + autoCompensateSp + ' 点 SP！');
+          updateUI();
+          renderTalents();
+        }, 1500);
+      }
+
       if(!G.activatedSets) G.activatedSets = {};
       if(!G.masterLevel) G.masterLevel = 1;
       checkActivatedSets();
@@ -2351,9 +2412,9 @@ function loadGame(){
       }
       G.lastTick = Date.now();
 
-      // ===== 【天道自愈】：修正暗影之书与超标层数，发放 1000 仙玉 + 20 SP 全员大礼包 =====
-      if(!G.v82_rebalance_fixed){
-        G.v82_rebalance_fixed = true;
+      // ===== 【天道全量自愈 v2】：修正全部超标法宝、蓝量与层数，发放 1000 仙玉 + 20 SP 全员大礼包 =====
+      if(!G.v82_rebalance_fixed_v2){
+        G.v82_rebalance_fixed_v2 = true;
         
         // 1. 关卡与装备等级安全收敛：将超过 1500 层的异常数据平滑校准至第一梯队合理线（1500层）
         const FAIR_MAX_STAGE = 1500;
@@ -2379,13 +2440,18 @@ function loadGame(){
         ['weapon','head','robe','aura','slash'].forEach(s => compressItem(G.equipment[s]));
         (G.equipInv || []).forEach(compressItem);
 
-        // 3. 智能压缩暗影之书到健康上限（1500 级）
-        let maxHealthyBos = Math.max(10, Math.floor((G.maxStage || 1) * 1.5));
-        if(G.artifacts && G.artifacts['art_25']){
-          let bosLv = G.artifacts['art_25'];
-          let cur = (typeof bosLv === 'number') ? bosLv : (bosLv.m * Math.pow(10, bosLv.e || 0));
-          if(cur > maxHealthyBos){
-            G.artifacts['art_25'] = new BN(maxHealthyBos);
+        // 3. 【全量法宝大自愈】：自动遍历并压缩全部 103 件无上限法宝到安全健康上限（2,250 级）
+        let maxHealthyArtLevel = Math.max(50, Math.floor((G.maxStage || 1) * 1.5));
+        if(G.artifacts){
+          for(let id in G.artifacts){
+            let artDef = ART_POOL.find(x => x.id === id);
+            if(artDef && artDef.max === -1){ // 只对无上限法宝生效，绝不影响有上限法宝
+              let lv = G.artifacts[id];
+              let cur = (typeof lv === 'number') ? lv : (lv.m * Math.pow(10, lv.e || 0));
+              if(cur > maxHealthyArtLevel){
+                G.artifacts[id] = new BN(maxHealthyArtLevel);
+              }
+            }
           }
         }
         
@@ -2393,7 +2459,7 @@ function loadGame(){
         let healthyRelic = Math.floor(Math.pow(Math.max(1, (G.maxStage || 1) - 75) / 14, 3) * 10);
         G.relic = new BN(healthyRelic);
         
-        // 5. 自动将暴走的蓝量拉回健康上限
+        // 5. 自动将暴走的蓝量拉回健康上限 (1000~2000)
         G.mana = Math.min(G.mana || 100, getMaxMana());
 
         // 6. 重置道友飞升阶数，按 10000 级新规则统一起跑
@@ -2404,7 +2470,7 @@ function loadGame(){
         G.sp = (G.sp || 0) + 20;
         
         setTimeout(()=>{
-          toast('📜 天道重归清明：已修复暗影之书异象，特为全员发放 1000 仙玉 + 20 SP 天道补偿！');
+          toast('📜 天道重归清明：已修复全部法宝异象，特为全员发放 1000 仙玉 + 20 SP 天道补偿！');
           updateUI();
           renderArtifacts();
           renderHeroes();
