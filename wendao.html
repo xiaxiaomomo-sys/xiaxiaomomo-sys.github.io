@@ -1973,7 +1973,7 @@ function renderEquip(){
   let sv=document.getElementById('equipSlotsView');
   if(sv)sv.innerHTML=EQUIP_SLOTS.map(s=>{
     let e=G.equipment[s.id];
-    let setInfo=(e&&e.set)?('<span class="set-badge">'+(EQUIP_SETS.find(x=>x.id===e.set)||{}).name+'</span>':'');
+    let setInfo=(e&&e.set)?'<span class="set-badge">'+(EQUIP_SETS.find(x=>x.id===e.set)||{}).name+'</span>':'';
     let clickAttr=e?' onclick="openEquippedItemMenu(\''+s.id+'\')" style="cursor:pointer"':'';
     return'<div class="equip-slot '+(e?'':'empty')+'"'+clickAttr+' title="'+(e?(e.name+'\n'+e.mainStat.name+'+'+numFmt(e.mainStat.val)):'未穿戴')+'">'+(e?'<div class="es-enchant">+'+(e.enchant||0)+'</div>':'')+'<div class="es-icon">'+s.icon+'</div><div class="es-name '+(e?(RARITIES.find(r=>r.id===e.rarity)||RARITIES[0]).cls:'')+'">'+(e?e.name.split('·'):'空')+setInfo+'</div><div class="es-stat">'+(e?e.mainStat.name+'+'+numFmt(e.mainStat.val):'')+'</div></div>'
   }).join('');
