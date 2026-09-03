@@ -1374,7 +1374,8 @@ function spawnFairy(){
     }
     updateUI();
   };
-}function triggerHeartOfGold(){if(!G.hogReady)return;G.hogReady=false;G.hogTimer=30;let r=getGoldDrop(G.stage,true).mul(8*getTalentEffect('k7')).mul(new BN(1).add(getArtifactMult('petGold')));G.stone=G.stone.add(r);let t=document.getElementById('petTip');if(t)t.style.display='none';let c=document.getElementById('petCompanion');if(c)c.classList.remove('hog-ready');playAudio('fairy');toast('🦊 聚宝+'+r.format())}
+}
+function triggerHeartOfGold(){if(!G.hogReady)return;G.hogReady=false;G.hogTimer=30;let r=getGoldDrop(G.stage,true).mul(8*getTalentEffect('k7')).mul(new BN(1).add(getArtifactMult('petGold')));G.stone=G.stone.add(r);let t=document.getElementById('petTip');if(t)t.style.display='none';let c=document.getElementById('petCompanion');if(c)c.classList.remove('hog-ready');playAudio('fairy');toast('🦊 聚宝+'+r.format())}
 /* ===== 技能系统 ===== */
 function getHeroTotalLevel(){let t=0;for(let i=0;i<HEROES.length;i++)t+=G.heroLevels[i]||0;return t}
 function getSkillUnlocked(id){return getHeroTotalLevel()>=(SKILLS[id]||{}).unlockLv||0}
@@ -1806,7 +1807,7 @@ function hatchAllPetEggs(){if(G.petEggs<=0)return toast('无灵兽蛋');let c=G.
 function instantHatch(){let cost=80;if(G.gem<cost)return toast('仙玉不足(需'+cost+')');let pool=getHatchPool();if(pool.length===0)return toast('全宠物已满级');G.gem-=cost;let p=pool[Math.floor(Math.random()*pool.length)];let addLv=1+Math.floor(Math.random()*5);G.pets[p.id]=(G.pets[p.id]||0)+addLv;G.dailyHatches=(G.dailyHatches||0)+1;playAudio('hatch');toast('💠 购买成功！【'+p.name+'】+'+addLv+'级（当前Lv.'+G.pets[p.id]+'）');renderPets();updateUI()}
 function rerollHatch(){if(!G.lastHatchPet)return toast('无可重随');if(G.hatchRerollCount>=2)return toast('每颗最多重随2次');if(G.gem<10)return toast('仙玉不足(需10)');G.gem-=10;G.hatchRerollCount++;G.pets[G.lastHatchPet]--;let pool=getHatchPool();if(pool.length===0){G.gem+=10;toast('全宠物满级');return}let p=pool[Math.floor(Math.random()*pool.length)];G.pets[p.id]=(G.pets[p.id]||0)+1;G.lastHatchPet=p.id;playAudio('hatch');toast('🔄 重随→【'+p.name+'】');renderPets();updateUI()}
 function renderPets(){let eggCap = Math.floor(getClanBonus().eggCap);
-let ec=document.getElementById('uiEggCount');if(ec)ec.textContent=G.petEggs+'/'+eggCap;let h=Math.floor(G.petEggTimer/3600),m=Math.floor((G.petEggTimer%3600)/60),s=Math.floor(G.petEggTimer%60);let te=document.getElementById('uiEggTimer');if(te)te.textContent=h.toString().padStart(2,'0')+':'+m.toString().padStart(2,'0')+':'+s.toString().padStart(2,'0');let list=document.getElementById('listPets');if(!list)return;list.innerHTML='<div style="display:flex;gap:4px;margin-bottom:6px"><button class="btn-buy" style="flex:1" onclick="hatchPetEgg()">🥚 孵化灵兽蛋</button><button class="btn-buy" style="flex:1;background:rgba(201,168,76,.2);border:1px solid var(--gold);color:var(--gold2)" onclick="hatchAllPetEggs()">⚡ 全部孵化</button><button class="btn-buy" style="flex:1;background:linear-gradient(145deg,#c4a0ff,#7b5ea7);color:#fff" onclick="instantHatch()">💠 仙玉抽取(80💠,随机1-5级)</button></div>'+PETS.map(p=>{let lv=G.pets[p.id]||0,owned=lv>0,act=G.activePet===p.id,asc=lv>=100,let passivePct=lv>=100?100:(lv>=50?10:5);return'<div class="card-row"><div class="c-avatar" style="opacity:'+(owned?1:.3)+'">'+p.icon+'</div><div class="c-info"><div class="c-title">'+(owned?p.name:'🔒 ???')+' <span style="font-size:7px;color:var(--gold2)">Lv.'+lv+'</span> '+(act?'⭐':'')+'</div><div class="c-desc">'+(owned?p.desc+' (+'+(p.val*lv*100).toFixed(0)+'%)':'未获得')+'</div><div class="c-stat" style="font-size:6px;color:'+(act?'var(--jade2)':'var(--mist)')+'">'+(act?'⭐出战中·100%生效':'被动'+passivePct.toFixed(0)+'%生效(Lv5解锁·每5级+5%)')+(asc?' ·🌟觉醒':'')+'</div></div><button class="btn-buy" onclick="G.activePet='+p.id+';renderPets();updateUI()" '+(owned?'':'disabled')+'>'+(act?'出战':'选择')+'</button></div>'}).join('')+(G.lastHatchPet?'<div style="text-align:center;margin-top:5px"><button class="btn-buy" onclick="rerollHatch()">🔄 重随上次结果(10💠,剩'+(2-G.hatchRerollCount)+'次)</button></div>':'')}
+let ec=document.getElementById('uiEggCount');if(ec)ec.textContent=G.petEggs+'/'+eggCap;let h=Math.floor(G.petEggTimer/3600),m=Math.floor((G.petEggTimer%3600)/60),s=Math.floor(G.petEggTimer%60);let te=document.getElementById('uiEggTimer');if(te)te.textContent=h.toString().padStart(2,'0')+':'+m.toString().padStart(2,'0')+':'+s.toString().padStart(2,'0');let list=document.getElementById('listPets');if(!list)return;list.innerHTML='<div style="display:flex;gap:4px;margin-bottom:6px"><button class="btn-buy" style="flex:1" onclick="hatchPetEgg()">🥚 孵化灵兽蛋</button><button class="btn-buy" style="flex:1;background:rgba(201,168,76,.2);border:1px solid var(--gold);color:var(--gold2)" onclick="hatchAllPetEggs()">⚡ 全部孵化</button><button class="btn-buy" style="flex:1;background:linear-gradient(145deg,#c4a0ff,#7b5ea7);color:#fff" onclick="instantHatch()">💠 仙玉抽取(80💠,随机1-5级)</button></div>'+PETS.map(p=>{let lv=G.pets[p.id]||0,owned=lv>0,act=G.activePet===p.id,asc=lv>=100,passivePct=lv>=100?100:(lv>=50?10:5);return'<div class="card-row"><div class="c-avatar" style="opacity:'+(owned?1:.3)+'">'+p.icon+'</div><div class="c-info"><div class="c-title">'+(owned?p.name:'🔒 ???')+' <span style="font-size:7px;color:var(--gold2)">Lv.'+lv+'</span> '+(act?'⭐':'')+'</div><div class="c-desc">'+(owned?p.desc+' (+'+(p.val*lv*100).toFixed(0)+'%)':'未获得')+'</div><div class="c-stat" style="font-size:6px;color:'+(act?'var(--jade2)':'var(--mist)')+'">'+(act?'⭐出战中·100%生效':'被动'+passivePct.toFixed(0)+'%生效(Lv5解锁·每5级+5%)')+(asc?' ·🌟觉醒':'')+'</div></div><button class="btn-buy" onclick="G.activePet='+p.id+';renderPets();updateUI()" '+(owned?'':'disabled')+'>'+(act?'出战':'选择')+'</button></div>'}).join('')+(G.lastHatchPet?'<div style="text-align:center;margin-top:5px"><button class="btn-buy" onclick="rerollHatch()">🔄 重随上次结果(10💠,剩'+(2-G.hatchRerollCount)+'次)</button></div>':'')}
 /* ===== 装备系统 ===== */
 const EQUIP_SLOTS=[{id:'weapon',name:'飞剑',icon:'🗡️'},{id:'head',name:'法冠',icon:'👑'},{id:'robe',name:'道袍',icon:'🥋'},{id:'aura',name:'灵光',icon:'✨'},{id:'slash',name:'剑佩',icon:'📿'}];
 const STAT_TYPES=[{type:'tap',name:'点击'},{type:'hero',name:'道友'},{type:'ship',name:'玄舟'},{type:'all',name:'全伤'},{type:'crit',name:'暴伤'},{type:'gold',name:'金币'},{type:'mana',name:'灵力'}];
@@ -2844,10 +2845,10 @@ async function cloudLoad(){
 
 async function submitScore(){
   if(!G.cloudName) return;
-  // 【物理天花板硬锁】：关卡只要大于 1500，强制纠偏为 1500，绝不允许 6000 层上榜！
-  if((G.maxStage || 1) > 1500){
-    G.maxStage = 1500;
-    G.stage = Math.min(G.stage || 1500, 1500);
+  // 放开正常冲榜：仅拦截大于 100,000 层的离谱数据，正常打到 2000、3000、5000 层完全不受限！
+  if((G.maxStage || 1) > 100000){
+    G.maxStage = 100000;
+    G.stage = Math.min(G.stage || 100000, 100000);
   }
   let power = getPlayerTotalPower();
   try{
@@ -2857,7 +2858,7 @@ async function submitScore(){
       await fetch(SUPABASE_URL + '/rest/v1/wendao_leaderboard?player_name=eq.' + encodeURIComponent(G.cloudName), {
         method: 'PATCH',
         headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ max_stage: Math.min(1500, G.maxStage), power: power, updated_at: Date.now() })
+        body: JSON.stringify({ max_stage: G.maxStage, power: power, updated_at: Date.now() })
       });
     } else {
       await fetch(SUPABASE_URL + '/rest/v1/wendao_leaderboard', {
@@ -2866,7 +2867,7 @@ async function submitScore(){
         body: JSON.stringify({
           id: 'lb_' + G.cloudName + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
           player_name: G.cloudName,
-          max_stage: Math.min(1500, G.maxStage),
+          max_stage: G.maxStage,
           power: power,
           updated_at: Date.now()
         })
